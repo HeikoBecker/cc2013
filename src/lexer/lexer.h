@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_set>
+#include "../pos.h"
 
 class Token;
 
@@ -22,7 +23,7 @@ enum TokenType {
 class Lexer
 {
 	public:
-		Lexer(FILE* f);
+		Lexer(FILE* f, char const *name);
 		std::vector<Token> lex();
 		enum SearchedDelimeter {
 			WHITESPACE = 0,
@@ -31,8 +32,24 @@ class Lexer
 		};
 
 	private:
+		int current;
+		Pos posinfo;
 		FILE* source;	
 		static std::unordered_set<std::string> keywords;
+		/* returns true iff it could consume a Punctuator */
+		bool consumePunctuator();
+		/* returns true iff it could consume a comment */
+		bool consumeComment();
+};
+
+class Token
+{
+	public:
+		Token(TokenType type, Pos posinfo); 
+		TokenType type() {return this->m_type;}
+	private:
+		const TokenType m_type;
+		const Pos m_posinfo; 
 };
 
 #endif
