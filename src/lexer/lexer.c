@@ -13,8 +13,21 @@ bool Lexer::consumePunctuator() {
 	return false;
 }
 
-bool consumeComment() {
+bool Lexer::consumeComment() {
 	ABORT;
+	if (current == '/') {
+		int next = fgetc(source);
+		if ((next != EOF)) {
+			if (next == '*') {
+				//found old-style coment
+				// consume until */
+			} else if (next == '/') {
+				// found new-style comment
+				// consume until newline
+			}
+		}
+		ungetc(next, source);
+	}
 	return false;
 }
 

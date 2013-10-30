@@ -26,7 +26,7 @@ class Lexer
 		Lexer(FILE* f, char const *name);
 		std::vector<Token> lex();
 		enum SearchedDelimeter {
-			WHITESPACE = 0,
+		,	WHITESPACE = 0,
 			SINGLEQUOTE = 1,
 			DOUBLEQUOTE = 2,
 		};
