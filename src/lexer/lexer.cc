@@ -5,12 +5,12 @@
 
 #define ABORT do {throw std::exception();} while (false)
 
-
 /*TODO:
  * + write a wrapper around fgetc which takes care of handling line and column
  * number
  * + too many while loops with too much EOF checking
  */
+using namespace Lexing;
 
 const auto Lexer::punctuators  = std::unordered_set<std::string> {{
 	"[", "]", "(", ")", "{", "}", ".", "->", "++", "--", "&", "*",
@@ -71,7 +71,6 @@ Token::Token(TokenType type, Pos posinfo): m_type(type), m_posinfo(posinfo) {}
 
 bool Lexer::consumePunctuator() {
 	#define MAXOPLENGTH 3
-	ABORT;
 	auto count_matches = 0;
 	auto partial = std::string(1, static_cast<unsigned char>(current));
 	//TODO: can be done in a more efficient way by checking which operators can
@@ -101,7 +100,6 @@ bool Lexer::consumePunctuator() {
 }
 
 bool Lexer::consumeComment() {
-	ABORT;
 	if (current == '/') {
 		int next = fgetc(source);
 		if ((next != EOF)) {
@@ -149,11 +147,7 @@ std::vector<Token> Lexer::lex() {
 		std::stringstream curword;
 		bool sawAlpha = false;
 		bool sawNumber = false;
-		while ((current = fgetc(source) != EOF), ++posinfo.column) {
-				/*if ((current == '\'' && delim == SINGLEQUOTE ) ||*/
-				/*(current == '\"' && delim == DOUBLEQUOTE)) {*/
-				/*// found string literal or character constant*/
-				/*}*/
+		while ((current = fgetc(source) != EOF)) {
 				if (delim != WHITESPACE) {
 						if (current == '\\') {
 								//start of escape sequence
@@ -163,26 +157,17 @@ std::vector<Token> Lexer::lex() {
 								} else {
 										switch (current) { //TODO: implement this
 												case '\'':
-														break;
 												case '\"':
-														break;
 												case '\?':
-														break;
 												case '\\':
-														break;
 												case 'a':
-														break;
 												case 'b':
-														break;
 												case 'f':
-														break;
 												case 'n':
-														break;
 												case 'r':
-														break;
 												case 't':
-														break;
 												case 'v':
+														ABORT;
 														break;
 												default:
 														//report error

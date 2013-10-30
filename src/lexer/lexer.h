@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include "../pos.h"
 
+namespace Lexing {
+
 class Token;
 
 enum TokenType {
@@ -52,5 +54,7 @@ class Token
 		const TokenType m_type;
 		const Pos m_posinfo; 
 };
+
+}
 
 #endif

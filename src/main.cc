@@ -56,11 +56,10 @@ int main(int, char** const argv)
 				if (hasNewErrors())
 					continue;
 
-				auto lexer = Lexer(f, name);
+				auto lexer = Lexing::Lexer(f, name);
 				lexer.lex();
 				switch (mode) {
 				case Mode::TOKENIZE:
-					
 					break;
 				case Mode::PARSE:
 				case Mode::PRINT_AST:
