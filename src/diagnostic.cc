@@ -59,7 +59,15 @@ static void verrorf(Pos const* const pos, char const* fmt, va_list ap)
 			pos->column != 0 ? "%s:%u:%u: " :
 			pos->line   != 0 ? "%s:%u: "    :
 			"%s: ";
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wformat-extra-args"
+#endif
+
 		fprintf(out, posFmt, pos->name, pos->line, pos->column);
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
 	}
 	fputs("error: ", out);
 
