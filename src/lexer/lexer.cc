@@ -72,7 +72,7 @@ Token::Token(TokenType type, Pos posinfo): m_type(type), m_posinfo(posinfo) {}
 bool Lexer::consumePunctuator() {
 	#define MAXOPLENGTH 3
 	auto count_matches = 0;
-	auto partial = std::string(1, static_cast<unsigned char>(current));
+	auto partial = std::string(1, static_cast<unsigned char>(tracker.current()));
 	//TODO: can be done in a more efficient way by checking which operators can
 	//actually be part of a "larger" operator
 	// check if in punctuator set
@@ -81,14 +81,14 @@ bool Lexer::consumePunctuator() {
 		matched = (punctuators.find(partial) != punctuators.end());
 		if (matched) {
 			count_matches++;
-			if ((current = fgetc(source)) != EOF) {
-				partial += static_cast<unsigned char>(current);
+			if ((tracker.fgetc()) != EOF) {
+				partial += static_cast<unsigned char>(tracker.current());
 			} else {
 				//TODO handle EOF...
 			}
 		} else if (count_matches > 0) {
 			// already had one match, but now got start another token
-			ungetc(current, source);
+			tracker.ungetc();
 			// TODO put token into tokenlist?
 			return true;
 		} else {
@@ -100,42 +100,38 @@ bool Lexer::consumePunctuator() {
 }
 
 bool Lexer::consumeComment() {
-	if (current == '/') {
-		int next = fgetc(source);
+	if (tracker.current()== '/') {
+		int next = tracker.fgetc();
 		if ((next != EOF)) {
 			if (next == '*') {
 				//found old-style coment
 				// consume until */
-				while ((current = fgetc(source) != EOF)) {
-					if ('*' == current) {
-						next = fgetc(source);
+				while ((tracker.fgetc() != EOF)) {
+					if ('*' == tracker.current()) {
+						next = tracker.fgetc();
 						if ('/' == next) {
 							return true;
 						} else {
-							ungetc(next, source);
+							tracker.ungetc();
 						}
 					}
 				}
 			} else if (next == '/') {
 				// found new-style comment
 				// consume until newline
-				while ((current = fgetc(source) != EOF)) {
-					if ('\n' == current) {
+				while ((tracker.fgetc() != EOF)) {
+					if ('\n' == tracker.current()) {
 						return true;
 					}
 				}
 			}
 		}
-		ungetc(next, source);
+		tracker.ungetc();
 	}
 	return false;
 }
 
-Lexer::Lexer(FILE* f, char const *name) : posinfo(name, 0, 0)
-{
-		this->source = f; 
-		this->current = EOF;
-}
+Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)) {}
 
 std::vector<Token> Lexer::lex() {
 		std::vector<Token> result;
@@ -147,15 +143,15 @@ std::vector<Token> Lexer::lex() {
 		std::stringstream curword;
 		bool sawAlpha = false;
 		bool sawNumber = false;
-		while ((current = fgetc(source) != EOF)) {
+		while ((tracker.fgetc() != EOF)) {
 				if (delim != WHITESPACE) {
-						if (current == '\\') {
+						if (tracker.current() == '\\') {
 								//start of escape sequence
-								if ((current = fgetc(source) == EOF)) {
+								if ((tracker.fgetc() == EOF)) {
 										// report error, got EOF while waiting for end
 										// of escape sequence
 								} else {
-										switch (current) { //TODO: implement this
+										switch (tracker.current()) { //TODO: implement this
 												case '\'':
 												case '\"':
 												case '\?':
@@ -175,17 +171,17 @@ std::vector<Token> Lexer::lex() {
 
 										}
 								}
-						} else if (delim == SINGLEQUOTE && current == '\'') {
+						} else if (delim == SINGLEQUOTE && tracker.current() == '\'') {
 								// end of character constant
 								delim = WHITESPACE;
-						} else if (delim == DOUBLEQUOTE && current == '\"') {
+						} else if (delim == DOUBLEQUOTE && tracker.current() == '\"') {
 								// end of string literal
 								delim = WHITESPACE;
 						} else {
 							// normal character
 						}
 				}
-				if (std::isspace(current)) {
+				if (std::isspace(tracker.current())) {
 						// if we're not in a char constant or a string literal,
 						// whitespace doesn't matter
 						// found token if there was previous input
@@ -194,18 +190,13 @@ std::vector<Token> Lexer::lex() {
 						sawNumber = false;
 						// remove consecutive whitespace
 						do {
-								if (current == '\n') {
-										++posinfo.line;
-										posinfo.column = 0;
-								} else if (!isspace(current)) {
-										break;
-								}
-						} while ((current = fgetc(source) != EOF), ++posinfo.column); //TODO: dangerous EOF handling
+								//what if current == EOF
+						} while ((tracker.fgetc() != EOF)); //TODO: dangerous EOF handling
 						
-				} else if (std::isdigit(current)) {
+				} else if (std::isdigit(tracker.current())) {
 					// could be part of identifier or decimal constant
 					sawNumber = true;
-				} else if (std::isalpha(current) || '_' == current) {
+				} else if (std::isalpha(tracker.current()) || '_' == tracker.current()) {
 					// can only be part of identifier
 					if (sawNumber && !sawAlpha) {
 						// started to read a number, but now encountered an alhpa
@@ -223,3 +214,28 @@ std::vector<Token> Lexer::lex() {
 		}
 		return std::vector<Token> {};
 };
+
+
+FileTracker::FileTracker(FILE* f, char const *name) : stream(f), position(Pos(name)) {};
+
+int FileTracker::fgetc() {
+	m_current = std::fgetc(stream);
+	if ('\n' == m_current) {
+		position.line++;
+		position.column = 0;
+	} else {
+		position.column++;
+	}
+	return m_current;
+}
+
+int FileTracker::ungetc() {
+	if ('\n' == m_current) {
+		// that's tricky; don't do this
+		position.line--;
+		//position.column = TODO
+	} else {
+		position.column--;
+	}
+	return std::ungetc(m_current, stream);
+}

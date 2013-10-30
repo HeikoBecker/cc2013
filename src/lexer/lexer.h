@@ -9,6 +9,23 @@ namespace Lexing {
 
 class Token;
 
+/*
+ * \brief A thin wrapper around fgetc and ungetc which keeps track of the
+ * positon in the file
+ */
+class FileTracker
+{
+	public:
+		FileTracker(FILE* f, char const *name);
+		int fgetc();
+		int ungetc();
+		int current() const {return m_current;}
+	private:
+		int m_current;
+		FILE* stream;
+		Pos position;
+};
+
 enum TokenType {
 		keyword = 0,
 		identifier = 1,
@@ -34,10 +51,8 @@ class Lexer
 		};
 
 	private:
-		int current;
-		Pos posinfo;
-		FILE* source;	
-		static const std::unordered_set<std::string> punctuators;
+		FileTracker tracker;
+		const static std::unordered_set<std::string> punctuators;
 		const static std::unordered_set<std::string> keywords;
 		/* returns true iff it could consume a Punctuator */
 		bool consumePunctuator();
