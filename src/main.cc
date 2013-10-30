@@ -2,6 +2,7 @@
 
 #include "diagnostic.h"
 #include "util.h"
+#include "lexer/lexer.h"
 
 enum class Mode {
 	TOKENIZE,
@@ -55,8 +56,12 @@ int main(int, char** const argv)
 				if (hasNewErrors())
 					continue;
 
+				auto lexer = Lexer(f, name);
+				lexer.lex();
 				switch (mode) {
 				case Mode::TOKENIZE:
+					
+					break;
 				case Mode::PARSE:
 				case Mode::PRINT_AST:
 				case Mode::COMPILE:

@@ -11,6 +11,8 @@ SRC    := $(sort $(wildcard $(SRCDIR)/*.cc))
 OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 
+SUBDIRS := lexer
+
 CFLAGS   += -Wall -W -Werror
 CXXFLAGS += $(CFLAGS) -std=c++11
 
