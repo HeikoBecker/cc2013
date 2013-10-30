@@ -6,11 +6,98 @@
 #define ABORT do {throw std::exception();} while (false)
 
 
+/*TODO:
+ * + write a wrapper around fgetc which takes care of handling line and column
+ * number
+ * + too many while loops with too much EOF checking
+ */
+
+const auto Lexer::punctuators  = std::unordered_set<std::string> {{
+	"[", "]", "(", ")", "{", "}", ".", "->", "++", "--", "&", "*",
+	"+", "-", "~", "!", "/", "%", "<<", ">>", "<", ">", "<=", ">=",
+	"==", "!=", "^", "|", "&&", "||", "?", ":", ";", "...", "=", 
+	"*=", "/=", "%=", "+=", "-=", "<<=", ">>=", "&=", "^=", "|=",
+	",", "#", "##", "<:", ":>", "<%", "%>", "%:", "%:%:",
+}};
+
+const auto Lexer::keywords = std::unordered_set<std::string> {{
+	"_Alignas",
+	"_Alignof",
+	"_Atomic",
+	"_Bool",
+	"_Complex",
+	"_Generic",
+	"_Imaginary",
+	"_Noreturn",
+	"_Static_assert",
+	"_Thread_local",
+	"auto",
+	"break",
+	"case",
+	"char",
+	"const",
+	"continue",
+	"default",
+	"do",
+	"double",
+	"else",
+	"enum",
+	"extern",
+	"float",
+	"for",
+	"goto",
+	"if",
+	"inline",
+	"int",
+	"long",
+	"register",
+	"restrict",
+	"return",
+	"short",
+	"signed",
+	"sizeof",
+	"static",
+	"struct",
+	"switch",
+	"typedef",
+	"union",
+	"unsigned",
+	"void",
+	"volatile",
+	"while",
+}};
+
 Token::Token(TokenType type, Pos posinfo): m_type(type), m_posinfo(posinfo) {}
 
 bool Lexer::consumePunctuator() {
+	#define MAXOPLENGTH 3
 	ABORT;
+	auto count_matches = 0;
+	auto partial = std::string(1, static_cast<unsigned char>(current));
+	//TODO: can be done in a more efficient way by checking which operators can
+	//actually be part of a "larger" operator
+	// check if in punctuator set
+	auto matched = false;
+	do {
+		matched = (punctuators.find(partial) != punctuators.end());
+		if (matched) {
+			count_matches++;
+			if ((current = fgetc(source)) != EOF) {
+				partial += static_cast<unsigned char>(current);
+			} else {
+				//TODO handle EOF...
+			}
+		} else if (count_matches > 0) {
+			// already had one match, but now got start another token
+			ungetc(current, source);
+			// TODO put token into tokenlist?
+			return true;
+		} else {
+			return false;
+		}
+	} while (count_matches < MAXOPLENGTH);
 	return false;
+	#undef MAXOPLENGTH 
 }
 
 bool Lexer::consumeComment() {
@@ -21,9 +108,24 @@ bool Lexer::consumeComment() {
 			if (next == '*') {
 				//found old-style coment
 				// consume until */
+				while ((current = fgetc(source) != EOF)) {
+					if ('*' == current) {
+						next = fgetc(source);
+						if ('/' == next) {
+							return true;
+						} else {
+							ungetc(next, source);
+						}
+					}
+				}
 			} else if (next == '/') {
 				// found new-style comment
 				// consume until newline
+				while ((current = fgetc(source) != EOF)) {
+					if ('\n' == current) {
+						return true;
+					}
+				}
 			}
 		}
 		ungetc(next, source);
@@ -35,52 +137,6 @@ Lexer::Lexer(FILE* f, char const *name) : posinfo(name, 0, 0)
 {
 		this->source = f; 
 		this->current = EOF;
-		this->keywords = std::unordered_set<std::string> {{
-				"_Alignas",
-						"_Alignof",
-						"_Atomic",
-						"_Bool",
-						"_Complex",
-						"_Generic",
-						"_Imaginary",
-						"_Noreturn",
-						"_Static_assert",
-						"_Thread_local",
-						"auto",
-						"break",
-						"case",
-						"char",
-						"const",
-						"continue",
-						"default",
-						"do",
-						"double",
-						"else",
-						"enum",
-						"extern",
-						"float",
-						"for",
-						"goto",
-						"if",
-						"inline",
-						"int",
-						"long",
-						"register",
-						"restrict",
-						"return",
-						"short",
-						"signed",
-						"sizeof",
-						"static",
-						"struct",
-						"switch",
-						"typedef",
-						"union",
-						"unsigned",
-						"void",
-						"volatile",
-						"while",
-		}};
 }
 
 std::vector<Token> Lexer::lex() {
@@ -172,10 +228,10 @@ std::vector<Token> Lexer::lex() {
 						ABORT;
 					}
 					sawAlpha = true;
-				} else if (consumePunctuator()) {
-					// must readahead to find out which punctuator this is
 				} else if (consumeComment()) {
-				
+					// TODO: anything left to do here?
+				} else if (consumePunctuator()) {
+					// TODO: anything left to do here?
 				} else {
 					// report error
 				}

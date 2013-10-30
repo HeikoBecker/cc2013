@@ -26,7 +26,7 @@ class Lexer
 		Lexer(FILE* f, char const *name);
 		std::vector<Token> lex();
 		enum SearchedDelimeter {
-		,	WHITESPACE = 0,
+			WHITESPACE = 0,
 			SINGLEQUOTE = 1,
 			DOUBLEQUOTE = 2,
 		};
@@ -35,7 +35,8 @@ class Lexer
 		int current;
 		Pos posinfo;
 		FILE* source;	
-		static std::unordered_set<std::string> keywords;
+		static const std::unordered_set<std::string> punctuators;
+		const static std::unordered_set<std::string> keywords;
 		/* returns true iff it could consume a Punctuator */
 		bool consumePunctuator();
 		/* returns true iff it could consume a comment */
