@@ -56,8 +56,11 @@ int main(int, char** const argv)
 				if (hasNewErrors())
 					continue;
 
-				auto lexer = Lexing::Lexer(f, name);
-				lexer.lex();
+				Lexing::Lexer lexer(f, name);
+				auto tokens = lexer.lex();
+				for (const auto token : tokens) {
+					printToken(token);
+				}
 				switch (mode) {
 				case Mode::TOKENIZE:
 					break;

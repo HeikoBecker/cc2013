@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 #include <cstdio>
 #include <cctype>
 #include "lexer.h"
@@ -91,7 +92,8 @@ bool Lexer::consumePunctuator() {
 		} else if (count_matches > 0) {
 			// already had one match, but now got start another token
 			tracker.ungetc();
-			// TODO put token into tokenlist?
+			curword << partial;
+			storeToken(TokenType::PUNCTUATOR);
 			return true;
 		} else {
 			return false;
@@ -148,6 +150,7 @@ bool Lexer::consumeQuoted() {
 		// text is not quoted
 		return false;
 	}
+	appendToToken(tracker.current());
 	while (tracker.fgetc() != EOF) {
 		if (tracker.current() == '\\') {
 			//start of escape sequence, do a readahead
@@ -169,6 +172,8 @@ bool Lexer::consumeQuoted() {
 					case 't':
 					case 'v':
 						//curword << '\\' << tracker.current();
+						appendToToken('\\');
+						appendToToken(tracker.current());
 						break;
 					default:
 						//report error
@@ -178,14 +183,17 @@ bool Lexer::consumeQuoted() {
 			}
 		} else if (singlequote && tracker.current() == '\'') {
 			// end of character constant
+			appendToToken(tracker.current());
+			storeToken(TokenType::CONSTANT);
 			// create Token
 			return true;
 		} else if (!singlequote && tracker.current() == '\"') {
 			// end of string literal
-			// create Token
+			appendToToken(tracker.current());
+			storeToken(TokenType::STRINGLITERAL);
 			return true;
 		} else {
-						//normal case
+			appendToToken(tracker.current());
 		}
 	}
 
@@ -193,48 +201,85 @@ bool Lexer::consumeQuoted() {
 	return true;
 }
 
-Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)) {}
+bool Lexer::consumeIdent() {
+	while (tracker.fgetc() != EOF) {
+		if (isalpha(tracker.current()) || isdigit(tracker.current()) || '_' == tracker.current()) {
+			// create token
+			appendToToken(tracker.current());
+		} else {
+			auto isKeyword = (keywords.find(curword.str()) != keywords.end());
+			storeToken(isKeyword ? TokenType::KEYWORD : TokenType::IDENTIFIER);
+			return true;
+		}
+	}
+	// handle EOf
+	return false;
+}
+
+bool Lexer::consumeDecimal() {
+	while (tracker.fgetc() != EOF) {
+		if (isdigit(tracker.current())) {
+			appendToToken(tracker.current());
+		} else {
+			tracker.ungetc();
+			storeToken(TokenType::CONSTANT);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Lexer::consumeIdentOrDecConstant() {
+	if ('0' == tracker.current()) {
+		// found 0 constant
+		appendToToken('0');
+		return true;
+	} else if(isalpha(tracker.current()) || '_' == tracker.current()) {
+		appendToToken(tracker.current());
+		return consumeIdent();
+	} else if (isdigit(tracker.current())) {
+		// if it were 0, it would have been catched by the previous rule
+		appendToToken(tracker.current());
+		return consumeDecimal();
+	}
+	return false;
+}
+
+Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
 std::vector<Token> Lexer::lex() {
-		std::vector<Token> result;
 		/* delim is the current token deliminator
 		 * it is WHITESPACE, except when a (double) quote has been previously
 		 * encountered 
 		 */
-		Lexer::SearchedDelimeter delim = WHITESPACE;
-		std::stringstream curword;
-		TokenType curtoken = TokenType::ILLEGAL;
-#define PUTTOKEN(X) do {	result.push_back(Token(curtoken, tracker.storedPosition(), curword.str())); } while (0)
 		while ((tracker.fgetc() != EOF)) {
 				if (consumeWhitespace()) {
 					// reached EOF
-					return result;
+					return this->tokens;
 				}
+				// new token begins after whitespace
+				tracker.storePosition();
 				if (consumeQuoted()) {
 					continue;
-				} else if (std::isdigit(tracker.current())) {
-					// could be part of identifier or decimal constant
-				} else if (std::isalpha(tracker.current()) || '_' == tracker.current()) {
-					// can only be part of identifier
-					curtoken = TokenType::IDENTIFIER;
+				} else if (consumeIdentOrDecConstant()) {
+					continue;
 				} else if (consumeComment()) {
-					// TODO: anything left to do here?
+					continue;
 				} else if (consumePunctuator()) {
-					// TODO: anything left to do here?
-				} else if ('\'' == tracker.current()) {
-					delim = SINGLEQUOTE;
-				} else if ('\"' == tracker.current()) {
-					delim = DOUBLEQUOTE;
+					continue;
 				} else {
 					// report error
 					ABORT;
 				}
 		}
-		if (curtoken == TokenType::ILLEGAL) {
-			ABORT;
-		}
-		return result;
+		return tokens;
 };
+
+void Lexer::storeToken(TokenType type) {
+	tokens.push_back(Token(type, tracker.storedPosition(), curword.str()));
+	curword.str("");
+	curword.clear();
+}
 
 
 FileTracker::FileTracker(FILE* f, char const *name) : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {};
@@ -259,4 +304,15 @@ int FileTracker::ungetc() {
 		m_position.column--;
 	}
 	return std::ungetc(m_current, stream);
+}
+
+void FileTracker::storePosition() {
+	m_storedPosition = m_position;
+}
+
+
+void Lexing::printToken(const Token token) {
+auto posinfo = token.pos();
+	std::cout << posinfo.name << ":" << posinfo.line << ":" << posinfo.column
+					  << " " << token.value();
 }

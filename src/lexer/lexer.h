@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <unordered_set>
+#include <sstream>
 #include "../pos.h"
 
 namespace Lexing {
@@ -33,7 +34,7 @@ enum class TokenType {
 		KEYWORD = 0,
 		IDENTIFIER = 1,
 		CONSTANT = 2,
-		STRINGLITERAl = 3,
+		STRINGLITERAL = 3,
 		PUNCTUATOR = 4,
 		ILLEGAL = 5
 };
@@ -48,14 +49,11 @@ class Lexer
 	public:
 		Lexer(FILE* f, char const *name);
 		std::vector<Token> lex();
-		enum SearchedDelimeter {
-			WHITESPACE = 0,
-			SINGLEQUOTE = 1,
-			DOUBLEQUOTE = 2,
-		};
 
 	private:
 		FileTracker tracker;
+		std::ostringstream curword;
+		std::vector<Token> tokens;
 		const static std::unordered_set<std::string> punctuators;
 		const static std::unordered_set<std::string> keywords;
 		/* returns true iff it could consume a Punctuator */
@@ -66,18 +64,28 @@ class Lexer
 		bool consumeWhitespace();
 		/* returns true iff it could consume string literal or char constant */
 		bool consumeQuoted();
+		bool consumeIdentOrDecConstant();
+		bool consumeDecimal();
+		bool consumeIdent();
+		inline void appendToToken(unsigned char c) {curword << c;}
+		void storeToken(TokenType type);
 };
 
+// TODO: consider to make this class templated over the TokenType
 class Token
 {
 	public:
 		Token(TokenType type, Pos posinfo, std::string value); 
-		TokenType type() {return this->m_type;}
+		TokenType type() const {return this->m_type;}
+		Pos pos() const {return this->m_posinfo;}
+		std::string value() const {return this->m_value;}
 	private:
 		const TokenType m_type;
 		const Pos m_posinfo; 
 		const std::string m_value;
 };
+
+void printToken(const Token token);
 
 }
 
