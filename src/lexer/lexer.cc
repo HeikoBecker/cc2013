@@ -133,6 +133,66 @@ bool Lexer::consumeComment() {
 	return false;
 }
 
+bool Lexer::consumeWhitespace() {
+	while (std::isspace(tracker.current())) {
+		tracker.fgetc();
+	}
+	return (tracker.current() == EOF);
+}
+
+bool Lexer::consumeQuoted() {
+	bool singlequote = false;
+	if ('\'' == tracker.current()) {
+		singlequote = true;
+	} else if ('\"' != tracker.current()) {
+		// text is not quoted
+		return false;
+	}
+	while (tracker.fgetc() != EOF) {
+		if (tracker.current() == '\\') {
+			//start of escape sequence, do a readahead
+			if ((tracker.fgetc() == EOF)) {
+				// report error, got EOF while waiting for end
+				// of escape sequence
+				ABORT;
+			} else {
+				switch (tracker.current()) { //TODO: implement this
+					case '\'':
+					case '\"':
+					case '\?':
+					case '\\':
+					case 'a':
+					case 'b':
+					case 'f':
+					case 'n':
+					case 'r':
+					case 't':
+					case 'v':
+						//curword << '\\' << tracker.current();
+						break;
+					default:
+						//report error
+						ABORT;
+						break;
+				}
+			}
+		} else if (singlequote && tracker.current() == '\'') {
+			// end of character constant
+			// create Token
+			return true;
+		} else if (!singlequote && tracker.current() == '\"') {
+			// end of string literal
+			// create Token
+			return true;
+		} else {
+						//normal case
+		}
+	}
+
+	ABORT;
+	return true;
+}
+
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)) {}
 
 std::vector<Token> Lexer::lex() {
@@ -144,78 +204,24 @@ std::vector<Token> Lexer::lex() {
 		Lexer::SearchedDelimeter delim = WHITESPACE;
 		std::stringstream curword;
 		TokenType curtoken = TokenType::ILLEGAL;
-		bool sawAlpha = false;
-		bool sawNumber = false;
 #define PUTTOKEN(X) do {	result.push_back(Token(curtoken, tracker.storedPosition(), curword.str())); } while (0)
 		while ((tracker.fgetc() != EOF)) {
-				if (delim != WHITESPACE) {
-						if (tracker.current() == '\\') {
-								//start of escape sequence
-								if ((tracker.fgetc() == EOF)) {
-										// report error, got EOF while waiting for end
-										// of escape sequence
-								} else {
-										switch (tracker.current()) { //TODO: implement this
-												case '\'':
-												case '\"':
-												case '\?':
-												case '\\':
-												case 'a':
-												case 'b':
-												case 'f':
-												case 'n':
-												case 'r':
-												case 't':
-												case 'v':
-														curword << '\\' << tracker.current();
-														break;
-												default:
-														//report error
-														break;
-
-										}
-								}
-						} else if (delim == SINGLEQUOTE && tracker.current() == '\'') {
-								// end of character constant
-								delim = WHITESPACE;
-								PUTTOKEN();
-						} else if (delim == DOUBLEQUOTE && tracker.current() == '\"') {
-								// end of string literal
-								delim = WHITESPACE;
-						} else {
-							curword << tracker.current();
-						}
+				if (consumeWhitespace()) {
+					// reached EOF
+					return result;
 				}
-				if (std::isspace(tracker.current())) {
-						// if we're not in a char constant or a string literal,
-						// whitespace doesn't matter
-						// found token if there was previous input
-						// reset canBeIdentifier and canBeNumber
-						sawAlpha = false;
-						sawNumber = false;
-						curtoken = TokenType::ILLEGAL;
-						// remove consecutive whitespace
-						do {
-								//what if current == EOF
-						} while ((tracker.fgetc() != EOF)); //TODO: dangerous EOF handling
-						
+				if (consumeQuoted()) {
+					continue;
 				} else if (std::isdigit(tracker.current())) {
 					// could be part of identifier or decimal constant
-					sawNumber = true;
 				} else if (std::isalpha(tracker.current()) || '_' == tracker.current()) {
 					// can only be part of identifier
-					if (sawNumber && !sawAlpha) {
-						// started to read a number, but now encountered an alhpa
-						// report error
-						ABORT;
-					}
 					curtoken = TokenType::IDENTIFIER;
-					sawAlpha = true;
 				} else if (consumeComment()) {
 					// TODO: anything left to do here?
 				} else if (consumePunctuator()) {
 					// TODO: anything left to do here?
-				} else if ('\'' == tracker.current()) 
+				} else if ('\'' == tracker.current()) {
 					delim = SINGLEQUOTE;
 				} else if ('\"' == tracker.current()) {
 					delim = DOUBLEQUOTE;

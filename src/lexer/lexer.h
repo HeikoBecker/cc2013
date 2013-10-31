@@ -62,6 +62,10 @@ class Lexer
 		bool consumePunctuator();
 		/* returns true iff it could consume a comment */
 		bool consumeComment();
+		/* returns true iff it reaches EOF */
+		bool consumeWhitespace();
+		/* returns true iff it could consume string literal or char constant */
+		bool consumeQuoted();
 };
 
 class Token
