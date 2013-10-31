@@ -233,6 +233,7 @@ bool Lexer::consumeIdentOrDecConstant() {
 	if ('0' == tracker.current()) {
 		// found 0 constant
 		appendToToken('0');
+		storeToken(TokenType::CONSTANT);
 		return true;
 	} else if(isalpha(tracker.current()) || '_' == tracker.current()) {
 		appendToToken(tracker.current());
