@@ -20,18 +20,22 @@ class FileTracker
 		int fgetc();
 		int ungetc();
 		int current() const {return m_current;}
+		Pos storedPosition() const {return  m_storedPosition;}
+		void storePosition();
 	private:
 		int m_current;
 		FILE* stream;
-		Pos position;
+		Pos m_position;
+		Pos m_storedPosition;
 };
 
-enum TokenType {
-		keyword = 0,
-		identifier = 1,
-		constant = 2,
-		stringLiteral = 3,
-		punctuator = 4
+enum class TokenType {
+		KEYWORD = 0,
+		IDENTIFIER = 1,
+		CONSTANT = 2,
+		STRINGLITERAl = 3,
+		PUNCTUATOR = 4,
+		ILLEGAL = 5
 };
 
 /*
@@ -63,11 +67,12 @@ class Lexer
 class Token
 {
 	public:
-		Token(TokenType type, Pos posinfo); 
+		Token(TokenType type, Pos posinfo, std::string value); 
 		TokenType type() {return this->m_type;}
 	private:
 		const TokenType m_type;
 		const Pos m_posinfo; 
+		const std::string m_value;
 };
 
 }

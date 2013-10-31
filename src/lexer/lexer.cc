@@ -12,7 +12,9 @@
  */
 using namespace Lexing;
 
-const auto Lexer::punctuators  = std::unordered_set<std::string> {{
+// GCC 4.8.1 complains when using auto instead of the explicit type
+// this does not make sense :-(
+const std::unordered_set<std::string> Lexer::punctuators  = std::unordered_set<std::string> {{
 	"[", "]", "(", ")", "{", "}", ".", "->", "++", "--", "&", "*",
 	"+", "-", "~", "!", "/", "%", "<<", ">>", "<", ">", "<=", ">=",
 	"==", "!=", "^", "|", "&&", "||", "?", ":", ";", "...", "=", 
@@ -20,7 +22,7 @@ const auto Lexer::punctuators  = std::unordered_set<std::string> {{
 	",", "#", "##", "<:", ":>", "<%", "%>", "%:", "%:%:",
 }};
 
-const auto Lexer::keywords = std::unordered_set<std::string> {{
+const std::unordered_set<std::string> Lexer::keywords = std::unordered_set<std::string> {{
 	"_Alignas",
 	"_Alignof",
 	"_Atomic",
@@ -67,7 +69,7 @@ const auto Lexer::keywords = std::unordered_set<std::string> {{
 	"while",
 }};
 
-Token::Token(TokenType type, Pos posinfo): m_type(type), m_posinfo(posinfo) {}
+Token::Token(TokenType type, Pos posinfo, std::string value): m_type(type), m_posinfo(posinfo), m_value(value) {}
 
 bool Lexer::consumePunctuator() {
 	#define MAXOPLENGTH 3
@@ -141,8 +143,10 @@ std::vector<Token> Lexer::lex() {
 		 */
 		Lexer::SearchedDelimeter delim = WHITESPACE;
 		std::stringstream curword;
+		TokenType curtoken = TokenType::ILLEGAL;
 		bool sawAlpha = false;
 		bool sawNumber = false;
+#define PUTTOKEN(X) do {	result.push_back(Token(curtoken, tracker.storedPosition(), curword.str())); } while (0)
 		while ((tracker.fgetc() != EOF)) {
 				if (delim != WHITESPACE) {
 						if (tracker.current() == '\\') {
@@ -163,7 +167,7 @@ std::vector<Token> Lexer::lex() {
 												case 'r':
 												case 't':
 												case 'v':
-														ABORT;
+														curword << '\\' << tracker.current();
 														break;
 												default:
 														//report error
@@ -174,11 +178,12 @@ std::vector<Token> Lexer::lex() {
 						} else if (delim == SINGLEQUOTE && tracker.current() == '\'') {
 								// end of character constant
 								delim = WHITESPACE;
+								PUTTOKEN();
 						} else if (delim == DOUBLEQUOTE && tracker.current() == '\"') {
 								// end of string literal
 								delim = WHITESPACE;
 						} else {
-							// normal character
+							curword << tracker.current();
 						}
 				}
 				if (std::isspace(tracker.current())) {
@@ -188,6 +193,7 @@ std::vector<Token> Lexer::lex() {
 						// reset canBeIdentifier and canBeNumber
 						sawAlpha = false;
 						sawNumber = false;
+						curtoken = TokenType::ILLEGAL;
 						// remove consecutive whitespace
 						do {
 								//what if current == EOF
@@ -203,28 +209,37 @@ std::vector<Token> Lexer::lex() {
 						// report error
 						ABORT;
 					}
+					curtoken = TokenType::IDENTIFIER;
 					sawAlpha = true;
 				} else if (consumeComment()) {
 					// TODO: anything left to do here?
 				} else if (consumePunctuator()) {
 					// TODO: anything left to do here?
+				} else if ('\'' == tracker.current()) 
+					delim = SINGLEQUOTE;
+				} else if ('\"' == tracker.current()) {
+					delim = DOUBLEQUOTE;
 				} else {
 					// report error
+					ABORT;
 				}
 		}
-		return std::vector<Token> {};
+		if (curtoken == TokenType::ILLEGAL) {
+			ABORT;
+		}
+		return result;
 };
 
 
-FileTracker::FileTracker(FILE* f, char const *name) : stream(f), position(Pos(name)) {};
+FileTracker::FileTracker(FILE* f, char const *name) : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {};
 
 int FileTracker::fgetc() {
 	m_current = std::fgetc(stream);
 	if ('\n' == m_current) {
-		position.line++;
-		position.column = 0;
+		m_position.line++;
+		m_position.column = 0;
 	} else {
-		position.column++;
+		m_position.column++;
 	}
 	return m_current;
 }
@@ -232,10 +247,10 @@ int FileTracker::fgetc() {
 int FileTracker::ungetc() {
 	if ('\n' == m_current) {
 		// that's tricky; don't do this
-		position.line--;
+		m_position.line--;
 		//position.column = TODO
 	} else {
-		position.column--;
+		m_position.column--;
 	}
 	return std::ungetc(m_current, stream);
 }

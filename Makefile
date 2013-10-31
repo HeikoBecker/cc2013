@@ -21,8 +21,8 @@ DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
 
 all: $(BIN)
 
-debug: CFLAGS += -DDEBUG -g
-debug: CXXFLAGS += -DDEBUG -g
+debug: CFLAGS += -DDEBUG -g -Wextra
+debug: CXXFLAGS += -DDEBUG -g -Wextra
 debug: $(BIN)
 
 -include $(CFG).cfg
