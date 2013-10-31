@@ -58,11 +58,11 @@ int main(int, char** const argv)
 
 				Lexing::Lexer lexer(f, name);
 				auto tokens = lexer.lex();
-				for (const auto token : tokens) {
-					printToken(token);
-				}
 				switch (mode) {
 				case Mode::TOKENIZE:
+  				for (const auto token : tokens) {
+	  				printToken(token);
+		  		}
 					break;
 				case Mode::PARSE:
 				case Mode::PRINT_AST:

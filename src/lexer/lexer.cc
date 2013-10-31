@@ -313,6 +313,26 @@ void FileTracker::storePosition() {
 
 void Lexing::printToken(const Token token) {
 auto posinfo = token.pos();
+	std::string tokentype {};
+  switch (token.type()) {
+		case TokenType::KEYWORD:
+						tokentype = "keyword";
+						break;
+		case TokenType::IDENTIFIER:
+						tokentype = "identifier";
+						break;
+		case TokenType::CONSTANT:
+						tokentype = "constant";
+						break;
+		case TokenType::STRINGLITERAL:
+						tokentype = "stringliteral";
+						break;
+		case TokenType::PUNCTUATOR:
+						tokentype = "punctuator";
+						break;
+		default:
+						ABORT;
+	}
 	std::cout << posinfo.name << ":" << posinfo.line << ":" << posinfo.column
-					  << " " << token.value();
+					  << " " << tokentype << " " << token.value() << std::endl;
 }
