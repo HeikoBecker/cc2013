@@ -183,6 +183,8 @@ bool Lexer::consumeQuoted() {
 						throw LexingException("Invalid format specifier", tracker.currentPosition());
 				}
 			}
+		} else if ('\n' == tracker.current()) {
+			throw LexingException("Found newline in string literal. Mayebe you forgot to add a \" or you wanted to use \\n.", tracker.currentPosition());
 		} else if (singlequote && tracker.current() == '\'') {
 			// end of character constant
 			appendToToken(tracker.current());
