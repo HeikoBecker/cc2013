@@ -283,7 +283,7 @@ void Lexer::storeToken(TokenType type) {
 }
 
 
-FileTracker::FileTracker(FILE* f, char const *name) : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {};
+FileTracker::FileTracker(FILE* f, char const *name) : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {m_position.line = 1;};
 
 int FileTracker::fgetc() {
 	m_current = std::fgetc(stream);
