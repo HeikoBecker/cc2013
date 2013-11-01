@@ -42,6 +42,9 @@ class FileTracker
 		FILE* stream;
 		Pos m_position;
 		Pos m_storedPosition;
+                // additional information, only required to make ungetc work better
+                int m_lastCollumn;
+                int m_lastChar;
 };
 
 enum class TokenType {

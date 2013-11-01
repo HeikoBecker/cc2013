@@ -1,2 +1,6 @@
 /*.cfg
+compiler.config
+compiler.creator
+compiler.files
+compiler.includes
 /build

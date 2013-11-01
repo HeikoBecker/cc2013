@@ -273,7 +273,9 @@ std::vector<Token> Lexer::lex() {
 					continue;
 				} else {
 					// report error
-					ABORT;
+                                       std::ostringstream msg;
+                                       msg << "Got illegal token: " << static_cast<unsigned char>(tracker.current ()) << std::endl;
+                                       throw LexingException(msg.str(), tracker.currentPosition ());
 				}
 		}
 		return tokens;
@@ -289,6 +291,8 @@ void Lexer::storeToken(TokenType type) {
 FileTracker::FileTracker(FILE* f, char const *name) : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {m_position.line = 1;};
 
 int FileTracker::fgetc() {
+        m_lastChar = m_current;
+        m_lastCollumn = m_position.column;
 	m_current = std::fgetc(stream);
 	if ('\n' == m_current) {
 		m_position.line++;
@@ -300,18 +304,18 @@ int FileTracker::fgetc() {
 }
 
 int FileTracker::ungetc() {
-	if ('\n' == m_current) {
-		// that's tricky; don't do this
+    if ('\n' == m_current) {
 		m_position.line--;
-		//position.column = TODO
+               m_position.column = m_lastCollumn;
 	} else {
 		m_position.column--;
 	}
-	return std::ungetc(m_current, stream);
+        m_current = m_lastChar;
+    return std::ungetc(m_current, stream);
 }
 
 void FileTracker::storePosition() {
-	m_storedPosition = m_position;
+    m_storedPosition = m_position;
 }
 
 
