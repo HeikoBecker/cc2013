@@ -162,7 +162,7 @@ bool Lexer::consumeQuoted() {
 				// of escape sequence
 				ABORT;
 			} else {
-				switch (tracker.current()) { //TODO: implement this
+				switch (tracker.current()) {
 					case '\'':
 					case '\"':
 					case '\?':
@@ -204,7 +204,7 @@ bool Lexer::consumeQuoted() {
 		}
 	}
 
-	// TODO: replace ???
+	// TODO: replace ??? with correct value
 	throw LexingException("Reached end of file while waiting for closing ???", tracker.currentPosition());
 	return true;
 }
