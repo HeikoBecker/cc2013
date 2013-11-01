@@ -6,11 +6,6 @@
 
 #define ABORT do {throw std::exception();} while (false)
 
-/*TODO:
- * + write a wrapper around fgetc which takes care of handling line and column
- * number
- * + too many while loops with too much EOF checking
- */
 using namespace Lexing;
 
 // GCC 4.8.1 complains when using auto instead of the explicit type
@@ -92,6 +87,9 @@ bool Lexer::consumePunctuator() {
 		} else if (count_matches > 0) {
 			// already had one match, but now got start another token
 			tracker.ungetc();
+			// remove last character; it was added in the previous
+			// iteration, but not actually part of the punctuator
+			partial.pop_back(); 
 			curword << partial;
 			storeToken(TokenType::PUNCTUATOR);
 			return true;
@@ -183,8 +181,13 @@ bool Lexer::consumeQuoted() {
 		} else if (singlequote && tracker.current() == '\'') {
 			// end of character constant
 			appendToToken(tracker.current());
-			storeToken(TokenType::CONSTANT);
+			// check that constant is not empty, that is, contains
+			// more than opening ' and closing '
+			if (curword.str().size() <= 2) {
+				throw LexingException("Empty character constant", tracker.currentPosition());
+			}
 			// create Token
+			storeToken(TokenType::CONSTANT);
 			return true;
 		} else if (!singlequote && tracker.current() == '\"') {
 			// end of string literal
