@@ -3,6 +3,7 @@
 #include "diagnostic.h"
 #include "util.h"
 #include "lexer/lexer.h"
+#include <iostream>
 
 enum class Mode {
 	TOKENIZE,
@@ -74,6 +75,13 @@ int main(int, char** const argv)
 					fclose(f);
 			}
 		}
+	} catch (Lexing::LexingException const& e) {
+	  std::cout << e.where().name << ":" << e.where().line << ":" << e.where().column
+							<< std::endl
+						  << "Encountered fatal error while lexing at"
+							<< e.what()
+							<< std::endl;
+		return -1;
 	} catch (std::exception const& e) {
 		errorf("caught exception: %s", e.what());
 	} catch (...) {

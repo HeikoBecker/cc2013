@@ -177,8 +177,7 @@ bool Lexer::consumeQuoted() {
 						break;
 					default:
 						//report error
-						ABORT;
-						break;
+						throw LexingException("Invalid format specifier", tracker.currentPosition());
 				}
 			}
 		} else if (singlequote && tracker.current() == '\'') {
@@ -197,7 +196,8 @@ bool Lexer::consumeQuoted() {
 		}
 	}
 
-	ABORT;
+	// TODO: replace ???
+	throw LexingException("Reached end of file while waiting for closing ???", tracker.currentPosition());
 	return true;
 }
 

@@ -4,9 +4,22 @@
 #include <vector>
 #include <unordered_set>
 #include <sstream>
+#include <stdexcept>
 #include "../pos.h"
 
 namespace Lexing {
+
+
+/* TODO: derive from another base exception (e.g. compilerexception) */
+class LexingException: public std::runtime_error 
+{
+	public:
+					LexingException(std::string message, Pos where) : std::runtime_error(message), m_where(where) {}
+					Pos where() const {return m_where;}
+	private:
+					Pos m_where;
+};
+
 
 class Token;
 
@@ -21,6 +34,7 @@ class FileTracker
 		int fgetc();
 		int ungetc();
 		int current() const {return m_current;}
+		Pos currentPosition() const {return m_position;}
 		Pos storedPosition() const {return  m_storedPosition;}
 		void storePosition();
 	private:
