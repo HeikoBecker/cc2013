@@ -160,7 +160,7 @@ bool Lexer::consumeQuoted() {
 			if ((tracker.fgetc() == EOF)) {
 				// report error, got EOF while waiting for end
 				// of escape sequence
-				ABORT;
+				throw LexingException("Reached end of file while looking for escape sequence", tracker.currentPosition());
 			} else {
 				switch (tracker.current()) {
 					case '\'':
