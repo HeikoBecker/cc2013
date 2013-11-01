@@ -32,7 +32,7 @@ class FileTracker
 	public:
 		FileTracker(FILE* f, char const *name);
 		int fgetc();
-		int ungetc();
+		int ungetc(bool reset = false);
 		int current() const {return m_current;}
 		Pos currentPosition() const {return m_position;}
 		Pos storedPosition() const {return  m_storedPosition;}

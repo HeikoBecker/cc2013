@@ -118,6 +118,7 @@ bool Lexer::consumeComment() {
 						}
 					}
 				}
+                               throw LexingException("Reached end of file while trying to find end of comment", tracker.currentPosition ());
 			} else if (next == '/') {
 				// found new-style comment
 				// consume until newline
@@ -125,10 +126,14 @@ bool Lexer::consumeComment() {
 					if ('\n' == tracker.current()) {
 						return true;
 					}
-				}
-			}
+                               }
+                               throw LexingException("Reached end of file while trying to find end of comment", tracker.currentPosition ());
+                        } else {
+                tracker.ungetc(true);
+            }
+		} else {
+                        tracker.ungetc();
 		}
-		tracker.ungetc();
 	}
 	return false;
 }
@@ -304,15 +309,18 @@ int FileTracker::fgetc() {
 	return m_current;
 }
 
-int FileTracker::ungetc() {
+int FileTracker::ungetc(bool reset) {
     if ('\n' == m_current) {
 		m_position.line--;
                m_position.column = m_lastCollumn;
 	} else {
 		m_position.column--;
 	}
-        //m_current = m_lastChar;
-    return std::ungetc(m_current, stream);
+    auto result =  std::ungetc(m_current, stream);
+    if (reset) {
+        m_current = m_lastChar;
+    }
+    return result;
 }
 
 void FileTracker::storePosition() {
