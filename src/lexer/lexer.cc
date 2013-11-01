@@ -352,6 +352,6 @@ auto posinfo = token.pos();
 		default:
 						ABORT;
 	}
-	std::cout << posinfo.name << ":" << posinfo.line << ":" << posinfo.column
+	std::cout << posinfo.name << ":" << posinfo.line << ":" << posinfo.column << ":"
 					  << " " << tokentype << " " << token.value() << std::endl;
 }
