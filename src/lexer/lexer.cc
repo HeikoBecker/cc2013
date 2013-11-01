@@ -88,8 +88,8 @@ bool Lexer::consumePunctuator() {
 			// already had one match, but now got start another token
 			tracker.ungetc();
 			// remove last character; it was added in the previous
-			// iteration, but not actually part of the punctuator
-			partial.pop_back(); 
+                       // iteration, but not actually part of the punctuator
+                       partial.pop_back();
 			curword << partial;
 			storeToken(TokenType::PUNCTUATOR);
 			return true;
@@ -210,6 +210,7 @@ bool Lexer::consumeIdent() {
 			// create token
 			appendToToken(tracker.current());
 		} else {
+            tracker.ungetc();
 			auto isKeyword = (keywords.find(curword.str()) != keywords.end());
 			storeToken(isKeyword ? TokenType::KEYWORD : TokenType::IDENTIFIER);
 			return true;
@@ -310,7 +311,7 @@ int FileTracker::ungetc() {
 	} else {
 		m_position.column--;
 	}
-        m_current = m_lastChar;
+        //m_current = m_lastChar;
     return std::ungetc(m_current, stream);
 }
 
