@@ -232,6 +232,9 @@ bool Lexer::consumeDecimal() {
 		if (isdigit(tracker.current())) {
 			appendToToken(tracker.current());
 		} else {
+			if (isalpha(tracker.current())) {
+				throw LexingException("Decimal constant contains illegal character.", tracker.currentPosition());
+			}
 			tracker.ungetc();
 			storeToken(TokenType::CONSTANT);
 			return true;
@@ -243,6 +246,11 @@ bool Lexer::consumeDecimal() {
 bool Lexer::consumeIdentOrDecConstant() {
 	if ('0' == tracker.current()) {
 		// found 0 constant
+		// TODO: is checking for alpha really enough?
+			if (isalpha(tracker.fgetc())) {
+				throw LexingException("0 constant must not be followed by character.", tracker.currentPosition());
+			}
+		tracker.ungetc();
 		appendToToken('0');
 		storeToken(TokenType::CONSTANT);
 		return true;
