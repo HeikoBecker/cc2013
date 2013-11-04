@@ -76,9 +76,9 @@ int main(int, char** const argv)
 			}
 		}
 	} catch (Lexing::LexingException const& e) {
-	  std::cout << e.where().name << ":" << e.where().line << ":" << e.where().column << ":"
+	  std::cout << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
 							<< std::endl
-						  << "Encountered fatal error while lexing at"
+						  << "Encountered fatal error:" << std::endl
 							<< e.what()
 							<< std::endl;
 		return -1;
