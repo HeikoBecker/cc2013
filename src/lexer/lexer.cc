@@ -257,11 +257,14 @@ bool Lexer::consumeIdentOrDecConstant() {
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
 Token Lexer::getNextToken() {
+  tokens.clear();
   if ((tracker.fgetc() != EOF)) {
     if (consumeWhitespace()) {
       // reached EOF
       return genToken(TokenType::END);
     }
+
+    tracker.storePosition();
     // new token begins after whitespace
     if (consumeQuoted() ||
         consumeIdentOrDecConstant() ||
@@ -277,37 +280,30 @@ Token Lexer::getNextToken() {
   }
 }
 
-
 std::vector<Token> Lexer::lex() {
   /* delim is the current token deliminator
    * it is WHITESPACE, except when a (double) quote has been previously
    * encountered 
    */
-  while ((tracker.fgetc() != EOF)) {
-    if (consumeWhitespace()) {
-      // reached EOF
-      return this->tokens;
-    }
-    // new token begins after whitespace
-    tracker.storePosition();
-    if (consumeQuoted()) {
-      continue;
-    } else if (consumeIdentOrDecConstant()) {
-      continue;
-    } else if (consumeComment()) {
-      continue;
-    } else if (consumePunctuator()) {
-      continue;
-    } else {
+
+  std::vector<Token> tokenList = std::vector<Token>();
+  while (true) {
+    Token token = getNextToken();
+
+    if(token.type() == TokenType::END) {
+      break;
+    } else if (token.type() == TokenType::ILLEGAL) {
       // report error
       std::ostringstream msg;
       msg << "Got illegal token: " 
           << static_cast<unsigned char>(tracker.current ()) 
           << std::endl;
       throw LexingException(msg.str(), tracker.currentPosition ());
+    } else {
+      tokenList.push_back(tokens[0]);
     }
   }
-  return tokens;
+  return tokenList;
 };
 
 Token Lexer::genToken(TokenType type) {

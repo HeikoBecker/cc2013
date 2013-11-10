@@ -9,7 +9,6 @@
 
 namespace Lexing {
 
-
   /* TODO: derive from another base exception (e.g. compilerexception) */
   class LexingException: public std::runtime_error 
   {
@@ -108,7 +107,6 @@ namespace Lexing {
   };
 
   void printToken(const Token token);
-
 }
 
 #endif
