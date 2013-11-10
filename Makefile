@@ -5,6 +5,14 @@ SRCDIR   ?= src
 
 Q ?= @
 
+
+UNAME := $(shell uname)
+
+# for mac another compiler
+ifeq ($(UNAME), Darwin)
+  CXX := /opt/local/bin/g++-mp-4.8
+endif
+
 BINDIR := $(BUILDDIR)/$(CFG)
 BIN    := $(BINDIR)/$(NAME)
 SUBDIRS := lexer
