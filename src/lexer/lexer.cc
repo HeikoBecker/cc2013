@@ -256,6 +256,28 @@ bool Lexer::consumeIdentOrDecConstant() {
 
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
+Token Lexer::getNextToken() {
+  if ((tracker.fgetc() != EOF)) {
+    if (consumeWhitespace()) {
+      // reached EOF
+      return genToken(TokenType::END);
+    }
+    // new token begins after whitespace
+    if (consumeQuoted() ||
+        consumeIdentOrDecConstant() ||
+        consumeComment() ||
+        consumePunctuator()) {
+      return tokens[0];
+    } else {
+      // report error
+      return genToken(TokenType::ILLEGAL);
+    }
+  } else {
+      return genToken(TokenType::END);
+  }
+}
+
+
 std::vector<Token> Lexer::lex() {
   /* delim is the current token deliminator
    * it is WHITESPACE, except when a (double) quote has been previously
@@ -288,12 +310,19 @@ std::vector<Token> Lexer::lex() {
   return tokens;
 };
 
-void Lexer::storeToken(TokenType type) {
-  tokens.push_back(Token(type, tracker.storedPosition(), curword.str()));
+Token Lexer::genToken(TokenType type) {
+  return Token(Token(type, tracker.storedPosition(), curword.str()));
+}
+
+void Lexer::resetCurrentWord() {
   curword.str("");
   curword.clear();
 }
 
+void Lexer::storeToken(TokenType type) {
+  tokens.push_back(genToken(type));
+  resetCurrentWord();
+}
 
 FileTracker::FileTracker(FILE* f, char const *name) 
   : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {
@@ -330,7 +359,6 @@ int FileTracker::ungetc(bool reset) {
 void FileTracker::storePosition() {
   m_storedPosition = m_position;
 }
-
 
 void Lexing::printToken(const Token token) {
   auto posinfo = token.pos();
