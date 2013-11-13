@@ -49,7 +49,7 @@ int main(int, char** const argv)
           f    = stdin;
           name = "<stdin>";
         } else {
-          f = fopen(name, "rb");
+          f = fopen(name, "r");
           if (!f)
             errorErrno(Pos(name));
         }
@@ -76,12 +76,12 @@ int main(int, char** const argv)
       }
     }
   } catch (Lexing::LexingException const& e) {
-    std::cout << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
+    std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
       << std::endl
       << "Encountered fatal error:" << std::endl
       << e.what()
       << std::endl;
-    return -1;
+    return 1;
   } catch (std::exception const& e) {
     errorf("caught exception: %s", e.what());
   } catch (...) {
