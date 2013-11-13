@@ -258,7 +258,7 @@ Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword
 
 Token Lexer::getNextToken() {
   tokens.clear();
-  if ((tracker.fgetc() != EOF)) {
+  while ((tracker.fgetc() != EOF)) {
     if (consumeWhitespace()) {
       // reached EOF
       return genToken(TokenType::END);
@@ -266,6 +266,9 @@ Token Lexer::getNextToken() {
 
     tracker.storePosition();
     // new token begins after whitespace
+    if (consumeComment()) {
+      continue;
+    }
     if (consumeQuoted() ||
         consumeIdentOrDecConstant() ||
         consumeComment() ||
@@ -275,9 +278,8 @@ Token Lexer::getNextToken() {
       // report error
       return genToken(TokenType::ILLEGAL);
     }
-  } else {
-      return genToken(TokenType::END);
   }
+  return genToken(TokenType::END);
 }
 
 std::vector<Token> Lexer::lex() {
