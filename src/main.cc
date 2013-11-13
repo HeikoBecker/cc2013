@@ -77,10 +77,10 @@ int main(int, char** const argv)
     }
   } catch (Lexing::LexingException const& e) {
     std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
-      << std::endl
-      << "Encountered fatal error:" << std::endl
+      << "\n"
+      << "Encountered fatal error:" << "\n"
       << e.what()
-      << std::endl;
+      << "\n";
     return 1;
   } catch (std::exception const& e) {
     errorf("caught exception: %s", e.what());
