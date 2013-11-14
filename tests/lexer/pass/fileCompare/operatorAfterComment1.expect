@@ -1,0 +1,17 @@
+operatorAfterComment1.c:1:1: keyword int
+operatorAfterComment1.c:1:5: identifier main
+operatorAfterComment1.c:1:9: punctuator (
+operatorAfterComment1.c:1:10: punctuator )
+operatorAfterComment1.c:1:12: punctuator {
+operatorAfterComment1.c:2:2: keyword int
+operatorAfterComment1.c:2:6: identifier a
+operatorAfterComment1.c:2:8: punctuator =
+operatorAfterComment1.c:2:10: constant 5
+operatorAfterComment1.c:2:10: constant 5
+operatorAfterComment1.c:3:3: punctuator /
+operatorAfterComment1.c:3:4: constant 3
+operatorAfterComment1.c:3:5: punctuator ;
+operatorAfterComment1.c:4:2: keyword return
+operatorAfterComment1.c:4:9: constant 0
+operatorAfterComment1.c:4:10: punctuator ;
+operatorAfterComment1.c:5:1: punctuator }

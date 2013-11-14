@@ -41,15 +41,15 @@ for word in files:
   if '/' in word:
     print('testing %s' % word)
     os.system('python %s/%s/gen.py' % (path, word))
-    for path, dirs, files in os.walk('%s/%s/' % (path, word)):
+    for filePath, dirs, files in os.walk('%s/%s/' % (path, word)):
       for f in files:
         if f.endswith('.in'):
           f = f[:-3]
-          inFile = '%s%s.in' % (path[:-1], f)
-          outFile = '%s%s.out' % (path[:-1], f)
+          inFile = '%s%s.in' % (filePath[:-1], f)
+          outFile = '%s%s.out' % (filePath[:-1], f)
 
           os.system('%s %s >>%s' % (program, inFile, outFile))
-          if (not (diff('%s%s' % (path[:-1],f)))) :
+          if (not (diff('%s%s' % (filePath[:-1],f)))) :
             sys.exit('== FAIL TEST ERRORS ==')
 
 print ('== SUCCESS ALL TESTS PASSED ==')

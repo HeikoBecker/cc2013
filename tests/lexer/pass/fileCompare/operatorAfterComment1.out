@@ -1,0 +1,17 @@
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:1:1: keyword int
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:1:5: identifier main
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:1:9: punctuator (
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:1:10: punctuator )
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:1:12: punctuator {
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:2:2: keyword int
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:2:6: identifier a
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:2:8: punctuator =
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:2:10: constant 5
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:2:10: constant 5
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:3:3: punctuator /
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:3:4: constant 3
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:3:5: punctuator ;
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:4:2: keyword return
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:4:9: constant 0
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:4:10: punctuator ;
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/operatorAfterComment1.in:5:1: punctuator }

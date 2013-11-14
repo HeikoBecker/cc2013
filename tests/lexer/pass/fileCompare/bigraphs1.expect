@@ -1,0 +1,17 @@
+bigraphs1.c:1:1: keyword int
+bigraphs1.c:1:5: identifier main
+bigraphs1.c:1:9: punctuator (
+bigraphs1.c:1:10: keyword int
+bigraphs1.c:1:14: identifier argc
+bigraphs1.c:1:18: punctuator ,
+bigraphs1.c:1:20: keyword char
+bigraphs1.c:1:24: punctuator *
+bigraphs1.c:1:26: identifier argv
+bigraphs1.c:1:30: punctuator <:
+bigraphs1.c:1:32: punctuator :>
+bigraphs1.c:1:34: punctuator )
+bigraphs1.c:1:36: punctuator <%
+bigraphs1.c:2:2: keyword return
+bigraphs1.c:2:9: constant 0
+bigraphs1.c:2:10: punctuator ;
+bigraphs1.c:3:1: punctuator %>

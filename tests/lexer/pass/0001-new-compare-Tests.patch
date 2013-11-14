@@ -1,0 +1,228 @@
+From a84ab1b785b747a5f97a36360882b77403907b61 Mon Sep 17 00:00:00 2001
+From: Patrick Klitzke <pklitzke@fb.com>
+Date: Thu, 14 Nov 2013 02:14:05 -0800
+Subject: [PATCH] new compare Tests
+
+---
+ tests/lexer/pass/bigraphs1.c                       |    3 --
+ tests/lexer/pass/commentAfterEqual.c               |    5 ---
+ tests/lexer/pass/fileCompare/bigraphs1.c           |    3 ++
+ tests/lexer/pass/fileCompare/bigraphs1.e           |   17 +++++++++++
+ tests/lexer/pass/fileCompare/commentAfterEqual.c   |    5 +++
+ tests/lexer/pass/fileCompare/commentAfterEqual.e   |   29 ++++++++++++++++++++
+ tests/lexer/pass/fileCompare/gen.py                |   13 +++++++++
+ tests/lexer/pass/fileCompare/genExpect.bash        |    2 +
+ .../lexer/pass/fileCompare/operatorAfterComment1.c |    5 +++
+ .../lexer/pass/fileCompare/operatorAfterComment1.e |   17 +++++++++++
+ tests/lexer/pass/operatorAfterComment1.c           |    5 ---
+ tests/lexer/pass/test.py                           |    8 +++---
+ 12 files changed, 95 insertions(+), 17 deletions(-)
+ delete mode 100644 tests/lexer/pass/bigraphs1.c
+ delete mode 100644 tests/lexer/pass/commentAfterEqual.c
+ create mode 100644 tests/lexer/pass/fileCompare/bigraphs1.c
+ create mode 100644 tests/lexer/pass/fileCompare/bigraphs1.e
+ create mode 100644 tests/lexer/pass/fileCompare/commentAfterEqual.c
+ create mode 100644 tests/lexer/pass/fileCompare/commentAfterEqual.e
+ create mode 100644 tests/lexer/pass/fileCompare/gen.py
+ create mode 100644 tests/lexer/pass/fileCompare/genExpect.bash
+ create mode 100644 tests/lexer/pass/fileCompare/operatorAfterComment1.c
+ create mode 100644 tests/lexer/pass/fileCompare/operatorAfterComment1.e
+ delete mode 100644 tests/lexer/pass/operatorAfterComment1.c
+
+diff --git a/tests/lexer/pass/bigraphs1.c b/tests/lexer/pass/bigraphs1.c
+deleted file mode 100644
+index 36a47f8..0000000
+--- a/tests/lexer/pass/bigraphs1.c
++++ /dev/null
+@@ -1,3 +0,0 @@
+-int main(int argc, char* argv<::>) <%
+-	return 0;
+-%>
+diff --git a/tests/lexer/pass/commentAfterEqual.c b/tests/lexer/pass/commentAfterEqual.c
+deleted file mode 100644
+index 16ad5e8..0000000
+--- a/tests/lexer/pass/commentAfterEqual.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-int main(int argc, char* argv[]) {
+-	char* text = "hihoha";
+-	char t =/*error: comment int union */'o';
+-	return 0;
+-}
+diff --git a/tests/lexer/pass/fileCompare/bigraphs1.c b/tests/lexer/pass/fileCompare/bigraphs1.c
+new file mode 100644
+index 0000000..36a47f8
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/bigraphs1.c
+@@ -0,0 +1,3 @@
++int main(int argc, char* argv<::>) <%
++	return 0;
++%>
+diff --git a/tests/lexer/pass/fileCompare/bigraphs1.e b/tests/lexer/pass/fileCompare/bigraphs1.e
+new file mode 100644
+index 0000000..54d997c
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/bigraphs1.e
+@@ -0,0 +1,17 @@
++bigraphs1.c:1:1: keyword int
++bigraphs1.c:1:5: identifier main
++bigraphs1.c:1:9: punctuator (
++bigraphs1.c:1:10: keyword int
++bigraphs1.c:1:14: identifier argc
++bigraphs1.c:1:18: punctuator ,
++bigraphs1.c:1:20: keyword char
++bigraphs1.c:1:24: punctuator *
++bigraphs1.c:1:26: identifier argv
++bigraphs1.c:1:30: punctuator <:
++bigraphs1.c:1:32: punctuator :>
++bigraphs1.c:1:34: punctuator )
++bigraphs1.c:1:36: punctuator <%
++bigraphs1.c:2:2: keyword return
++bigraphs1.c:2:9: constant 0
++bigraphs1.c:2:10: punctuator ;
++bigraphs1.c:3:1: punctuator %>
+diff --git a/tests/lexer/pass/fileCompare/commentAfterEqual.c b/tests/lexer/pass/fileCompare/commentAfterEqual.c
+new file mode 100644
+index 0000000..16ad5e8
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/commentAfterEqual.c
+@@ -0,0 +1,5 @@
++int main(int argc, char* argv[]) {
++	char* text = "hihoha";
++	char t =/*error: comment int union */'o';
++	return 0;
++}
+diff --git a/tests/lexer/pass/fileCompare/commentAfterEqual.e b/tests/lexer/pass/fileCompare/commentAfterEqual.e
+new file mode 100644
+index 0000000..cd77b73
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/commentAfterEqual.e
+@@ -0,0 +1,29 @@
++commentAfterEqual.c:1:1: keyword int
++commentAfterEqual.c:1:5: identifier main
++commentAfterEqual.c:1:9: punctuator (
++commentAfterEqual.c:1:10: keyword int
++commentAfterEqual.c:1:14: identifier argc
++commentAfterEqual.c:1:18: punctuator ,
++commentAfterEqual.c:1:20: keyword char
++commentAfterEqual.c:1:24: punctuator *
++commentAfterEqual.c:1:26: identifier argv
++commentAfterEqual.c:1:30: punctuator [
++commentAfterEqual.c:1:31: punctuator ]
++commentAfterEqual.c:1:32: punctuator )
++commentAfterEqual.c:1:34: punctuator {
++commentAfterEqual.c:2:2: keyword char
++commentAfterEqual.c:2:6: punctuator *
++commentAfterEqual.c:2:8: identifier text
++commentAfterEqual.c:2:13: punctuator =
++commentAfterEqual.c:2:15: stringliteral "hihoha"
++commentAfterEqual.c:2:23: punctuator ;
++commentAfterEqual.c:3:2: keyword char
++commentAfterEqual.c:3:7: identifier t
++commentAfterEqual.c:3:9: punctuator =
++commentAfterEqual.c:3:9: punctuator =
++commentAfterEqual.c:3:39: constant 'o'
++commentAfterEqual.c:3:42: punctuator ;
++commentAfterEqual.c:4:2: keyword return
++commentAfterEqual.c:4:9: constant 0
++commentAfterEqual.c:4:10: punctuator ;
++commentAfterEqual.c:5:1: punctuator }
+diff --git a/tests/lexer/pass/fileCompare/gen.py b/tests/lexer/pass/fileCompare/gen.py
+new file mode 100644
+index 0000000..d866f3d
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/gen.py
+@@ -0,0 +1,13 @@
++import os
++import sys
++
++nameFile = 'keyword';
++
++path = os.path.abspath(__file__)
++pos = path.rfind('/')
++path = path[0:pos]
++os.system('rm -f %s/*.in' % path)
++os.system('rm -f %s/*.out' % path)
++os.system('rm -f %s/*.expect' % path)
++os.system("ls %s | grep '\.c'| sed 's/.c//' | xargs -I% sh -c 'cp %s/%.c %s/%.in' ".replace('%s',path));
++os.system("ls %s | grep '\.c'| sed 's/.c//' | xargs -I% sh -c 'cp %s/%.e %s/%.expect' ".replace('%s',path));
+diff --git a/tests/lexer/pass/fileCompare/genExpect.bash b/tests/lexer/pass/fileCompare/genExpect.bash
+new file mode 100644
+index 0000000..13bfc65
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/genExpect.bash
+@@ -0,0 +1,2 @@
++# gets the input files and generates the expect files
++ls | grep c | sed 's/.c//' | xargs -I% sh -c "../../../../build/default/c4 --tokenize %.c >> %.e"
+diff --git a/tests/lexer/pass/fileCompare/operatorAfterComment1.c b/tests/lexer/pass/fileCompare/operatorAfterComment1.c
+new file mode 100644
+index 0000000..b4214b0
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/operatorAfterComment1.c
+@@ -0,0 +1,5 @@
++int main() {
++	int a = 5 //
++		/3;
++	return 0;
++}
+diff --git a/tests/lexer/pass/fileCompare/operatorAfterComment1.e b/tests/lexer/pass/fileCompare/operatorAfterComment1.e
+new file mode 100644
+index 0000000..5cc6055
+--- /dev/null
++++ b/tests/lexer/pass/fileCompare/operatorAfterComment1.e
+@@ -0,0 +1,17 @@
++operatorAfterComment1.c:1:1: keyword int
++operatorAfterComment1.c:1:5: identifier main
++operatorAfterComment1.c:1:9: punctuator (
++operatorAfterComment1.c:1:10: punctuator )
++operatorAfterComment1.c:1:12: punctuator {
++operatorAfterComment1.c:2:2: keyword int
++operatorAfterComment1.c:2:6: identifier a
++operatorAfterComment1.c:2:8: punctuator =
++operatorAfterComment1.c:2:10: constant 5
++operatorAfterComment1.c:2:10: constant 5
++operatorAfterComment1.c:3:3: punctuator /
++operatorAfterComment1.c:3:4: constant 3
++operatorAfterComment1.c:3:5: punctuator ;
++operatorAfterComment1.c:4:2: keyword return
++operatorAfterComment1.c:4:9: constant 0
++operatorAfterComment1.c:4:10: punctuator ;
++operatorAfterComment1.c:5:1: punctuator }
+diff --git a/tests/lexer/pass/operatorAfterComment1.c b/tests/lexer/pass/operatorAfterComment1.c
+deleted file mode 100644
+index b4214b0..0000000
+--- a/tests/lexer/pass/operatorAfterComment1.c
++++ /dev/null
+@@ -1,5 +0,0 @@
+-int main() {
+-	int a = 5 //
+-		/3;
+-	return 0;
+-}
+diff --git a/tests/lexer/pass/test.py b/tests/lexer/pass/test.py
+index b45862f..ebbee7a 100644
+--- a/tests/lexer/pass/test.py
++++ b/tests/lexer/pass/test.py
+@@ -41,15 +41,15 @@ for word in files:
+   if '/' in word:
+     print('testing %s' % word)
+     os.system('python %s/%s/gen.py' % (path, word))
+-    for path, dirs, files in os.walk('%s/%s/' % (path, word)):
++    for filePath, dirs, files in os.walk('%s/%s/' % (path, word)):
+       for f in files:
+         if f.endswith('.in'):
+           f = f[:-3]
+-          inFile = '%s%s.in' % (path[:-1], f)
+-          outFile = '%s%s.out' % (path[:-1], f)
++          inFile = '%s%s.in' % (filePath[:-1], f)
++          outFile = '%s%s.out' % (filePath[:-1], f)
+ 
+           os.system('%s %s >>%s' % (program, inFile, outFile))
+-          if (not (diff('%s%s' % (path[:-1],f)))) :
++          if (not (diff('%s%s' % (filePath[:-1],f)))) :
+             sys.exit('== FAIL TEST ERRORS ==')
+ 
+ print ('== SUCCESS ALL TESTS PASSED ==')
+-- 
+1.7.4.4
+

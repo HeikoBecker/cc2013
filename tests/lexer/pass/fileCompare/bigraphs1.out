@@ -1,0 +1,17 @@
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:1: keyword int
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:5: identifier main
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:9: punctuator (
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:10: keyword int
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:14: identifier argc
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:18: punctuator ,
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:20: keyword char
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:24: punctuator *
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:26: identifier argv
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:30: punctuator <:
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:32: punctuator :>
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:34: punctuator )
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:1:36: punctuator <%
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:2:2: keyword return
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:2:9: constant 0
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:2:10: punctuator ;
+/Users/pklitzke/c4/tests/lexer/pass/fileCompare/bigraphs1.in:3:1: punctuator %>
