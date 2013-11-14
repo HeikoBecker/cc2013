@@ -7,7 +7,7 @@ Q ?= @
 
 BINDIR := $(BUILDDIR)/$(CFG)
 BIN    := $(BINDIR)/$(NAME)
-SRC    := $(sort $(wildcard $(SRCDIR)/*.cc))
+SRC    := $(sort $(shell find $(SRCDIR) -name '*.cc'))
 OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 
