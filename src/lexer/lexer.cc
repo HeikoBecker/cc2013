@@ -30,9 +30,6 @@ const std::unordered_set<std::string> Lexer::keywords =
   "volatile", "while",
 }};
 
-Token::Token(TokenType type, Pos posinfo, std::string value)
-: m_type(type), m_posinfo(posinfo), m_value(value) {}
-
 bool Lexer::consumePunctuator() {
 #define MAXOPLENGTH 3
   auto count_matches = 0;

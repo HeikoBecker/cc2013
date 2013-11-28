@@ -24,7 +24,47 @@ namespace Parsing {
       bool parse();
 
     private:
-      vector<Token> tokenList;
+      vector<Token> m_tokenList;
+      Token m_nextsym;
+
+      Token scan();
+
+      // parse functions
+      void primaryExpression();
+      void postfixExpression();
+      void argumentExpressionList();
+      void unaryExpression();
+      void unaryOperator(); // TODO: probably not needed
+      void additiveExpression();
+      void multiplicativeExpression();
+      void castExpression();
+      void declaration();
+      void declarationSpecifiers();
+      void initDeclaratorList();
+      void initDeclarator();
+      void typeSpecifier();
+      void structOrUnion();
+      void structOrUnionSpecifier();
+      void structDeclarationList();
+      void structDeclaration();
+      void specifierQualifierList();
+      void structDeclaratorList();
+      void structDeclarator();
+      void enumSpecifier();
+      void enumeratorList();
+      void enumerator();
+      void pointer();
+      void parameterTypeList();
+      void parameterList();
+      void parameterDeclaration();
+      void identifierList();
+      void typeName();
+      void declarator();
+      void directOrAbstractDeclarator(bool isDirect);
+      void functionDefinition();
+      void externalDeclaration();
+      void translationUnit();
+      void compoundStatement();
   };
 }
 

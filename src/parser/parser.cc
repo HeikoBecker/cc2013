@@ -7,20 +7,56 @@
 
 #define ABORT do {throw std::exception();} while (false)
 
-using namespace std;
 using namespace Lexing;
 using namespace Parsing;
 
 // init parser
-Parser::Parser(vector<Token> tokens) : tokenList(std::move(tokens)) {
+Parser::Parser(vector<Token> tokens) : m_tokenList(std::move(tokens)) , m_nextsym(m_tokenList.front()) {
   // should you really copy?
   // or is a reference enough
 }
 
 bool Parser::parse() {
-  bool ok = true;
+  auto ok = true;
 
   // do the parsing here
 
   return ok;
+}
+
+Token Parser::scan() {
+  return m_nextsym;
+  // TODO: implement this for real
+}
+
+void Parser::translationUnit() {
+  // TODO: handle more than one externalDeclaration
+  externalDeclaration();
+}
+
+void Parser::externalDeclaration() {
+  functionDefinition();
+}
+
+
+void Parser::functionDefinition() {
+  declarationSpecifiers();
+  declarator();
+  compoundStatement();
+}
+
+void Parser::declarationSpecifiers() {
+  typeSpecifier();
+}
+
+void Parser::typeSpecifier() {
+  // TODO
+}
+
+void Parser::declarator() {
+  // TODO
+}
+
+void Parser::compoundStatement() {
+  // TODO
 }
