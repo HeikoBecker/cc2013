@@ -5,7 +5,7 @@
 #include <utility> // for std::move
 #include "parser.h"
 
-#define ABORT do {throw std::exception();} while (false)
+#define ABORT(X) do {throw std::exception();} while (false)
 
 using namespace Lexing;
 using namespace Parsing;
@@ -19,8 +19,12 @@ Parser::Parser(vector<Token> tokens) : m_tokenList(std::move(tokens)) , m_nextsy
 bool Parser::parse() {
   auto ok = true;
 
-  // do the parsing here
-
+  /*This is the entry point*/
+  scan();
+  translationUnit();
+  if (m_nextsym.type() != TokenType::END) {
+    ABORT();
+  }
   return ok;
 }
 
@@ -50,7 +54,15 @@ void Parser::declarationSpecifiers() {
 }
 
 void Parser::typeSpecifier() {
-  // TODO
+  if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "void") {
+    scan();
+  } else if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "char") {
+    scan();
+  } else if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "int") {
+    scan();
+  } else {
+    
+  }
 }
 
 void Parser::declarator() {
