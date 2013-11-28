@@ -3,6 +3,7 @@
 #include "diagnostic.h"
 #include "util.h"
 #include "lexer/lexer.h"
+#include "parser/parser.h"
 #include <iostream>
 
 enum class Mode {
@@ -66,9 +67,21 @@ int main(int, char** const argv)
             }
             break;
           case Mode::PARSE:
+          {
+            Parsing::Parser parser(tokens);
+            if (parser.parse()) {
+              printf("PARSING SUCCESSFUL");
+            } else {
+              PANIC("PARSING FAILED");
+            }
+            break;
+          }
           case Mode::PRINT_AST:
+            PANIC("TODO implement");
+            break;
           case Mode::COMPILE:
             PANIC("TODO implement");
+            break;
         }
 
         if (f != stdin)
