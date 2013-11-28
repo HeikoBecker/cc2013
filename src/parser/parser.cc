@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cctype>
-#include "../lexer/lexer.h"
+#include "parser.h"
 
 #define ABORT do {throw std::exception();} while (false)
 
