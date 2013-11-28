@@ -6,6 +6,7 @@
 #include <sstream>
 #include <stdexcept>
 #include "../pos.h"
+#include "token.h"
 
 namespace Lexing {
 
@@ -18,9 +19,6 @@ namespace Lexing {
     private:
       Pos m_where;
   };
-
-
-  class Token;
 
   /*
    * \brief A thin wrapper around fgetc and ungetc which keeps track of the
@@ -46,17 +44,7 @@ namespace Lexing {
       int m_lastChar;
   };
 
-  enum class TokenType {
-    KEYWORD = 0,
-    IDENTIFIER = 1,
-    CONSTANT = 2,
-    STRINGLITERAL = 3,
-    PUNCTUATOR = 4,
-    ILLEGAL = 5,
-    END = 6
-  };
-
-  /*
+ /*
    * \brief Class implementing the basic lexing functionality
    * @TODO
    *
@@ -91,21 +79,6 @@ namespace Lexing {
       Token genToken(TokenType type);
       void resetCurrentWord();
   };
-
-  // TODO: consider to make this class templated over the TokenType
-  class Token
-  {
-    public:
-      Token(TokenType type, Pos posinfo, std::string value); 
-      TokenType type() const {return this->m_type;}
-      Pos pos() const {return this->m_posinfo;}
-      std::string value() const {return this->m_value;}
-    private:
-      const TokenType m_type;
-      const Pos m_posinfo; 
-      const std::string m_value;
-  };
-
   void printToken(const Token token);
 }
 
