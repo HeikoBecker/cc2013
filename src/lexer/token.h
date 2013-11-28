@@ -1,6 +1,9 @@
 #ifndef LEXER_TOKEN_H
 #define LEXER_TOKEN_H
 
+#include "../pos.h"
+
+
 namespace Lexing {
   enum class TokenType {
     KEYWORD = 0,

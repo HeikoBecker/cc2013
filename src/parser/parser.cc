@@ -11,10 +11,9 @@ using namespace Lexing;
 using namespace Parsing;
 
 // init parser
-Parser::Parser(vector<Token> tokens) {
+Parser::Parser(vector<Token> tokens) : tokenList(tokens) {
   // should you really copy?
   // or is a reference enough
-  tokenList = tokens;
 }
 
 bool Parser::parse() {
