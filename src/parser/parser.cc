@@ -39,6 +39,7 @@ void Parser::translationUnit() {
 }
 
 void Parser::externalDeclaration() {
+  // TODO : also handle declaration 
   functionDefinition();
 }
 
