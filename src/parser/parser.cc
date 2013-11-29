@@ -35,6 +35,18 @@ string Parser::getNextValue() {
   return getNextSymbol().value(); 
 }
 
+bool Parser::testType(TokenType type) {
+  return getNextType() == type;
+}
+
+bool Parser::testValue(string value) {
+  return getNextValue() == value;
+}
+
+bool Parser::test(TokenType type, string val) {
+  return testType(type) && testValue(val);
+}
+
 Token Parser::scan() {
   posTokenList++;
   // TODO : throw exception when scanning after list
@@ -81,14 +93,15 @@ void Parser::declarationSpecifiers() {
 }
 
 void Parser::typeSpecifier() {
-  if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "void") {
+  if (test(TokenType::KEYWORD, "void")) {
     scan();
-  } else if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "char") {
+  } else if (test(TokenType::KEYWORD, "char")) {
     scan();
-  } else if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "int") {
+  } else if (test(TokenType::KEYWORD, "int")) {
     scan();
   } else {
     // TODO: support structs
+    // and throw an exception otherwise
   }
 }
 
@@ -173,7 +186,9 @@ void Parser::enumerator() {
 }
 
 void Parser::pointer() {
-  // TODO
+  while(test(TokenType::PUNCTUATOR,"*")) {
+    scan();
+  }
 }
 
 void Parser::parameterTypeList() {

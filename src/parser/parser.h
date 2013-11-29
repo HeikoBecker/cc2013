@@ -34,6 +34,9 @@ namespace Parsing {
       TokenType getNextType();
       string getNextValue();
       Token scan();
+      bool testType(TokenType token);
+      bool testValue(string value);
+      bool test(TokenType token, string value);
 
       // debug function 
       void debugOutput();
