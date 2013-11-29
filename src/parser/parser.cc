@@ -55,6 +55,10 @@ bool Parser::testp(string val) {
   return test(TokenType::PUNCTUATOR, val);
 }
 
+bool Parser::testk(string val) {
+  return test(TokenType::KEYWORD, val);
+}
+
 Token Parser::scan() {
   posTokenList++;
   // TODO : throw exception when scanning after list
@@ -79,8 +83,9 @@ bool Parser::parse() {
 }
 
 void Parser::translationUnit() {
-  // TODO: handle more than one externalDeclaration
-  externalDeclaration();
+  while (!testType(TokenType::END)) {
+    externalDeclaration();
+  }
 }
 
 void Parser::externalDeclaration() {
@@ -101,6 +106,7 @@ void Parser::declarationSpecifiers() {
   typeSpecifier();
 }
 
+
 void Parser::typeSpecifier() {
   if (test(TokenType::KEYWORD, "void")) {
     scan();
@@ -108,9 +114,10 @@ void Parser::typeSpecifier() {
     scan();
   } else if (test(TokenType::KEYWORD, "int")) {
     scan();
+  } else if (test(TokenType::KEYWORD, "struct")) {
+    structOrUnionSpecifier();
   } else {
-    // TODO: support structs
-    // and throw an exception otherwise
+    throw "typespecifier : no matching";
   }
 }
 
@@ -153,10 +160,6 @@ void Parser::initDeclaratorList() {
 void Parser::initDeclarator() {
 }
 
-void Parser::structOrUnion() {
-  // TODO
-}
-
 void Parser::structOrUnionSpecifier() {
   // TODO
 }
@@ -194,7 +197,7 @@ void Parser::enumerator() {
 }
 
 void Parser::pointer() {
-  while(test(TokenType::PUNCTUATOR,"*")) {
+  while(testp("*")) {
     scan();
   }
 }
@@ -329,6 +332,102 @@ void Parser::compoundStatement() {
   }
 }
 
+/*
+block-item-list ->  block-item
+                  | block-item block-item-list
+*/
 void Parser::blockItemList() {
+  while(!testp("}")) {
+    blockItem();
+  }
+}
+
+bool Parser::testTypeSpecifier() {
+  return testType(TokenType::KEYWORD) && (
+    testValue("void") || testValue("int") ||
+    testValue("char") || testValue("struct")
+  );
+}
+
+
+/*
+block-item ->   declaration
+              | statement
+*/
+void Parser::blockItem() {
+  // TODO : handle static asser declaration
+  if (testTypeSpecifier()) {
+    declaration();
+  } else {
+    statement();
+  }
+}
+
+/**
+statement ->   
+    labeled-statement
+  | compound-statement
+  | expression-statement 
+  | selection-statement
+  | iteration-statement
+  | jump-statement
+*/
+void Parser::statement() {
+  if(testk("goto") || testk("continue") || testk("break") || testk("return")) {
+    jumpStatement();
+  }
+
+  // TODO : other statements
+}
+
+void Parser::readSemicolon(string funcName) {
+  if(testp(";")) {
+    scan();
+  } else {
+    throw funcName+" expected";
+  }
+}
+
+/*
+jump-statement ->  
+  "goto" identifier ";"
+  "continue" ";"
+  "break" ";"
+  "return" expression ";"
+  "return" ";"
+*/
+void Parser::jumpStatement() {
+  if (testk("goto")) {
+    scan();
+    if(testType(TokenType::IDENTIFIER)) {
+      scan();
+
+      readSemicolon("jump-statement");
+      
+    } else {
+      throw "jump-statement: identifier expected";
+    }
+  } else if (testk("continue")) {
+    scan();
+    readSemicolon("jump-statement");
+  } else if (testk("break")) {
+    scan();
+    readSemicolon("jump-statement");
+  } else if (testk("return")){
+    scan();
+
+    if(testp(";")) {
+      scan();
+    } else {
+      expression();
+      readSemicolon("jump-statement");
+    }
+
+  } else {
+    throw "jump-statement : unexpected token";
+  }
+}
+
+void Parser::expression() {
   // TODO
 }

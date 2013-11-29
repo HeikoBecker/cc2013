@@ -38,12 +38,24 @@ namespace Parsing {
       bool testValue(string value);
       bool test(TokenType token, string value);
       bool testp(string value); // test punctuator
+      bool testk(string value); // test keyword
+      bool testTypeSpecifier();
+
+      void readSemicolon(string funcName);
 
       // debug function 
       void debugOutput();
 
       // parse functions
       void blockItemList();
+      void blockItem();
+
+
+      // statements
+      void statement();
+      void jumpStatement();
+
+      void expression();
       void primaryExpression();
       void postfixExpression();
       void argumentExpressionList();
