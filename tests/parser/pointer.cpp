@@ -1,1 +1,1 @@
-char** arr;
+int***** main () { }
