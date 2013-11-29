@@ -20,7 +20,11 @@ Parser::Parser(vector<Token> tokens) : m_tokenList(std::move(tokens)) , m_nextsy
 
 void Parser::debugOutput() {
   // print current token
-  printToken(getNextSymbol());
+  if (getNextType() == TokenType::END) {
+    cout<<"END OF TOKENS REACHED"<<endl;
+  } else {
+     printToken(getNextSymbol());
+  }
 }
 
 Token Parser::getNextSymbol() {
@@ -45,6 +49,10 @@ bool Parser::testValue(string value) {
 
 bool Parser::test(TokenType type, string val) {
   return testType(type) && testValue(val);
+}
+
+bool Parser::testp(string val) {
+  return test(TokenType::PUNCTUATOR, val);
 }
 
 Token Parser::scan() {
@@ -85,6 +93,7 @@ void Parser::functionDefinition() {
   declarationSpecifiers();
   cout<<"declarator"<<endl;
   declarator();
+  cout<<"compoundStatement();"<<endl;
   compoundStatement();
 }
 
@@ -142,7 +151,6 @@ void Parser::initDeclaratorList() {
 }
 
 void Parser::initDeclarator() {
-  // TODO
 }
 
 void Parser::structOrUnion() {
@@ -211,17 +219,116 @@ void Parser::typeName() {
   // TODO
 }
 
+/*
+declarator ->   pointer direct-declarator
+              | direct-declarator
+*/
 void Parser::declarator() {
-  // TODO
+
+  if(test(TokenType::PUNCTUATOR,"*")) {
+    pointer();
+  }
+
+  directDeclarator();
+}
+
+/*
+direct-declarator -> identifier direct-declarator_help
+                   | "(" declarator ")" direct-declarator_help
+
+*/
+void Parser::directDeclarator() {
+  if (testType(TokenType::IDENTIFIER)) {
+    scan();
+
+    if(testp("(")) {
+      directDeclaratorHelp();
+    }
+
+  } else if (testp("(")) {
+    scan();
+    declarator();
+
+    if(testp(")")) {
+      scan();
+    } else {
+      throw "direct-declarator : expected ')'";
+    }
+
+    if(testp("(")) {
+      directDeclaratorHelp();
+    }
+
+  } else {
+    throw "error in direct Declarator";
+  }
+
+}
+
+/*
+direct-declarator_help -> "(" parameter-type-list ")" direct-declarator_help
+             | "(" identifier-list ")" direct-declarator_help
+                          |  "(" ")" direct-declarator_help
+                                       | EPSILON
+*/
+void Parser::directDeclaratorHelp() {
+  if (testp("(")) {
+    scan();
+
+    // 1. option
+    if(testp(")")) {
+      scan();
+      
+      if(testp("(")) {
+        directDeclaratorHelp();
+      }
+
+      return;
+    }
+
+    // TODO : parameter-type-list
+    // TODO: identifier-list
+  } else {
+    throw "direct-declatror_help : '(' expected";
+  }
+
 }
 
 void Parser::directOrAbstractDeclarator(bool isDirect) {
   if (isDirect) {
     // so we have no compile error 
+    directDeclarator();
+  } else {
+    throw "astract declarator is not implemented yet";
   }
-  // TODO
 }
 
+/**
+compound-statement -> "{" block-item-list "}"
+                     |  "{" "}"
+*/
 void Parser::compoundStatement() {
+  if (testp("{")) {
+    scan();
+
+    if (testp("}")) {
+      scan();
+      return;
+    } else {
+      blockItemList();
+      if(testp("}")) {
+        scan();
+        return;
+      } else {
+        throw "compoundStatement: '}' expected";
+      }
+    }
+
+  } else {
+    throw "compoundStatement: '{' expected";
+  }
+}
+
+void Parser::blockItemList() {
   // TODO
 }

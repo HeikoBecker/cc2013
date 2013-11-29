@@ -293,6 +293,7 @@ std::vector<Token> Lexer::lex() {
     Token token = getNextToken();
 
     if(token.type() == TokenType::END) {
+      tokenList.push_back(token);
       break;
     } else if (token.type() == TokenType::ILLEGAL) {
       // report error

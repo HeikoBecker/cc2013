@@ -37,11 +37,13 @@ namespace Parsing {
       bool testType(TokenType token);
       bool testValue(string value);
       bool test(TokenType token, string value);
+      bool testp(string value); // test punctuator
 
       // debug function 
       void debugOutput();
 
       // parse functions
+      void blockItemList();
       void primaryExpression();
       void postfixExpression();
       void argumentExpressionList();
@@ -52,6 +54,8 @@ namespace Parsing {
       void castExpression();
       void declaration();
       void declarationSpecifiers();
+      void directDeclarator();
+      void directDeclaratorHelp();
       void initDeclaratorList();
       void initDeclarator();
       void typeSpecifier();

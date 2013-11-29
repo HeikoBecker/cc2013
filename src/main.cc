@@ -63,6 +63,9 @@ int main(int, char** const argv)
         switch (mode) {
           case Mode::TOKENIZE:
             for (const auto token : tokens) {
+              if(token.type() == TokenType::END) {
+                break;
+              }
               printToken(token);
             }
             break;
@@ -70,9 +73,9 @@ int main(int, char** const argv)
           {
             Parsing::Parser parser(tokens);
             if (parser.parse()) {
-              printf("PARSING SUCCESSFUL");
+              printf("PARSING SUCCESSFUL\n");
             } else {
-              PANIC("PARSING FAILED");
+              PANIC("PARSING FAILED\n");
             }
             break;
           }
