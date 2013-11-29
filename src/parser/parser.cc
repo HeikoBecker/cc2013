@@ -38,6 +38,9 @@ string Parser::getNextValue() {
 Token Parser::scan() {
   posTokenList++;
   // TODO : throw exception when scanning after list
+  
+  cout<<"SCAN "<<endl;
+  debugOutput();
   return m_tokenList[posTokenList];
 }
 
@@ -47,14 +50,9 @@ bool Parser::parse() {
   /*This is the entry point*/
   scan();
 
-  debugOutput();
-
-  scan();
-  
-  debugOutput();
 
   translationUnit();
-  if (m_nextsym.type() != TokenType::END) {
+  if (getNextType() != TokenType::END) {
     ABORT();
   }
   return ok;
@@ -70,9 +68,10 @@ void Parser::externalDeclaration() {
   functionDefinition();
 }
 
-
 void Parser::functionDefinition() {
+  cout<<"first symbol"<<endl;
   declarationSpecifiers();
+  cout<<"declarator"<<endl;
   declarator();
   compoundStatement();
 }
@@ -93,7 +92,118 @@ void Parser::typeSpecifier() {
   }
 }
 
+void Parser::primaryExpression() {
+  // TODO
+}
+
+void Parser::postfixExpression() {
+  // TODO
+}
+
+void Parser::argumentExpressionList() {
+  // TODO
+}
+
+void Parser::unaryExpression() {
+  // TODO
+}
+
+void Parser::additiveExpression() {
+  // TODO
+}
+
+void Parser::multiplicativeExpression() {
+  // TODO
+}
+
+void Parser::castExpression() {
+  // TODO
+}
+
+void Parser::declaration() {
+  // TODO
+}
+
+void Parser::initDeclaratorList() {
+  // TODO
+}
+
+void Parser::initDeclarator() {
+  // TODO
+}
+
+void Parser::structOrUnion() {
+  // TODO
+}
+
+void Parser::structOrUnionSpecifier() {
+  // TODO
+}
+
+void Parser::structDeclarationList() {
+  // TODO
+}
+
+void Parser::structDeclaration() {
+  // TODO
+}
+
+void Parser::specifierQualifierList() {
+  // TODO
+}
+
+void Parser::structDeclaratorList() {
+  // TODO
+}
+
+void Parser::structDeclarator() {
+  // TODO
+}
+
+void Parser::enumSpecifier() {
+  // TODO
+}
+
+void Parser::enumeratorList() {
+  // TODO
+}
+
+void Parser::enumerator() {
+  // TODO
+}
+
+void Parser::pointer() {
+  // TODO
+}
+
+void Parser::parameterTypeList() {
+  // TODO
+}
+
+void Parser::parameterList() {
+  // TODO
+}
+
+void Parser::parameterDeclaration() {
+  // TODO
+}
+
+void Parser::identifierList() {
+  // TODO
+}
+
+void Parser::typeName() {
+  // TODO
+}
+
 void Parser::declarator() {
+  // TODO
+}
+
+void Parser::directOrAbstractDeclarator(bool isDirect) {
+  if (isDirect) {
+    // so we have no compile error 
+  }
   // TODO
 }
 
