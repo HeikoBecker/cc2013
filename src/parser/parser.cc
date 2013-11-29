@@ -4,6 +4,7 @@
 #include <cctype>
 #include <utility> // for std::move
 #include "parser.h"
+#include "../lexer/lexer.h"
 
 #define ABORT(X) do {throw std::exception();} while (false)
 
@@ -14,6 +15,30 @@ using namespace Parsing;
 Parser::Parser(vector<Token> tokens) : m_tokenList(std::move(tokens)) , m_nextsym(m_tokenList.front()) {
   // should you really copy?
   // or is a reference enough
+  posTokenList = -1;
+}
+
+void Parser::debugOutput() {
+  // print current token
+  printToken(getNextSymbol());
+}
+
+Token Parser::getNextSymbol() {
+  return m_tokenList[posTokenList];
+}
+
+TokenType Parser::getNextType() {
+  return getNextSymbol().type();
+}
+
+string Parser::getNextValue() {
+  return getNextSymbol().value(); 
+}
+
+Token Parser::scan() {
+  posTokenList++;
+  // TODO : throw exception when scanning after list
+  return m_tokenList[posTokenList];
 }
 
 bool Parser::parse() {
@@ -21,16 +46,18 @@ bool Parser::parse() {
 
   /*This is the entry point*/
   scan();
+
+  debugOutput();
+
+  scan();
+  
+  debugOutput();
+
   translationUnit();
   if (m_nextsym.type() != TokenType::END) {
     ABORT();
   }
   return ok;
-}
-
-Token Parser::scan() {
-  return m_nextsym;
-  // TODO: implement this for real
 }
 
 void Parser::translationUnit() {
@@ -62,7 +89,7 @@ void Parser::typeSpecifier() {
   } else if (m_nextsym.type() == TokenType::KEYWORD && m_nextsym.value() == "int") {
     scan();
   } else {
-    
+    // TODO: support structs
   }
 }
 

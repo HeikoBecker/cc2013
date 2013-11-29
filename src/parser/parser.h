@@ -26,8 +26,17 @@ namespace Parsing {
     private:
       vector<Token> m_tokenList;
       Token m_nextsym;
+      int posTokenList;
 
+
+      // function concerning reading
+      Token getNextSymbol();
+      TokenType getNextType();
+      string getNextValue();
       Token scan();
+
+      // debug function 
+      void debugOutput();
 
       // parse functions
       void primaryExpression();
