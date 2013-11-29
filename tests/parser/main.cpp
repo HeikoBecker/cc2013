@@ -1,1 +1,8 @@
-int main () { }
+
+
+int main () { 
+
+}
+
+char calcChar () { }
+void nothing () { }

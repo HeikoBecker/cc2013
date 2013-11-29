@@ -79,8 +79,9 @@ bool Parser::parse() {
 }
 
 void Parser::translationUnit() {
-  // TODO: handle more than one externalDeclaration
-  externalDeclaration();
+  while (!testType(TokenType::END)) {
+    externalDeclaration();
+  }
 }
 
 void Parser::externalDeclaration() {
