@@ -4,3 +4,4 @@ compiler.creator
 compiler.files
 compiler.includes
 /build
+*.swp

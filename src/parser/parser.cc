@@ -63,7 +63,7 @@ Token Parser::scan() {
   posTokenList++;
   // TODO : throw exception when scanning after list
   
-  cout<<"SCAN "<<endl;
+  cout<<"SCAN :";
   debugOutput();
   return m_tokenList[posTokenList];
 }
@@ -374,11 +374,56 @@ statement ->
 */
 void Parser::statement() {
   if(testk("goto") || testk("continue") || testk("break") || testk("return")) {
+    // jump-statement
     jumpStatement();
+  } else if(testp("{")) {
+    compoundStatement();
+  } else if(testk("if") || testk("switch")) {
+    selectionStatement();
   }
-
   // TODO : other statements
 }
+
+
+/*
+selection-statement ->   "if" "(" expression ")" statement
+   | "if" "(" expression ")" statement "else" statement
+   | "switch" "(" expression ")" statement
+*/
+
+void Parser::selectionStatement() {
+  if (testk("if")) {
+    scan();
+
+    readP("(");
+    expression();
+    readP(")");
+    statement();
+
+    if(testk("else")) {
+      scan();
+      statement();
+    }
+  
+  } else if (testk("switch")) {
+    scan();
+    readP("(");
+    expression();
+    readP(")");
+    statement();
+  } else {
+    throw "selectionStatement: no match";
+  }
+}
+
+void Parser::readP(string value) {
+  if(testp(value)) {
+    scan();
+  } else {
+    throw "error: "+value+" expected";
+  }
+}
+
 
 void Parser::readSemicolon(string funcName) {
   if(testp(";")) {

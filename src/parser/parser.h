@@ -40,6 +40,7 @@ namespace Parsing {
       bool testp(string value); // test punctuator
       bool testk(string value); // test keyword
       bool testTypeSpecifier();
+      void readP(string value); // read punctuator 
 
       void readSemicolon(string funcName);
 
@@ -54,6 +55,7 @@ namespace Parsing {
       // statements
       void statement();
       void jumpStatement();
+      void selectionStatement();
 
       void expression();
       void primaryExpression();
