@@ -378,7 +378,7 @@ void Parser::statement() {
     jumpStatement();
   } else if(testp("{")) {
     compoundStatement();
-  } else if(testk("if") || testk("switch")) {
+  } else if(testk("if")) {
     selectionStatement();
   } else if(testk("while") || testk("do")) {
     iterationStatement();
@@ -417,7 +417,6 @@ void Parser::iterationStatement() {
 /*
 selection-statement ->   "if" "(" expression ")" statement
    | "if" "(" expression ")" statement "else" statement
-   | "switch" "(" expression ")" statement
 */
 
 void Parser::selectionStatement() {
@@ -433,13 +432,6 @@ void Parser::selectionStatement() {
       scan();
       statement();
     }
-  
-  } else if (testk("switch")) {
-    scan();
-    readP("(");
-    expression();
-    readP(")");
-    statement();
   } else {
     throw "selectionStatement: no match";
   }
