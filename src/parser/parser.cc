@@ -380,8 +380,37 @@ void Parser::statement() {
     compoundStatement();
   } else if(testk("if") || testk("switch")) {
     selectionStatement();
+  } else if(testk("while") || testk("do")) {
+    iterationStatement();
   }
   // TODO : other statements
+}
+
+/*
+iteration-statement ->  "while" "(" expression ")" statement
+                      | "do" statement "while" "(" expression ")" ";"
+
+*/
+void Parser::iterationStatement() {
+  if(testk("while")) {
+    scan();
+    readP("(");
+    expression();
+    readP(")");
+    statement();
+  } else if (testk("do")) {
+    scan();
+    statement();
+    readK("while");
+    readP("(");
+    expression();
+    readP(")");
+    readP(";");
+
+  } else {
+    throw "iteration-statement : no match found";
+  }
+  
 }
 
 
@@ -418,6 +447,14 @@ void Parser::selectionStatement() {
 
 void Parser::readP(string value) {
   if(testp(value)) {
+    scan();
+  } else {
+    throw "error: "+value+" expected";
+  }
+}
+
+void Parser::readK(string value) {
+  if(testk(value)) {
     scan();
   } else {
     throw "error: "+value+" expected";
