@@ -378,12 +378,29 @@ void Parser::statement() {
     jumpStatement();
   } else if(testp("{")) {
     compoundStatement();
-  } else if(testk("if") || testk("switch")) {
+  } else if(testk("if")) {
     selectionStatement();
   } else if(testk("while") || testk("do")) {
     iterationStatement();
+  } else if(testType(TokenType::IDENTIFIER)) {
+    // TODO: is it clear that it is not an expression
+    labeledStatement();
+  } else {
+    expression();
   }
-  // TODO : other statements
+}
+
+/*
+labeled-statement -> identifier : statement
+*/
+void Parser::labeledStatement() {
+  if(testType(TokenType::IDENTIFIER)) {
+    scand();
+    readP(":");
+    statement();
+  } else {
+    throw "labeled-statement : identifier expected";
+  }
 }
 
 /*
@@ -417,7 +434,6 @@ void Parser::iterationStatement() {
 /*
 selection-statement ->   "if" "(" expression ")" statement
    | "if" "(" expression ")" statement "else" statement
-   | "switch" "(" expression ")" statement
 */
 
 void Parser::selectionStatement() {
@@ -433,13 +449,6 @@ void Parser::selectionStatement() {
       scan();
       statement();
     }
-  
-  } else if (testk("switch")) {
-    scan();
-    readP("(");
-    expression();
-    readP(")");
-    statement();
   } else {
     throw "selectionStatement: no match";
   }
