@@ -202,16 +202,37 @@ void Parser::pointer() {
   }
 }
 
-void Parser::parameterTypeList() {
-  // TODO
+
+/*
+
+parameter-list  ->   parameter-declaration
+                   | parameter-list "," parameter-declaration
+*/
+void Parser::parameterList() {
+  parameterDeclaration();
+
+  while(testp(",")) {
+    scan();
+    parameterDeclaration();
+  }
 }
 
-void Parser::parameterList() {
-  // TODO
-}
+
+/*
+ *
+ parameter-declaration ->   declaration-specifiers declarator
+ | declarations-specifiers abstract-declarator
+ | declarations-specifiers
+*/
 
 void Parser::parameterDeclaration() {
-  // TODO
+  declarationSpecifiers();
+  if (testp(",") || testp(")")) {
+    return;
+  } else {
+    declarator();
+    // TODO distinguish abstract-declarator
+  }
 }
 
 void Parser::identifierList() {
@@ -269,7 +290,7 @@ void Parser::directDeclarator() {
 }
 
 /*
-direct-declarator_help -> "(" parameter-type-list ")" direct-declarator_help
+direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
              | "(" identifier-list ")" direct-declarator_help
                           |  "(" ")" direct-declarator_help
                                        | EPSILON
@@ -287,9 +308,16 @@ void Parser::directDeclaratorHelp() {
       }
 
       return;
-    }
+    } else if (testTypeSpecifier()) { // parameter-list
+      parameterList();
+      readP(")");
 
-    // TODO : parameter-type-list
+      if(testp("(")) {
+        directDeclaratorHelp();
+      }
+    } 
+
+    // TODO : parameter-list
     // TODO: identifier-list
   } else {
     throw "direct-declatror_help : '(' expected";
@@ -395,7 +423,7 @@ labeled-statement -> identifier : statement
 */
 void Parser::labeledStatement() {
   if(testType(TokenType::IDENTIFIER)) {
-    scand();
+    scan();
     readP(":");
     statement();
   } else {
