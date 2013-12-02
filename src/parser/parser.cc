@@ -149,10 +149,22 @@ static inline int getPrec(Token t, bool isUnary = false) {
 
 static inline bool isBinaryOperator(Token t) {
   //TODO: remove this nonsense
-  if (t.value() == "(") {
+  if (   t.value() == "||"
+      || t.value() == "=="
+      || t.value() == "!="
+      || t.value() == "<"
+      || t.value() == "&&"
+      || t.value() == "+"
+      || t.value() == "-"
+      || t.value() == "*"
+      || t.value() == "?"
+      || t.value() == ":"
+      || t.value() == "="
+      ) {
+    return true;
+  } else {
     return false;
   }
-  return true;
 }
 
 static inline bool isRightAssociative(Token t) {
@@ -210,7 +222,6 @@ void Parser::expression(int minPrecedence = 0) {
     scan();
     expression(precNext);
   }
-  std::cout << "Leaving expression" << std::endl;
 }
 
 
