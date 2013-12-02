@@ -122,7 +122,14 @@ void Parser::typeSpecifier() {
 }
 
 static inline int getPrec(Token t, bool isUnary = false) {
-  if (t.value() == "||") {
+  if (t.value() == "=") {
+    return 0;
+  } else if (t.value() == "?" || t.value() == ":") {
+    return 1;
+  } else if (   t.value() == "*" || t.value() == "&" 
+             || t.value() == "sizeof") {
+    return 2;
+  } else if (t.value() == "||") {
     return 0;
   } else if (t.value() == "&&") {
     return 1;
@@ -186,14 +193,14 @@ void Parser::expression(int minPrecedence = 0) {
   if (testp("?")) {
     scan();
     expression(/*TODO: which precedence should this be*/100);
+    // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
+    // operator
+    if (!testp(":")) {
+      ABORT(); //TODO
+    } else {
+      // do we need to change the value of minPrecedence here?
+    }
   }  
-  // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
-  // operator
-  if (!testp(":")) {
-    ABORT(); //TODO
-  } else {
-    // do we need to change the value of minPrecedence here?
-  }
   while (isBinaryOperator(m_nextsym) && getPrec(m_nextsym) >= minPrecedence) {
     auto precNext = (isRightAssociative(m_nextsym))
                     ? getPrec(m_nextsym)
