@@ -121,6 +121,79 @@ void Parser::typeSpecifier() {
   }
 }
 
+static inline int getPrec(Token t, bool isUnary = false) {
+  if (t.value() == "||") {
+    return 0;
+  } else if (t.value() == "&&") {
+    return 1;
+  } else if (t.value() == "+" || t.value() == "-") {
+    return 2;
+  } else {
+    ABORT();
+    return 0;
+  }
+}
+
+static inline bool isBinaryOperator(Token t) {
+  // TODO
+  return true;
+}
+
+static inline bool isRightAssociative(Token t) {
+  //TODO
+  return false;
+}
+
+void Parser::computeAtom() {
+  if (testp("(")) { 
+    // parse expression in parentheses
+    scan();
+      expression(0);
+    if (!testp(")")) {
+      //unmatched (
+      ABORT();
+    }
+  } else if (   m_nextsym.type() == TokenType::IDENTIFIER 
+             || m_nextsym.type() == TokenType::CONSTANT) {
+    // 'normal ' atom, variable or constant
+    scan();
+    expression(1);
+  } else if (testp("*") || testp("-")) {
+    //unary operators: * and -
+    auto precNext = getPrec(m_nextsym, true);
+    scan();
+    expression(precNext);
+  } else {
+    // something went wrong
+    // TODO: LATER: return error expression object
+  }
+}
+
+void Parser::expression(int minPrecedence) {
+  computeAtom();
+  // handle ternary operator
+  if (testp("?")) {
+    scan();
+    expression(/*TODO: which precedence should this be*/100);
+  }  
+  // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
+  // operator
+  if (!testp(":")) {
+    ABORT(); //TODO
+  } else {
+    // do we need to change the value of minPrecedence here?
+  }
+  while (isBinaryOperator(m_nextsym) && getPrec(m_nextsym) >= minPrecedence) {
+    auto precNext = (isRightAssociative(m_nextsym))
+                    ? getPrec(m_nextsym)
+                    : getPrec(m_nextsym) + 1;
+    scan();
+    expression(precNext);
+  }
+}
+
+
+
 void Parser::primaryExpression() {
   // TODO
 }

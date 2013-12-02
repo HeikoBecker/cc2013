@@ -60,7 +60,8 @@ namespace Parsing {
       void iterationStatement();
       void labeledStatement();
 
-      void expression();
+      void expression(int minPrecedence);
+      void computeAtom();
       void primaryExpression();
       void postfixExpression();
       void argumentExpressionList();
