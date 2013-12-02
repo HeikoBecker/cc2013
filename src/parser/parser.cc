@@ -65,6 +65,7 @@ Token Parser::scan() {
   
   cout<<"SCAN :";
   debugOutput();
+  m_nextsym = m_tokenList[posTokenList];
   return m_tokenList[posTokenList];
 }
 
@@ -141,14 +142,14 @@ static inline int getPrec(Token t, bool isUnary = false) {
     }
     return 3;
   } else {
-    ABORT();
-    return 0;
+    std::cout << t.value() << std::endl;
+    return -1;
   }
 }
 
 static inline bool isBinaryOperator(Token t) {
   //TODO: remove this nonsense
-  if (t.value() == "dutriaenfqu") {
+  if (t.value() == "(") {
     return false;
   }
   return true;
@@ -175,6 +176,7 @@ void Parser::computeAtom() {
              || m_nextsym.type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
     scan();
+    std::cout << "Parsed constant or variable" << std::endl;
     expression(1);
   } else if (testp("*") || testp("-")) {
     //unary operators: * and -
@@ -208,6 +210,7 @@ void Parser::expression(int minPrecedence = 0) {
     scan();
     expression(precNext);
   }
+  std::cout << "Leaving expression" << std::endl;
 }
 
 

@@ -22,9 +22,9 @@ namespace Lexing {
       Pos pos() const {return this->m_posinfo;}
       std::string value() const {return this->m_value;}
     private:
-      const TokenType m_type;
-      const Pos m_posinfo; 
-      const std::string m_value;
+      TokenType m_type;
+      Pos m_posinfo; 
+      std::string m_value;
   };
 }
 
