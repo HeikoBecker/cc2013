@@ -1,4 +1,4 @@
 int main () {
-  while () {}
-  do {} while ();
+  while (1+1) {}
+  // do {} while (x);
 }
