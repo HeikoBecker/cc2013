@@ -134,8 +134,10 @@ static inline int getPrec(Token t, bool isUnary = false) {
     return 0;
   } else if (t.value() == "&&") {
     return 1;
+  } else if (t.value() == "==" || t.value() == "||") {
+    return 8;
   } else if (t.value() == "<") {
-    return 5;
+    return 9;
   } else if (t.value() == "+" || t.value() == "-") {
     return 2;
   } else if (t.value() == "*") {
