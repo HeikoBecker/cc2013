@@ -128,6 +128,11 @@ static inline int getPrec(Token t, bool isUnary = false) {
     return 1;
   } else if (t.value() == "+" || t.value() == "-") {
     return 2;
+  } else if (t.value() == "*") {
+    if (isUnary) {
+      return 42; // TODO: recheck
+    }
+    return 3;
   } else {
     ABORT();
     return 0;
@@ -135,12 +140,18 @@ static inline int getPrec(Token t, bool isUnary = false) {
 }
 
 static inline bool isBinaryOperator(Token t) {
-  // TODO
+  //TODO: remove this nonsense
+  if (t.value() == "dutriaenfqu") {
+    return false;
+  }
   return true;
 }
 
 static inline bool isRightAssociative(Token t) {
   //TODO
+  if (t.value() == "=") {
+    return true; // TODO: check
+  }
   return false;
 }
 
@@ -169,7 +180,7 @@ void Parser::computeAtom() {
   }
 }
 
-void Parser::expression(int minPrecedence) {
+void Parser::expression(int minPrecedence = 0) {
   computeAtom();
   // handle ternary operator
   if (testp("?")) {
@@ -193,34 +204,6 @@ void Parser::expression(int minPrecedence) {
 }
 
 
-
-void Parser::primaryExpression() {
-  // TODO
-}
-
-void Parser::postfixExpression() {
-  // TODO
-}
-
-void Parser::argumentExpressionList() {
-  // TODO
-}
-
-void Parser::unaryExpression() {
-  // TODO
-}
-
-void Parser::additiveExpression() {
-  // TODO
-}
-
-void Parser::multiplicativeExpression() {
-  // TODO
-}
-
-void Parser::castExpression() {
-  // TODO
-}
 
 void Parser::declaration() {
   // TODO
@@ -618,8 +601,4 @@ void Parser::jumpStatement() {
   } else {
     throw "jump-statement : unexpected token";
   }
-}
-
-void Parser::expression() {
-  // TODO
 }
