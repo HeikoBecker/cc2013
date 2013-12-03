@@ -123,28 +123,45 @@ void Parser::typeSpecifier() {
 }
 
 static inline int getPrec(Token t, bool isUnary = false) {
-  if (t.value() == "=") {
+  /* this function works even for some operators we don't support */
+  if (t.value() == ",") {
     return 0;
-  } else if (t.value() == "?" || t.value() == ":") {
+  } else if (t.value() == "=") {
     return 1;
-  } else if (   t.value() == "*" || t.value() == "&" 
-             || t.value() == "sizeof") {
+  } else if (t.value() == "?" || t.value() == ":") {
     return 2;
   } else if (t.value() == "||") {
-    return 0;
-  } else if (t.value() == "&&") {
-    return 1;
-  } else if (t.value() == "==" || t.value() == "||") {
-    return 8;
-  } else if (t.value() == "<") {
-    return 9;
-  } else if (t.value() == "+" || t.value() == "-") {
-    return 2;
-  } else if (t.value() == "*") {
-    if (isUnary) {
-      return 42; // TODO: recheck
-    }
     return 3;
+  } else if (t.value() == "&&") {
+    return 4;
+  } else if (t.value() == "|") {
+    return 5;
+  } else if (t.value() == "^") {
+    return 6;
+  } else if (t.value() == "&" && !isUnary) {
+    return 7;
+  } else if (t.value() == "==" || t.value() == "!=") {
+    return 8;
+  } else if (t.value() == "<" || t.value() == ">") {
+    return 9;
+  } else if (t.value() == "<<" || t.value() == ">>") {
+    return 10;
+  } else if (!isUnary && (t.value() == "+" || t.value() == "-")) {
+    return 11;
+  } else if (   (t.value() == "*" && !isUnary) || t.value() == "/" 
+             || t.value() == "%") {
+    return 12;
+  } else if (   t.value() == "*" 
+             || t.value() == "!"
+             || t.value() == "&"
+             || t.value() == "sizeof"
+             || t.value() == "-") {
+    /* unary operators */
+    return 13;
+  } else if (   t.value() == "->"
+             || t.value() == "."
+             /*TODO: handle () and [] here*/) {
+    return 14;
   } else {
     std::cout << t.value() << std::endl;
     return -1;
