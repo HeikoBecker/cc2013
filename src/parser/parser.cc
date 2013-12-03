@@ -189,9 +189,10 @@ static inline bool isBinaryOperator(Token t) {
 }
 
 static inline bool isRightAssociative(Token t) {
-  //TODO
-  if (t.value() == "=") {
-    return true; // TODO: check
+  /* this function currently only works for binary operators */
+  if (   t.value() == "="
+      || t.value() == "?") {
+    return true;
   }
   return false;
 }
