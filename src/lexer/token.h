@@ -1,8 +1,8 @@
 #ifndef LEXER_TOKEN_H
 #define LEXER_TOKEN_H
+#pragma once
 
 #include "../pos.h"
-
 
 namespace Lexing {
   enum class TokenType {
@@ -12,7 +12,7 @@ namespace Lexing {
     STRINGLITERAL = 3,
     PUNCTUATOR = 4,
     ILLEGAL = 5,
-    END = 6
+    END = 6,
   };
 
   class Token {
