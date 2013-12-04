@@ -222,11 +222,12 @@ void Parser::computeAtom() {
         scan();
       } else if (testp("[")) { //array access(?). TODO: Are expressions supported in []?
         scan();
+        expression(0);
         if (!testp("]")) {
           ABORT();
         }
         scan();
-      } else if (testp("->")) {
+      } else if (testp("->") || testp(".")) {
         scan();
         if (m_nextsym.type() != TokenType::IDENTIFIER) {
           ABORT();
@@ -236,7 +237,7 @@ void Parser::computeAtom() {
         cont = !cont;
       }
     }
-    expression(1); // TODO: this looks wrong
+    //expression(1); // TODO: this looks wrong
   } else if (testp("*") || testp("-")) {
     //unary operators: * and -
     auto precNext = getPrec(m_nextsym, true);
