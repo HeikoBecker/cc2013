@@ -14,6 +14,11 @@
           node.prettyPrint(out);
         }
 
+        template<typename S> void pprint(std::shared_ptr<S> nodeptr,
+                                         std::ostream & out) {
+          nodeptr->prettyPrint(out);
+        }
+
         template<> void pprint<PunctuatorType>(PunctuatorType op, std::ostream & out) {
           switch (op) {
             case PunctuatorType::PLUS:

@@ -13,8 +13,8 @@ BinaryExpression::BinaryExpression(std::shared_ptr<AstNode> lhs,
 
 void BinaryExpression::prettyPrint(std::ostream & out) {
   pprint('(', out);
-  pprint(*this->lhs, out);
+  pprint(this->lhs, out);
   pprint(op, out);
-  pprint(*this->rhs, out);
+  pprint(this->rhs, out);
   pprint(')', out);
 }
