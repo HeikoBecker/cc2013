@@ -309,9 +309,9 @@ std::vector<Token> Lexer::lex() {
 
 Token Lexer::genToken(TokenType type) {
   if (TokenType::PUNCTUATOR == type) {
-  
+    return PunctuatorToken(type, tracker.storedPosition(), curword.str());
   }
-  return Token(Token(type, tracker.storedPosition(), curword.str()));
+  return Token(type, tracker.storedPosition(), curword.str());
 }
 
 void Lexer::resetCurrentWord() {
