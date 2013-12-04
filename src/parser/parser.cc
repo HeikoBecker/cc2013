@@ -209,9 +209,34 @@ void Parser::computeAtom() {
   } else if (   m_nextsym.type() == TokenType::IDENTIFIER 
              || m_nextsym.type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
+    // maybe followed by one of ., ->, [], ()
+    // TODO: can this follow after a constant?
+    bool cont = m_nextsym.type() == TokenType::IDENTIFIER;
     scan();
-    std::cout << "Parsed constant or variable" << std::endl;
-    expression(1);
+    while (cont) {
+      if (testp("(")) { //function call operator
+        scan();
+        if (!testp(")")) {
+          ABORT();
+        }
+        scan();
+      } else if (testp("[")) { //array access(?). TODO: Are expressions supported in []?
+        scan();
+        if (!testp("]")) {
+          ABORT();
+        }
+        scan();
+      } else if (testp("->")) {
+        scan();
+        if (m_nextsym.type() != TokenType::IDENTIFIER) {
+          ABORT();
+        }
+        scan();
+      } else {
+        cont = !cont;
+      }
+    }
+    expression(1); // TODO: this looks wrong
   } else if (testp("*") || testp("-")) {
     //unary operators: * and -
     auto precNext = getPrec(m_nextsym, true);
