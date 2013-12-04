@@ -7,11 +7,13 @@ enum class OperatorType {
   STAR,    // *
   ASSIGN,  // =
   EQUAL,   // ==
+  NEQUAL,  // !=
   QMARK,   // ?
   COLON,   // :
   LAND,    // &&
   LOR,     // ||
   LESS,    // <
-  GREATER,  // >
+  GREATER, // >
+  ILLEGAL, // TODO: probably not necessary
 };
 #endif

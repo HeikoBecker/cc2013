@@ -3,13 +3,11 @@
 #include <cstdio>
 #include <cctype>
 #include "lexer.h"
+#include "token.h"
 
 #define ABORT do {throw std::exception();} while (false)
 
 using namespace Lexing;
-
-Token::Token(TokenType type, Pos posinfo, std::string value)
-: m_type(type), m_posinfo(posinfo), m_value(value) {}
 
 // GCC 4.8.1 complains when using auto instead of the explicit type
 // this does not make sense :-(

@@ -1,6 +1,8 @@
 #ifndef LEXER_TOKEN_H
 #define LEXER_TOKEN_H
 #pragma once
+#include <string>
+#include "operatortype.h"
 
 #include "../pos.h"
 
@@ -25,6 +27,14 @@ namespace Lexing {
       TokenType m_type;
       Pos m_posinfo; 
       std::string m_value;
+  };
+
+  class OperatorToken : public Token {
+    public:
+      OperatorToken(TokenType type, Pos posinfo, std::string value);
+      OperatorType optype() {return this->m_optype;};
+    private:
+      OperatorType m_optype;
   };
 }
 
