@@ -1,9 +1,10 @@
 #include "ast.h"
+#include "pprinter.h"
 
 using namespace Parser;
 
-BinaryExpression::BinaryExpression(std::shared_ptr<AstNode> lhs,
-                                   std::shared_ptr<AstNode> rhs,
+BinaryExpression::BinaryExpression(AstChild lhs,
+                                   AstChild rhs,
                                    PunctuatorType op) :
   lhs(lhs),
   rhs(rhs),
@@ -11,10 +12,22 @@ BinaryExpression::BinaryExpression(std::shared_ptr<AstNode> lhs,
 {
 }
 
-void BinaryExpression::prettyPrint(std::ostream & out) {
-  pprint('(', out);
-  pprint(this->lhs, out);
-  pprint(op, out);
-  pprint(this->rhs, out);
-  pprint(')', out);
+void BinaryExpression::prettyPrint(PrettyPrinter & pp) {
+  pp.pprint('(');
+  pp.pprint(this->lhs);
+  pp.pprint(op);
+  pp.pprint(this->rhs);
+  pp.pprint(')');
+}
+
+UnaryExpression::UnaryExpression(AstChild operand, PunctuatorType op) :
+  operand(operand), op(op)
+{
+}
+
+void UnaryExpression::prettyPrint(PrettyPrinter & pp) {
+  pp.pprint(this->op);
+  pp.pprint('(');
+  pp.pprint(this->operand);
+  pp.pprint(')');
 }
