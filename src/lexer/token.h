@@ -2,7 +2,7 @@
 #define LEXER_TOKEN_H
 #pragma once
 #include <string>
-#include "operatortype.h"
+#include "punctuatortype.h"
 
 #include "../pos.h"
 
@@ -29,12 +29,12 @@ namespace Lexing {
       std::string m_value;
   };
 
-  class OperatorToken : public Token {
+  class PunctuatorToken : public Token {
     public:
-      OperatorToken(TokenType type, Pos posinfo, std::string value);
-      OperatorType optype() {return this->m_optype;};
+      PunctuatorToken(TokenType type, Pos posinfo, std::string value);
+      PunctuatorType punctype() {return this->m_puncttype;};
     private:
-      OperatorType m_optype;
+      PunctuatorType m_puncttype;
   };
 }
 

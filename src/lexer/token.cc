@@ -5,34 +5,34 @@ Token::Token(TokenType type, Pos posinfo, std::string value)
 : m_type(type), m_posinfo(posinfo), m_value(value) {}
 
 
-OperatorToken::OperatorToken(TokenType type, Pos posinfo, std::string value)
+PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
   : Token(type, posinfo, value) {
     if (value == "+") {
-      m_optype = OperatorType::PLUS;
+      m_puncttype = PunctuatorType::PLUS;
     } else if (value == "-") {
-      m_optype = OperatorType::MINUS;
+      m_puncttype = PunctuatorType::MINUS;
     } else if (value == "*") {
-      m_optype = OperatorType::STAR;
+      m_puncttype = PunctuatorType::STAR;
     } else if (value == "=") {
-      m_optype = OperatorType::ASSIGN;
+      m_puncttype = PunctuatorType::ASSIGN;
     } else if (value == "==") {
-      m_optype = OperatorType::EQUAL;
+      m_puncttype = PunctuatorType::EQUAL;
     } else if (value == "!=") {
-      m_optype = OperatorType::NEQUAL;
+      m_puncttype = PunctuatorType::NEQUAL;
     } else if (value == "?") {
-      m_optype = OperatorType::QMARK;
+      m_puncttype = PunctuatorType::QMARK;
     } else if (value == ":") {
-      m_optype = OperatorType::COLON;
+      m_puncttype = PunctuatorType::COLON;
     } else if (value == "&&") {
-      m_optype = OperatorType::LAND;
+      m_puncttype = PunctuatorType::LAND;
     } else if (value == "||") {
-      m_optype = OperatorType::LOR;
+      m_puncttype = PunctuatorType::LOR;
     } else if (value == "<") {
-      m_optype = OperatorType::LESS;
+      m_puncttype = PunctuatorType::LESS;
     } else if (value == ">") {
-      m_optype = OperatorType::GREATER;
+      m_puncttype = PunctuatorType::GREATER;
     } else {
       // TODO?
-      m_optype = OperatorType::ILLEGAL;
+      m_puncttype = PunctuatorType::ILLEGAL;
     }
   }

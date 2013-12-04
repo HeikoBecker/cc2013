@@ -4,7 +4,7 @@ using namespace Parser;
 
 BinaryExpression::BinaryExpression(std::shared_ptr<AstNode> lhs,
                                    std::shared_ptr<AstNode> rhs,
-                                   OperatorType op) :
+                                   PunctuatorType op) :
   lhs(lhs),
   rhs(rhs),
   op(op)

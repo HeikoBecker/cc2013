@@ -1,7 +1,7 @@
-#ifndef LEXER_OPERATOR_H
-#define LEXER_OPERATOR_H
+#ifndef LEXER_PUNCTUATOR_H
+#define LEXER_PUNCTUATOR_H
 
-enum class OperatorType {
+enum class PunctuatorType {
   PLUS,    // +
   MINUS,   // -
   STAR,    // *

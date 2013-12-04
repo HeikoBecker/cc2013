@@ -4,7 +4,7 @@
 #include <iosfwd>
 #include <ostream>
 #include <memory>
-#include "../lexer/operatortype.h"
+#include "../lexer/punctuatortype.h"
 
 #define IS_ASTNODE : public AstNode
 
@@ -14,36 +14,36 @@
           node.prettyPrint(out);
         }
 
-        template<> void pprint<OperatorType>(OperatorType op, std::ostream & out) {
+        template<> void pprint<PunctuatorType>(PunctuatorType op, std::ostream & out) {
           switch (op) {
-            case OperatorType::PLUS:
+            case PunctuatorType::PLUS:
               out << " + ";
               break;
-            case OperatorType::MINUS:
+            case PunctuatorType::MINUS:
               out << " - ";
               break;
-            case OperatorType::STAR:
+            case PunctuatorType::STAR:
               out << " * ";
               break;
-            case OperatorType::ASSIGN:
+            case PunctuatorType::ASSIGN:
               out << " = ";
               break;
-            case OperatorType::EQUAL:
+            case PunctuatorType::EQUAL:
               out << " == ";
               break;
-            case OperatorType::QMARK:
+            case PunctuatorType::QMARK:
               out << " ? ";
               break;
-            case OperatorType::COLON:
+            case PunctuatorType::COLON:
               out << " : ";
               break;
-            case OperatorType::LAND:
+            case PunctuatorType::LAND:
               out << " && ";
               break;
-            case OperatorType::LOR:
+            case PunctuatorType::LOR:
               out << " || ";
               break;
-            case OperatorType::LESS:
+            case PunctuatorType::LESS:
               out << " < ";
             default:
               out << "ERROR"; //TODO
@@ -67,12 +67,12 @@ class BinaryExpression IS_ASTNODE
   public:
     BinaryExpression(std::shared_ptr<Parser::AstNode> lhs,
                      std::shared_ptr<Parser::AstNode> rhs,
-                     OperatorType op);
+                     PunctuatorType op);
     void prettyPrint(std::ostream & out) override;
   private:
     std::shared_ptr<Parser::AstNode> lhs;
     std::shared_ptr<Parser::AstNode> rhs;
-    OperatorType op;
+    PunctuatorType op;
 };
 
 }
