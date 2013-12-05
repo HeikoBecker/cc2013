@@ -17,6 +17,7 @@ enum class PunctuatorType {
   ARRAY_ACCESS, //[]
   MEMBER_ACCESS, // .
   ARROW, // ->
+  SIZEOF, // sizeof
   ILLEGAL, // TODO: probably not necessary
 };
 #endif

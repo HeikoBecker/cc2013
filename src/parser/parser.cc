@@ -251,10 +251,12 @@ AstChild Parser::computeAtom() {
     }
     return child;
     //expression(1); // TODO: this looks wrong
-  } else if (testp("*") || testp("-")) {
+  } else if (testp("*") || testp("-") || testk("sizeof")) {
     //unary operators: * and -
-    auto op = (testp("*")) ? PunctuatorType::STAR
-                          : PunctuatorType::MINUS;
+    auto op = testk("sizeof") ?
+              PunctuatorType::SIZEOF :
+              ((testp("*"))   ? PunctuatorType::STAR
+                              : PunctuatorType::MINUS);
     auto precNext = getPrec(m_nextsym, true);
     scan();
     auto operand = expression(precNext);
