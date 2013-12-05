@@ -216,6 +216,7 @@ void Parser::computeAtom() {
     while (cont) {
       if (testp("(")) { //function call operator
         scan();
+        // handle function arguments
         if (!testp(")")) {
           ABORT();
         }
