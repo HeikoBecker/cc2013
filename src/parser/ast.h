@@ -2,11 +2,18 @@
 #define PARSER_AST_H
 #pragma once
 #include <memory>
+#include <string>
+#include <vector>
 #include "../lexer/punctuatortype.h"
 #include "pprinter.h"
 
 
-#define IS_ASTNODE : public AstNode
+
+/**
+ * This macro is meant to simplify a later transition from virtual inheritance
+ * to CRTP static inheritance
+ */
+#define ASTNODE(X) X : public AstNode
 
 namespace Parser {
 
@@ -19,7 +26,7 @@ class AstNode
 
 typedef std::shared_ptr<AstNode> AstChild;
 
-class BinaryExpression IS_ASTNODE
+class ASTNODE(BinaryExpression)
 {
   public:
     BinaryExpression(std::shared_ptr<Parser::AstNode> lhs,
@@ -32,15 +39,35 @@ class BinaryExpression IS_ASTNODE
     PunctuatorType op;
 };
 
-class UnaryExpression IS_ASTNODE
+class ASTNODE(UnaryExpression)
 {
- public:
+  public:
    UnaryExpression(std::shared_ptr<Parser::AstNode> operand,
                    PunctuatorType op);
    void prettyPrint(PrettyPrinter & pp) override;
- private:
+  private:
    AstChild operand;
    PunctuatorType op;
+};
+
+class ASTNODE(Variable)
+{
+  public:
+    Variable(std::string name);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    std::string name;
+};
+
+class ASTNODE(FunctionCall)
+{
+  public:
+    FunctionCall(std::shared_ptr<Variable> funcName,
+                 std::vector<AstChild> arguments);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    std::shared_ptr<Variable> funcName;
+    std::vector<AstChild> arguments;
 };
 
 }

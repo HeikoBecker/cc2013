@@ -65,5 +65,10 @@ template<> inline void PrettyPrinter::pprint<char>(char c) {
   out << c;
 }
 
+template<> inline void PrettyPrinter::pprint<std::string>(std::string s)
+{
+  out << s;
+}
+
 }
 #endif
