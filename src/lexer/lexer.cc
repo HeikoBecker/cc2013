@@ -274,12 +274,17 @@ Token Lexer::getNextToken() {
       return tokens[0];
     } else {
       // report error
-      return genToken(TokenType::ILLEGAL);
+      std::ostringstream msg;
+      msg << "Got illegal token: " 
+          << static_cast<unsigned char>(tracker.current ()) 
+          << std::endl;
+      throw LexingException(msg.str(), tracker.currentPosition ());
     }
   }
   return genToken(TokenType::END);
 }
 
+#if 0
 std::vector<Token> Lexer::lex() {
   /* delim is the current token deliminator
    * it is WHITESPACE, except when a (double) quote has been previously
@@ -306,6 +311,7 @@ std::vector<Token> Lexer::lex() {
   }
   return tokenList;
 };
+#endif
 
 Token Lexer::genToken(TokenType type) {
   if (TokenType::PUNCTUATOR == type) {
@@ -379,6 +385,7 @@ void Lexing::printToken(const Token token) {
     case TokenType::PUNCTUATOR:
       tokentype = "punctuator";
       break;
+
     default:
       ABORT;
   }
