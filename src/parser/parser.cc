@@ -5,7 +5,7 @@
 #include <utility> // for std::move
 #include "parser.h"
 #include "../lexer/lexer.h"
-#include "ast.h"
+#include "../lexer/punctuatortype.h"
 
 #define ABORT(X) do {throw std::exception();} while (false)
 
@@ -198,61 +198,76 @@ static inline bool isRightAssociative(Token t) {
   return false;
 }
 
-void Parser::computeAtom() {
+AstChild Parser::computeAtom() {
   if (testp("(")) { 
     // parse expression in parentheses
     scan();
-      expression(0);
+      auto child = expression(0);
     if (!testp(")")) {
       //unmatched (
       ABORT();
     }
+    return child;
   } else if (   m_nextsym.type() == TokenType::IDENTIFIER 
              || m_nextsym.type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
     // maybe followed by one of ., ->, [], ()
     // TODO: can this follow after a constant?
     bool cont = m_nextsym.type() == TokenType::IDENTIFIER;
+    auto var = std::make_shared<Variable>(m_nextsym.value());
     scan();
+    auto child = AstChild(var);
     while (cont) {
       if (testp("(")) { //function call operator
         scan();
         // handle function arguments
+        auto arguments = std::vector<AstChild> {}; // empty set of arguments
         if (!testp(")")) {
           ABORT();
         }
+        child = make_shared<FunctionCall>(child, arguments);
         scan();
       } else if (testp("[")) { //array access(?). TODO: Are expressions supported in []?
         scan();
-        expression(0);
+        auto index = expression(0);
         if (!testp("]")) {
           ABORT();
         }
         scan();
+        child = make_shared<UnaryExpression>(PunctuatorType::ARRAY_ACCESS,index);
       } else if (testp("->") || testp(".")) {
+        PunctuatorType p = (testp(".")) ? PunctuatorType::MEMBER_ACCESS
+                                        : PunctuatorType::ARROW;
         scan();
         if (m_nextsym.type() != TokenType::IDENTIFIER) {
           ABORT();
         }
+        auto var = make_shared<Variable>(m_nextsym.value());
+        child = make_shared<UnaryExpression>(p,var);
         scan();
       } else {
         cont = !cont;
       }
     }
+    return child;
     //expression(1); // TODO: this looks wrong
   } else if (testp("*") || testp("-")) {
     //unary operators: * and -
+    auto op = (testp("*")) ? PunctuatorType::STAR
+                          : PunctuatorType::MINUS;
     auto precNext = getPrec(m_nextsym, true);
     scan();
-    expression(precNext);
+    auto operand = expression(precNext);
+    return make_shared<UnaryExpression>(op, operand);
   } else {
     // something went wrong
     // TODO: LATER: return error expression object
+    ABORT();
   }
 }
 
-void Parser::expression(int minPrecedence = 0) {
-  computeAtom();
+AstChild Parser::expression(int minPrecedence = 0) {
+  auto left = computeAtom();
   // handle ternary operator
   if (testp("?")) {
     scan();
@@ -272,6 +287,7 @@ void Parser::expression(int minPrecedence = 0) {
     scan();
     expression(precNext);
   }
+  return left;
 }
 
 

@@ -14,6 +14,9 @@ enum class PunctuatorType {
   LOR,     // ||
   LESS,    // <
   GREATER, // >
+  ARRAY_ACCESS, //[]
+  MEMBER_ACCESS, // .
+  ARROW, // ->
   ILLEGAL, // TODO: probably not necessary
 };
 #endif

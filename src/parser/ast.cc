@@ -21,7 +21,7 @@ void BinaryExpression::prettyPrint(PrettyPrinter & pp)
   pp.pprint(')');
 }
 
-UnaryExpression::UnaryExpression(AstChild operand, PunctuatorType op) :
+UnaryExpression::UnaryExpression(PunctuatorType op, AstChild operand) :
   operand(operand), op(op)
 {
 }
@@ -41,7 +41,7 @@ void Variable::prettyPrint(PrettyPrinter & pp)
   pp.pprint(this->name);
 }
 
-FunctionCall::FunctionCall(std::shared_ptr<Variable> funcName,
+FunctionCall::FunctionCall(AstChild funcName,
                            std::vector<AstChild> arguments)
         : funcName(funcName), arguments(arguments) {;}
 

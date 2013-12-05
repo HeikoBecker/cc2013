@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <sstream>
 #include <stdexcept>
+#include "ast.h"
 #include "../lexer/token.h"
 
 using namespace std;
@@ -60,8 +61,8 @@ namespace Parsing {
       void iterationStatement();
       void labeledStatement();
 
-      void expression(int minPrecedence);
-      void computeAtom();
+      AstChild expression(int minPrecedence);
+      AstChild computeAtom();
       void primaryExpression();
       void postfixExpression();
       void argumentExpressionList();

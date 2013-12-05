@@ -42,8 +42,8 @@ class ASTNODE(BinaryExpression)
 class ASTNODE(UnaryExpression)
 {
   public:
-   UnaryExpression(std::shared_ptr<Parsing::AstNode> operand,
-                   PunctuatorType op);
+   UnaryExpression(PunctuatorType op,
+       std::shared_ptr<Parsing::AstNode> operand);
    void prettyPrint(PrettyPrinter & pp) override;
   private:
    AstChild operand;
@@ -62,11 +62,11 @@ class ASTNODE(Variable)
 class ASTNODE(FunctionCall)
 {
   public:
-    FunctionCall(std::shared_ptr<Variable> funcName,
+    FunctionCall(AstChild funcName,
                  std::vector<AstChild> arguments);
     void prettyPrint(PrettyPrinter & pp) override;
   private:
-    std::shared_ptr<Variable> funcName;
+    AstChild funcName;
     std::vector<AstChild> arguments;
 };
 
