@@ -13,10 +13,8 @@ using namespace Lexing;
 using namespace Parsing;
 
 // init parser
-Parser::Parser(vector<Token> tokens) : m_tokenList(std::move(tokens)) , m_nextsym(m_tokenList.front()) {
-  // should you really copy?
-  // or is a reference enough
-  posTokenList = -1;
+Parser::Parser(unique_ptr<Lexer> lexer)
+  :  m_nextsym(lexer->getNextToken()), m_lexer(std::move(lexer)) {
 }
 
 void Parser::debugOutput() {
@@ -29,7 +27,7 @@ void Parser::debugOutput() {
 }
 
 Token Parser::getNextSymbol() {
-  return m_tokenList[posTokenList];
+  return m_nextsym;
 }
 
 TokenType Parser::getNextType() {
@@ -61,21 +59,14 @@ bool Parser::testk(string val) {
 }
 
 Token Parser::scan() {
-  posTokenList++;
-  // TODO : throw exception when scanning after list
-  
   cout<<"SCAN :";
   debugOutput();
-  m_nextsym = m_tokenList[posTokenList];
-  return m_tokenList[posTokenList];
+  m_nextsym = m_lexer->getNextToken();
+  return m_nextsym;
 }
 
 bool Parser::parse() {
   auto ok = true;
-
-  /*This is the entry point*/
-  scan();
-
 
   translationUnit();
   if (getNextType() != TokenType::END) {

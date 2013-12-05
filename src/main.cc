@@ -58,20 +58,17 @@ int main(int, char** const argv)
         if (hasNewErrors())
           continue;
 
-        Lexing::Lexer lexer(f, name);
-        auto tokens = lexer.lex();
+        auto lexer = unique_ptr<Lexer>(new Lexing::Lexer(f, name));
         switch (mode) {
           case Mode::TOKENIZE:
-            for (const auto token : tokens) {
-              if(token.type() == TokenType::END) {
-                break;
-              }
+            for(auto token = lexer->getNextToken(); token.type() != TokenType::END;
+                token = lexer->getNextToken()) {
               printToken(token);
             }
             break;
           case Mode::PARSE:
           {
-            Parsing::Parser parser(tokens);
+            auto parser = Parsing::Parser(std::move(lexer));
             if (parser.parse()) {
               printf("PARSING SUCCESSFUL\n");
             } else {

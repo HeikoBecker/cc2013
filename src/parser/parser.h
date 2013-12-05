@@ -5,8 +5,13 @@
 #include <unordered_set>
 #include <sstream>
 #include <stdexcept>
+#include <memory>
 #include "ast.h"
 #include "../lexer/token.h"
+
+namespace Lexing {
+  class Lexer;
+}
 
 using namespace std;
 using namespace Lexing;
@@ -21,14 +26,12 @@ namespace Parsing {
   class Parser
   {
     public:
-      Parser(vector<Token> token);
+      Parser(unique_ptr<Lexer> lexer);
       bool parse();
 
     private:
-      vector<Token> m_tokenList;
       Token m_nextsym;
-      int posTokenList;
-
+      unique_ptr<Lexer> m_lexer;
 
       // function concerning reading
       Token getNextSymbol();
