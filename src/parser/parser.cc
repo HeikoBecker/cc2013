@@ -269,7 +269,7 @@ AstChild Parser::computeAtom() {
 }
 
 AstChild Parser::expression(int minPrecedence = 0) {
-  auto left = computeAtom();
+  auto expr = computeAtom();
   // handle ternary operator
   if (testp("?")) {
     scan();
@@ -289,7 +289,7 @@ AstChild Parser::expression(int minPrecedence = 0) {
     scan();
     expression(precNext);
   }
-  return left;
+  return expr;
 }
 
 
