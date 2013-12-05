@@ -26,12 +26,12 @@ namespace Parsing {
   class Parser
   {
     public:
-      Parser(unique_ptr<Lexer> lexer);
+      Parser(FILE* f, char const *name);
       bool parse();
 
     private:
-      Token m_nextsym;
       unique_ptr<Lexer> m_lexer;
+      Token m_nextsym;
 
       // function concerning reading
       Token getNextSymbol();

@@ -13,8 +13,10 @@ using namespace Lexing;
 using namespace Parsing;
 
 // init parser
-Parser::Parser(unique_ptr<Lexer> lexer)
-  :  m_nextsym(lexer->getNextToken()), m_lexer(std::move(lexer)) {
+Parser::Parser(FILE* f, char const *name)
+  :  m_lexer(unique_ptr<Lexer>(new Lexer(f,name))) ,
+     m_nextsym(m_lexer->getNextToken())
+{
 }
 
 void Parser::debugOutput() {
