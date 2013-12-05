@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <unordered_set>
-#include <sstream>
 #include <stdexcept>
 #include "../pos.h"
 #include "token.h"
@@ -59,7 +58,7 @@ namespace Lexing {
     private:
 
       FileTracker tracker;
-      std::ostringstream curword;
+      std::string curword;
       std::vector<Token> tokens;
       const static std::unordered_set<std::string> punctuators;
       const static std::unordered_set<std::string> keywords;
@@ -74,7 +73,7 @@ namespace Lexing {
       bool consumeIdentOrDecConstant();
       bool consumeDecimal();
       bool consumeIdent();
-      inline void appendToToken(unsigned char c) {curword << c;}
+      inline void appendToToken(unsigned char c) {curword += c;}
       void storeToken(TokenType type);
       Token genToken(TokenType type);
       void resetCurrentWord();

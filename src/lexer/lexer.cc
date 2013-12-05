@@ -54,7 +54,7 @@ bool Lexer::consumePunctuator() {
       // remove last character; it was added in the previous
       // iteration, but not actually part of the punctuator
       partial.pop_back();
-      curword << partial;
+      curword += partial;
       storeToken(TokenType::PUNCTUATOR);
       return true;
     } else {
@@ -166,7 +166,7 @@ bool Lexer::consumeQuoted() {
       appendToToken(tracker.current());
       // check that constant is not empty, that is, contains
       // more than opening ' and closing '
-      if (curword.str().size() <= 2) {
+      if (curword.size() <= 2) {
         throw LexingException(
           "Empty character constant", 
           tracker.currentPosition()
@@ -202,7 +202,7 @@ bool Lexer::consumeIdent() {
       appendToToken(tracker.current());
     } else {
       tracker.ungetc();
-      auto isKeyword = (keywords.find(curword.str()) != keywords.end());
+      auto isKeyword = (keywords.find(curword) != keywords.end());
       storeToken(isKeyword ? TokenType::KEYWORD : TokenType::IDENTIFIER);
       return true;
     }
@@ -315,13 +315,12 @@ std::vector<Token> Lexer::lex() {
 
 Token Lexer::genToken(TokenType type) {
   if (TokenType::PUNCTUATOR == type) {
-    return PunctuatorToken(type, tracker.storedPosition(), curword.str());
+    return PunctuatorToken(type, tracker.storedPosition(), curword);
   }
-  return Token(type, tracker.storedPosition(), curword.str());
+  return Token(type, tracker.storedPosition(), curword);
 }
 
 void Lexer::resetCurrentWord() {
-  curword.str("");
   curword.clear();
 }
 
