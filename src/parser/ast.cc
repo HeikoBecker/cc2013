@@ -1,7 +1,7 @@
 #include "ast.h"
 #include "pprinter.h"
 
-using namespace Parser;
+using namespace Parsing;
 
 BinaryExpression::BinaryExpression(AstChild lhs,
                                    AstChild rhs,

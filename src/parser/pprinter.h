@@ -4,7 +4,7 @@
 #include <ostream>
 #include "../lexer/punctuatortype.h"
 
-namespace Parser {
+namespace Parsing {
 
 class PrettyPrinter {
   public:

@@ -5,6 +5,7 @@
 #include <utility> // for std::move
 #include "parser.h"
 #include "../lexer/lexer.h"
+#include "ast.h"
 
 #define ABORT(X) do {throw std::exception();} while (false)
 

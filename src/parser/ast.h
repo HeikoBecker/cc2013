@@ -15,7 +15,7 @@
  */
 #define ASTNODE(X) X : public AstNode
 
-namespace Parser {
+namespace Parsing {
 
 class AstNode
 {
@@ -29,8 +29,8 @@ typedef std::shared_ptr<AstNode> AstChild;
 class ASTNODE(BinaryExpression)
 {
   public:
-    BinaryExpression(std::shared_ptr<Parser::AstNode> lhs,
-                     std::shared_ptr<Parser::AstNode> rhs,
+    BinaryExpression(std::shared_ptr<Parsing::AstNode> lhs,
+                     std::shared_ptr<Parsing::AstNode> rhs,
                      PunctuatorType op);
     void prettyPrint(PrettyPrinter & pp) override;
   private:
@@ -42,7 +42,7 @@ class ASTNODE(BinaryExpression)
 class ASTNODE(UnaryExpression)
 {
   public:
-   UnaryExpression(std::shared_ptr<Parser::AstNode> operand,
+   UnaryExpression(std::shared_ptr<Parsing::AstNode> operand,
                    PunctuatorType op);
    void prettyPrint(PrettyPrinter & pp) override;
   private:

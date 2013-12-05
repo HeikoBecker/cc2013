@@ -1,6 +1,6 @@
 #include <iostream>
 #include "pprinter.h"
 
-using namespace Parser;
+using namespace Parsing;
 
 PrettyPrinter::PrettyPrinter() : identLevel(0), out(std::cout) {};
