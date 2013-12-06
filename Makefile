@@ -20,7 +20,7 @@ SRC    := $(sort $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/lexer/*.cc) $(w
 OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 
-CFLAGS   += -Wall -W -Werror
+CFLAGS   += -Wall -W -Werror -O2
 CXXFLAGS += $(CFLAGS) -std=c++11
 
 DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
