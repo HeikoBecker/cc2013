@@ -191,7 +191,7 @@ static inline bool isRightAssociative(Token t) {
   return false;
 }
 
-AstChild Parser::computeAtom() {
+SubExpression Parser::computeAtom() {
   if (testp("(")) { 
     // parse expression in parentheses
     scan();
@@ -207,14 +207,14 @@ AstChild Parser::computeAtom() {
     // maybe followed by one of ., ->, [], ()
     // TODO: can this follow after a constant?
     bool cont = m_nextsym->type() == TokenType::IDENTIFIER;
-    auto var = std::make_shared<Variable>(m_nextsym->value());
+    auto var = std::make_shared<VariableUsage>(m_nextsym->value());
     scan();
-    auto child = AstChild(var);
+    auto child = SubExpression(var);
     while (cont) {
       if (testp("(")) { //function call operator
         scan();
         // handle function arguments
-        auto arguments = std::vector<AstChild> {}; // empty set of arguments
+        auto arguments = std::vector<SubExpression> {}; // empty set of arguments
         if (!testp(")")) {
           ABORT();
         }
@@ -235,7 +235,7 @@ AstChild Parser::computeAtom() {
         if (m_nextsym->type() != TokenType::IDENTIFIER) {
           ABORT();
         }
-        auto var = make_shared<Variable>(m_nextsym->value());
+        auto var = make_shared<VariableUsage>(m_nextsym->value());
         child = make_shared<UnaryExpression>(p,var);
         scan();
       } else {
@@ -261,7 +261,7 @@ AstChild Parser::computeAtom() {
   }
 }
 
-AstChild Parser::expression(int minPrecedence = 0) {
+SubExpression Parser::expression(int minPrecedence = 0) {
   auto expr = computeAtom();
   // handle ternary operator
   if (testp("?")) {

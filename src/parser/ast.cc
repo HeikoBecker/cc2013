@@ -3,8 +3,8 @@
 
 using namespace Parsing;
 
-BinaryExpression::BinaryExpression(AstChild lhs,
-                                   AstChild rhs,
+BinaryExpression::BinaryExpression(SubExpression lhs,
+                                   SubExpression rhs,
                                    PunctuatorType op) :
   lhs(lhs),
   rhs(rhs),
@@ -21,7 +21,7 @@ void BinaryExpression::prettyPrint(PrettyPrinter & pp)
   pp.pprint(')');
 }
 
-UnaryExpression::UnaryExpression(PunctuatorType op, AstChild operand) :
+UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand) :
   operand(operand), op(op)
 {
 }
@@ -34,15 +34,15 @@ void UnaryExpression::prettyPrint(PrettyPrinter & pp)
   pp.pprint(')');
 }
 
-Variable::Variable(std::string name) : name(name) {;}
+VariableUsage::VariableUsage(std::string name) : name(name) {;}
 
-void Variable::prettyPrint(PrettyPrinter & pp)
+void VariableUsage::prettyPrint(PrettyPrinter & pp)
 {
   pp.pprint(this->name);
 }
 
-FunctionCall::FunctionCall(AstChild funcName,
-                           std::vector<AstChild> arguments)
+FunctionCall::FunctionCall(SubExpression funcName,
+                           std::vector<SubExpression> arguments)
         : funcName(funcName), arguments(arguments) {;}
 
 void FunctionCall::prettyPrint(PrettyPrinter & pp)

@@ -14,6 +14,7 @@
  * to CRTP static inheritance
  */
 #define ASTNODE(X) X : public AstNode
+#define EXPRESSION(X) X : public Expression
 
 namespace Parsing {
 
@@ -24,50 +25,53 @@ class AstNode
     virtual void prettyPrint(PrettyPrinter &) {};
 };
 
-typedef std::shared_ptr<AstNode> AstChild;
+class ASTNODE(Expression) {};
 
-class ASTNODE(BinaryExpression)
+typedef std::shared_ptr<AstNode> AstChild;
+typedef std::shared_ptr<Expression> SubExpression;
+
+class EXPRESSION(BinaryExpression)
 {
   public:
-    BinaryExpression(std::shared_ptr<Parsing::AstNode> lhs,
-                     std::shared_ptr<Parsing::AstNode> rhs,
+    BinaryExpression(SubExpression lhs,
+                     SubExpression rhs,
                      PunctuatorType op);
     void prettyPrint(PrettyPrinter & pp) override;
   private:
-    AstChild lhs;
-    AstChild rhs;
+    SubExpression lhs;
+    SubExpression rhs;
     PunctuatorType op;
 };
 
-class ASTNODE(UnaryExpression)
+class EXPRESSION(UnaryExpression)
 {
   public:
    UnaryExpression(PunctuatorType op,
-       std::shared_ptr<Parsing::AstNode> operand);
+       SubExpression operand);
    void prettyPrint(PrettyPrinter & pp) override;
   private:
-   AstChild operand;
+   SubExpression operand;
    PunctuatorType op;
 };
 
-class ASTNODE(Variable)
+class EXPRESSION(VariableUsage)
 {
   public:
-    Variable(std::string name);
+    VariableUsage(std::string name);
     void prettyPrint(PrettyPrinter & pp) override;
   private:
     std::string name;
 };
 
-class ASTNODE(FunctionCall)
+class EXPRESSION(FunctionCall)
 {
   public:
-    FunctionCall(AstChild funcName,
-                 std::vector<AstChild> arguments);
+    FunctionCall(SubExpression funcName,
+                 std::vector<SubExpression> arguments);
     void prettyPrint(PrettyPrinter & pp) override;
   private:
-    AstChild funcName;
-    std::vector<AstChild> arguments;
+    SubExpression funcName;
+    std::vector<SubExpression> arguments;
 };
 
 }
