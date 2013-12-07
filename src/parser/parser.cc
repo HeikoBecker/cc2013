@@ -216,10 +216,26 @@ SubExpression Parser::computeAtom() {
         // handle function arguments
         auto arguments = std::vector<SubExpression> {}; // empty set of arguments
         if (!testp(")")) {
+          auto multipleArguments = false;
+          do {
+            if (multipleArguments) {
+              scan(); // read the , separating the arguments
+            } else {
+              /* This happens only when we read the first argument
+               * If there is only one argument, the value of multipleArguments
+               * is not important; else it ensures that we read the ,
+               * */
+              multipleArguments = true;
+            }
+            arguments.push_back(expression(0));
+          } while (testp(","));
+        }
+        if (testp(")")) {
+          scan(); // now we've read the closing ")"
+        } else {
           ABORT();
         }
         child = make_shared<FunctionCall>(child, arguments);
-        scan();
       } else if (testp("[")) { //array access(?). TODO: Are expressions supported in []?
         scan();
         auto index = expression(0);
@@ -257,6 +273,7 @@ SubExpression Parser::computeAtom() {
   } else {
     // something went wrong
     // TODO: LATER: return error expression object
+    std::cerr << m_nextsym->value() ;
     ABORT();
   }
 }
