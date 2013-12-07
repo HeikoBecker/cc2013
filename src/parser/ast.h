@@ -74,5 +74,18 @@ class EXPRESSION(FunctionCall)
     std::vector<SubExpression> arguments;
 };
 
+class EXPRESSION(TernaryExpression)
+{
+  public:
+    TernaryExpression(SubExpression condition,
+                      SubExpression lhs, 
+                      SubExpression rhs);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    SubExpression condition;
+    SubExpression lhs;
+    SubExpression rhs;
+};
+
 }
 #endif

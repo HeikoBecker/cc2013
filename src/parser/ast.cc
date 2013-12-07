@@ -60,3 +60,21 @@ void FunctionCall::prettyPrint(PrettyPrinter & pp)
   }
   pp.pprint(')');
 }
+
+TernaryExpression::TernaryExpression(SubExpression condition, 
+                                     SubExpression lhs, 
+                                     SubExpression rhs)
+     : condition(condition), lhs(lhs), rhs(rhs)
+{
+ //TODO: type checking
+}
+
+void TernaryExpression::prettyPrint(PrettyPrinter & pp) {
+  pp.pprint('(');
+  pp.pprint(this->condition);
+  pp.pprint(std::string(" ? "));
+  pp.pprint(this->lhs);
+  pp.pprint(std::string(" : "));
+  pp.pprint(this->rhs);
+  pp.pprint(')');
+}
