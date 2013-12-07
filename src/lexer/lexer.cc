@@ -387,5 +387,5 @@ void Lexing::printToken(const Token token) {
   }
   std::cout << posinfo.name << ":" << posinfo.line << ":" << posinfo.column 
             << ": " << tokentype << " " << token.value() 
-            << std::endl;
+            << "\n";
 }
