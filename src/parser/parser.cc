@@ -567,10 +567,31 @@ void Parser::statement() {
     iterationStatement();
   } else if(testType(TokenType::IDENTIFIER)) {
     // TODO: is it clear that it is not an expression
+    // TODO: Fabian: no it isn't -> do a lookahead to check if next symbol is
+    // a colon Then it is a labeled statement
     labeledStatement();
   } else {
-    expression();
+    expressionStatement();
   }
+}
+
+/*
+ expression-statement -> ";" | expression ";"
+ */
+void Parser::expressionStatement() {
+  if (testp(";")) {
+    scan();
+    return;
+  } else {
+    expression();
+    if (testp(";")) {
+      scan();
+      return;
+    } else {
+      ABORT();
+    }
+  }
+
 }
 
 /*

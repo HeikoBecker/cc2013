@@ -103,6 +103,7 @@ namespace Parsing {
       void externalDeclaration();
       void translationUnit();
       void compoundStatement();
+      void expressionStatement();
   };
 }
 
