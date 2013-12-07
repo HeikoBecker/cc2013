@@ -61,9 +61,10 @@ int main(int, char** const argv)
         Lexing::Lexer lexer{f, name};
         switch (mode) {
           case Mode::TOKENIZE:
-            for(auto token = lexer.getNextToken(); token.type() != TokenType::END;
+            for(auto token = lexer.getNextToken(); 
+                token->type() != TokenType::END;
                 token = lexer.getNextToken()) {
-              printToken(token);
+              printToken(*token);
             }
             break;
           case Mode::PARSE:

@@ -24,20 +24,20 @@ void Parser::debugOutput() {
   if (getNextType() == TokenType::END) {
     cout<<"END OF TOKENS REACHED"<<endl;
   } else {
-     printToken(getNextSymbol());
+     printToken(*getNextSymbol());
   }
 }
 
-Token Parser::getNextSymbol() {
+std::shared_ptr<Token> Parser::getNextSymbol() {
   return m_nextsym;
 }
 
 TokenType Parser::getNextType() {
-  return getNextSymbol().type();
+  return getNextSymbol()->type();
 }
 
 string Parser::getNextValue() {
-  return getNextSymbol().value(); 
+  return getNextSymbol()->value(); 
 }
 
 bool Parser::testType(TokenType type) {
@@ -60,7 +60,7 @@ bool Parser::testk(string val) {
   return test(TokenType::KEYWORD, val);
 }
 
-Token Parser::scan() {
+std::shared_ptr<Token> Parser::scan() {
   cout<<"SCAN :";
   debugOutput();
   m_nextsym = m_lexer->getNextToken();
@@ -201,13 +201,13 @@ AstChild Parser::computeAtom() {
       ABORT();
     }
     return child;
-  } else if (   m_nextsym.type() == TokenType::IDENTIFIER 
-             || m_nextsym.type() == TokenType::CONSTANT) {
+  } else if (   m_nextsym->type() == TokenType::IDENTIFIER 
+             || m_nextsym->type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
     // maybe followed by one of ., ->, [], ()
     // TODO: can this follow after a constant?
-    bool cont = m_nextsym.type() == TokenType::IDENTIFIER;
-    auto var = std::make_shared<Variable>(m_nextsym.value());
+    bool cont = m_nextsym->type() == TokenType::IDENTIFIER;
+    auto var = std::make_shared<Variable>(m_nextsym->value());
     scan();
     auto child = AstChild(var);
     while (cont) {
@@ -232,10 +232,10 @@ AstChild Parser::computeAtom() {
         PunctuatorType p = (testp(".")) ? PunctuatorType::MEMBER_ACCESS
                                         : PunctuatorType::ARROW;
         scan();
-        if (m_nextsym.type() != TokenType::IDENTIFIER) {
+        if (m_nextsym->type() != TokenType::IDENTIFIER) {
           ABORT();
         }
-        auto var = make_shared<Variable>(m_nextsym.value());
+        auto var = make_shared<Variable>(m_nextsym->value());
         child = make_shared<UnaryExpression>(p,var);
         scan();
       } else {
@@ -250,7 +250,7 @@ AstChild Parser::computeAtom() {
               PunctuatorType::SIZEOF :
               ((testp("*"))   ? PunctuatorType::STAR
                               : PunctuatorType::MINUS);
-    auto precNext = getPrec(m_nextsym, true);
+    auto precNext = getPrec(*m_nextsym, true);
     scan();
     auto operand = expression(precNext);
     return make_shared<UnaryExpression>(op, operand);
@@ -275,10 +275,10 @@ AstChild Parser::expression(int minPrecedence = 0) {
       // do we need to change the value of minPrecedence here?
     }
   }  
-  while (isBinaryOperator(m_nextsym) && getPrec(m_nextsym) >= minPrecedence) {
-    auto precNext = (isRightAssociative(m_nextsym))
-                    ? getPrec(m_nextsym)
-                    : getPrec(m_nextsym) + 1;
+  while (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence) {
+    auto precNext = (isRightAssociative(*m_nextsym))
+                    ? getPrec(*m_nextsym)
+                    : getPrec(*m_nextsym) + 1;
     scan();
     expression(precNext);
   }

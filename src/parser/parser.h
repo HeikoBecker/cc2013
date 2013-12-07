@@ -31,13 +31,13 @@ namespace Parsing {
 
     private:
       unique_ptr<Lexer> m_lexer;
-      Token m_nextsym;
+      shared_ptr<Token> m_nextsym;
 
       // function concerning reading
-      Token getNextSymbol();
+      shared_ptr<Token> getNextSymbol();
       TokenType getNextType();
       string getNextValue();
-      Token scan();
+      shared_ptr<Token> scan();
       bool testType(TokenType token);
       bool testValue(string value);
       bool test(TokenType token, string value);

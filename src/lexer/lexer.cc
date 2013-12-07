@@ -254,24 +254,19 @@ bool Lexer::consumeIdentOrDecConstant() {
 
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
-Token Lexer::getNextToken() {
-  tokens.clear();
+std::shared_ptr<Token> Lexer::getNextToken() {
   while ((tracker.fgetc() != EOF)) {
-    if (consumeWhitespace()) {
-      // reached EOF
-      return genToken(TokenType::END);
+    if (consumeWhitespace() || consumeComment()) {
+      continue;
     }
 
     tracker.storePosition();
     // new token begins after whitespace
-    if (consumeComment()) {
-      continue;
-    }
     if (consumeQuoted() ||
         consumeIdentOrDecConstant() ||
         consumeComment() ||
         consumePunctuator()) {
-      return tokens[0];
+      return curtoken;
     } else {
       // report error
       std::ostringstream msg;
@@ -313,11 +308,13 @@ std::vector<Token> Lexer::lex() {
 };
 #endif
 
-Token Lexer::genToken(TokenType type) {
+std::shared_ptr<Token> Lexer::genToken(TokenType type) {
   if (TokenType::PUNCTUATOR == type) {
-    return PunctuatorToken(type, tracker.storedPosition(), curword);
+    return std::make_shared<PunctuatorToken>(type, 
+                                             tracker.storedPosition(),
+                                             curword);
   }
-  return Token(type, tracker.storedPosition(), curword);
+  return std::make_shared<Token>(type, tracker.storedPosition(), curword);
 }
 
 void Lexer::resetCurrentWord() {
@@ -325,7 +322,7 @@ void Lexer::resetCurrentWord() {
 }
 
 void Lexer::storeToken(TokenType type) {
-  tokens.push_back(genToken(type));
+  curtoken = genToken(type);
   resetCurrentWord();
 }
 

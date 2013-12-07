@@ -1,9 +1,9 @@
 #ifndef LEXER_LEXER_H
 #define LEXER_LEXER_H
 
-#include <vector>
 #include <unordered_set>
 #include <stdexcept>
+#include <memory>
 #include "../pos.h"
 #include "token.h"
 
@@ -52,14 +52,13 @@ namespace Lexing {
   {
     public:
       Lexer(FILE* f, char const *name);
-      std::vector<Token> lex();
-      Token getNextToken();
+      std::shared_ptr<Token> getNextToken();
 
     private:
 
       FileTracker tracker;
       std::string curword;
-      std::vector<Token> tokens;
+      std::shared_ptr<Token> curtoken;
       const static std::unordered_set<std::string> punctuators;
       const static std::unordered_set<std::string> keywords;
       /* returns true iff it could consume a Punctuator */
@@ -75,7 +74,7 @@ namespace Lexing {
       bool consumeIdent();
       inline void appendToToken(unsigned char c) {curword += c;}
       void storeToken(TokenType type);
-      Token genToken(TokenType type);
+      std::shared_ptr<Token> genToken(TokenType type);
       void resetCurrentWord();
   };
   void printToken(const Token token);
