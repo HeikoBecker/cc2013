@@ -32,10 +32,31 @@ namespace Lexing {
   class PunctuatorToken : public Token {
     public:
       PunctuatorToken(TokenType type, Pos posinfo, std::string value);
-      PunctuatorType punctype() {return this->m_puncttype;};
+      PunctuatorType punctype() const {return this->m_puncttype;};
     private:
       PunctuatorType m_puncttype;
   };
+
+/*
+ *  operator== is NOT virtual; cast a Token to the subclass you want before
+ *  using it
+ */
+
+inline bool operator==(const Token & lhs, const Token & rhs) {
+  if (lhs.type() == rhs.type()) {
+    return lhs.value() == rhs.value();
+  }
+  return false;
+}
+
+inline bool operator==(const PunctuatorToken & lhs, const PunctuatorToken & rhs) {
+  return lhs.punctype() == rhs.punctype();
+}
+
+inline bool operator==(const PunctuatorToken & lhs, const PunctuatorType p) {
+  return lhs.punctype() == p;
+}
+
 }
 
 #endif
