@@ -311,12 +311,12 @@ SubExpression Parser::computeAtom() {
     return child;
   } else if (testp(   PunctuatorType::STAR) 
                    || testp(PunctuatorType::MINUS) 
-                   || testk(KeywordType::SIZEOF)) {
+                   || testk(KeywordType::SIZEOF)
+                   || testp(PunctuatorType::AMPERSAND)) {
     //unary operators: * and -
-    auto op = testk(KeywordType::SIZEOF) ?
-              PunctuatorType::SIZEOF :
-              ((testp(PunctuatorType::STAR))   ? PunctuatorType::STAR
-                              : PunctuatorType::MINUS);
+    auto op = testk(KeywordType::SIZEOF) ? PunctuatorType::SIZEOF 
+                                         : static_pointer_cast<PunctuatorToken>(
+                                             m_nextsym)->punctype();
     auto precNext = getPrec(*m_nextsym, true);
     scan();
     auto operand = expression(precNext);
