@@ -122,7 +122,7 @@ static inline int getPrec(Token t, bool isUnary = false) {
     return 0;
   } else if (t.value() == "=") {
     return 1;
-  } else if (t.value() == "?" || t.value() == ":") {
+  } else if (t.value() == "?") {
     return 2;
   } else if (t.value() == "||") {
     return 3;
@@ -156,6 +156,8 @@ static inline int getPrec(Token t, bool isUnary = false) {
              || t.value() == "."
              /*TODO: handle () and [] here*/) {
     return 14;
+  } else if ( t.value() == ":") {
+    return 15;
   } else {
     std::cout << t.value() << std::endl;
     return -1;
@@ -172,8 +174,6 @@ static inline bool isBinaryOperator(Token t) {
       || t.value() == "+"
       || t.value() == "-"
       || t.value() == "*"
-      || t.value() == "?"
-      || t.value() == ":"
       || t.value() == "="
       ) {
     return true;
@@ -281,9 +281,12 @@ SubExpression Parser::computeAtom() {
 SubExpression Parser::expression(int minPrecedence = 0) {
   auto expr = computeAtom();
   // handle ternary operator
+  auto isTernary = false;
+  SubExpression ternaryHelper;
   if (testp("?")) {
     scan();
-    expression(/*TODO: which precedence should this be*/100);
+    isTernary = true;
+    ternaryHelper = expression(/*TODO: which precedence should this be*/0);
     // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
     // operator
     if (!testp(":")) {
@@ -292,12 +295,24 @@ SubExpression Parser::expression(int minPrecedence = 0) {
       // do we need to change the value of minPrecedence here?
     }
   }  
-  while (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence) {
-    auto precNext = (isRightAssociative(*m_nextsym))
-                    ? getPrec(*m_nextsym)
-                    : getPrec(*m_nextsym) + 1;
-    scan();
-    expression(precNext);
+  while (  (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence)
+         || isTernary) {
+    int precNext;
+    if (isTernary) {
+      precNext = 2;
+      isTernary = false;
+    } else {
+      precNext = (isRightAssociative(*m_nextsym))
+                 ? getPrec(*m_nextsym)
+                 : getPrec(*m_nextsym) + 1;
+    }
+    scan(); // this will either read the binary operator or ":" if we're parsing the ternary operator
+    auto rhs = expression(precNext);
+    if (!isTernary) {
+      expr = make_shared<BinaryExpression>(expr, rhs, PunctuatorType::ILLEGAL);
+    } else {
+      expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs);
+    }
   }
   return expr;
 }
