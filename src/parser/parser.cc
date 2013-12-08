@@ -297,6 +297,7 @@ SubExpression Parser::computeAtom() {
     child = postfixExpression(child);
     return child;
   } else if (   m_nextsym->type() == TokenType::IDENTIFIER 
+             || m_nextsym->type() == TokenType::STRINGLITERAL
              || m_nextsym->type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
     // maybe followed by one of ., ->, [], ()
@@ -338,7 +339,7 @@ SubExpression Parser::computeAtom() {
   } else {
     // something went wrong
     // TODO: LATER: return error expression object
-    std::cerr << m_nextsym->value() ;
+    Lexing::printToken(*m_nextsym);
     ABORT();
   }
 }
