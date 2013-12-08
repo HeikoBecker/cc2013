@@ -3,6 +3,7 @@
 #pragma once
 #include <string>
 #include "punctuatortype.h"
+#include "keywordtokentype.h"
 
 #include "../pos.h"
 
@@ -35,6 +36,14 @@ namespace Lexing {
       PunctuatorType punctype() const {return this->m_puncttype;};
     private:
       PunctuatorType m_puncttype;
+  };
+
+  class KeywordToken : public Token {
+    public:
+      KeywordToken(TokenType type, Pos posinfo, std::string value);
+      KeywordType keywordtype() const {return this->m_keywordtype;};
+    private:
+      KeywordType m_keywordtype;
   };
 
 /*

@@ -1,3 +1,4 @@
+#pragma once
 #ifndef LEXER_PUNCTUATOR_H
 #define LEXER_PUNCTUATOR_H
 

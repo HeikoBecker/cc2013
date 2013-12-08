@@ -310,7 +310,11 @@ std::vector<Token> Lexer::lex() {
 
 std::shared_ptr<Token> Lexer::genToken(TokenType type) {
   if (TokenType::PUNCTUATOR == type) {
-    return std::make_shared<PunctuatorToken>(type, 
+    return std::make_shared<PunctuatorToken>(type,
+                                             tracker.storedPosition(),
+                                             curword);
+  } else if (TokenType::KEYWORD == type) {
+    return std::make_shared<KeywordToken>(type,
                                              tracker.storedPosition(),
                                              curword);
   }

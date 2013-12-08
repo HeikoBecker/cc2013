@@ -58,3 +58,55 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       m_puncttype = PunctuatorType::ILLEGAL;
     }
   }
+
+KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)
+  : Token(type, posinfo, value) 
+{
+  if (value == "auto") {
+    m_keywordtype = KeywordType::AUTO;
+  } else if (value == "break") {
+    m_keywordtype = KeywordType::BREAK;
+  } else if (value == "case") {
+    m_keywordtype = KeywordType::CASE;
+  } else if (value == "char") {
+    m_keywordtype = KeywordType::CHAR;
+  } else if (value == "const") {
+    m_keywordtype = KeywordType::CONST;
+  } else if (value == "continue") {
+    m_keywordtype = KeywordType::CONTINUE;
+  } else if (value == "default") {
+    m_keywordtype = KeywordType::DEFAULT;
+  } else if (value == "do") {
+    m_keywordtype = KeywordType::DO;
+  } else if (value == "double") {
+    m_keywordtype = KeywordType::DOUBLE;
+  } else if (value == "else") {
+    m_keywordtype = KeywordType::ELSE;
+  } else if (value == "enum") {
+    m_keywordtype = KeywordType::ENUM;
+  } else if (value == "float") {
+    m_keywordtype = KeywordType::FLOAT;
+  } else if (value == "for") {
+    m_keywordtype = KeywordType::FOR;
+  } else if (value == "goto") {
+    m_keywordtype = KeywordType::GOTO;
+  } else if (value == "if") {
+    m_keywordtype = KeywordType::IF;
+  } else if (value == "int") {
+    m_keywordtype = KeywordType::INT;
+  } else if (value == "return") {
+    m_keywordtype = KeywordType::RETURN;
+  } else if (value == "sizeof") {
+    m_keywordtype = KeywordType::SIZEOF;
+  } else if (value == "struct") {
+    m_keywordtype = KeywordType::STRUCT;
+  } else if (value == "switch") {
+    m_keywordtype = KeywordType::SWITCH;
+  } else if (value == "void") {
+    m_keywordtype = KeywordType::VOID;
+  } else if (value == "while") {
+    m_keywordtype = KeywordType::WHILE;
+  } else {
+    m_keywordtype = KeywordType::WHO_CARES;
+  }
+}
