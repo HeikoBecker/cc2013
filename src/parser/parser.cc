@@ -16,8 +16,9 @@ using namespace Parsing;
 // init parser
 Parser::Parser(FILE* f, char const *name)
   :  m_lexer(unique_ptr<Lexer>(new Lexer(f,name))) ,
-     m_nextsym(m_lexer->getNextToken())
+     m_nextsym(m_lexer->getNextToken()), m_lookahead(m_lexer->getNextToken())
 {
+
 }
 
 void Parser::debugOutput() {
@@ -57,6 +58,11 @@ bool Parser::testp(string val) {
   return test(TokenType::PUNCTUATOR, val);
 }
 
+bool Parser::testLookAheadP(string val) {
+  return m_lookahead->value() == val && 
+         m_lookahead->type() == TokenType::PUNCTUATOR;
+}
+
 bool Parser::testp(PunctuatorType puncutator) {
   if (testType(TokenType::PUNCTUATOR)) {
     return     std::static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype() 
@@ -77,15 +83,17 @@ bool Parser::testk(KeywordType keyword) {
   } else {
     return false;
   }
-  
 }
 
 std::shared_ptr<Token> Parser::scan() {
   cout<<"SCAN :";
   debugOutput();
-  m_nextsym = m_lexer->getNextToken();
+
+  m_nextsym = m_lookahead;
+  m_lookahead = m_lexer->getNextToken();
   return m_nextsym;
 }
+
 
 bool Parser::parse() {
   auto ok = true;
@@ -692,10 +700,11 @@ void Parser::statement() {
   } else if(testk(KeywordType::WHILE) || testk(KeywordType::DO)) {
     iterationStatement();
   } else if(testType(TokenType::IDENTIFIER)) {
-    // TODO: is it clear that it is not an expression
-    // TODO: Fabian: no it isn't -> do a lookahead to check if next symbol is
-    // a colon Then it is a labeled statement
-    labeledStatement();
+    if (testLookAheadP(":")) {
+      labeledStatement();
+    } else {
+      expressionStatement();
+    }
   } else {
     expressionStatement();
   }

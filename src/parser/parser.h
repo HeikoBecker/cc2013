@@ -32,6 +32,7 @@ namespace Parsing {
     private:
       unique_ptr<Lexer> m_lexer;
       shared_ptr<Token> m_nextsym;
+      shared_ptr<Token> m_lookahead;
 
       // function concerning reading
       shared_ptr<Token> getNextSymbol();
@@ -48,7 +49,7 @@ namespace Parsing {
       bool testTypeSpecifier();
       void readP(string value); // read punctuator 
       void readK(string value); // read keyword
-
+      bool testLookAheadP(string val);
       void readSemicolon(string funcName);
 
       // debug function 
