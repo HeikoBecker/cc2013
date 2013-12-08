@@ -103,9 +103,34 @@ void Parser::translationUnit() {
   }
 }
 
+void Parser::staticAssert() {
+  cout<<" static assert not implemented"<<endl;
+  ABORT();
+  
+/*  readK("_Static_assert");
+  readP("(");
+
+  // TODO constant-expression instead of expression
+  expression();
+
+  readP(",");
+
+  if(testType(TokenType::STRINGLITERAL)) {
+    scan();
+  } else {
+    ABORT();
+  }
+
+  readP(")");
+  readP(";");*/
+}
+
 void Parser::externalDeclaration() {
 
-  // TODO: test for static_assert for declaration
+  if (testk("_Static_assert")) {
+    staticAssert();
+    return ;
+  }
   // functionDefintion or declaration ?
   declarationSpecifiers();
 
@@ -350,7 +375,11 @@ SubExpression Parser::expression(int minPrecedence = 0) {
 
 
 void Parser::declaration() {
-  // TODO implement static_assert-declaration
+  if (testk("_Static_assert")) {
+    staticAssert();
+    return ;
+  }
+
   declarationSpecifiers();
   if (testp(";")) {
     scan();
@@ -407,8 +436,10 @@ void Parser::structDeclaration() {
      structDeclaratorList();
      readP(";");
     }
+  } else if(testk("_Static_assert")) {
+    staticAssert();
   } else {
-    // TODO static assertion
+    ABORT();
   }
 }
 
@@ -629,8 +660,9 @@ block-item ->   declaration
               | statement
 */
 void Parser::blockItem() {
-  // TODO : handle static assert declaration
-  if (testTypeSpecifier()) {
+  if (testk("_Static_assert")) {
+    staticAssert();
+  } else if (testTypeSpecifier()) {
     declaration();
   } else {
     statement();

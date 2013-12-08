@@ -105,6 +105,7 @@ namespace Parsing {
       void translationUnit();
       void compoundStatement();
       void expressionStatement();
+      void staticAssert();
   };
 }
 
