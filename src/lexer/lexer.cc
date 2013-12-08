@@ -317,13 +317,9 @@ std::shared_ptr<Token> Lexer::genToken(TokenType type) {
   return std::make_shared<Token>(type, tracker.storedPosition(), curword);
 }
 
-void Lexer::resetCurrentWord() {
-  curword.clear();
-}
-
 void Lexer::storeToken(TokenType type) {
   curtoken = genToken(type);
-  resetCurrentWord();
+  curword.clear();
 }
 
 FileTracker::FileTracker(FILE* f, char const *name) 
