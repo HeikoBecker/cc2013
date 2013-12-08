@@ -6,6 +6,7 @@
 #include "parser.h"
 #include "../lexer/lexer.h"
 #include "../lexer/punctuatortype.h"
+#include "../lexer/keywordtokentype.h"
 
 #define ABORT(X) do {throw std::exception();} while (false)
 
@@ -68,6 +69,16 @@ bool Parser::testp(PunctuatorType puncutator) {
 bool Parser::testk(string val) {
   return test(TokenType::KEYWORD, val);
 }
+
+bool Parser::testk(KeywordType keyword) {
+  if (testType(TokenType::KEYWORD)) {
+    return     std::static_pointer_cast<KeywordToken>(m_nextsym)->keywordtype() 
+            == keyword;
+  } else {
+    return false;
+  }
+  
+};
 
 std::shared_ptr<Token> Parser::scan() {
   cout<<"SCAN :";
