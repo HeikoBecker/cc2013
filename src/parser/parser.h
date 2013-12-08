@@ -42,6 +42,7 @@ namespace Parsing {
       bool testValue(string value);
       bool test(TokenType token, string value);
       bool testp(string value); // test punctuator
+      bool testp(PunctuatorType puncutator); // test punctuator
       bool testk(string value); // test keyword
       bool testTypeSpecifier();
       void readP(string value); // read punctuator 

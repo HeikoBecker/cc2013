@@ -56,6 +56,15 @@ bool Parser::testp(string val) {
   return test(TokenType::PUNCTUATOR, val);
 }
 
+bool Parser::testp(PunctuatorType puncutator) {
+  if (testType(TokenType::PUNCTUATOR)) {
+    return     std::static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype() 
+            == puncutator;
+  } else {
+    return false;
+  }
+}
+
 bool Parser::testk(string val) {
   return test(TokenType::KEYWORD, val);
 }
