@@ -111,28 +111,6 @@ void Parser::translationUnit() {
   }
 }
 
-void Parser::staticAssert() {
-  cout<<" static assert not implemented"<<endl;
-  ABORT();
-  
-/*  readK("_Static_assert");
-  readP("(");
-
-  // TODO constant-expression instead of expression
-  expression();
-
-  readP(",");
-
-  if(testType(TokenType::STRINGLITERAL)) {
-    scan();
-  } else {
-    ABORT();
-  }
-
-  readP(")");
-  readP(";");*/
-}
-
 void Parser::externalDeclaration() {
 
   if (testk("_Static_assert")) {
@@ -858,3 +836,23 @@ void Parser::jumpStatement() {
     throw "jump-statement : unexpected token";
   }
 }
+
+void Parser::staticAssert() {
+  readK("_Static_assert");
+  readP("(");
+
+  // TODO constant-expression instead of expression
+  expression();
+
+  readP(",");
+
+  if(testType(TokenType::STRINGLITERAL)) {
+    scan();
+  } else {
+    ABORT();
+  }
+
+  readP(")");
+  readP(";");
+}
+
