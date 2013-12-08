@@ -78,7 +78,7 @@ bool Parser::testk(KeywordType keyword) {
     return false;
   }
   
-};
+}
 
 std::shared_ptr<Token> Parser::scan() {
   cout<<"SCAN :";
@@ -288,9 +288,11 @@ SubExpression Parser::computeAtom() {
     }
     return child;
     //expression(1); // TODO: this looks wrong
-  } else if (testp(PunctuatorType::STAR) || testp(PunctuatorType::MINUS) || testk("sizeof")) {
+  } else if (testp(   PunctuatorType::STAR) 
+                   || testp(PunctuatorType::MINUS) 
+                   || testk(KeywordType::SIZEOF)) {
     //unary operators: * and -
-    auto op = testk("sizeof") ?
+    auto op = testk(KeywordType::SIZEOF) ?
               PunctuatorType::SIZEOF :
               ((testp(PunctuatorType::STAR))   ? PunctuatorType::STAR
                               : PunctuatorType::MINUS);
@@ -645,14 +647,17 @@ statement ->
   | jump-statement
 */
 void Parser::statement() {
-  if(testk("goto") || testk("continue") || testk("break") || testk("return")) {
+  if(testk(   KeywordType::GOTO) 
+           || testk(KeywordType::CONTINUE) 
+           || testk(KeywordType::BREAK) 
+           || testk(KeywordType::RETURN)) {
     // jump-statement
     jumpStatement();
   } else if(testp(PunctuatorType::LEFTCURLYBRACE)) {
     compoundStatement();
-  } else if(testk("if")) {
+  } else if(testk(KeywordType::IF)) {
     selectionStatement();
-  } else if(testk("while") || testk("do")) {
+  } else if(testk(KeywordType::WHILE) || testk(KeywordType::DO)) {
     iterationStatement();
   } else if(testType(TokenType::IDENTIFIER)) {
     // TODO: is it clear that it is not an expression
@@ -702,13 +707,13 @@ iteration-statement ->  "while" "(" expression ")" statement
 
 */
 void Parser::iterationStatement() {
-  if(testk("while")) {
+  if(testk(KeywordType::WHILE)) {
     scan();
     readP("(");
     expression();
     readP(")");
     statement();
-  } else if (testk("do")) {
+  } else if (testk(KeywordType::DO)) {
     scan();
     statement();
     readK("while");
@@ -730,7 +735,7 @@ selection-statement ->   "if" "(" expression ")" statement
 */
 
 void Parser::selectionStatement() {
-  if (testk("if")) {
+  if (testk(KeywordType::IF)) {
     scan();
 
     readP("(");
@@ -738,7 +743,7 @@ void Parser::selectionStatement() {
     readP(")");
     statement();
 
-    if(testk("else")) {
+    if(testk(KeywordType::ELSE)) {
       scan();
       statement();
     }
@@ -782,7 +787,7 @@ jump-statement ->
   "return" ";"
 */
 void Parser::jumpStatement() {
-  if (testk("goto")) {
+  if (testk(KeywordType::GOTO)) {
     scan();
     if(testType(TokenType::IDENTIFIER)) {
       scan();
@@ -792,13 +797,13 @@ void Parser::jumpStatement() {
     } else {
       throw "jump-statement: identifier expected";
     }
-  } else if (testk("continue")) {
+  } else if (testk(KeywordType::CONTINUE)) {
     scan();
     readSemicolon("jump-statement");
-  } else if (testk("break")) {
+  } else if (testk(KeywordType::BREAK)) {
     scan();
     readSemicolon("jump-statement");
-  } else if (testk("return")){
+  } else if (testk(KeywordType::RETURN)){
     scan();
 
     if(testp(PunctuatorType::SEMICOLON)) {
