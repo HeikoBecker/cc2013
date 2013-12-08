@@ -230,25 +230,8 @@ static inline bool isRightAssociative(Token t) {
   return false;
 }
 
-SubExpression Parser::computeAtom() {
-  if (testp(PunctuatorType::LEFTPARENTHESIS)) { 
-    // parse expression in parentheses
-    scan();
-      auto child = expression(0);
-    if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
-      //unmatched (
-      ABORT();
-    }
-    return child;
-  } else if (   m_nextsym->type() == TokenType::IDENTIFIER 
-             || m_nextsym->type() == TokenType::CONSTANT) {
-    // 'normal ' atom, variable or constant
-    // maybe followed by one of ., ->, [], ()
-    // TODO: can this follow after a constant?
-    bool cont = m_nextsym->type() == TokenType::IDENTIFIER;
-    auto var = std::make_shared<VariableUsage>(m_nextsym->value());
-    scan();
-    auto child = SubExpression(var);
+SubExpression Parser::postfixExpression(SubExpression child) {
+    auto cont = true;
     while (cont) {
       if (testp(PunctuatorType::LEFTPARENTHESIS)) { //function call operator
         scan();
@@ -298,7 +281,34 @@ SubExpression Parser::computeAtom() {
       }
     }
     return child;
-    //expression(1); // TODO: this looks wrong
+}
+
+SubExpression Parser::computeAtom() {
+  if (testp(PunctuatorType::LEFTPARENTHESIS)) { 
+    // parse expression in parentheses
+    scan();
+    auto child = expression(0);
+    if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
+      //unmatched (
+      ABORT();
+    }
+    scan();
+    // handle postfix-expression
+    child = postfixExpression(child);
+    return child;
+  } else if (   m_nextsym->type() == TokenType::IDENTIFIER 
+             || m_nextsym->type() == TokenType::CONSTANT) {
+    // 'normal ' atom, variable or constant
+    // maybe followed by one of ., ->, [], ()
+    auto var = std::make_shared<VariableUsage>(m_nextsym->value());
+    auto cont = m_nextsym->type() == TokenType::IDENTIFIER;
+    scan();
+    auto child = SubExpression(var);
+    // handle postfix-expression
+    if (cont) {
+      child = postfixExpression(child);
+    }
+    return child;
   } else if (testp(   PunctuatorType::STAR) 
                    || testp(PunctuatorType::MINUS) 
                    || testk(KeywordType::SIZEOF)) {
