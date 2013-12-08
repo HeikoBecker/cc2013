@@ -386,13 +386,9 @@ void Parser::structDeclaration() {
 
 /*
 specifier-qualifier-list ->   type-specifier
-                            | type-specifier specifier-qualifier-list
 */
 void Parser::specifierQualifierList() {
   typeSpecifier();
-  while(testTypeSpecifier()) {
-    typeSpecifier();
-  }
 }
 
 void Parser::structDeclaratorList() {
