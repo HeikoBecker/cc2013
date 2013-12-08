@@ -320,7 +320,20 @@ SubExpression Parser::computeAtom() {
                                              m_nextsym)->punctype();
     auto precNext = getPrec(*m_nextsym, true);
     scan();
-    auto operand = expression(precNext);
+    auto operand = SubExpression{};
+    // sizeof needs special care if it is applied to a type
+    // TODO: get rid of ridiculous if expression
+    if (    PunctuatorType::SIZEOF == op
+         && testp(PunctuatorType::LEFTPARENTHESIS)
+         && m_lookahead->type() == TokenType::KEYWORD
+         && (   m_lookahead->value() == "char"
+             || m_lookahead->value() == "int"
+             || m_lookahead->value() == "void"
+             || m_lookahead->value() == "struct")) {
+      operand = sizeOfType(); 
+    } else {
+      operand = expression(precNext);
+    }
     return make_shared<UnaryExpression>(op, operand);
   } else {
     // something went wrong
@@ -328,6 +341,18 @@ SubExpression Parser::computeAtom() {
     std::cerr << m_nextsym->value() ;
     ABORT();
   }
+}
+
+SubExpression Parser::sizeOfType() {
+  // TODO: actually construct AST class
+  scan(); // read starting parenthesis
+  // read type
+  typeName();
+  if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
+    ABORT();
+  }
+  scan();  // read closing parenthesis
+  return SubExpression{};
 }
 
 SubExpression Parser::expression(int minPrecedence = 0) {
@@ -513,7 +538,8 @@ void Parser::identifierList() {
 }
 
 void Parser::typeName() {
-  // TODO
+  //TODO: what's  below is wrong, or rather not everything that's needed
+  specifierQualifierList();
 }
 
 /*

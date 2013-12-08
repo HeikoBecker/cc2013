@@ -70,6 +70,7 @@ namespace Parsing {
       SubExpression expression(int minPrecedence);
       SubExpression computeAtom();
       SubExpression postfixExpression(SubExpression child);
+      SubExpression sizeOfType();
       void primaryExpression();
       void postfixExpression();
       void argumentExpressionList();
