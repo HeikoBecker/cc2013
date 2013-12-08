@@ -75,7 +75,6 @@ namespace Lexing {
       inline void appendToToken(unsigned char c) {curword += c;}
       void storeToken(TokenType type);
       std::shared_ptr<Token> genToken(TokenType type);
-      void resetCurrentWord();
   };
   void printToken(const Token token);
 }
