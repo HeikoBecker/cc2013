@@ -32,6 +32,7 @@ enum class PunctuatorType {
   RIGHTCURLYBRACE, // }
   COMMA, // ,
   AMPERSAND, // & which genius made this adressof AND binary and?
+  NOT, // !
   ILLEGAL, 
 };
 #endif

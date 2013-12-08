@@ -312,6 +312,7 @@ SubExpression Parser::computeAtom() {
   } else if (testp(   PunctuatorType::STAR) 
                    || testp(PunctuatorType::MINUS) 
                    || testk(KeywordType::SIZEOF)
+                   || testp(PunctuatorType::NOT)
                    || testp(PunctuatorType::AMPERSAND)) {
     //unary operators: * and -
     auto op = testk(KeywordType::SIZEOF) ? PunctuatorType::SIZEOF 

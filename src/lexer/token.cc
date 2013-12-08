@@ -19,6 +19,8 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       m_puncttype = PunctuatorType::EQUAL;
     } else if (value == "!=") {
       m_puncttype = PunctuatorType::NEQUAL;
+    } else if (value == "!") {
+      m_puncttype = PunctuatorType::NOT;
     } else if (value == "?") {
       m_puncttype = PunctuatorType::QMARK;
     } else if (value == ":") {
