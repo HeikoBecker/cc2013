@@ -349,11 +349,9 @@ void Parser::structOrUnionSpecifier() {
 
   if (testType(TokenType::IDENTIFIER)) {
     scan();
-    if (testp("{")) {
-      readP("{");
-      structDeclarationList();
-      readP("}");
-    }
+    readP("{");
+    structDeclarationList();
+    readP("}");
   } else if(testp("{")) {
     scan();
     structDeclarationList();
@@ -364,61 +362,36 @@ void Parser::structOrUnionSpecifier() {
 }
 
 void Parser::structDeclarationList() {
-  structDeclaration();
-  while (!testp("}")) {
-    structDeclaration();
-  } 
+  // TODO
 }
 
 void Parser::structDeclaration() {
-  if(testTypeSpecifier()) {
-    specifierQualifierList();
-    if (testp(";")) {
-      scan();
-    } else {
-     structDeclaratorList();
-     readP(";");
-    }
-  } else {
-    // TODO static assertion
-  }
+  // TODO
 }
 
-/*
-specifier-qualifier-list ->   type-specifier
-                            | type-specifier specifier-qualifier-list
-*/
 void Parser::specifierQualifierList() {
-  typeSpecifier();
-  while(testTypeSpecifier()) {
-    typeSpecifier();
-  }
+  // TODO
 }
 
 void Parser::structDeclaratorList() {
-  structDeclarator();
-
-  while(testp(",")) {
-    scan();
-    structDeclarator(); 
-  }
+  // TODO
 }
 
 void Parser::structDeclarator() {
-  if (testp(":")) {
-    scan();
-    // TODO : replace with constant-Expression
-    expression();
-  } else {
-    declarator();
-    if (testp(":")) {
-      scan();
-      // TODO: replace with constant-expression
-      expression();
-    }
-  }
+  // TODO
 }
 
+void Parser::enumSpecifier() {
+  // TODO
+}
+
+void Parser::enumeratorList() {
+  // TODO
+}
+
+void Parser::enumerator() {
+  // TODO
+}
 
 void Parser::pointer() {
   while(testp("*")) {
@@ -426,7 +399,9 @@ void Parser::pointer() {
   }
 }
 
+
 /*
+
 parameter-list  ->   parameter-declaration
                    | parameter-list "," parameter-declaration
 */
@@ -438,6 +413,7 @@ void Parser::parameterList() {
     parameterDeclaration();
   }
 }
+
 
 /*
  *
