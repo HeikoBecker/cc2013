@@ -201,11 +201,11 @@ static inline bool isRightAssociative(Token t) {
 }
 
 SubExpression Parser::computeAtom() {
-  if (testp("(")) { 
+  if (testp(PunctuatorType::LEFTPARENTHESIS)) { 
     // parse expression in parentheses
     scan();
       auto child = expression(0);
-    if (!testp(")")) {
+    if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
       //unmatched (
       ABORT();
     }
@@ -220,11 +220,11 @@ SubExpression Parser::computeAtom() {
     scan();
     auto child = SubExpression(var);
     while (cont) {
-      if (testp("(")) { //function call operator
+      if (testp(PunctuatorType::LEFTPARENTHESIS)) { //function call operator
         scan();
         // handle function arguments
         auto arguments = std::vector<SubExpression> {}; // empty set of arguments
-        if (!testp(")")) {
+        if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
           auto multipleArguments = false;
           do {
             if (multipleArguments) {
@@ -237,24 +237,24 @@ SubExpression Parser::computeAtom() {
               multipleArguments = true;
             }
             arguments.push_back(expression(0));
-          } while (testp(","));
+          } while (testp(PunctuatorType::COMMA));
         }
-        if (testp(")")) {
+        if (testp(PunctuatorType::RIGHTPARENTHESIS)) {
           scan(); // now we've read the closing ")"
         } else {
           ABORT();
         }
         child = make_shared<FunctionCall>(child, arguments);
-      } else if (testp("[")) { //array access(?). TODO: Are expressions supported in []?
+      } else if (testp(PunctuatorType::LEFTSQBRACKET)) { //array access(?). TODO: Are expressions supported in []?
         scan();
         auto index = expression(0);
-        if (!testp("]")) {
+        if (!testp(PunctuatorType::RIGHTSQBRACKET)) {
           ABORT();
         }
         scan();
         child = make_shared<UnaryExpression>(PunctuatorType::ARRAY_ACCESS,index);
-      } else if (testp("->") || testp(".")) {
-        PunctuatorType p = (testp(".")) ? PunctuatorType::MEMBER_ACCESS
+      } else if (testp(PunctuatorType::ARROW) || testp(PunctuatorType::MEMBER_ACCESS)) {
+        PunctuatorType p = (testp(PunctuatorType::MEMBER_ACCESS)) ? PunctuatorType::MEMBER_ACCESS
                                         : PunctuatorType::ARROW;
         scan();
         if (m_nextsym->type() != TokenType::IDENTIFIER) {
@@ -269,11 +269,11 @@ SubExpression Parser::computeAtom() {
     }
     return child;
     //expression(1); // TODO: this looks wrong
-  } else if (testp("*") || testp("-") || testk("sizeof")) {
+  } else if (testp(PunctuatorType::STAR) || testp(PunctuatorType::MINUS) || testk("sizeof")) {
     //unary operators: * and -
     auto op = testk("sizeof") ?
               PunctuatorType::SIZEOF :
-              ((testp("*"))   ? PunctuatorType::STAR
+              ((testp(PunctuatorType::STAR))   ? PunctuatorType::STAR
                               : PunctuatorType::MINUS);
     auto precNext = getPrec(*m_nextsym, true);
     scan();
@@ -292,13 +292,13 @@ SubExpression Parser::expression(int minPrecedence = 0) {
   // handle ternary operator
   auto isTernary = false;
   SubExpression ternaryHelper;
-  if (testp("?")) {
+  if (testp(PunctuatorType::QMARK)) {
     scan();
     isTernary = true;
     ternaryHelper = expression(/*TODO: which precedence should this be*/0);
     // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
     // operator
-    if (!testp(":")) {
+    if (!testp(PunctuatorType::COLON)) {
       ABORT(); //TODO
     } else {
       // do we need to change the value of minPrecedence here?
@@ -376,7 +376,7 @@ void Parser::enumerator() {
 }
 
 void Parser::pointer() {
-  while(testp("*")) {
+  while(testp(PunctuatorType::STAR)) {
     scan();
   }
 }
@@ -390,7 +390,7 @@ parameter-list  ->   parameter-declaration
 void Parser::parameterList() {
   parameterDeclaration();
 
-  while(testp(",")) {
+  while(testp(PunctuatorType::COMMA)) {
     scan();
     parameterDeclaration();
   }
@@ -406,7 +406,7 @@ void Parser::parameterList() {
 
 void Parser::parameterDeclaration() {
   declarationSpecifiers();
-  if (testp(",") || testp(")")) {
+  if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
     return;
   } else {
     declarator();
@@ -444,21 +444,21 @@ void Parser::directDeclarator() {
   if (testType(TokenType::IDENTIFIER)) {
     scan();
 
-    if(testp("(")) {
+    if(testp(PunctuatorType::LEFTPARENTHESIS)) {
       directDeclaratorHelp();
     }
 
-  } else if (testp("(")) {
+  } else if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     scan();
     declarator();
 
-    if(testp(")")) {
+    if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
     } else {
       throw "direct-declarator : expected ')'";
     }
 
-    if(testp("(")) {
+    if(testp(PunctuatorType::LEFTPARENTHESIS)) {
       directDeclaratorHelp();
     }
 
@@ -475,14 +475,14 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
                                        | EPSILON
 */
 void Parser::directDeclaratorHelp() {
-  if (testp("(")) {
+  if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     scan();
 
     // 1. option
-    if(testp(")")) {
+    if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
       
-      if(testp("(")) {
+      if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         directDeclaratorHelp();
       }
 
@@ -491,7 +491,7 @@ void Parser::directDeclaratorHelp() {
       parameterList();
       readP(")");
 
-      if(testp("(")) {
+      if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         directDeclaratorHelp();
       }
     } 
@@ -518,15 +518,15 @@ compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
 */
 void Parser::compoundStatement() {
-  if (testp("{")) {
+  if (testp(PunctuatorType::LEFTCURLYBRACE)) {
     scan();
 
-    if (testp("}")) {
+    if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
       scan();
       return;
     } else {
       blockItemList();
-      if(testp("}")) {
+      if(testp(PunctuatorType::RIGHTCURLYBRACE)) {
         scan();
         return;
       } else {
@@ -544,7 +544,7 @@ block-item-list ->  block-item
                   | block-item block-item-list
 */
 void Parser::blockItemList() {
-  while(!testp("}")) {
+  while(!testp(PunctuatorType::RIGHTCURLYBRACE)) {
     blockItem();
   }
 }
@@ -583,7 +583,7 @@ void Parser::statement() {
   if(testk("goto") || testk("continue") || testk("break") || testk("return")) {
     // jump-statement
     jumpStatement();
-  } else if(testp("{")) {
+  } else if(testp(PunctuatorType::LEFTCURLYBRACE)) {
     compoundStatement();
   } else if(testk("if")) {
     selectionStatement();
@@ -603,12 +603,12 @@ void Parser::statement() {
  expression-statement -> ";" | expression ";"
  */
 void Parser::expressionStatement() {
-  if (testp(";")) {
+  if (testp(PunctuatorType::SEMICOLON)) {
     scan();
     return;
   } else {
     expression();
-    if (testp(";")) {
+    if (testp(PunctuatorType::SEMICOLON)) {
       scan();
       return;
     } else {
@@ -682,6 +682,7 @@ void Parser::selectionStatement() {
   }
 }
 
+//TODO: port to new readP method
 void Parser::readP(string value) {
   if(testp(value)) {
     scan();
@@ -700,7 +701,7 @@ void Parser::readK(string value) {
 
 
 void Parser::readSemicolon(string funcName) {
-  if(testp(";")) {
+  if(testp(PunctuatorType::SEMICOLON)) {
     scan();
   } else {
     throw funcName+" expected";
@@ -735,7 +736,7 @@ void Parser::jumpStatement() {
   } else if (testk("return")){
     scan();
 
-    if(testp(";")) {
+    if(testp(PunctuatorType::SEMICOLON)) {
       scan();
     } else {
       expression();
