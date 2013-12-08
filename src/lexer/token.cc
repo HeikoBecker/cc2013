@@ -51,6 +51,8 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       m_puncttype = PunctuatorType::SEMICOLON;
     } else if (value == ",") {
       m_puncttype = PunctuatorType::COMMA;
+    } else if (value == ".") {
+      m_puncttype = PunctuatorType::MEMBER_ACCESS;
     } else {
       /* #, ##, %:, %:%: are missing
        * however, those aren't legal/relevant at the parsing stage anymore
