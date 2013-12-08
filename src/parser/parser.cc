@@ -93,23 +93,31 @@ void Parser::translationUnit() {
 }
 
 void Parser::externalDeclaration() {
-  // TODO : also handle declaration 
-  functionDefinition();
-}
 
-void Parser::functionDefinition() {
-  cout<<"first symbol"<<endl;
+  // TODO: test for static_assert for declaration
+  // functionDefintion or declaration ?
   declarationSpecifiers();
-  cout<<"declarator"<<endl;
+
+  if (testp(";")) {
+    // it was a declaration
+    scan();
+    return ;
+  }
   declarator();
-  cout<<"compoundStatement();"<<endl;
+
+  if (testp(";")) {
+    scan();
+    // it was a declaration()
+    return ;
+  }
+
+  // it is a functionDefition! 
   compoundStatement();
 }
 
 void Parser::declarationSpecifiers() {
   typeSpecifier();
 }
-
 
 void Parser::typeSpecifier() {
   if (test(TokenType::KEYWORD, "void")) {
@@ -329,7 +337,14 @@ SubExpression Parser::expression(int minPrecedence = 0) {
 
 
 void Parser::declaration() {
-  // TODO
+  // TODO implement static_assert-declaration
+  declarationSpecifiers();
+  if (testp(";")) {
+    scan();
+  } else {
+    declarator();
+    readP(";");
+  }
 }
 
 void Parser::initDeclaratorList() {
@@ -556,6 +571,7 @@ compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
 */
 void Parser::compoundStatement() {
+
   if (testp(PunctuatorType::LEFTCURLYBRACE)) {
     scan();
 
@@ -600,7 +616,7 @@ block-item ->   declaration
               | statement
 */
 void Parser::blockItem() {
-  // TODO : handle static asser declaration
+  // TODO : handle static assert declaration
   if (testTypeSpecifier()) {
     declaration();
   } else {

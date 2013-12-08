@@ -100,7 +100,6 @@ namespace Parsing {
       void typeName();
       void declarator();
       void directOrAbstractDeclarator(bool isDirect);
-      void functionDefinition();
       void externalDeclaration();
       void translationUnit();
       void compoundStatement();
