@@ -60,7 +60,7 @@ bool Lexer::consumePunctuator() {
     } else {
       return false;
     }
-  } while (count_matches < MAXOPLENGTH);
+  } while (count_matches <= MAXOPLENGTH);
   return false;
 #undef MAXOPLENGTH 
 }
