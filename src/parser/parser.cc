@@ -523,13 +523,73 @@ void Parser::parameterList() {
   }
 }
 
+
+/*
+abstract-declarator ->  pointer
+                      | pointer direct-abstract-declarator
+                                            | direct-abstract-declarator
+
+                                            direct-abstract-declarator ->  "(" abstract-declarator ")" direct-abstract-declarator_help
+
+                                            direct-abstract-declarator_help -> "(" parameter-type-list ")" direct-abstract-declarator_help
+                                                                         |   "(" ")" direct-abstract-declarator_help
+                                                                                                      | EPSILON
+*/
+void Parser::abstractDeclarator() {
+  while(testp("*")) {
+    scan();
+  } 
+
+  if (testp("(")) {
+    directAbstractDeclarator();
+  }
+}
+
+/*
+direct-abstract-declarator ->  "(" abstract-declarator ")" direct-abstract-declarator_help
+
+                                            direct-abstract-declarator_help -> "(" parameter-type-list ")" direct-abstract-declarator_help
+                                                                         |   "(" ")" direct-abstract-declarator_help
+                                                                                                      | EPSILON
+*/
+void Parser::directAbstractDeclarator() {
+  expect("(");
+  scan();
+  abstractDeclarator();
+  expect(")");
+  scan();
+
+  if(testp("(")) {
+    directAbstractDeclaratorHelp();
+  }
+}
+
+void Parser::directAbstractDeclaratorHelp() {
+  expect("(");
+  scan();
+  
+  if (testp(")")) {
+    scan();
+    if(testp("(")) {
+      directAbstractDeclaratorHelp();
+    }
+  } else {
+    parameterList();
+    expect(")");
+    scan();
+
+    if(testp("(")) {
+      directAbstractDeclaratorHelp();
+    }
+  }
+}
+
 /*
  *
  parameter-declaration ->   declaration-specifiers declarator
  | declarations-specifiers abstract-declarator
  | declarations-specifiers
 */
-
 void Parser::parameterDeclaration() {
   declarationSpecifiers();
   if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
