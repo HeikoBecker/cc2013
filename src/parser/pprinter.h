@@ -9,7 +9,8 @@ namespace Parsing {
 class PrettyPrinter {
   public:
     PrettyPrinter();
-    void ident();
+    void addIndentLevel();
+    void removeIndentLevel();
 
     template<typename T> void pprint(T node) {
       node.prettyPrint(*this);
@@ -19,7 +20,7 @@ class PrettyPrinter {
       nodeptr->prettyPrint(*this);
     }
   private:
-    int identLevel;
+    int indentLevel;
     std::ostream& out;
 
 };

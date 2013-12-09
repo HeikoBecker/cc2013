@@ -3,4 +3,7 @@
 
 using namespace Parsing;
 
-PrettyPrinter::PrettyPrinter() : identLevel(0), out(std::cout) {}
+PrettyPrinter::PrettyPrinter() : indentLevel(0), out(std::cout) {}
+
+void PrettyPrinter::addIndentLevel() {++indentLevel;}
+void PrettyPrinter::removeIndentLevel() {--indentLevel;}
