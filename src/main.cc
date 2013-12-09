@@ -70,11 +70,15 @@ int main(int, char** const argv)
           case Mode::PARSE:
           {
             auto parser = Parsing::Parser{f, name};
+#ifdef DEBUG
             if (parser.parse()) {
               printf("PARSING SUCCESSFUL\n");
             } else {
               PANIC("PARSING FAILED\n");
             }
+#else
+            parser.parse();
+#endif
             break;
           }
           case Mode::PRINT_AST:
@@ -89,6 +93,8 @@ int main(int, char** const argv)
           fclose(f);
       }
     }
+  } catch (Parsing::ParsingException const& e) {
+    /* no need to handle it; TODO: avoid throwing an exception at all */
   } catch (Lexing::LexingException const& e) {
     std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
       << "\n"

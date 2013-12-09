@@ -1,9 +1,11 @@
 #include <sstream>
 #include <iostream>
+#include <exception>
 #include <cstdio>
 #include <cctype>
 #include <utility> // for std::move
 #include "parser.h"
+#include "../diagnostic.h"
 #include "../lexer/lexer.h"
 #include "../lexer/punctuatortype.h"
 #include "../lexer/keywordtokentype.h"
@@ -20,7 +22,11 @@ Parser::Parser(FILE* f, char const *name)
 
 }
 
-inline void Parser::reportError() {};
+inline void Parser::reportError(std::string msg = "Parsing error") {
+  errorf(m_nextsym->pos(), msg.c_str());
+  // TODO: the full featured parser should continue
+  throw ParsingException(msg);
+};
 
 void Parser::expectedAnyOf() {
   reportError();
@@ -53,11 +59,14 @@ void Parser::expect(TokenType tokenType) {
 
 void Parser::debugOutput() {
   // print current token
+#ifdef DEBUG
+  cout<<"SCAN :";
   if (getNextType() == TokenType::END) {
     cout<<"END OF TOKENS REACHED"<<endl;
   } else {
      printToken(*getNextSymbol());
   }
+#endif
 }
 
 std::shared_ptr<Token> Parser::getNextSymbol() {
@@ -116,7 +125,6 @@ bool Parser::testk(KeywordType keyword) {
 }
 
 std::shared_ptr<Token> Parser::scan() {
-  cout<<"SCAN :";
   debugOutput();
 
   m_nextsym = m_lookahead;
@@ -688,7 +696,7 @@ void Parser::directDeclaratorHelp() {
       return;
     } else if (testTypeSpecifier()) { // parameter-list
       parameterList();
-      expect(PunctuatorType::LEFTPARENTHESIS);
+      expect(PunctuatorType::RIGHTPARENTHESIS);
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {

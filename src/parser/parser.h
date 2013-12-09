@@ -18,6 +18,13 @@ using namespace Lexing;
 
 namespace Parsing {
 
+  class ParsingException: public std::runtime_error 
+  {
+    public:
+      ParsingException(std::string message) : std::runtime_error(message){};
+  };
+
+
   /* class for the Parsing
    * the parser takes a list of tokens
    * and checks whether it is valid
@@ -53,7 +60,7 @@ namespace Parsing {
       inline void expect(PunctuatorType puncutator);
       inline void expect(KeywordType keyword);
       inline void expect(TokenType tokenType);
-      inline void reportError();
+      inline void reportError(std::string msg);
       inline void expectedAnyOf(/*TODO: varargs?*/);
 
 
