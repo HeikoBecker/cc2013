@@ -94,7 +94,6 @@ std::shared_ptr<Token> Parser::scan() {
   return m_nextsym;
 }
 
-
 bool Parser::parse() {
   auto ok = true;
 
@@ -395,8 +394,6 @@ SubExpression Parser::expression(int minPrecedence = 0) {
   return expr;
 }
 
-
-
 void Parser::declaration() {
   if (testk("_Static_assert")) {
     staticAssert();
@@ -410,13 +407,6 @@ void Parser::declaration() {
     declarator();
     readP(";");
   }
-}
-
-void Parser::initDeclaratorList() {
-  // TODO
-}
-
-void Parser::initDeclarator() {
 }
 
 /*
@@ -485,18 +475,15 @@ void Parser::structDeclaratorList() {
 void Parser::structDeclarator() {
   if (testp(":")) {
     scan();
-    // TODO : replace with constant-Expression
-    expression();
+    constantExpression();
   } else {
     declarator();
     if (testp(":")) {
       scan();
-      // TODO: replace with constant-expression
-      expression();
+      constantExpression();
     }
   }
 }
-
 
 void Parser::pointer() {
   while(testp(PunctuatorType::STAR)) {
@@ -533,9 +520,26 @@ void Parser::parameterDeclaration() {
     // TODO distinguish abstract-declarator
   }
 }
-
+/*
+identifier-list ->  identifier
+                  | identifier "," identifier-list
+*/
 void Parser::identifierList() {
-  // TODO
+  if (!testType(TokenType::IDENTIFIER)) {
+    ABORT();
+  }
+
+  scan();
+
+  while (testp(",")) {
+    scan();
+
+    if (!testType(TokenType::IDENTIFIER)) {
+      ABORT();
+    }
+
+    scan();
+  }
 }
 
 void Parser::typeName() {
@@ -678,7 +682,6 @@ bool Parser::testTypeSpecifier() {
   );
 }
 
-
 /*
 block-item ->   declaration
               | statement
@@ -785,7 +788,6 @@ void Parser::iterationStatement() {
   
 }
 
-
 /*
 selection-statement ->   "if" "(" expression ")" statement
    | "if" "(" expression ")" statement "else" statement
@@ -825,7 +827,6 @@ void Parser::readK(string value) {
     throw "error: "+value+" expected";
   }
 }
-
 
 void Parser::readSemicolon(string funcName) {
   if(testp(PunctuatorType::SEMICOLON)) {
@@ -879,8 +880,7 @@ void Parser::staticAssert() {
   readK("_Static_assert");
   readP("(");
 
-  // TODO constant-expression instead of expression
-  expression();
+  constantExpression();
 
   readP(",");
 
@@ -892,5 +892,10 @@ void Parser::staticAssert() {
 
   readP(")");
   readP(";");
+}
+
+void Parser::constantExpression() {
+  // TODO: use constant expression
+  expression();
 }
 

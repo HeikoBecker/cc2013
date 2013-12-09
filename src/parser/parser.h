@@ -75,6 +75,7 @@ namespace Parsing {
       void postfixExpression();
       void argumentExpressionList();
       void unaryExpression();
+      void constantExpression();
       void unaryOperator(); // TODO: probably not needed
       void additiveExpression();
       void multiplicativeExpression();
@@ -83,8 +84,6 @@ namespace Parsing {
       void declarationSpecifiers();
       void directDeclarator();
       void directDeclaratorHelp();
-      void initDeclaratorList();
-      void initDeclarator();
       void typeSpecifier();
       void structOrUnion();
       void structOrUnionSpecifier();
