@@ -47,8 +47,6 @@ namespace Parsing {
       bool testk(string value); // test keyword
       bool testk(KeywordType keyword); // test keyword
       bool testTypeSpecifier();
-      void readP(string value); // read punctuator 
-      void readK(string value); // read keyword
       bool testLookAheadP(string val);
       void readSemicolon(string funcName);
       inline void expect(std::string s);

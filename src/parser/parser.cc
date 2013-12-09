@@ -306,10 +306,7 @@ SubExpression Parser::computeAtom() {
     // parse expression in parentheses
     scan();
     auto child = expression(0);
-    if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
-      //unmatched (
-      ABORT();
-    }
+    expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     // handle postfix-expression
     child = postfixExpression(child);
@@ -367,9 +364,7 @@ SubExpression Parser::sizeOfType() {
   scan(); // read starting parenthesis
   // read type
   typeName();
-  if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
-    ABORT();
-  }
+  expect(PunctuatorType::RIGHTPARENTHESIS);
   scan();  // read closing parenthesis
   return SubExpression{};
 }
@@ -385,11 +380,8 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     ternaryHelper = expression(/*TODO: which precedence should this be*/0);
     // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
     // operator
-    if (!testp(PunctuatorType::COLON)) {
-      ABORT(); //TODO
-    } else {
-      // do we need to change the value of minPrecedence here?
-    }
+    expect(PunctuatorType::COLON);
+    // TODO: do we need to change the value of minPrecedence here?
   }  
   while (  (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence)
          || isTernary) {
@@ -424,7 +416,8 @@ void Parser::declaration() {
     scan();
   } else {
     declarator();
-    readP(";");
+    expect(PunctuatorType::SEMICOLON);
+    scan();
   }
 }
 
@@ -434,19 +427,23 @@ struct-or-union-specifier -> "struct" identifier "{" struct-declarations-list "}
                                                         | "struct"  identifier
 */
 void Parser::structOrUnionSpecifier() {
-  readK("struct");
+  expect("struct");
+  scan();
 
   if (testType(TokenType::IDENTIFIER)) {
     scan();
     if (testp("{")) {
-      readP("{");
+      expect(PunctuatorType::LEFTCURLYBRACE);
+      scan();
       structDeclarationList();
-      readP("}");
+      expect(PunctuatorType::RIGHTCURLYBRACE);
+      scan();
     }
   } else if(testp("{")) {
     scan();
     structDeclarationList();
-    readP("}");
+    expect(PunctuatorType::RIGHTCURLYBRACE);
+    scan();
   } else {
     ABORT();
   }
@@ -466,7 +463,8 @@ void Parser::structDeclaration() {
       scan();
     } else {
      structDeclaratorList();
-     readP(";");
+     expect(PunctuatorType::COMMA);
+     scan();
     }
   } else if(testk("_Static_assert")) {
     staticAssert();
@@ -604,19 +602,13 @@ identifier-list ->  identifier
                   | identifier "," identifier-list
 */
 void Parser::identifierList() {
-  if (!testType(TokenType::IDENTIFIER)) {
-    ABORT();
-  }
-
+  expect(TokenType::IDENTIFIER);
   scan();
 
   while (testp(",")) {
     scan();
 
-    if (!testType(TokenType::IDENTIFIER)) {
-      ABORT();
-    }
-
+    expect(TokenType::IDENTIFIER);
     scan();
   }
 }
@@ -693,7 +685,8 @@ void Parser::directDeclaratorHelp() {
       return;
     } else if (testTypeSpecifier()) { // parameter-list
       parameterList();
-      readP(")");
+      expect(PunctuatorType::LEFTPARENTHESIS);
+      scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         directDeclaratorHelp();
@@ -833,7 +826,8 @@ labeled-statement -> identifier : statement
 void Parser::labeledStatement() {
   if(testType(TokenType::IDENTIFIER)) {
     scan();
-    readP(":");
+    expect(PunctuatorType::COLON);
+    scan();
     statement();
   } else {
     throw "labeled-statement : identifier expected";
@@ -848,18 +842,24 @@ iteration-statement ->  "while" "(" expression ")" statement
 void Parser::iterationStatement() {
   if(testk(KeywordType::WHILE)) {
     scan();
-    readP("(");
+    expect(PunctuatorType::LEFTPARENTHESIS);
+    scan();
     expression();
-    readP(")");
+    expect(PunctuatorType::RIGHTPARENTHESIS);
+    scan();
     statement();
   } else if (testk(KeywordType::DO)) {
     scan();
     statement();
-    readK("while");
-    readP("(");
+    expect("while");
+    scan();
+    expect("(");
+    scan();
     expression();
-    readP(")");
-    readP(";");
+    expect(")");
+    scan();
+    expect(";");
+    scan();
 
   } else {
     throw "iteration-statement : no match found";
@@ -876,9 +876,11 @@ void Parser::selectionStatement() {
   if (testk(KeywordType::IF)) {
     scan();
 
-    readP("(");
+    expect("(");
+    scan();
     expression();
-    readP(")");
+    expect(")");
+    scan();
     statement();
 
     if(testk(KeywordType::ELSE)) {
@@ -887,23 +889,6 @@ void Parser::selectionStatement() {
     }
   } else {
     throw "selectionStatement: no match";
-  }
-}
-
-//TODO: port to new readP method
-void Parser::readP(string value) {
-  if(testp(value)) {
-    scan();
-  } else {
-    throw "error: "+value+" expected";
-  }
-}
-
-void Parser::readK(string value) {
-  if(testk(value)) {
-    scan();
-  } else {
-    throw "error: "+value+" expected";
   }
 }
 
@@ -956,12 +941,15 @@ void Parser::jumpStatement() {
 }
 
 void Parser::staticAssert() {
-  readK("_Static_assert");
-  readP("(");
+  expect("_Static_assert");
+  scan();
+  expect("(");
+  scan();
 
   constantExpression();
 
-  readP(",");
+  expect(",");
+  scan();
 
   if(testType(TokenType::STRINGLITERAL)) {
     scan();
@@ -969,8 +957,10 @@ void Parser::staticAssert() {
     ABORT();
   }
 
-  readP(")");
-  readP(";");
+  expect(")");
+  scan();
+  expect(";");
+  scan();
 }
 
 void Parser::constantExpression() {
