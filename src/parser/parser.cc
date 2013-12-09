@@ -474,7 +474,7 @@ void Parser::structDeclaration() {
       scan();
     } else {
      structDeclaratorList();
-     expect(PunctuatorType::COMMA);
+     expect(PunctuatorType::SEMICOLON);
      scan();
     }
   } else if(testk("_Static_assert")) {
