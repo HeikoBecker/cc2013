@@ -8,8 +8,6 @@
 #include "../lexer/punctuatortype.h"
 #include "../lexer/keywordtokentype.h"
 
-#define ABORT(X) do {throw std::exception();} while (false)
-
 using namespace Lexing;
 using namespace Parsing;
 
@@ -23,6 +21,10 @@ Parser::Parser(FILE* f, char const *name)
 }
 
 inline void Parser::reportError() {};
+
+void Parser::expectedAnyOf() {
+  reportError();
+}
 
 void Parser::expect(std::string s) {
   if (m_nextsym->value() != s) {
@@ -354,8 +356,9 @@ SubExpression Parser::computeAtom() {
   } else {
     // something went wrong
     // TODO: LATER: return error expression object
-    Lexing::printToken(*m_nextsym);
-    ABORT();
+    expectedAnyOf();
+    shared_ptr<Expression> errorneous;
+    return errorneous;
   }
 }
 
@@ -445,7 +448,7 @@ void Parser::structOrUnionSpecifier() {
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
   } else {
-    ABORT();
+    expectedAnyOf();
   }
 }
 
@@ -469,7 +472,7 @@ void Parser::structDeclaration() {
   } else if(testk("_Static_assert")) {
     staticAssert();
   } else {
-    ABORT();
+    expectedAnyOf();
   }
 }
 
@@ -814,7 +817,7 @@ void Parser::expressionStatement() {
       scan();
       return;
     } else {
-      ABORT();
+      expectedAnyOf();
     }
   }
 
@@ -951,14 +954,12 @@ void Parser::staticAssert() {
   expect(",");
   scan();
 
-  if(testType(TokenType::STRINGLITERAL)) {
-    scan();
-  } else {
-    ABORT();
-  }
+  expect(TokenType::STRINGLITERAL);
+  scan();
 
   expect(")");
   scan();
+
   expect(";");
   scan();
 }

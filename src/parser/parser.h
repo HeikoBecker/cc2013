@@ -54,6 +54,7 @@ namespace Parsing {
       inline void expect(KeywordType keyword);
       inline void expect(TokenType tokenType);
       inline void reportError();
+      inline void expectedAnyOf(/*TODO: varargs?*/);
 
 
       // debug function 
