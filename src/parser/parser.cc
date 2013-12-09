@@ -13,6 +13,7 @@
 using namespace Lexing;
 using namespace Parsing;
 
+
 // init parser
 Parser::Parser(FILE* f, char const *name)
   :  m_lexer(unique_ptr<Lexer>(new Lexer(f,name))) ,
@@ -20,6 +21,33 @@ Parser::Parser(FILE* f, char const *name)
 {
 
 }
+
+inline void Parser::reportError() {};
+
+void Parser::expect(std::string s) {
+  if (m_nextsym->value() != s) {
+    reportError();
+  }
+}
+
+void Parser::expect(PunctuatorType puncutator) {
+  if (!testp(puncutator)) {
+    reportError();
+  }
+}
+
+void Parser::expect(KeywordType keyword) {
+  if (!testk(keyword)) {
+    reportError();
+  }
+}
+
+void Parser::expect(TokenType tokenType) {
+  if (getNextType() != tokenType) {
+    reportError();
+  }
+}
+
 
 void Parser::debugOutput() {
   // print current token
@@ -98,9 +126,7 @@ bool Parser::parse() {
   auto ok = true;
 
   translationUnit();
-  if (getNextType() != TokenType::END) {
-    ABORT();
-  }
+  expect(TokenType::END);
   return ok;
 }
 
@@ -251,27 +277,20 @@ SubExpression Parser::postfixExpression(SubExpression child) {
             arguments.push_back(expression(0));
           } while (testp(PunctuatorType::COMMA));
         }
-        if (testp(PunctuatorType::RIGHTPARENTHESIS)) {
-          scan(); // now we've read the closing ")"
-        } else {
-          ABORT();
-        }
+        expect(PunctuatorType::RIGHTPARENTHESIS);
+        scan(); // now we've read the closing ")"
         child = make_shared<FunctionCall>(child, arguments);
       } else if (testp(PunctuatorType::LEFTSQBRACKET)) { //array access(?). TODO: Are expressions supported in []?
         scan();
         auto index = expression(0);
-        if (!testp(PunctuatorType::RIGHTSQBRACKET)) {
-          ABORT();
-        }
+        expect(PunctuatorType::RIGHTSQBRACKET);
         scan();
         child = make_shared<UnaryExpression>(PunctuatorType::ARRAY_ACCESS,index);
       } else if (testp(PunctuatorType::ARROW) || testp(PunctuatorType::MEMBER_ACCESS)) {
         PunctuatorType p = (testp(PunctuatorType::MEMBER_ACCESS)) ? PunctuatorType::MEMBER_ACCESS
                                         : PunctuatorType::ARROW;
         scan();
-        if (m_nextsym->type() != TokenType::IDENTIFIER) {
-          ABORT();
-        }
+        expect(TokenType::IDENTIFIER);
         auto var = make_shared<VariableUsage>(m_nextsym->value());
         child = make_shared<UnaryExpression>(p,var);
         scan();
