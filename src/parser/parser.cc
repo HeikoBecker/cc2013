@@ -34,7 +34,11 @@ void Parser::expectedAnyOf() {
 
 void Parser::expect(std::string s) {
   if (m_nextsym->value() != s) {
-    reportError();
+    auto msg = std::string("Expected ");
+    msg += s;
+    msg += std::string(" but got ");
+    msg += m_nextsym->value();
+    reportError(msg);
   }
 }
 
