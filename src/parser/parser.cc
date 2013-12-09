@@ -903,14 +903,6 @@ void Parser::selectionStatement() {
   }
 }
 
-void Parser::readSemicolon(string funcName) {
-  if(testp(PunctuatorType::SEMICOLON)) {
-    scan();
-  } else {
-    throw funcName+" expected";
-  }
-}
-
 /*
 jump-statement ->  
   "goto" identifier ";"
@@ -925,17 +917,20 @@ void Parser::jumpStatement() {
     if(testType(TokenType::IDENTIFIER)) {
       scan();
 
-      readSemicolon("jump-statement");
+      expect(";");
+      scan();
       
     } else {
       throw "jump-statement: identifier expected";
     }
   } else if (testk(KeywordType::CONTINUE)) {
     scan();
-    readSemicolon("jump-statement");
+    expect(";");
+    scan();
   } else if (testk(KeywordType::BREAK)) {
     scan();
-    readSemicolon("jump-statement");
+    expect(";");
+    scan();
   } else if (testk(KeywordType::RETURN)){
     scan();
 
@@ -943,7 +938,8 @@ void Parser::jumpStatement() {
       scan();
     } else {
       expression();
-      readSemicolon("jump-statement");
+      expect(";");
+      scan();
     }
 
   } else {

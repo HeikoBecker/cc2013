@@ -55,7 +55,6 @@ namespace Parsing {
       bool testk(KeywordType keyword); // test keyword
       bool testTypeSpecifier();
       bool testLookAheadP(string val);
-      void readSemicolon(string funcName);
       inline void expect(std::string s);
       inline void expect(PunctuatorType puncutator);
       inline void expect(KeywordType keyword);
