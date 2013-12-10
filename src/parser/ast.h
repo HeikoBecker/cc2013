@@ -197,7 +197,7 @@ class JUMPSTATEMENT(ReturnStatement) {
 
 
 typedef std::shared_ptr<JumpStatement> SubJumpStatement;
-
+typedef std::shared_ptr<CompoundStatement> SubCompoundStatement;
 
 
 
