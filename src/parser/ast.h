@@ -15,6 +15,8 @@
  */
 #define ASTNODE(X) X : public AstNode
 #define EXPRESSION(X) X : public Expression
+#define TYPE(X) X : public Type
+#define STATEMENT(X) X : public Statement
 
 namespace Parsing {
 
@@ -25,7 +27,7 @@ class AstNode
     virtual void prettyPrint(PrettyPrinter &) {};
 };
 
-class ASTNODE(Expression) {};
+class ASTNODE(Expression) { };
 
 typedef std::shared_ptr<AstNode> AstChild;
 typedef std::shared_ptr<Expression> SubExpression;
@@ -85,6 +87,60 @@ class EXPRESSION(TernaryExpression)
     SubExpression condition;
     SubExpression lhs;
     SubExpression rhs;
+};
+
+class ASTNODE(Type) {};
+
+class TYPE(BasicType) {
+  // this type includes int/char/void  
+  public:
+    BasicType(std::string str);
+    void prettyPrint(PrettyPrinter & pp) override;
+  
+  private:
+    enum ReturnType {
+      VOID,
+      INT,
+      CHAR
+    };
+
+    ReturnType type;
+};
+
+class TYPE(StructType) {
+  // TODO Add content
+  public:
+    StructType();
+    StructType(std::string str);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    std::string name;
+};
+
+class ASTNODE(Statement) {};
+
+class STATEMENT(CompoundStatement) {
+  public:
+    CompoundStatement();
+    void prettyPrint(PrettyPrinter & pp) override;
+};
+
+class STATEMENT(ExpressionStatement) {
+  public:
+    ExpressionStatement(Expression ex);
+    void prettyPrint(PrettyPrinter & pp) override;
+
+  private:
+    Expression expression;
+};
+
+class ASTNODE(Pointer) {
+  public:
+    Pointer(int counter);
+    void prettyPrint(PrettyPrinter & pp) override;
+
+  private:
+    int counter;
 };
 
 }

@@ -157,7 +157,7 @@ void Parser::externalDeclaration() {
     return ;
   }
   // functionDefintion or declaration ?
-  declarationSpecifiers();
+  Type t = typeSpecifier();
 
   if (testp(";")) {
     // it was a declaration
@@ -180,17 +180,16 @@ void Parser::declarationSpecifiers() {
   typeSpecifier();
 }
 
-void Parser::typeSpecifier() {
-  if (test(TokenType::KEYWORD, "void")) {
-    scan();
-  } else if (test(TokenType::KEYWORD, "char")) {
-    scan();
-  } else if (test(TokenType::KEYWORD, "int")) {
-    scan();
-  } else if (test(TokenType::KEYWORD, "struct")) {
+Type Parser::typeSpecifier() {
+  cout<<"Type specifier" <<endl;
+  if (testk("struct")) {
     structOrUnionSpecifier();
+    // TODO : implement struct
+    return BasicType("struct");
   } else {
-    throw "typespecifier : no matching";
+    BasicType type(m_nextsym->value());
+    scan();
+    return type;
   }
 }
 
@@ -426,7 +425,7 @@ void Parser::declaration() {
     return ;
   }
 
-  declarationSpecifiers();
+  typeSpecifier();
   if (testp(";")) {
     scan();
   } else {
@@ -441,11 +440,13 @@ struct-or-union-specifier -> "struct" identifier "{" struct-declarations-list "}
                             | "struct" "{" struct-declarations-list "}"
                                                         | "struct"  identifier
 */
-void Parser::structOrUnionSpecifier() {
+StructType Parser::structOrUnionSpecifier() {
   expect("struct");
   scan();
 
   if (testType(TokenType::IDENTIFIER)) {
+    StructType type(m_nextsym->value());
+
     scan();
     if (testp("{")) {
       expect(PunctuatorType::LEFTCURLYBRACE);
@@ -454,6 +455,8 @@ void Parser::structOrUnionSpecifier() {
       expect(PunctuatorType::RIGHTCURLYBRACE);
       scan();
     }
+
+    return type;
   } else if(testp("{")) {
     scan();
     structDeclarationList();
@@ -462,7 +465,10 @@ void Parser::structOrUnionSpecifier() {
   } else {
     expectedAnyOf();
   }
+
+  return StructType();
 }
+
 
 void Parser::structDeclarationList() {
   structDeclaration();
@@ -604,7 +610,7 @@ void Parser::directAbstractDeclaratorHelp() {
  | declarations-specifiers
 */
 void Parser::parameterDeclaration() {
-  declarationSpecifiers();
+  typeSpecifier();
   if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
     return;
   } else {
@@ -642,9 +648,14 @@ declarator ->   pointer direct-declarator
 */
 void Parser::declarator() {
 
+  int counter = 0;
+
   if(test(TokenType::PUNCTUATOR,"*")) {
+    counter++;
     pointer();
   }
+
+  Pointer pointer(counter);
 
   directDeclarator();
 }
@@ -732,19 +743,21 @@ void Parser::directOrAbstractDeclarator(bool isDirect) {
 compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
 */
-void Parser::compoundStatement() {
+CompoundStatement Parser::compoundStatement() {
 
   if (testp(PunctuatorType::LEFTCURLYBRACE)) {
     scan();
 
     if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
       scan();
-      return;
+      return CompoundStatement();
     } else {
       blockItemList();
       if(testp(PunctuatorType::RIGHTCURLYBRACE)) {
         scan();
-        return;
+
+        // TODO fill CompundStatement with BlockList
+        return CompoundStatement();
       } else {
         throw "compoundStatement: '}' expected";
       }

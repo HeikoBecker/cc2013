@@ -95,9 +95,9 @@ namespace Parsing {
       void declarationSpecifiers();
       void directDeclarator();
       void directDeclaratorHelp();
-      void typeSpecifier();
+      Type typeSpecifier();
       void structOrUnion();
-      void structOrUnionSpecifier();
+      StructType structOrUnionSpecifier();
       void structDeclarationList();
       void structDeclaration();
       void specifierQualifierList();
@@ -116,7 +116,7 @@ namespace Parsing {
       void directOrAbstractDeclarator(bool isDirect);
       void externalDeclaration();
       void translationUnit();
-      void compoundStatement();
+      CompoundStatement compoundStatement();
       void expressionStatement();
       void staticAssert();
       void abstractDeclarator();
