@@ -835,20 +835,21 @@ void Parser::statement() {
 /*
  expression-statement -> ";" | expression ";"
  */
-void Parser::expressionStatement() {
+SubExpressionStatement Parser::expressionStatement() {
   if (testp(PunctuatorType::SEMICOLON)) {
     scan();
-    return;
+    return make_shared<ExpressionStatement>();
   } else {
-    expression();
+    SubExpression ex = expression();
+
     if (testp(PunctuatorType::SEMICOLON)) {
       scan();
-      return;
     } else {
       expectedAnyOf();
     }
-  }
 
+    return make_shared<ExpressionStatement>(ex);
+  }
 }
 
 /*

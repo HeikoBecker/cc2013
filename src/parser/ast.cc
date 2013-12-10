@@ -140,7 +140,9 @@ PRETTY_PRINT(Pointer) {
 
 PRETTY_PRINT(ExpressionStatement) {
   // TODO : check whether this is working
-  pp.pprint(expression);
+  if (expression != NULL) {
+    pp.pprint(expression);
+  }
   pp.pprint(';');
 }
 

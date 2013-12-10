@@ -128,6 +128,7 @@ class STATEMENT(CompoundStatement) {
 
 class STATEMENT(ExpressionStatement) {
   public:
+    ExpressionStatement() { };
     ExpressionStatement(SubExpression ex) :expression(ex) { };
     void prettyPrint(PrettyPrinter & pp) override;
 
@@ -204,6 +205,7 @@ enum IterationEnum {
 typedef std::shared_ptr<JumpStatement> SubJumpStatement;
 typedef std::shared_ptr<CompoundStatement> SubCompoundStatement;
 typedef std::shared_ptr<Statement> SubStatement;
+typedef std::shared_ptr<ExpressionStatement> SubExpressionStatement;
 
 class STATEMENT(IterationStatement) { 
   public:
