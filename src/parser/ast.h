@@ -215,5 +215,15 @@ class STATEMENT(IterationStatement) {
     IterationEnum kind;
 };
 
+class STATEMENT(LabeledStatement) {
+  public:
+    LabeledStatement(std::string str, SubStatement st) : name(str), statement(st) { };
+    void prettyPrint(PrettyPrinter & pp) override;
+
+  private:
+    std::string name;
+    SubStatement statement;
+};
+
 }
 #endif

@@ -220,3 +220,9 @@ PRETTY_PRINT(IterationStatement) {
     pp.pprint(std::string("));"));
   }
 }
+
+PRETTY_PRINT(LabeledStatement) {
+  pp.pprint(name);
+  pp.pprint(std::string(": "));
+  pp.pprint(statement);
+}
