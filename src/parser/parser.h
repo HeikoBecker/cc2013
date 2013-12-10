@@ -106,7 +106,6 @@ namespace Parsing {
       void enumSpecifier();
       void enumeratorList();
       void enumerator();
-      void pointer();
       void parameterTypeList();
       void parameterList();
       void parameterDeclaration();
@@ -116,7 +115,6 @@ namespace Parsing {
       void directOrAbstractDeclarator(bool isDirect);
       void externalDeclaration();
       void translationUnit();
-
 
       SubCompoundStatement compoundStatement();
       SubExpressionStatement expressionStatement();

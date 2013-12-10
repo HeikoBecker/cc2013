@@ -522,12 +522,6 @@ void Parser::structDeclarator() {
   }
 }
 
-void Parser::pointer() {
-  while(testp(PunctuatorType::STAR)) {
-    scan();
-  }
-}
-
 /*
 parameter-list  ->   parameter-declaration
                    | parameter-list "," parameter-declaration
@@ -646,12 +640,13 @@ declarator ->   pointer direct-declarator
               | direct-declarator
 */
 void Parser::declarator() {
-
   int counter = 0;
 
   if(test(TokenType::PUNCTUATOR,"*")) {
-    counter++;
-    pointer();
+    while(testp(PunctuatorType::STAR)) {
+      counter++;
+      scan();
+    }
   }
 
   Pointer pointer(counter);
