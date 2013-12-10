@@ -629,8 +629,11 @@ void Parser::identifierList() {
 }
 
 void Parser::typeName() {
-  //TODO: what's  below is wrong, or rather not everything that's needed
   specifierQualifierList();
+
+  if (!testp(")")) {
+    abstractDeclarator();
+  }
 }
 
 /*
