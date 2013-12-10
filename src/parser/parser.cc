@@ -26,7 +26,7 @@ inline void Parser::reportError(std::string msg = "Parsing error") {
   errorf(m_nextsym->pos(), msg.c_str());
   // TODO: the full featured parser should continue
   throw ParsingException(msg);
-};
+}
 
 void Parser::expectedAnyOf() {
   reportError();
@@ -185,7 +185,7 @@ Type Parser::typeSpecifier() {
   if (testk("struct")) {
     structOrUnionSpecifier();
     // TODO : implement struct
-    return BasicType("struct");
+    return BasicType("int");
   } else {
     BasicType type(m_nextsym->value());
     scan();

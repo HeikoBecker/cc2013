@@ -7,8 +7,6 @@
 #include "../lexer/punctuatortype.h"
 #include "pprinter.h"
 
-
-
 /**
  * This macro is meant to simplify a later transition from virtual inheritance
  * to CRTP static inheritance
@@ -216,8 +214,6 @@ class STATEMENT(IterationStatement) {
     SubStatement statement;
     IterationEnum kind;
 };
-
-
 
 }
 #endif
