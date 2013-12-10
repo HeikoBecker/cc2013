@@ -146,24 +146,24 @@ PRETTY_PRINT(Pointer) {
   }
 }
 
-ExpressionStatement::ExpressionStatement(Expression ex) {
+ExpressionStatement::ExpressionStatement(SubExpression ex) {
   expression = ex;
 }
 
 PRETTY_PRINT(ExpressionStatement) {
   // TODO : check whether this is working
-  expression.prettyPrint(pp); 
+  pp.pprint(expression);
   pp.pprint(';');
 }
 
-SelectionStatement::SelectionStatement(Expression ex, Statement ifStat) {
+SelectionStatement::SelectionStatement(SubExpression ex, Statement ifStat) {
   expression = ex;
   ifStatement = ifStat;
   hasElseStatement = false;
 }
 
 SelectionStatement::SelectionStatement(
-  Expression ex, 
+  SubExpression ex, 
   Statement ifStat, 
   Statement elseStat) {
   expression = ex;
@@ -175,11 +175,11 @@ SelectionStatement::SelectionStatement(
 
 PRETTY_PRINT(SelectionStatement) {
   pp.pprint(std::string("if ("));
-  expression.prettyPrint(pp);
+  pp.pprint(expression);
   pp.pprint(')');
-  ifStatement.prettyPrint(pp);
+  pp.pprint(ifStatement);
 
   if (hasElseStatement) {
-    elseStatement.prettyPrint(pp);
+    pp.pprint(elseStatement);
   }
 }

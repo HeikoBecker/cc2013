@@ -127,11 +127,11 @@ class STATEMENT(CompoundStatement) {
 
 class STATEMENT(ExpressionStatement) {
   public:
-    ExpressionStatement(Expression ex);
+    ExpressionStatement(SubExpression ex);
     void prettyPrint(PrettyPrinter & pp) override;
 
   private:
-    Expression expression;
+    SubExpression expression;
 };
 
 class ASTNODE(Pointer) {
@@ -146,15 +146,16 @@ class ASTNODE(Pointer) {
 class STATEMENT(SelectionStatement) {
   public:
     void prettyPrint(PrettyPrinter & pp) override;
-    SelectionStatement(Expression ex, Statement ifStatement);
+    SelectionStatement(SubExpression ex, Statement ifStatement);
     SelectionStatement(
-      Expression ex, 
+      SubExpression ex, 
       Statement ifStatement, 
       Statement elseStatement
     );
 
+// TODO : get rid of hasElseStatement ?
   private:
-    Expression expression;
+    SubExpression expression;
     Statement ifStatement;
     Statement elseStatement;
     bool hasElseStatement;
