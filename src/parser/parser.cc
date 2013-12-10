@@ -743,21 +743,21 @@ void Parser::directOrAbstractDeclarator(bool isDirect) {
 compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
 */
-CompoundStatement Parser::compoundStatement() {
+SubCompoundStatement Parser::compoundStatement() {
 
   if (testp(PunctuatorType::LEFTCURLYBRACE)) {
     scan();
 
     if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
       scan();
-      return CompoundStatement();
+      return make_shared<CompoundStatement>();
     } else {
       blockItemList();
       if(testp(PunctuatorType::RIGHTCURLYBRACE)) {
         scan();
 
         // TODO fill CompundStatement with BlockList
-        return CompoundStatement();
+        return make_shared<CompoundStatement>();
       } else {
         throw "compoundStatement: '}' expected";
       }
