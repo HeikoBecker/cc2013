@@ -935,15 +935,18 @@ jump-statement ->
   "return" expression ";"
   "return" ";"
 */
-void Parser::jumpStatement() {
+SubJumpStatement Parser::jumpStatement() {
   if (testk(KeywordType::GOTO)) {
     scan();
     if(testType(TokenType::IDENTIFIER)) {
+
+      SubJumpStatement gotoStatement = make_shared<GotoStatement>(m_nextsym->value());
       scan();
 
       expect(";");
       scan();
-      
+
+      return gotoStatement;
     } else {
       throw "jump-statement: identifier expected";
     }
@@ -951,21 +954,27 @@ void Parser::jumpStatement() {
     scan();
     expect(";");
     scan();
+
+    return make_shared<ContinueStatement>();
   } else if (testk(KeywordType::BREAK)) {
     scan();
     expect(";");
     scan();
+    return make_shared<BreakStatement>();
   } else if (testk(KeywordType::RETURN)){
     scan();
 
     if(testp(PunctuatorType::SEMICOLON)) {
       scan();
+
+      return make_shared<ReturnStatement>();
     } else {
-      expression();
+      SubExpression sub = expression();
       expect(";");
       scan();
-    }
 
+      return make_shared<ReturnStatement>(sub);
+    }
   } else {
     throw "jump-statement : unexpected token";
   }

@@ -73,7 +73,7 @@ namespace Parsing {
 
       // statements
       void statement();
-      void jumpStatement();
+      SubJumpStatement jumpStatement();
       void selectionStatement();
       void iterationStatement();
       void labeledStatement();
