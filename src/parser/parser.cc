@@ -449,6 +449,7 @@ StructType Parser::structOrUnionSpecifier() {
 
     scan();
     if (testp("{")) {
+      // TODO : Add the content of the struct
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
       structDeclarationList();
