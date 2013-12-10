@@ -181,7 +181,6 @@ void Parser::declarationSpecifiers() {
 }
 
 Type Parser::typeSpecifier() {
-  cout<<"Type specifier" <<endl;
   if (testk("struct")) {
     structOrUnionSpecifier();
     // TODO : implement struct
@@ -808,28 +807,28 @@ statement ->
   | iteration-statement
   | jump-statement
 */
-void Parser::statement() {
+SubStatement Parser::statement() {
+
   if(testk(   KeywordType::GOTO) 
            || testk(KeywordType::CONTINUE) 
            || testk(KeywordType::BREAK) 
            || testk(KeywordType::RETURN)) {
-    // jump-statement
-    jumpStatement();
+    return jumpStatement();
   } else if(testp(PunctuatorType::LEFTCURLYBRACE)) {
-    compoundStatement();
+    return compoundStatement();
   } else if(testk(KeywordType::IF)) {
-    selectionStatement();
+    return selectionStatement();
   } else if(testk(KeywordType::WHILE) || testk(KeywordType::DO)) {
-    iterationStatement();
+    return iterationStatement();
   } else if(testType(TokenType::IDENTIFIER)) {
     if (testLookAheadP(":")) {
-      labeledStatement();
+      return labeledStatement();
     } else {
-      expressionStatement();
+      return expressionStatement();
     }
   } else {
-    expressionStatement();
-  }
+    return expressionStatement();
+  } 
 }
 
 /*
@@ -855,12 +854,16 @@ SubExpressionStatement Parser::expressionStatement() {
 /*
 labeled-statement -> identifier : statement
 */
-void Parser::labeledStatement() {
+SubLabeledStatement Parser::labeledStatement() {
   if(testType(TokenType::IDENTIFIER)) {
+    std::string label = m_nextsym->value();
     scan();
     expect(PunctuatorType::COLON);
     scan();
-    statement();
+
+    SubStatement st = statement();
+
+    return make_shared<LabeledStatement>(label,st);
   } else {
     throw "labeled-statement : identifier expected";
   }
@@ -871,27 +874,30 @@ iteration-statement ->  "while" "(" expression ")" statement
                       | "do" statement "while" "(" expression ")" ";"
 
 */
-void Parser::iterationStatement() {
+SubIterationStatement Parser::iterationStatement() {
   if(testk(KeywordType::WHILE)) {
     scan();
     expect(PunctuatorType::LEFTPARENTHESIS);
     scan();
-    expression();
+    SubExpression ex = expression();
     expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
-    statement();
+    SubStatement st = statement();
+    return make_shared<IterationStatement>(ex, st, IterationEnum::WHILE);
   } else if (testk(KeywordType::DO)) {
     scan();
-    statement();
+    SubStatement st = statement();
     expect("while");
     scan();
     expect("(");
     scan();
-    expression();
+    SubExpression ex = expression();
     expect(")");
     scan();
     expect(";");
     scan();
+
+    return make_shared<IterationStatement>(ex, st, IterationEnum::DOWHILE);
 
   } else {
     throw "iteration-statement : no match found";
@@ -904,24 +910,24 @@ selection-statement ->   "if" "(" expression ")" statement
    | "if" "(" expression ")" statement "else" statement
 */
 
-void Parser::selectionStatement() {
+SubSelectionStatement Parser::selectionStatement() {
   if (testk(KeywordType::IF)) {
     scan();
 
     expect("(");
     scan();
-    expression();
+    SubExpression ex = expression();
     expect(")");
     scan();
-    statement();
+    SubStatement st1 = statement();
 
     if(testk(KeywordType::ELSE)) {
       scan();
       // TODO
-      // return SelectionStatement(ex, if, else);
-      statement();
+      SubStatement st2 = statement();
+      return make_shared<SelectionStatement>(ex, st1, st2);
     } else {
-      // TODO: return SelectionStatement(ex, if);
+      return make_shared<SelectionStatement>(ex, st1);
     }
   } else {
     throw "selectionStatement: no match";

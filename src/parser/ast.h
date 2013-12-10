@@ -119,6 +119,8 @@ class TYPE(StructType) {
 
 class ASTNODE(Statement) {};
 
+typedef std::shared_ptr<Statement> SubStatement;
+
 class STATEMENT(CompoundStatement) {
   public:
     // TODO add inner blocks here
@@ -148,18 +150,18 @@ class ASTNODE(Pointer) {
 class STATEMENT(SelectionStatement) {
   public:
     void prettyPrint(PrettyPrinter & pp) override;
-    SelectionStatement(SubExpression ex, Statement ifStatement);
+    SelectionStatement(SubExpression ex, SubStatement ifStatement);
     SelectionStatement(
       SubExpression ex, 
-      Statement ifStatement, 
-      Statement elseStatement
+      SubStatement ifStatement, 
+      SubStatement elseStatement
     );
 
   // TODO : get rid of hasElseStatement ?
   private:
     SubExpression expression;
-    Statement ifStatement;
-    Statement elseStatement;
+    SubStatement ifStatement;
+    SubStatement elseStatement;
     bool hasElseStatement;
 };
 
@@ -201,11 +203,13 @@ enum IterationEnum {
   WHILE,
   DOWHILE
 };
-
 typedef std::shared_ptr<JumpStatement> SubJumpStatement;
 typedef std::shared_ptr<CompoundStatement> SubCompoundStatement;
-typedef std::shared_ptr<Statement> SubStatement;
 typedef std::shared_ptr<ExpressionStatement> SubExpressionStatement;
+ 
+typedef std::shared_ptr<SelectionStatement> SubSelectionStatement;
+
+
 
 class STATEMENT(IterationStatement) { 
   public:
@@ -228,6 +232,7 @@ class STATEMENT(LabeledStatement) {
     SubStatement statement;
 };
 
-
+typedef std::shared_ptr<LabeledStatement> SubLabeledStatement;
+typedef std::shared_ptr<IterationStatement> SubIterationStatement;
 }
 #endif

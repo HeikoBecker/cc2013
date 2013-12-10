@@ -72,11 +72,11 @@ namespace Parsing {
 
 
       // statements
-      void statement();
+      SubStatement statement();
       SubJumpStatement jumpStatement();
-      void selectionStatement();
-      void iterationStatement();
-      void labeledStatement();
+      SubSelectionStatement selectionStatement();
+      SubIterationStatement iterationStatement();
+      SubLabeledStatement labeledStatement();
 
       SubExpression expression(int minPrecedence);
       SubExpression computeAtom();

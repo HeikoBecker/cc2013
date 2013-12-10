@@ -146,7 +146,7 @@ PRETTY_PRINT(ExpressionStatement) {
   pp.pprint(';');
 }
 
-SelectionStatement::SelectionStatement(SubExpression ex, Statement ifStat) {
+SelectionStatement::SelectionStatement(SubExpression ex, SubStatement ifStat) {
   expression = ex;
   ifStatement = ifStat;
   hasElseStatement = false;
@@ -154,8 +154,8 @@ SelectionStatement::SelectionStatement(SubExpression ex, Statement ifStat) {
 
 SelectionStatement::SelectionStatement(
   SubExpression ex, 
-  Statement ifStat, 
-  Statement elseStat) {
+  SubStatement ifStat, 
+  SubStatement elseStat) {
   expression = ex;
   ifStatement = ifStat;
   elseStatement = elseStat;
