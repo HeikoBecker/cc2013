@@ -156,3 +156,30 @@ PRETTY_PRINT(ExpressionStatement) {
   pp.pprint(';');
 }
 
+SelectionStatement::SelectionStatement(Expression ex, Statement ifStat) {
+  expression = ex;
+  ifStatement = ifStat;
+  hasElseStatement = false;
+}
+
+SelectionStatement::SelectionStatement(
+  Expression ex, 
+  Statement ifStat, 
+  Statement elseStat) {
+  expression = ex;
+  ifStatement = ifStat;
+  elseStatement = elseStat;
+  hasElseStatement = true;
+}
+
+
+PRETTY_PRINT(SelectionStatement) {
+  pp.pprint(std::string("if ("));
+  expression.prettyPrint(pp);
+  pp.pprint(')');
+  ifStatement.prettyPrint(pp);
+
+  if (hasElseStatement) {
+    elseStatement.prettyPrint(pp);
+  }
+}

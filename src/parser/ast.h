@@ -143,5 +143,22 @@ class ASTNODE(Pointer) {
     int counter;
 };
 
+class STATEMENT(SelectionStatement) {
+  public:
+    void prettyPrint(PrettyPrinter & pp) override;
+    SelectionStatement(Expression ex, Statement ifStatement);
+    SelectionStatement(
+      Expression ex, 
+      Statement ifStatement, 
+      Statement elseStatement
+    );
+
+  private:
+    Expression expression;
+    Statement ifStatement;
+    Statement elseStatement;
+    bool hasElseStatement;
+};
+
 }
 #endif

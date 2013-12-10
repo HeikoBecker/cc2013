@@ -916,7 +916,11 @@ void Parser::selectionStatement() {
 
     if(testk(KeywordType::ELSE)) {
       scan();
+      // TODO
+      // return SelectionStatement(ex, if, else);
       statement();
+    } else {
+      // TODO: return SelectionStatement(ex, if);
     }
   } else {
     throw "selectionStatement: no match";
