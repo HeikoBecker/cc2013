@@ -124,12 +124,6 @@ PRETTY_PRINT(StructType) {
   pp.pprint('}');
 }
 
-
-CompoundStatement::CompoundStatement() {
-  // TODO add block items  
-  
-}
-
 PRETTY_PRINT(CompoundStatement) {
 
   pp.pprint('{');
@@ -138,16 +132,10 @@ PRETTY_PRINT(CompoundStatement) {
   pp.pprint('}');
 }
 
-Pointer::Pointer(int num) : counter(num) {}
-
 PRETTY_PRINT(Pointer) {
   for(int n=0; n<counter; n++) {
     pp.pprint('*');
   }
-}
-
-ExpressionStatement::ExpressionStatement(SubExpression ex) {
-  expression = ex;
 }
 
 PRETTY_PRINT(ExpressionStatement) {

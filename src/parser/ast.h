@@ -121,13 +121,14 @@ class ASTNODE(Statement) {};
 
 class STATEMENT(CompoundStatement) {
   public:
-    CompoundStatement();
+    // TODO add inner blocks here
+    CompoundStatement() { };
     void prettyPrint(PrettyPrinter & pp) override;
 };
 
 class STATEMENT(ExpressionStatement) {
   public:
-    ExpressionStatement(SubExpression ex);
+    ExpressionStatement(SubExpression ex) :expression(ex) { };
     void prettyPrint(PrettyPrinter & pp) override;
 
   private:
@@ -136,7 +137,7 @@ class STATEMENT(ExpressionStatement) {
 
 class ASTNODE(Pointer) {
   public:
-    Pointer(int counter);
+    Pointer(int counter) : counter(counter) { } ;
     void prettyPrint(PrettyPrinter & pp) override;
 
   private:
@@ -224,6 +225,7 @@ class STATEMENT(LabeledStatement) {
     std::string name;
     SubStatement statement;
 };
+
 
 }
 #endif
