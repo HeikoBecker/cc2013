@@ -183,3 +183,25 @@ PRETTY_PRINT(SelectionStatement) {
     pp.pprint(elseStatement);
   }
 }
+
+PRETTY_PRINT(GotoStatement) {
+  pp.pprint(std::string("goto "));
+  pp.pprint(label);
+  pp.pprint(';');
+}
+
+PRETTY_PRINT(ContinueStatement) {
+  pp.pprint(std::string("continue;"));
+}
+
+PRETTY_PRINT(BreakStatement) {
+  pp.pprint(std::string("break;"));
+}
+
+PRETTY_PRINT(ReturnStatement) {
+  pp.pprint(std::string("return "));
+  if (expression != NULL) {
+    pp.pprint(expression);
+  }
+  pp.pprint(';');
+}

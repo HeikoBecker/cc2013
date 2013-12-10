@@ -17,6 +17,7 @@
 #define EXPRESSION(X) X : public Expression
 #define TYPE(X) X : public Type
 #define STATEMENT(X) X : public Statement
+#define JUMPSTATEMENT(X) X: public JumpStatement
 
 namespace Parsing {
 
@@ -153,13 +154,51 @@ class STATEMENT(SelectionStatement) {
       Statement elseStatement
     );
 
-// TODO : get rid of hasElseStatement ?
+  // TODO : get rid of hasElseStatement ?
   private:
     SubExpression expression;
     Statement ifStatement;
     Statement elseStatement;
     bool hasElseStatement;
 };
+
+class STATEMENT(JumpStatement) { };
+
+class JUMPSTATEMENT(GotoStatement) {
+  public:
+    void prettyPrint(PrettyPrinter & pp) override;
+    GotoStatement(std::string label) : label(label) {};
+
+  private:
+    std::string label;
+};
+
+class JUMPSTATEMENT(ContinueStatement) {
+  public:
+    void prettyPrint(PrettyPrinter & pp) override;
+    ContinueStatement() { };
+};
+
+class JUMPSTATEMENT(BreakStatement) {
+  public:
+    void prettyPrint(PrettyPrinter & pp) override;
+    BreakStatement() { };
+};
+
+class JUMPSTATEMENT(ReturnStatement) {
+  public:
+    void prettyPrint(PrettyPrinter & pp) override;
+    ReturnStatement() { };
+    ReturnStatement(SubExpression ex) :expression(ex) { };
+  
+  private:
+    SubExpression expression;
+};
+
+
+
+
+
 
 }
 #endif
