@@ -205,3 +205,18 @@ PRETTY_PRINT(ReturnStatement) {
   }
   pp.pprint(';');
 }
+
+PRETTY_PRINT(IterationStatement) {
+  if (kind == WHILE) {
+    pp.pprint(std::string("while ("));
+    pp.pprint(expression);
+    pp.pprint(std::string("))"));
+    pp.pprint(statement);
+  } else { // kind == DO
+    pp.pprint(std::string("do "));
+    pp.pprint(statement);
+    pp.pprint(std::string("while ("));
+    pp.pprint(expression);
+    pp.pprint(std::string("));"));
+  }
+}

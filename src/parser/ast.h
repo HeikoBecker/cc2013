@@ -18,6 +18,7 @@
 #define TYPE(X) X : public Type
 #define STATEMENT(X) X : public Statement
 #define JUMPSTATEMENT(X) X: public JumpStatement
+#define ITERATIONSTATEMENT(X) X: public IterationStatement
 
 namespace Parsing {
 
@@ -195,9 +196,26 @@ class JUMPSTATEMENT(ReturnStatement) {
     SubExpression expression;
 };
 
+// iteration statement i.e. while and for
+enum IterationEnum {
+  WHILE,
+  DOWHILE
+};
 
 typedef std::shared_ptr<JumpStatement> SubJumpStatement;
 typedef std::shared_ptr<CompoundStatement> SubCompoundStatement;
+typedef std::shared_ptr<Statement> SubStatement;
+
+class STATEMENT(IterationStatement) { 
+  public:
+    IterationStatement(SubExpression ex, SubStatement st, IterationEnum k): expression(ex), statement(st), kind(k) { };
+    void prettyPrint(PrettyPrinter & pp) override;
+
+  private:
+    SubExpression expression;
+    SubStatement statement;
+    IterationEnum kind;
+};
 
 
 
