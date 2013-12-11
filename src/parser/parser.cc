@@ -747,26 +747,17 @@ compound-statement -> "{" block-item-list "}"
 */
 SubCompoundStatement Parser::compoundStatement() {
 
-  if (testp(PunctuatorType::LEFTCURLYBRACE)) {
+  expect(PunctuatorType::LEFTCURLYBRACE);
+  scan();
+
+  if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
     scan();
-
-    if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
-      scan();
-      return make_shared<CompoundStatement>();
-    } else {
-      blockItemList();
-      if(testp(PunctuatorType::RIGHTCURLYBRACE)) {
-        scan();
-
-        // TODO fill CompundStatement with BlockList
-        return make_shared<CompoundStatement>();
-      } else {
-        throw "compoundStatement: '}' expected";
-      }
-    }
-
+    return make_shared<CompoundStatement>();
   } else {
-    throw "compoundStatement: '{' expected";
+    blockItemList();
+    expect(PunctuatorType::RIGHTCURLYBRACE);
+    scan();
+    return make_shared<CompoundStatement>();
   }
 }
 
