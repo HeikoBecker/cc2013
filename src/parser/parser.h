@@ -117,7 +117,6 @@ namespace Parsing {
 
       SubCompoundStatement compoundStatement();
       SubExpressionStatement expressionStatement();
-      void staticAssert();
       void abstractDeclarator();
       void directAbstractDeclarator();
       void directAbstractDeclaratorHelp();

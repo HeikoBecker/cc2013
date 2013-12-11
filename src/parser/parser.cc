@@ -152,10 +152,6 @@ void Parser::translationUnit() {
 
 void Parser::externalDeclaration() {
 
-  if (testk("_Static_assert")) {
-    staticAssert();
-    return ;
-  }
   // functionDefintion or declaration ?
   Type t = typeSpecifier();
 
@@ -415,10 +411,6 @@ SubExpression Parser::expression(int minPrecedence = 0) {
 }
 
 void Parser::declaration() {
-  if (testk("_Static_assert")) {
-    staticAssert();
-    return ;
-  }
 
   typeSpecifier();
   if (testp(";")) {
@@ -482,8 +474,6 @@ void Parser::structDeclaration() {
      expect(PunctuatorType::SEMICOLON);
      scan();
     }
-  } else if(testk("_Static_assert")) {
-    staticAssert();
   } else {
     expectedAnyOf();
   }
@@ -780,9 +770,7 @@ block-item ->   declaration
               | statement
 */
 void Parser::blockItem() {
-  if (testk("_Static_assert")) {
-    staticAssert();
-  } else if (testTypeSpecifier()) {
+  if (testTypeSpecifier()) {
     declaration();
   } else {
     statement();
@@ -976,27 +964,6 @@ SubJumpStatement Parser::jumpStatement() {
   } else {
     throw "jump-statement : unexpected token";
   }
-}
-
-void Parser::staticAssert() {
-  expect("_Static_assert");
-  scan();
-  expect("(");
-  scan();
-
-  constantExpression();
-
-  expect(",");
-  scan();
-
-  expect(TokenType::STRINGLITERAL);
-  scan();
-
-  expect(")");
-  scan();
-
-  expect(";");
-  scan();
 }
 
 void Parser::constantExpression() {
