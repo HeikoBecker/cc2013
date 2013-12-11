@@ -92,7 +92,7 @@ namespace Parsing {
       void multiplicativeExpression();
       void castExpression();
       void declaration();
-      void directDeclarator();
+      SubDirectDeclarator directDeclarator();
       SubDirectDeclartorHelp directDeclaratorHelp();
       Type typeSpecifier();
       void structOrUnion();
@@ -110,7 +110,7 @@ namespace Parsing {
       void parameterDeclaration();
       SubIdentifierList identifierList();
       void typeName();
-      void declarator();
+      SubDeclarator declarator();
       void directOrAbstractDeclarator(bool isDirect);
       void externalDeclaration();
       void translationUnit();

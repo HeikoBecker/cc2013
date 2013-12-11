@@ -638,7 +638,7 @@ void Parser::typeName() {
 declarator ->   pointer direct-declarator
               | direct-declarator
 */
-void Parser::declarator() {
+SubDeclarator Parser::declarator() {
   int counter = 0;
 
   if(test(TokenType::PUNCTUATOR,"*")) {
@@ -649,8 +649,9 @@ void Parser::declarator() {
   }
 
   Pointer pointer(counter);
+  SubDirectDeclarator dec = directDeclarator();
 
-  directDeclarator();
+  return make_shared<Declarator>(counter, dec);
 }
 
 /*
@@ -658,17 +659,23 @@ direct-declarator -> identifier direct-declarator_help
                    | "(" declarator ")" direct-declarator_help
 
 */
-void Parser::directDeclarator() {
+SubDirectDeclarator Parser::directDeclarator() {
   if (testType(TokenType::IDENTIFIER)) {
+    std::string identifier = m_nextsym->value();
     scan();
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      directDeclaratorHelp();
+      SubDirectDeclartorHelp help =  directDeclaratorHelp();
+      return make_shared<IdentifierDirectDeclarator>(identifier, help);
+    } else {
+      return make_shared<IdentifierDirectDeclarator>(identifier);
     }
 
   } else if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     scan();
-    declarator();
+
+
+    SubDeclarator dec = declarator();
 
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
@@ -677,9 +684,11 @@ void Parser::directDeclarator() {
     }
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      directDeclaratorHelp();
+      SubDirectDeclartorHelp help = directDeclaratorHelp();
+      return make_shared<DeclaratorDirectDeclarator>(dec,help);
+    } else {
+      return make_shared<DeclaratorDirectDeclarator>(dec);
     }
-
   } else {
     throw "error in direct Declarator";
   }

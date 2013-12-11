@@ -260,12 +260,6 @@ enum DirectDeclaratorHelpEnum {
   EPSILON
 };
 
-class ASTNODE(Declarator) {
-
-};
-
-typedef std::shared_ptr<Declarator> SubDeclarator;
-
 class ASTNODE(DirectDeclaratorHelp) {
   public:
     DirectDeclaratorHelp() { };
@@ -278,11 +272,26 @@ class ASTNODE(DirectDeclarator) { };
 
 typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 
+class ASTNODE(Declarator) {
+  public:
+    Declarator(int cnt, SubDirectDeclarator ast) : pointerCounter(cnt), directDeclarator(ast) { };
+    // TODO : pretty printing
+  private:
+    int pointerCounter;
+    SubDirectDeclarator directDeclarator;
+};
+
+typedef std::shared_ptr<Declarator> SubDeclarator;
+
 class DIRECTDECLARATOR(IdentifierDirectDeclarator) { 
   public:
    
     IdentifierDirectDeclarator(std::string str, SubDirectDeclartorHelp h) : identifier(str), help(h) { } ;
-    // TODO pretty Print
+
+    IdentifierDirectDeclarator(std::string str) : identifier(str) { } ;
+
+  // TODO pretty Print
+  // handle SubDirectDeclaratorHelp not given
   
   private:
     std::string identifier;
@@ -294,7 +303,9 @@ class DIRECTDECLARATOR(DeclaratorDirectDeclarator) {
     DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclartorHelp h) :
       declarator(d), help(h) { } ;
     // TODO pretty Print
-
+ DeclaratorDirectDeclarator(SubDeclarator d) :
+      declarator(d){ } ;
+    
   private:
     SubDeclarator declarator;
     SubDirectDeclartorHelp help;
