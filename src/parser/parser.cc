@@ -692,19 +692,18 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
                           |  "(" ")" direct-declarator_help
                                        | EPSILON
 */
-void Parser::directDeclaratorHelp() {
+SubDirectDeclartorHelp Parser::directDeclaratorHelp() {
   if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     scan();
 
     // 1. option
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
-      
+
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         directDeclaratorHelp();
       }
 
-      return;
     } else if (testTypeSpecifier()) { // parameter-list
       parameterList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
@@ -715,9 +714,19 @@ void Parser::directDeclaratorHelp() {
       }
     } else if(testType(TokenType::IDENTIFIER)) {
       identifierList();
+      expect(PunctuatorType::RIGHTPARENTHESIS);
+      scan();
+
+      if(testp(PunctuatorType::LEFTPARENTHESIS)) {
+        directDeclaratorHelp();
+      }
     } else {
       expectedAnyOf();
     }
+
+    // TODO : give right parameter
+    return make_shared<DirectDeclaratorHelp>();
+
   } else {
     throw "direct-declatror_help : '(' expected";
   }

@@ -93,7 +93,7 @@ namespace Parsing {
       void castExpression();
       void declaration();
       void directDeclarator();
-      void directDeclaratorHelp();
+      SubDirectDeclartorHelp directDeclaratorHelp();
       Type typeSpecifier();
       void structOrUnion();
       StructType structOrUnionSpecifier();

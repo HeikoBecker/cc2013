@@ -261,6 +261,7 @@ class ASTNODE(DirectDeclaratorHelp) {
     // TODO : implement the lists
 };
 
+typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclartorHelp;
 
 
 /*
