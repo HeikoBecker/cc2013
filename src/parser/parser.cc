@@ -608,16 +608,22 @@ void Parser::parameterDeclaration() {
 identifier-list ->  identifier
                   | identifier "," identifier-list
 */
-void Parser::identifierList() {
+SubIdentifierList Parser::identifierList() {
+  std::vector<std::string> myList;
+
   expect(TokenType::IDENTIFIER);
+  myList.push_back(m_nextsym->value());
   scan();
 
   while (testp(",")) {
     scan();
 
     expect(TokenType::IDENTIFIER);
+    myList.push_back(m_nextsym->value());
     scan();
   }
+
+  return make_shared<IdentifierList>(myList);
 }
 
 void Parser::typeName() {

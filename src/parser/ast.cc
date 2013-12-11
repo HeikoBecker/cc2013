@@ -216,3 +216,11 @@ PRETTY_PRINT(LabeledStatement) {
   pp.pprint(std::string(": "));
   pp.pprint(statement);
 }
+
+PRETTY_PRINT(IdentifierList) {
+  pp.pprint(nameList[0]);
+  for(int n = 1; n < (int) nameList.size(); n++) {
+    pp.pprint(',');
+    pp.pprint(nameList[n]);
+  }
+}

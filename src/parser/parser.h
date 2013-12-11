@@ -108,7 +108,7 @@ namespace Parsing {
       void parameterTypeList();
       void parameterList();
       void parameterDeclaration();
-      void identifierList();
+      SubIdentifierList identifierList();
       void typeName();
       void declarator();
       void directOrAbstractDeclarator(bool isDirect);

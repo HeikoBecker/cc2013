@@ -235,6 +235,19 @@ class STATEMENT(LabeledStatement) {
 typedef std::shared_ptr<LabeledStatement> SubLabeledStatement;
 typedef std::shared_ptr<IterationStatement> SubIterationStatement;
 
+
+class ASTNODE(IdentifierList) {
+  public:
+    IdentifierList(std::vector<std::string > list) : nameList(list) { };
+    void prettyPrint(PrettyPrinter & pp) override;
+
+  private:
+    std::vector<std::string> nameList;
+};
+
+typedef std::shared_ptr<IdentifierList> SubIdentifierList;
+
+
 enum DirectDeclaratorEnum {
   PARAMETERLIST,
   IDENTIFIERLIST,
