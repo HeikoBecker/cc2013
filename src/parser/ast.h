@@ -25,7 +25,7 @@ class AstNode
 {
   public:
     virtual ~AstNode() {};
-    virtual void prettyPrint(PrettyPrinter &) {};
+    virtual void prettyPrint(PrettyPrinter & pp) {pp.pprint(std::string("IMPLEMENTATION MISSING!\n"));};
 };
 
 class ASTNODE(Expression) { };

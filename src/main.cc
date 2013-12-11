@@ -5,6 +5,7 @@
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 #include <iostream>
+#include "parser/pprinter.h"
 
 enum class Mode {
   TOKENIZE,
@@ -82,8 +83,13 @@ int main(int, char** const argv)
             break;
           }
           case Mode::PRINT_AST:
-            PANIC("TODO implement");
+          {
+            auto parser = Parsing::Parser{f, name};
+            auto ast = parser.parse();
+            auto pp = Parsing::PrettyPrinter();
+            pp.pprint(ast);
             break;
+          }
           case Mode::COMPILE:
             PANIC("TODO implement");
             break;
