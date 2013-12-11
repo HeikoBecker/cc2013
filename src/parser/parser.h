@@ -92,7 +92,6 @@ namespace Parsing {
       void multiplicativeExpression();
       void castExpression();
       void declaration();
-      void declarationSpecifiers();
       void directDeclarator();
       void directDeclaratorHelp();
       Type typeSpecifier();

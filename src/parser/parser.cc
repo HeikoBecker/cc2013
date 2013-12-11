@@ -176,10 +176,6 @@ void Parser::externalDeclaration() {
   compoundStatement();
 }
 
-void Parser::declarationSpecifiers() {
-  typeSpecifier();
-}
-
 Type Parser::typeSpecifier() {
   if (testk("struct")) {
     structOrUnionSpecifier();
