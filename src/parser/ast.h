@@ -282,7 +282,7 @@ class ASTNODE(Declarator) {
   public:
     Declarator(int cnt, SubDirectDeclarator ast) : pointerCounter(cnt), directDeclarator(ast) { };
     int fixCompileError() {return pointerCounter;};
-    // TODO : pretty printing
+    void prettyPrint(PrettyPrinter & pp) override;
   private:
     int pointerCounter;
     SubDirectDeclarator directDeclarator;

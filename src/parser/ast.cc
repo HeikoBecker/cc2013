@@ -231,6 +231,14 @@ PRETTY_PRINT(IdentifierList) {
   }
 }
 
+PRETTY_PRINT(Declarator)
+{
+  // TODO : unfinished
+  for (auto i = 0; i < this->pointerCounter; ++i) {
+    pp.pprint('*');
+  }
+  pp.pprint(this->directDeclarator);
+}
 
 Declaration::Declaration(TypeNode t, SubDeclarator declarator)
   :type(t),declarator(declarator){}
