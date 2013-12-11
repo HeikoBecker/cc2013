@@ -31,6 +31,8 @@ class AstNode
 class ASTNODE(Expression) { };
 
 typedef std::shared_ptr<AstNode> AstChild;
+/* TODO: this shouldn't be so general */
+typedef std::shared_ptr<AstNode> BlockItem;
 typedef std::shared_ptr<Expression> SubExpression;
 
 class EXPRESSION(BinaryExpression)
@@ -125,8 +127,10 @@ typedef std::shared_ptr<Statement> SubStatement;
 class STATEMENT(CompoundStatement) {
   public:
     // TODO add inner blocks here
-    CompoundStatement() { };
+    CompoundStatement(std::vector<BlockItem> subStatements);
     void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    std::vector<BlockItem> subStatements;
 };
 
 class STATEMENT(ExpressionStatement) {

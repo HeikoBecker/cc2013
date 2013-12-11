@@ -67,8 +67,8 @@ namespace Parsing {
       void debugOutput();
 
       // parse functions
-      void blockItemList();
-      void blockItem();
+      std::vector<BlockItem> blockItemList();
+      BlockItem blockItem();
 
 
       // statements

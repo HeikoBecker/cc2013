@@ -124,6 +124,12 @@ PRETTY_PRINT(StructType) {
   pp.pprint('}');
 }
 
+CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
+  : subStatements(std::move(subStatements))
+{
+
+}
+
 PRETTY_PRINT(CompoundStatement) {
 
   pp.pprint('{');

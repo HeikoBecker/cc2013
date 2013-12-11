@@ -750,14 +750,15 @@ SubCompoundStatement Parser::compoundStatement() {
   expect(PunctuatorType::LEFTCURLYBRACE);
   scan();
 
+  decltype(blockItemList()) subStatements {}; 
   if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
     scan();
-    return make_shared<CompoundStatement>();
+    return make_shared<CompoundStatement>(subStatements);
   } else {
-    blockItemList();
+    subStatements = blockItemList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
-    return make_shared<CompoundStatement>();
+    return make_shared<CompoundStatement>(subStatements);
   }
 }
 
@@ -765,21 +766,25 @@ SubCompoundStatement Parser::compoundStatement() {
 block-item-list ->  block-item
                   | block-item block-item-list
 */
-void Parser::blockItemList() {
+std::vector<BlockItem> Parser::blockItemList() {
+  auto items = std::vector<BlockItem>();
   while(!testp(PunctuatorType::RIGHTCURLYBRACE)) {
-    blockItem();
+    items.push_back(blockItem());
   }
+  return items;
 }
 
 /*
 block-item ->   declaration
               | statement
 */
-void Parser::blockItem() {
+BlockItem Parser::blockItem() {
   if (testTypeSpecifier()) {
     declaration();
+    /* TODO: declaration doesn't return an AstNode yet! */
+    return make_shared<AstNode>();
   } else {
-    statement();
+    return statement();
   }
 }
 
