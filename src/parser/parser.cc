@@ -60,6 +60,13 @@ void Parser::expect(TokenType tokenType) {
   }
 }
 
+bool Parser::testTypeSpecifier() {
+  return testType(TokenType::KEYWORD) && (
+    testValue("void") || testValue("int") ||
+    testValue("char") || testValue("struct")
+  );
+}
+
 
 void Parser::debugOutput() {
   // print current token
@@ -700,10 +707,11 @@ void Parser::directDeclaratorHelp() {
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         directDeclaratorHelp();
       }
-    } 
-
-    // TODO : parameter-list
-    // TODO: identifier-list
+    } else if(testType(TokenType::IDENTIFIER)) {
+      identifierList();
+    } else {
+      expectedAnyOf();
+    }
   } else {
     throw "direct-declatror_help : '(' expected";
   }
@@ -756,13 +764,6 @@ void Parser::blockItemList() {
   while(!testp(PunctuatorType::RIGHTCURLYBRACE)) {
     blockItem();
   }
-}
-
-bool Parser::testTypeSpecifier() {
-  return testType(TokenType::KEYWORD) && (
-    testValue("void") || testValue("int") ||
-    testValue("char") || testValue("struct")
-  );
 }
 
 /*
@@ -902,7 +903,6 @@ SubSelectionStatement Parser::selectionStatement() {
 
     if(testk(KeywordType::ELSE)) {
       scan();
-      // TODO
       SubStatement st2 = statement();
       return make_shared<SelectionStatement>(ex, st1, st2);
     } else {
@@ -966,8 +966,8 @@ SubJumpStatement Parser::jumpStatement() {
   }
 }
 
-void Parser::constantExpression() {
+SubExpression Parser::constantExpression() {
   // TODO: use constant expression
-  expression();
+  return expression();
 }
 

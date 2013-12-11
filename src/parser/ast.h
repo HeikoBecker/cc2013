@@ -234,5 +234,36 @@ class STATEMENT(LabeledStatement) {
 
 typedef std::shared_ptr<LabeledStatement> SubLabeledStatement;
 typedef std::shared_ptr<IterationStatement> SubIterationStatement;
+
+enum DirectDeclaratorEnum {
+  PARAMETERLIST,
+  IDENTIFIERLIST,
+  EMPTYLIST,
+  EPSILON
+};
+
+class ASTNODE(DirectDeclaratorHelp) {
+  public:
+    DirectDeclaratorHelp() { };
+    // TODO : implement the lists
+};
+
+
+
+/*
+
+class ASTNODE(Declarator) {
+  public:
+    Declarator(Pointer ptr, DirectDeclarator) : name(str), statement(st) { };
+    void prettyPrint(PrettyPrinter & pp) override;
+
+
+}
+*/
+
+
+
+
+
 }
 #endif

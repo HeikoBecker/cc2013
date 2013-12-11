@@ -86,7 +86,7 @@ namespace Parsing {
       void postfixExpression();
       void argumentExpressionList();
       void unaryExpression();
-      void constantExpression();
+      SubExpression constantExpression();
       void unaryOperator(); // TODO: probably not needed
       void additiveExpression();
       void multiplicativeExpression();
