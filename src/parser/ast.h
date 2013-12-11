@@ -17,6 +17,7 @@
 #define STATEMENT(X) X : public Statement
 #define JUMPSTATEMENT(X) X: public JumpStatement
 #define ITERATIONSTATEMENT(X) X: public IterationStatement
+#define DIRECTDECLARATOR(X) X : public DirectDeclarator
 
 namespace Parsing {
 
@@ -248,12 +249,18 @@ class ASTNODE(IdentifierList) {
 typedef std::shared_ptr<IdentifierList> SubIdentifierList;
 
 
-enum DirectDeclaratorEnum {
+enum DirectDeclaratorHelpEnum {
   PARAMETERLIST,
   IDENTIFIERLIST,
   EMPTYLIST,
   EPSILON
 };
+
+class ASTNODE(Declarator) {
+
+};
+
+typedef std::shared_ptr<Declarator> SubDeclarator;
 
 class ASTNODE(DirectDeclaratorHelp) {
   public:
@@ -262,6 +269,34 @@ class ASTNODE(DirectDeclaratorHelp) {
 };
 
 typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclartorHelp;
+
+class ASTNODE(DirectDeclarator) { };
+
+typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
+
+class DIRECTDECLARATOR(IdentifierDirectDeclarator) { 
+  public:
+   
+    IdentifierDirectDeclarator(std::string str, SubDirectDeclartorHelp h) : identifier(str), help(h) { } ;
+    // TODO pretty Print
+  
+  private:
+    std::string identifier;
+    SubDirectDeclartorHelp help;
+};
+
+class DIRECTDECLARATOR(DeclaratorDirectDeclarator) { 
+  public:
+    DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclartorHelp h) :
+      declarator(d), help(h) { } ;
+    // TODO pretty Print
+
+  private:
+    SubDeclarator declarator;
+    SubDirectDeclartorHelp help;
+};
+
+
 
 
 /*

@@ -683,7 +683,6 @@ void Parser::directDeclarator() {
   } else {
     throw "error in direct Declarator";
   }
-
 }
 
 /*
