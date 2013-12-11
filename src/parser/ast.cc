@@ -258,3 +258,17 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type)
 TranslationUnit::TranslationUnit(
     std::vector<ExternalDeclarationNode> externalDeclarations
     ) : externalDeclarations(externalDeclarations) {}
+
+PRETTY_PRINT(TranslationUnit) {
+  /*TODO: unfinished */
+  for(auto externalDeclaration : externalDeclarations) {
+    pp.pprint(externalDeclaration);
+  }
+}
+
+PRETTY_PRINT(ExternalDeclaration) {
+  /*TODO: unfinished */
+  pp.pprint(this->type);
+  pp.pprint(this->declarator);
+  pp.pprint(this->compoundStatement);
+}

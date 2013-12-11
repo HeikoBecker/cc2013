@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <typeinfo>
 #include "../lexer/punctuatortype.h"
 #include "pprinter.h"
 
@@ -25,7 +26,11 @@ class AstNode
 {
   public:
     virtual ~AstNode() {};
-    virtual void prettyPrint(PrettyPrinter & pp) {pp.pprint(std::string("IMPLEMENTATION MISSING!\n"));};
+    virtual void prettyPrint(PrettyPrinter & pp) {
+      pp.pprint(std::string("IMPLEMENTATION MISSING!\n"));
+      pp.pprint(std::string(typeid(*this).name()));
+      pp.pprint('\n');
+    };
 };
 
 class ASTNODE(Expression) { };
@@ -276,6 +281,7 @@ typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 class ASTNODE(Declarator) {
   public:
     Declarator(int cnt, SubDirectDeclarator ast) : pointerCounter(cnt), directDeclarator(ast) { };
+    int fixCompileError() {return pointerCounter;};
     // TODO : pretty printing
   private:
     int pointerCounter;
@@ -333,6 +339,7 @@ class ASTNODE(ExternalDeclaration) {
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator);
     ExternalDeclaration(TypeNode type);
+    void prettyPrint(PrettyPrinter & pp) override;
   private:
     TypeNode type;
     SubDeclarator declarator;
@@ -344,6 +351,7 @@ typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;
 class ASTNODE(TranslationUnit) {
   public:
     TranslationUnit(std::vector<ExternalDeclarationNode> externalDeclarations);
+    void prettyPrint(PrettyPrinter & pp) override;
   private:
     std::vector<ExternalDeclarationNode> externalDeclarations;
 };
