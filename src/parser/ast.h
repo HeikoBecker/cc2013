@@ -311,6 +311,19 @@ class DIRECTDECLARATOR(DeclaratorDirectDeclarator) {
     SubDirectDeclartorHelp help;
 };
 
+typedef std::shared_ptr<Type> TypeNode;
+
+class ASTNODE(Declaration) {
+  public:
+    Declaration(TypeNode t, SubDeclarator declarator);
+    Declaration(TypeNode t);
+  private:
+    TypeNode type;
+    SubDeclarator declarator;
+};
+
+typedef std::shared_ptr<Declaration> DeclarationNode;
+
 
 
 

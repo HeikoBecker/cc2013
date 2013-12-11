@@ -230,3 +230,10 @@ PRETTY_PRINT(IdentifierList) {
     pp.pprint(nameList[n]);
   }
 }
+
+
+Declaration::Declaration(TypeNode t, SubDeclarator declarator)
+  :type(t),declarator(declarator){}
+
+Declaration::Declaration(TypeNode t)
+  :type(t){}

@@ -91,10 +91,10 @@ namespace Parsing {
       void additiveExpression();
       void multiplicativeExpression();
       void castExpression();
-      void declaration();
+      DeclarationNode declaration();
       SubDirectDeclarator directDeclarator();
       SubDirectDeclartorHelp directDeclaratorHelp();
-      Type typeSpecifier();
+      TypeNode typeSpecifier();
       void structOrUnion();
       StructType structOrUnionSpecifier();
       void structDeclarationList();

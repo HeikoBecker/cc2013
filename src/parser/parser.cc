@@ -160,7 +160,7 @@ void Parser::translationUnit() {
 void Parser::externalDeclaration() {
 
   // functionDefintion or declaration ?
-  Type t = typeSpecifier();
+  auto t = typeSpecifier();
 
   if (testp(";")) {
     // it was a declaration
@@ -179,13 +179,13 @@ void Parser::externalDeclaration() {
   compoundStatement();
 }
 
-Type Parser::typeSpecifier() {
+TypeNode Parser::typeSpecifier() {
   if (testk("struct")) {
     structOrUnionSpecifier();
     // TODO : implement struct
-    return BasicType("int");
+    return std::make_shared<BasicType>("int");
   } else {
-    BasicType type(m_nextsym->value());
+    auto type = std::make_shared<BasicType>(m_nextsym->value());
     scan();
     return type;
   }
@@ -417,15 +417,17 @@ SubExpression Parser::expression(int minPrecedence = 0) {
   return expr;
 }
 
-void Parser::declaration() {
+DeclarationNode Parser::declaration() {
 
-  typeSpecifier();
+  auto type = typeSpecifier();
   if (testp(";")) {
     scan();
+    return std::make_shared<Declaration>(type);
   } else {
-    declarator();
+    auto decl = declarator();
     expect(PunctuatorType::SEMICOLON);
     scan();
+    return std::make_shared<Declaration>(type, decl);
   }
 }
 
