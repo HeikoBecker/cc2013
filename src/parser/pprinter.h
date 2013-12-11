@@ -17,7 +17,13 @@ class PrettyPrinter {
     }
 
     template<typename S> void pprint(std::shared_ptr<S> nodeptr) {
-      nodeptr->prettyPrint(*this);
+      if(nodeptr) {
+        nodeptr->prettyPrint(*this);
+      } else {
+        pprint(std::string("******************************************\n"));
+        pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"));
+        pprint(std::string("******************************************\n"));
+      }
     }
   private:
     int indentLevel;
