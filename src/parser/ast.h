@@ -324,6 +324,31 @@ class ASTNODE(Declaration) {
 
 typedef std::shared_ptr<Declaration> DeclarationNode;
 
+class ASTNODE(ExternalDeclaration) {
+  public:
+    ExternalDeclaration(TypeNode type,
+                        SubDeclarator declarator,
+                        SubCompoundStatement compoundStatement);
+    ExternalDeclaration(TypeNode type,
+                        SubDeclarator declarator);
+    ExternalDeclaration(TypeNode type);
+  private:
+    TypeNode type;
+    SubDeclarator declarator;
+    SubCompoundStatement compoundStatement;
+};
+
+typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;
+
+class ASTNODE(TranslationUnit) {
+  public:
+    TranslationUnit(std::vector<ExternalDeclarationNode> externalDeclarations);
+  private:
+    std::vector<ExternalDeclarationNode> externalDeclarations;
+};
+
+typedef std::shared_ptr<TranslationUnit> TUNode;
+
 
 
 

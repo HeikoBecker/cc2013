@@ -151,32 +151,35 @@ bool Parser::parse() {
   return ok;
 }
 
-void Parser::translationUnit() {
+TUNode Parser::translationUnit() {
+  std::vector<ExternalDeclarationNode> externalDeclarations {};
   while (!testType(TokenType::END)) {
-    externalDeclaration();
+     externalDeclarations.push_back(externalDeclaration());
   }
+  return make_shared<TranslationUnit>(externalDeclarations);
 }
 
-void Parser::externalDeclaration() {
+ExternalDeclarationNode Parser::externalDeclaration() {
 
   // functionDefintion or declaration ?
-  auto t = typeSpecifier();
+  auto type = typeSpecifier();
 
   if (testp(";")) {
     // it was a declaration
     scan();
-    return ;
+    return make_shared<ExternalDeclaration>(type);
   }
-  declarator();
+  auto decl = declarator();
 
   if (testp(";")) {
     scan();
     // it was a declaration()
-    return ;
+    return make_shared<ExternalDeclaration>(type, decl);
   }
 
   // it is a functionDefition! 
-  compoundStatement();
+  auto compStat = compoundStatement();
+  return make_shared<ExternalDeclaration>(type, decl, compStat);
 }
 
 TypeNode Parser::typeSpecifier() {

@@ -112,8 +112,8 @@ namespace Parsing {
       void typeName();
       SubDeclarator declarator();
       void directOrAbstractDeclarator(bool isDirect);
-      void externalDeclaration();
-      void translationUnit();
+      ExternalDeclarationNode externalDeclaration();
+      TUNode translationUnit();
 
       SubCompoundStatement compoundStatement();
       SubExpressionStatement expressionStatement();

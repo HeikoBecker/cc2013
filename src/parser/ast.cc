@@ -237,3 +237,24 @@ Declaration::Declaration(TypeNode t, SubDeclarator declarator)
 
 Declaration::Declaration(TypeNode t)
   :type(t){}
+
+
+ExternalDeclaration::ExternalDeclaration(TypeNode type,
+                        SubDeclarator declarator,
+                        SubCompoundStatement compoundStatement)
+  : type(type), declarator(declarator), compoundStatement(compoundStatement)
+{}
+
+ExternalDeclaration::ExternalDeclaration(TypeNode type,
+                        SubDeclarator declarator)
+  : type(type), declarator(declarator)
+{}
+
+ExternalDeclaration::ExternalDeclaration(TypeNode type)
+  : type(type)
+{}
+
+
+TranslationUnit::TranslationUnit(
+    std::vector<ExternalDeclarationNode> externalDeclarations
+    ) : externalDeclarations(externalDeclarations) {}
