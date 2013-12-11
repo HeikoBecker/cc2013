@@ -34,7 +34,7 @@ namespace Parsing {
   {
     public:
       Parser(FILE* f, char const *name);
-      bool parse();
+      AstRoot parse();
 
     private:
       unique_ptr<Lexer> m_lexer;

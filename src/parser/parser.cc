@@ -143,12 +143,10 @@ std::shared_ptr<Token> Parser::scan() {
   return m_nextsym;
 }
 
-bool Parser::parse() {
-  auto ok = true;
-
-  translationUnit();
+AstRoot Parser::parse() {
+  auto tu = translationUnit();
   expect(TokenType::END);
-  return ok;
+  return tu;
 }
 
 TUNode Parser::translationUnit() {

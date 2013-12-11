@@ -31,6 +31,7 @@ class AstNode
 class ASTNODE(Expression) { };
 
 typedef std::shared_ptr<AstNode> AstChild;
+typedef std::shared_ptr<AstNode> AstRoot;
 /* TODO: this shouldn't be so general */
 typedef std::shared_ptr<AstNode> BlockItem;
 typedef std::shared_ptr<Expression> SubExpression;
