@@ -90,7 +90,7 @@ namespace Parsing {
       StructType structOrUnionSpecifier();
       void structDeclarationList();
       void structDeclaration();
-      void specifierQualifierList();
+      TypeNode specifierQualifierList();
       void structDeclaratorList();
       void structDeclarator();
       void parameterTypeList();

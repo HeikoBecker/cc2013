@@ -492,8 +492,8 @@ void Parser::structDeclaration() {
 /*
 specifier-qualifier-list ->   type-specifier
 */
-void Parser::specifierQualifierList() {
-  typeSpecifier();
+TypeNode Parser::specifierQualifierList() {
+  return typeSpecifier();
 }
 
 void Parser::structDeclaratorList() {
