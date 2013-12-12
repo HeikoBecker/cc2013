@@ -275,8 +275,8 @@ PRETTY_PRINT(TranslationUnit) {
 }
 
 PRETTY_PRINT(ExternalDeclaration) {
-  /*TODO: unfinished */
-  pp.pprint(this->type);
+    /*TODO: unfinished */
+    pp.pprint(this->type);
   pp.pprint(this->declarator);
   pp.pprint(this->compoundStatement);
 }
@@ -284,4 +284,20 @@ PRETTY_PRINT(ExternalDeclaration) {
 PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/
   pp.pprint(this->identifier);
+}
+
+Parameter::Parameter(TypeNode type, SubDeclarator declarator)
+  : type(type), declarator(declarator) {
+  
+}
+
+Parameter::Parameter(TypeNode type)
+  : type(type) {
+  
+}
+
+PRETTY_PRINT(Parameter) {
+  /*TODO: unfinished*/
+  pp.pprint(type);
+  pp.pprint(declarator);
 }

@@ -598,13 +598,14 @@ void Parser::directAbstractDeclaratorHelp() {
  | declarations-specifiers abstract-declarator
  | declarations-specifiers
 */
-void Parser::parameterDeclaration() {
-  typeSpecifier();
+ParameterNode Parser::parameterDeclaration() {
+  auto type = typeSpecifier();
   if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
-    return;
+    return make_shared<Parameter>(type);
   } else {
-    declarator();
+    auto decl = declarator();
     // TODO distinguish abstract-declarator
+    return make_shared<Parameter>(type, decl);
   }
 }
 /*
@@ -707,12 +708,13 @@ SubDirectDeclartorHelp Parser::directDeclaratorHelp() {
   if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     scan();
 
+    decltype(directDeclaratorHelp()) declHelp;
     // 1. option
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        directDeclaratorHelp();
+        declHelp = directDeclaratorHelp();
       }
 
     } else if (testTypeSpecifier()) { // parameter-list

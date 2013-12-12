@@ -365,6 +365,17 @@ class ASTNODE(TranslationUnit) {
 
 typedef std::shared_ptr<TranslationUnit> TUNode;
 
+class ASTNODE(Parameter) {
+  public:
+    Parameter(TypeNode type, SubDeclarator declarator);
+    Parameter(TypeNode type);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    TypeNode type;
+    SubDeclarator declarator;
+};
+
+typedef std::shared_ptr<Parameter> ParameterNode;
 
 
 

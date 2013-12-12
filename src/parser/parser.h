@@ -107,7 +107,7 @@ namespace Parsing {
       void enumerator();
       void parameterTypeList();
       void parameterList();
-      void parameterDeclaration();
+      ParameterNode parameterDeclaration();
       SubIdentifierList identifierList();
       void typeName();
       SubDeclarator declarator();
