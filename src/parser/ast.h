@@ -274,7 +274,13 @@ class ASTNODE(DirectDeclaratorHelp) {
 
 typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclartorHelp;
 
-class ASTNODE(DirectDeclarator) { };
+class ASTNODE(DirectDeclarator) { 
+  public:
+    virtual void prettyPrint(PrettyPrinter & pp) {
+      AstNode::prettyPrint(pp);
+      pp.pprint(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"));
+    };
+};
 
 typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 
@@ -297,6 +303,7 @@ class DIRECTDECLARATOR(IdentifierDirectDeclarator) {
 
     IdentifierDirectDeclarator(std::string str) : identifier(str) { } ;
 
+    void prettyPrint(PrettyPrinter & pp) override;
   // TODO pretty Print
   // handle SubDirectDeclaratorHelp not given
   

@@ -280,3 +280,8 @@ PRETTY_PRINT(ExternalDeclaration) {
   pp.pprint(this->declarator);
   pp.pprint(this->compoundStatement);
 }
+
+PRETTY_PRINT(IdentifierDirectDeclarator) {
+  /*TODO: unfinished*/
+  pp.pprint(this->identifier);
+}
