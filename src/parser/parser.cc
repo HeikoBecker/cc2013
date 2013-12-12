@@ -22,14 +22,14 @@ Parser::Parser(FILE* f, char const *name)
 
 }
 
-inline void Parser::reportError(std::string msg = "Parsing error") {
+[[noreturn]] inline void Parser::reportError(std::string msg = "Parsing error") {
   errorf(m_nextsym->pos(), msg.c_str());
   // TODO: the full featured parser should continue
   throw ParsingException(msg);
 }
 
-void Parser::expectedAnyOf() {
-  reportError();
+[[noreturn]] void Parser::expectedAnyOf(std::string msg = "Parsing error") {
+  reportError(msg);
 }
 
 void Parser::expect(std::string s) {
@@ -686,7 +686,7 @@ SubDirectDeclarator Parser::directDeclarator() {
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
     } else {
-      throw "direct-declarator : expected ')'";
+      expectedAnyOf(std::string("direct-declarator : expected ')'"));
     }
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
@@ -696,7 +696,7 @@ SubDirectDeclarator Parser::directDeclarator() {
       return make_shared<DeclaratorDirectDeclarator>(dec);
     }
   } else {
-    throw "error in direct Declarator";
+    expectedAnyOf(std::string("error in direct Declarator"));
   }
 }
 
@@ -743,7 +743,7 @@ SubDirectDeclartorHelp Parser::directDeclaratorHelp() {
     return make_shared<DirectDeclaratorHelp>();
 
   } else {
-    throw "direct-declatror_help : '(' expected";
+    expectedAnyOf(std::string("direct-declatror_help : '(' expected"));
   }
 
 }
@@ -753,7 +753,7 @@ void Parser::directOrAbstractDeclarator(bool isDirect) {
     // so we have no compile error 
     directDeclarator();
   } else {
-    throw "astract declarator is not implemented yet";
+    expectedAnyOf(std::string("abstract declarator is not implemented yet"));
   }
 }
 
@@ -871,7 +871,7 @@ SubLabeledStatement Parser::labeledStatement() {
 
     return make_shared<LabeledStatement>(label,st);
   } else {
-    throw "labeled-statement : identifier expected";
+    expectedAnyOf(std::string("labeled-statement : identifier expected"));
   }
 }
 
@@ -906,7 +906,7 @@ SubIterationStatement Parser::iterationStatement() {
     return make_shared<IterationStatement>(ex, st, IterationEnum::DOWHILE);
 
   } else {
-    throw "iteration-statement : no match found";
+    expectedAnyOf(std::string("iteration-statement : no match found"));
   }
   
 }
@@ -935,7 +935,7 @@ SubSelectionStatement Parser::selectionStatement() {
       return make_shared<SelectionStatement>(ex, st1);
     }
   } else {
-    throw "selectionStatement: no match";
+    expectedAnyOf(std::string("selectionStatement: no match"));
   }
 }
 
@@ -960,7 +960,7 @@ SubJumpStatement Parser::jumpStatement() {
 
       return gotoStatement;
     } else {
-      throw "jump-statement: identifier expected";
+      expectedAnyOf(std::string("jump-statement: identifier expected"));
     }
   } else if (testk(KeywordType::CONTINUE)) {
     scan();
@@ -988,7 +988,7 @@ SubJumpStatement Parser::jumpStatement() {
       return make_shared<ReturnStatement>(sub);
     }
   } else {
-    throw "jump-statement : unexpected token";
+    expectedAnyOf(std::string("jump-statement : unexpected token"));
   }
 }
 

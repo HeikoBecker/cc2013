@@ -59,8 +59,8 @@ namespace Parsing {
       inline void expect(PunctuatorType puncutator);
       inline void expect(KeywordType keyword);
       inline void expect(TokenType tokenType);
-      inline void reportError(std::string msg);
-      inline void expectedAnyOf(/*TODO: varargs?*/);
+      [[noreturn]] inline void reportError(std::string msg);
+      [[noreturn]] inline void expectedAnyOf(std::string msg);
 
 
       // debug function 
