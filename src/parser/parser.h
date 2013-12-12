@@ -106,7 +106,7 @@ namespace Parsing {
       void enumeratorList();
       void enumerator();
       void parameterTypeList();
-      void parameterList();
+      std::vector<ParameterNode> parameterList();
       ParameterNode parameterDeclaration();
       SubIdentifierList identifierList();
       void typeName();

@@ -522,13 +522,15 @@ void Parser::structDeclarator() {
 parameter-list  ->   parameter-declaration
                    | parameter-list "," parameter-declaration
 */
-void Parser::parameterList() {
-  parameterDeclaration();
-
+std::vector<ParameterNode> Parser::parameterList() {
+  decltype(parameterList()) parameters {};
+  auto parameter = parameterDeclaration();
+  parameters.push_back(parameter);
   while(testp(PunctuatorType::COMMA)) {
     scan();
     parameterDeclaration();
   }
+  return parameters;
 }
 
 
