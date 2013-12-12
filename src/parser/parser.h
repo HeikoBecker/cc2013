@@ -82,15 +82,7 @@ namespace Parsing {
       SubExpression computeAtom();
       SubExpression postfixExpression(SubExpression child);
       SubExpression sizeOfType();
-      void primaryExpression();
-      void postfixExpression();
-      void argumentExpressionList();
-      void unaryExpression();
       SubExpression constantExpression();
-      void unaryOperator(); // TODO: probably not needed
-      void additiveExpression();
-      void multiplicativeExpression();
-      void castExpression();
       DeclarationNode declaration();
       SubDirectDeclarator directDeclarator();
       SubDirectDeclartorHelp directDeclaratorHelp();
