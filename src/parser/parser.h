@@ -87,16 +87,12 @@ namespace Parsing {
       SubDirectDeclarator directDeclarator();
       SubDirectDeclartorHelp directDeclaratorHelp();
       TypeNode typeSpecifier();
-      void structOrUnion();
       StructType structOrUnionSpecifier();
       void structDeclarationList();
       void structDeclaration();
       void specifierQualifierList();
       void structDeclaratorList();
       void structDeclarator();
-      void enumSpecifier();
-      void enumeratorList();
-      void enumerator();
       void parameterTypeList();
       std::vector<ParameterNode> parameterList();
       ParameterNode parameterDeclaration();
