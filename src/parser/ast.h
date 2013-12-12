@@ -377,8 +377,6 @@ class ASTNODE(Parameter) {
 
 typedef std::shared_ptr<Parameter> ParameterNode;
 
-
-
 /*
 
 class ASTNODE(Declarator) {
