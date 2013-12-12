@@ -468,10 +468,9 @@ StructType Parser::structOrUnionSpecifier() {
 
 
 void Parser::structDeclarationList() {
-  structDeclaration();
-  while (!testp("}")) {
+  do {
     structDeclaration();
-  } 
+  } while (!testp("}")); 
 }
 
 void Parser::structDeclaration() {
@@ -496,24 +495,33 @@ TypeNode Parser::specifierQualifierList() {
   return typeSpecifier();
 }
 
-void Parser::structDeclaratorList() {
-  structDeclarator();
+std::vector<std::pair<SubDeclarator,SubExpression>> Parser::structDeclaratorList() {
+  decltype(structDeclaratorList()) structDeclarators {};
+  structDeclarators.push_back(structDeclarator());
 
   while(testp(",")) {
     scan();
-    structDeclarator(); 
+    structDeclarators.push_back(structDeclarator());
   }
+  return structDeclarators;
 }
 
-void Parser::structDeclarator() {
+std::pair<SubDeclarator,SubExpression> Parser::structDeclarator() {
   if (testp(":")) {
+    /* TODO: when can this ever happen?!?
+     * A structDeclarator without a declarator?
+     */
     scan();
-    constantExpression();
+    // SubDeclarator will be an empty shared_ptr
+    return std::make_pair(SubDeclarator(), constantExpression());
   } else {
-    declarator();
+    auto decl = declarator();
     if (testp(":")) {
       scan();
-      constantExpression();
+      return std::make_pair(decl, constantExpression());
+    } else {
+    // SubExpression will be an empty shared_ptr
+      return std::make_pair(decl, SubExpression());
     }
   }
 }
