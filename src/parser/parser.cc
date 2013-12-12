@@ -485,7 +485,7 @@ void Parser::structDeclaration() {
      scan();
     }
   } else {
-    expectedAnyOf();
+    expectedAnyOf(";");
   }
 }
 
