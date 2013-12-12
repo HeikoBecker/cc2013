@@ -93,7 +93,6 @@ namespace Parsing {
       TypeNode specifierQualifierList();
       void structDeclaratorList();
       void structDeclarator();
-      void parameterTypeList();
       std::vector<ParameterNode> parameterList();
       ParameterNode parameterDeclaration();
       SubIdentifierList identifierList();
