@@ -442,46 +442,51 @@ StructType Parser::structOrUnionSpecifier() {
   scan();
 
   if (testType(TokenType::IDENTIFIER)) {
-    StructType type(m_nextsym->value());
+    auto name = m_nextsym->value();
 
     scan();
     if (testp("{")) {
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
-      structDeclarationList();
+      auto structDecLst = structDeclarationList();
       expect(PunctuatorType::RIGHTCURLYBRACE);
       scan();
+      return StructType(name, structDecLst);
     }
 
-    return type;
+    return StructType(name);
   } else if(testp("{")) {
     scan();
-    structDeclarationList();
+    auto structDecLst = structDeclarationList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
+    return StructType("",structDecLst);
   } else {
     expectedAnyOf();
   }
-
-  return StructType();
 }
 
 
-void Parser::structDeclarationList() {
+std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>>> Parser::structDeclarationList() {
+  std::vector<decltype(structDeclaration())> declarations{}; 
   do {
-    structDeclaration();
+    declarations.push_back(structDeclaration());
   } while (!testp("}")); 
+  return declarations;
 }
 
-void Parser::structDeclaration() {
+std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> Parser::structDeclaration() {
   if(testTypeSpecifier()) {
-    specifierQualifierList();
+    auto type = specifierQualifierList();
     if (testp(";")) {
+      decltype(structDeclaration().second) empty {};
       scan();
+      return std::make_pair(type, empty);
     } else {
-     structDeclaratorList();
+     auto sdecll = structDeclaratorList();
      expect(PunctuatorType::SEMICOLON);
      scan();
+     return make_pair(type, sdecll);
     }
   } else {
     expectedAnyOf(";");

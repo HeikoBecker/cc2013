@@ -88,8 +88,8 @@ namespace Parsing {
       SubDirectDeclartorHelp directDeclaratorHelp();
       TypeNode typeSpecifier();
       StructType structOrUnionSpecifier();
-      void structDeclarationList();
-      void structDeclaration();
+      std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> structDeclaration();
+      std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>>> structDeclarationList();
       TypeNode specifierQualifierList();
       std::vector<std::pair<SubDeclarator,SubExpression>> structDeclaratorList();
       std::pair<SubDeclarator,SubExpression> structDeclarator();

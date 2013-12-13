@@ -116,16 +116,6 @@ class TYPE(BasicType) {
     ReturnType type;
 };
 
-class TYPE(StructType) {
-  // TODO Add content
-  public:
-    StructType();
-    StructType(std::string str);
-    void prettyPrint(PrettyPrinter & pp) override;
-  private:
-    std::string name;
-};
-
 class ASTNODE(Statement) {};
 
 typedef std::shared_ptr<Statement> SubStatement;
@@ -387,6 +377,20 @@ class ASTNODE(Declarator) {
 
 }
 */
+
+typedef std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>>> StructContent;
+
+class TYPE(StructType) {
+  // TODO Add content
+  public:
+    StructType();
+    StructType(std::string name);
+    StructType(std::string name, StructContent content);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    std::string name;
+    StructContent content; 
+};
 
 
 

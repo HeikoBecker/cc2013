@@ -102,13 +102,19 @@ void BasicType::prettyPrint(PrettyPrinter & pp) {
   }
 }
 
+StructType::StructType(std::string name) : name(name) {
+  // default string is empty
+  content = StructContent();
+}
+
+
 StructType::StructType() {
   // default string is empty
   name = std::string("");
+  content = StructContent();
 }
 
-StructType::StructType(std::string str) {
-  name = str;
+StructType::StructType(std::string name, StructContent content) : name(name), content(content) {
 }
 
 PRETTY_PRINT(StructType) {
@@ -120,7 +126,9 @@ PRETTY_PRINT(StructType) {
 
   pp.pprint('{');
   
-  // TODO : show content
+  if (!content.empty()) {
+    // TODO : show content
+  }
   pp.pprint('}');
 }
 
