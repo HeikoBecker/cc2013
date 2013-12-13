@@ -256,6 +256,13 @@ enum DirectDeclaratorHelpEnum {
   EPSILON
 };
 
+/* TODO: If we want to use only one class for DirectDeclaratorHelp
+ * we would need to implement something like Boost::Variant
+ * to efficiently store the members
+ * or at least some clever use of placement new
+ *
+ * For now, we will just go with wasting space
+ */
 class ASTNODE(DirectDeclaratorHelp) {
   public:
     DirectDeclaratorHelp() { };
