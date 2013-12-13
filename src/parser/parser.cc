@@ -182,9 +182,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
 TypeNode Parser::typeSpecifier() {
   if (testk("struct")) {
-    structOrUnionSpecifier();
-    // TODO : implement struct
-    return std::make_shared<BasicType>("int");
+    return structOrUnionSpecifier();
   } else {
     auto type = std::make_shared<BasicType>(m_nextsym->value());
     scan();
