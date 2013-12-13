@@ -125,10 +125,19 @@ PRETTY_PRINT(StructType) {
   }
 
   pp.pprint('{');
+  pp.pprint('\n');
   
-  if (!content.empty()) {
-    // TODO : show content
+  for (auto typeSubDeclarationPair : content) {
+    pp.pprint(typeSubDeclarationPair.first);
+    for (auto subDeclarationPair : typeSubDeclarationPair.second) {
+      pp.pprint(subDeclarationPair.first);
+      if (subDeclarationPair.second) {
+        pp.pprint(' '); //TODO: this seems wrong
+        pp.pprint(subDeclarationPair.second);
+      }
+    }
   }
+  pp.pprint('\n');
   pp.pprint('}');
 }
 

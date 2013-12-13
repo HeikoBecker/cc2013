@@ -20,9 +20,11 @@ class PrettyPrinter {
       if(nodeptr) {
         nodeptr->prettyPrint(*this);
       } else {
+        pprint(std::string("\n"));
         pprint(std::string("******************************************\n"));
         pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"));
         pprint(std::string("******************************************\n"));
+        pprint(std::string("\n"));
       }
     }
   private:
