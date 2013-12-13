@@ -276,6 +276,7 @@ SubExpression Parser::postfixExpression(SubExpression child) {
           auto multipleArguments = false;
           do {
             if (multipleArguments) {
+              expect(PunctuatorType::COMMA);
               scan(); // read the , separating the arguments
             } else {
               /* This happens only when we read the first argument
