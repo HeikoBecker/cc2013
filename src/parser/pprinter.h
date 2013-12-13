@@ -23,6 +23,7 @@ class PrettyPrinter {
         pprint(std::string("\n"));
         pprint(std::string("******************************************\n"));
         pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"));
+        pprint(std::string("*Should have been ") + typeid(S).name() + "\n");
         pprint(std::string("******************************************\n"));
         pprint(std::string("\n"));
       }
