@@ -309,3 +309,11 @@ PRETTY_PRINT(Parameter) {
   pp.pprint(type);
   pp.pprint(declarator);
 }
+
+
+PRETTY_PRINT(DeclaratorDirectDeclarator)
+{
+  /*TODO: unfinished*/
+  pp.pprint(declarator);
+  pp.pprint(help);
+}

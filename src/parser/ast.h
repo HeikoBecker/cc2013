@@ -306,6 +306,7 @@ class DIRECTDECLARATOR(DeclaratorDirectDeclarator) {
   public:
     DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclartorHelp h) :
       declarator(d), help(h) { } ;
+    void prettyPrint(PrettyPrinter & pp) override;
     // TODO pretty Print
  DeclaratorDirectDeclarator(SubDeclarator d) :
       declarator(d){ } ;
