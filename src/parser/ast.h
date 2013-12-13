@@ -392,6 +392,8 @@ class TYPE(StructType) {
     StructContent content; 
 };
 
+typedef std::shared_ptr<StructType> StructNode;
+
 
 
 

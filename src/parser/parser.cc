@@ -437,7 +437,7 @@ struct-or-union-specifier -> "struct" identifier "{" struct-declarations-list "}
                             | "struct" "{" struct-declarations-list "}"
                                                         | "struct"  identifier
 */
-StructType Parser::structOrUnionSpecifier() {
+StructNode Parser::structOrUnionSpecifier() {
   expect("struct");
   scan();
 
@@ -451,16 +451,16 @@ StructType Parser::structOrUnionSpecifier() {
       auto structDecLst = structDeclarationList();
       expect(PunctuatorType::RIGHTCURLYBRACE);
       scan();
-      return StructType(name, structDecLst);
+      return make_shared<StructType>(name, structDecLst);
     }
 
-    return StructType(name);
+    return make_shared<StructType>(name);
   } else if(testp("{")) {
     scan();
     auto structDecLst = structDeclarationList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
-    return StructType("",structDecLst);
+    return make_shared<StructType>("",structDecLst);
   } else {
     expectedAnyOf();
   }
