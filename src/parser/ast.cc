@@ -360,6 +360,7 @@ PRETTY_PRINT(ExternalDeclaration) {
   if (this->declarator) {
     PPRINT(this->declarator);
     if (this->compoundStatement) {
+      PPRINT('\n');
       PPRINT(this->compoundStatement);
       return; // so that we don't print a semicolon
     }
