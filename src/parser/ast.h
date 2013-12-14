@@ -8,6 +8,9 @@
 #include "../lexer/punctuatortype.h"
 #include "pprinter.h"
 
+/* This macro allows an easy switching of pprint in all methods*/
+#define PPRINTABLE  void prettyPrint(PrettyPrinter & pp) override;
+
 /**
  * This macro is meant to simplify a later transition from virtual inheritance
  * to CRTP static inheritance
@@ -47,7 +50,7 @@ class EXPRESSION(BinaryExpression)
     BinaryExpression(SubExpression lhs,
                      SubExpression rhs,
                      PunctuatorType op);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     SubExpression lhs;
     SubExpression rhs;
@@ -59,7 +62,7 @@ class EXPRESSION(UnaryExpression)
   public:
    UnaryExpression(PunctuatorType op,
        SubExpression operand);
-   void prettyPrint(PrettyPrinter & pp) override;
+   PPRINTABLE
   private:
    SubExpression operand;
    PunctuatorType op;
@@ -69,7 +72,7 @@ class EXPRESSION(VariableUsage)
 {
   public:
     VariableUsage(std::string name);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     std::string name;
 };
@@ -79,7 +82,7 @@ class EXPRESSION(FunctionCall)
   public:
     FunctionCall(SubExpression funcName,
                  std::vector<SubExpression> arguments);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     SubExpression funcName;
     std::vector<SubExpression> arguments;
@@ -91,7 +94,7 @@ class EXPRESSION(TernaryExpression)
     TernaryExpression(SubExpression condition,
                       SubExpression lhs, 
                       SubExpression rhs);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     SubExpression condition;
     SubExpression lhs;
@@ -104,7 +107,7 @@ class TYPE(BasicType) {
   // this type includes int/char/void  
   public:
     BasicType(std::string str);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   
   private:
     enum ReturnType {
@@ -124,7 +127,7 @@ class STATEMENT(CompoundStatement) {
   public:
     // TODO add inner blocks here
     CompoundStatement(std::vector<BlockItem> subStatements);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     std::vector<BlockItem> subStatements;
 };
@@ -133,7 +136,7 @@ class STATEMENT(ExpressionStatement) {
   public:
     ExpressionStatement() { };
     ExpressionStatement(SubExpression ex) :expression(ex) { };
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
 
   private:
     SubExpression expression;
@@ -142,7 +145,7 @@ class STATEMENT(ExpressionStatement) {
 class ASTNODE(Pointer) {
   public:
     Pointer(int counter) : counter(counter) { } ;
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
 
   private:
     int counter;
@@ -150,7 +153,7 @@ class ASTNODE(Pointer) {
 
 class STATEMENT(SelectionStatement) {
   public:
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
     SelectionStatement(SubExpression ex, SubStatement ifStatement);
     SelectionStatement(
       SubExpression ex, 
@@ -169,7 +172,7 @@ class STATEMENT(JumpStatement) { };
 
 class JUMPSTATEMENT(GotoStatement) {
   public:
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
     GotoStatement(std::string label) : label(label) {};
 
   private:
@@ -178,19 +181,19 @@ class JUMPSTATEMENT(GotoStatement) {
 
 class JUMPSTATEMENT(ContinueStatement) {
   public:
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
     ContinueStatement() { };
 };
 
 class JUMPSTATEMENT(BreakStatement) {
   public:
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
     BreakStatement() { };
 };
 
 class JUMPSTATEMENT(ReturnStatement) {
   public:
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
     ReturnStatement() { };
     ReturnStatement(SubExpression ex) :expression(ex) { };
   
@@ -214,7 +217,7 @@ typedef std::shared_ptr<SelectionStatement> SubSelectionStatement;
 class STATEMENT(IterationStatement) { 
   public:
     IterationStatement(SubExpression ex, SubStatement st, IterationEnum k): expression(ex), statement(st), kind(k) { };
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
 
   private:
     SubExpression expression;
@@ -225,7 +228,7 @@ class STATEMENT(IterationStatement) {
 class STATEMENT(LabeledStatement) {
   public:
     LabeledStatement(std::string str, SubStatement st) : name(str), statement(st) { };
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
 
   private:
     std::string name;
@@ -239,7 +242,7 @@ typedef std::shared_ptr<IterationStatement> SubIterationStatement;
 class ASTNODE(IdentifierList) {
   public:
     IdentifierList(std::vector<std::string > list) : nameList(list) { };
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
 
   private:
     std::vector<std::string> nameList;
@@ -284,7 +287,7 @@ class ASTNODE(DirectDeclaratorHelp) {
     DirectDeclaratorHelp(SubIdentifierList idList);
     DirectDeclaratorHelp(SubIdentifierList idList, 
                          std::shared_ptr<DirectDeclaratorHelp> help);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     DirectDeclaratorHelpEnum helperType;
     std::shared_ptr<DirectDeclaratorHelp> help;
@@ -309,7 +312,7 @@ class ASTNODE(Declarator) {
   public:
     Declarator(int cnt, SubDirectDeclarator ast) : pointerCounter(cnt), directDeclarator(ast) { };
     int fixCompileError() {return pointerCounter;};
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     int pointerCounter;
     SubDirectDeclarator directDeclarator;
@@ -324,7 +327,7 @@ class DIRECTDECLARATOR(IdentifierDirectDeclarator) {
 
     IdentifierDirectDeclarator(std::string str) : identifier(str) { } ;
 
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   // TODO pretty Print
   // handle SubDirectDeclaratorHelp not given
   
@@ -337,7 +340,7 @@ class DIRECTDECLARATOR(DeclaratorDirectDeclarator) {
   public:
     DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclaratorHelp h) :
       declarator(d), help(h) { } ;
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
     // TODO pretty Print
  DeclaratorDirectDeclarator(SubDeclarator d) :
       declarator(d){ } ;
@@ -353,7 +356,7 @@ class ASTNODE(Declaration) {
   public:
     Declaration(TypeNode t, SubDeclarator declarator);
     Declaration(TypeNode t);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     TypeNode type;
     SubDeclarator declarator;
@@ -369,7 +372,7 @@ class ASTNODE(ExternalDeclaration) {
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator);
     ExternalDeclaration(TypeNode type);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     TypeNode type;
     SubDeclarator declarator;
@@ -381,7 +384,7 @@ typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;
 class ASTNODE(TranslationUnit) {
   public:
     TranslationUnit(std::vector<ExternalDeclarationNode> externalDeclarations);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     std::vector<ExternalDeclarationNode> externalDeclarations;
 };
@@ -392,7 +395,7 @@ class ASTNODE(Parameter) {
   public:
     Parameter(TypeNode type, SubDeclarator declarator);
     Parameter(TypeNode type);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     TypeNode type;
     SubDeclarator declarator;
@@ -405,7 +408,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
 class ASTNODE(Declarator) {
   public:
     Declarator(Pointer ptr, DirectDeclarator) : name(str), statement(st) { };
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
 
 
 }
@@ -419,7 +422,7 @@ class TYPE(StructType) {
     StructType();
     StructType(std::string name);
     StructType(std::string name, StructContent content);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     std::string name;
     StructContent content; 
@@ -431,7 +434,7 @@ class EXPRESSION(SizeOfExpression)
 {
   public:
     SizeOfExpression(std::pair<TypeNode, SubDeclarator>);
-    void prettyPrint(PrettyPrinter & pp) override;
+    PPRINTABLE
   private:
     std::pair<TypeNode, SubDeclarator> operand;
 };
