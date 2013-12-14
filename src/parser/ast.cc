@@ -148,6 +148,7 @@ PRETTY_PRINT(StructType) {
 
   if (name.length() > 0) {
     PPRINT(name);
+    PPRINT(' ');
   }
 
   PPRINT('{');
@@ -162,6 +163,7 @@ PRETTY_PRINT(StructType) {
         PPRINT(' '); //TODO: this seems wrong
         PPRINT(subDeclarationPair.second);
       }
+      PPRINT(';'); // <- FIXME: no idea if this belongs here, but probably correct
     }
   }
   REMOVEINDENT();
@@ -180,11 +182,18 @@ PRETTY_PRINT(CompoundStatement) {
   PPRINT('{');
   ADDINDENT();
   PPRINT('\n');
-  for (auto statement : this->subStatements) {
-    PPRINT(statement);
-    PPRINT('\n');
+  auto statement = this->subStatements.begin();
+  auto afterLastStatement = this->subStatements.end();
+  while (statement != afterLastStatement) { 
+    PPRINT(*statement);
+    auto next = ++statement;
+    if (next != afterLastStatement) {
+      PPRINT('\n');
+    }
+    statement = next;
   }
   REMOVEINDENT();
+  PPRINT('\n');
   PPRINT('}');
 }
 
@@ -310,7 +319,10 @@ PRETTY_PRINT(Declaration)
 {
   PPRINT(type);
   PPRINT(' ');
-  PPRINT(declarator);
+  if (declarator) {
+    PPRINT(declarator);
+  }
+  PPRINT(';');
 }
 
 
