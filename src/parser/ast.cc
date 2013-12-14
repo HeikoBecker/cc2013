@@ -357,7 +357,9 @@ PRETTY_PRINT(DeclaratorDirectDeclarator)
 {
   /*TODO: unfinished*/
   pp.pprint(declarator);
-  pp.pprint(help);
+  if (help) {
+    pp.pprint(help);
+  }
 }
 
 
