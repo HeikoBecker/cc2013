@@ -548,16 +548,16 @@ std::vector<ParameterNode> Parser::parameterList() {
 
 
 /*
-abstract-declarator ->  pointer
-                      | pointer direct-abstract-declarator
-                                            | direct-abstract-declarator
+   abstract-declarator ->  pointer
+   | pointer direct-abstract-declarator
+   | direct-abstract-declarator
 
-                                            direct-abstract-declarator ->  "(" abstract-declarator ")" direct-abstract-declarator_help
+   direct-abstract-declarator ->  "(" abstract-declarator ")" direct-abstract-declarator_help
 
-                                            direct-abstract-declarator_help -> "(" parameter-type-list ")" direct-abstract-declarator_help
-                                                                         |   "(" ")" direct-abstract-declarator_help
-                                                                                                      | EPSILON
-*/
+   direct-abstract-declarator_help -> "(" parameter-type-list ")" direct-abstract-declarator_help
+   |   "(" ")" direct-abstract-declarator_help
+   | EPSILON
+   */
 void Parser::abstractDeclarator() {
   while(testp("*")) {
     scan();
@@ -569,12 +569,12 @@ void Parser::abstractDeclarator() {
 }
 
 /*
-direct-abstract-declarator ->  "(" abstract-declarator ")" direct-abstract-declarator_help
+   direct-abstract-declarator ->  "(" abstract-declarator ")" direct-abstract-declarator_help
 
-                                            direct-abstract-declarator_help -> "(" parameter-type-list ")" direct-abstract-declarator_help
-                                                                         |   "(" ")" direct-abstract-declarator_help
-                                                                                                      | EPSILON
-*/
+   direct-abstract-declarator_help -> "(" parameter-type-list ")" direct-abstract-declarator_help
+   |   "(" ")" direct-abstract-declarator_help
+   | EPSILON
+   */
 void Parser::directAbstractDeclarator() {
   expect("(");
   scan();
