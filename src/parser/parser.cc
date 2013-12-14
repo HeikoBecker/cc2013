@@ -296,14 +296,14 @@ SubExpression Parser::postfixExpression(SubExpression child) {
         auto index = expression(0);
         expect(PunctuatorType::RIGHTSQBRACKET);
         scan();
-        child = make_shared<UnaryExpression>(PunctuatorType::ARRAY_ACCESS,index);
-      } else if (testp(PunctuatorType::ARROW) || testp(PunctuatorType::MEMBER_ACCESS)) {
+        child = make_shared<BinaryExpression>(child,index, PunctuatorType::ARRAY_ACCESS);
+      } else if (testp(PunctuatorType::ARROW) || testp(PunctuatorType::MEMBER_ACCESS)) { // member access
         PunctuatorType p = (testp(PunctuatorType::MEMBER_ACCESS)) ? PunctuatorType::MEMBER_ACCESS
                                         : PunctuatorType::ARROW;
         scan();
         expect(TokenType::IDENTIFIER);
         auto var = make_shared<VariableUsage>(m_nextsym->value());
-        child = make_shared<UnaryExpression>(p,var);
+        child = make_shared<BinaryExpression>(child, var, p);
         scan();
       } else {
         cont = !cont;
