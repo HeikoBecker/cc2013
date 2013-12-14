@@ -286,11 +286,18 @@ PRETTY_PRINT(IdentifierList) {
 
 PRETTY_PRINT(Declarator)
 {
-  // TODO : unfinished
-  for (auto i = 0; i < this->pointerCounter; ++i) {
+  // TODO : unfinished, probably also broken
+  for (auto i = this->pointerCounter; i>0; --i) {
+    if (i>0)
+    {
+      PPRINT('(');
+    }
     PPRINT('*');
   }
   PPRINT(this->directDeclarator);
+  for (auto i = this->pointerCounter; i>1; --i) {
+    PPRINT(')');
+  }
 }
 
 Declaration::Declaration(TypeNode t, SubDeclarator declarator)

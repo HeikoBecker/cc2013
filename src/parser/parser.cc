@@ -639,7 +639,7 @@ SubDeclarator Parser::declarator(bool abstract) {
     }
   }
 
-  Pointer pointer(counter);
+  Pointer pointer(counter); // TODO: Is this still needed?
   SubDirectDeclarator dec = directDeclarator(abstract);
 
   return make_shared<Declarator>(counter, dec);
