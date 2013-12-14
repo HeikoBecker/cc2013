@@ -18,7 +18,17 @@ void BinaryExpression::prettyPrint(PrettyPrinter & pp)
 {
   pp.pprint('(');
   pp.pprint(this->lhs);
-  pp.pprint(op);
+  switch (this->op) {
+    case PunctuatorType::ARROW:
+    case PunctuatorType::MEMBER_ACCESS:
+      pp.pprint(op);
+      break;
+    default:
+      pp.pprint(' ');
+      pp.pprint(op);
+      pp.pprint(' ');
+      break;
+  }
   pp.pprint(this->rhs);
   pp.pprint(')');
 }

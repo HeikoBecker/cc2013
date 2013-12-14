@@ -37,79 +37,79 @@ class PrettyPrinter {
 template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) {
   switch (op) {
     case PunctuatorType::PLUS:
-      out << " + ";
+      out << "+";
       break;
     case PunctuatorType::MINUS:
-      out << " - ";
+      out << "-";
       break;
     case PunctuatorType::STAR:
-      out << " * ";
+      out << "*";
       break;
     case PunctuatorType::ASSIGN:
-      out << " = ";
+      out << "=";
       break;
     case PunctuatorType::EQUAL:
-      out << " == ";
+      out << "==";
       break;
     case PunctuatorType::NEQUAL:
-      out << " != ";
+      out << "!=";
       break;
     case PunctuatorType::QMARK:
-      out << " ? ";
+      out << "?";
       break;
     case PunctuatorType::COLON:
-      out << " : ";
+      out << ":";
       break;
     case PunctuatorType::SEMICOLON:
-      out << " ; ";
+      out << ";";
       break;
     case PunctuatorType::LAND:
-      out << " && ";
+      out << "&&";
       break;
     case PunctuatorType::LOR:
-      out << " || ";
+      out << "||";
       break;
     case PunctuatorType::LESS:
-      out << " < ";
+      out << "<";
       break;
     case PunctuatorType::GREATER:
-      out << " > ";
+      out << ">";
       break;
     case PunctuatorType::ARRAY_ACCESS:
-      out << " [] ";
+      out << "[]";
       break;
     case PunctuatorType::MEMBER_ACCESS:
-      out << " . ";
+      out << ".";
       break;
     case PunctuatorType::ARROW:
-      out << " -> ";
+      out << "->";
       break;
     case PunctuatorType::SIZEOF:
-      out << " sizeof ";
+      out << "sizeof";
       break;
     case PunctuatorType::LEFTSQBRACKET:
-      out << " [ ";
+      out << "[";
       break;
     case PunctuatorType::RIGHTSQBRACKET:
-      out << " ] ";
+      out << "]";
       break;
     case PunctuatorType::LEFTCURLYBRACE:
-      out << " { ";
+      out << "{";
       break;
     case PunctuatorType::RIGHTCURLYBRACE:
-      out << " } ";
+      out << "}";
       break;
     case PunctuatorType::COMMA:
-      out << " , ";
+      out << ",";
       break;
     case PunctuatorType::AMPERSAND:
-      out << " & ";
+      out << "&";
       break;
     case PunctuatorType::NOT:
-      out << " ! ";
+      out << "!";
       break;
     case PunctuatorType::ILLEGAL:
-      out << " ILLEGAL ";
+      out << "ILLEGAL";
       break;
     default:
       out << "ERROR"; //TODO
