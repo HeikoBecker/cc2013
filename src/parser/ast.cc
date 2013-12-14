@@ -30,8 +30,8 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand) :
 
 void UnaryExpression::prettyPrint(PrettyPrinter & pp)
 {
-  pp.pprint(this->op);
   pp.pprint('(');
+  pp.pprint(this->op);
   pp.pprint(this->operand);
   pp.pprint(')');
 }
@@ -349,7 +349,9 @@ Parameter::Parameter(TypeNode type)
 PRETTY_PRINT(Parameter) {
   /*TODO: unfinished*/
   pp.pprint(type);
-  pp.pprint(declarator);
+  if (declarator) {
+    pp.pprint(declarator);
+  }
 }
 
 
