@@ -358,7 +358,9 @@ PRETTY_PRINT(ExternalDeclaration) {
   /*TODO: unfinished */
   PPRINT(this->type);
   if (this->declarator) {
+    PPRINT('('); // <- WTF, that's a really coding style
     PPRINT(this->declarator);
+    PPRINT(')');
     if (this->compoundStatement) {
       PPRINT('\n');
       PPRINT(this->compoundStatement);
