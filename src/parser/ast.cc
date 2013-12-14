@@ -176,7 +176,6 @@ PRETTY_PRINT(ExpressionStatement) {
 SelectionStatement::SelectionStatement(SubExpression ex, SubStatement ifStat) {
   expression = ex;
   ifStatement = ifStat;
-  hasElseStatement = false;
 }
 
 SelectionStatement::SelectionStatement(
@@ -186,7 +185,6 @@ SelectionStatement::SelectionStatement(
   expression = ex;
   ifStatement = ifStat;
   elseStatement = elseStat;
-  hasElseStatement = true;
 }
 
 
@@ -200,7 +198,7 @@ PRETTY_PRINT(SelectionStatement) {
   pp.removeIndentLevel();
   pp.pprint('\n');
 
-  if (hasElseStatement) {
+  if (elseStatement) {
     pp.pprint(elseStatement);
   }
 }

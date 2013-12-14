@@ -163,7 +163,6 @@ class STATEMENT(SelectionStatement) {
     SubExpression expression;
     SubStatement ifStatement;
     SubStatement elseStatement;
-    bool hasElseStatement;
 };
 
 class STATEMENT(JumpStatement) { };
