@@ -329,21 +329,59 @@ PRETTY_PRINT(DeclaratorDirectDeclarator)
 
 
 
-DirectDeclaratorHelp::DirectDeclaratorHelp() {}
+DirectDeclaratorHelp::DirectDeclaratorHelp() 
+{
+  helperType = EPSILON;
+}
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(
-    SubDirectDeclaratorHelp help) : help(help){}
+    SubDirectDeclaratorHelp help) : help(help)
+{
+  helperType = EMPTYLIST;
+}
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList)
-  : paramList(paramList) {}
+  : paramList(paramList) 
+{  
+  helperType = PARAMETERLIST; 
+}
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
                                            SubDirectDeclaratorHelp help)
-  :help(help), paramList(paramList) {}
+  :help(help), paramList(paramList) 
+{
+  helperType = PARAMETERLIST;
+}
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList)
-  : idList(idList) {}
+  : idList(idList) 
+{
+  helperType = IDENTIFIERLIST;
+}
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList,
                                            SubDirectDeclaratorHelp help)
-  : help(help), idList(idList) {}
+  : help(help), idList(idList)
+{
+  helperType = IDENTIFIERLIST;
+}
+
+
+PRETTY_PRINT(DirectDeclaratorHelp)
+{
+  switch (helperType) {
+    case EPSILON:
+      return;
+    case IDENTIFIERLIST:
+      pp.pprint(idList);
+    case EMPTYLIST:
+      break;
+    case PARAMETERLIST:
+      for (auto parameter: paramList) {
+        pp.pprint(parameter);
+      }
+  }
+  if (help) {
+    pp.pprint(help);
+  }
+}  

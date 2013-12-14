@@ -285,6 +285,7 @@ class ASTNODE(DirectDeclaratorHelp) {
     DirectDeclaratorHelp(SubIdentifierList idList);
     DirectDeclaratorHelp(SubIdentifierList idList, 
                          std::shared_ptr<DirectDeclaratorHelp> help);
+    void prettyPrint(PrettyPrinter & pp) override;
   private:
     DirectDeclaratorHelpEnum helperType;
     std::shared_ptr<DirectDeclaratorHelp> help;
