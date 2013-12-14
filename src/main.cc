@@ -87,7 +87,7 @@ int main(int, char** const argv)
             auto parser = Parsing::Parser{f, name};
             auto ast = parser.parse();
             auto pp = Parsing::PrettyPrinter();
-            pp.pprint(ast);
+            pp.pprint(ast, 0);
             break;
           }
           case Mode::COMPILE:

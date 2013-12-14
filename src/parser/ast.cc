@@ -1,7 +1,9 @@
 #include "ast.h"
 #include "pprinter.h"
 
-#define PRETTY_PRINT(X) void X::prettyPrint(PrettyPrinter & pp)
+#define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
+#define PPRINT(X)  do {pp.pprint((X), indentLevel);} while(0);
+
 
 using namespace Parsing;
 
@@ -14,23 +16,23 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
 {
 }
 
-void BinaryExpression::prettyPrint(PrettyPrinter & pp)
+PRETTY_PRINT(BinaryExpression)
 {
-  pp.pprint('(');
-  pp.pprint(this->lhs);
+  PPRINT('(');
+  PPRINT(this->lhs);
   switch (this->op) {
     case PunctuatorType::ARROW:
     case PunctuatorType::MEMBER_ACCESS:
-      pp.pprint(op);
+      PPRINT(op);
       break;
     default:
-      pp.pprint(' ');
-      pp.pprint(op);
-      pp.pprint(' ');
+      PPRINT(' ');
+      PPRINT(op);
+      PPRINT(' ');
       break;
   }
-  pp.pprint(this->rhs);
-  pp.pprint(')');
+  PPRINT(this->rhs);
+  PPRINT(')');
 }
 
 UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand) :
@@ -38,39 +40,39 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand) :
 {
 }
 
-void UnaryExpression::prettyPrint(PrettyPrinter & pp)
+PRETTY_PRINT(UnaryExpression)
 {
-  pp.pprint('(');
-  pp.pprint(this->op);
-  pp.pprint(this->operand);
-  pp.pprint(')');
+  PPRINT('(');
+  PPRINT(this->op);
+  PPRINT(this->operand);
+  PPRINT(')');
 }
 
 VariableUsage::VariableUsage(std::string name) : name(name) {;}
 
-void VariableUsage::prettyPrint(PrettyPrinter & pp)
+PRETTY_PRINT(VariableUsage)
 {
-  pp.pprint(this->name);
+  PPRINT(this->name);
 }
 
 FunctionCall::FunctionCall(SubExpression funcName,
                            std::vector<SubExpression> arguments)
         : funcName(funcName), arguments(arguments) {;}
 
-void FunctionCall::prettyPrint(PrettyPrinter & pp)
+PRETTY_PRINT(FunctionCall)
 {
-  pp.pprint(funcName);
-  pp.pprint('(');
+  PPRINT(funcName);
+  PPRINT('(');
   if (!arguments.empty()) {
     auto size = arguments.size();
       for (auto argument : arguments) {
-        pp.pprint(argument);
+        PPRINT(argument);
         if (--size != 0) {
-          pp.pprint(',');
+          PPRINT(',');
         }
       }
   }
-  pp.pprint(')');
+  PPRINT(')');
 }
 
 TernaryExpression::TernaryExpression(SubExpression condition, 
@@ -81,14 +83,15 @@ TernaryExpression::TernaryExpression(SubExpression condition,
  //TODO: type checking
 }
 
-void TernaryExpression::prettyPrint(PrettyPrinter & pp) {
-  pp.pprint('(');
-  pp.pprint(this->condition);
-  pp.pprint(std::string(" ? "));
-  pp.pprint(this->lhs);
-  pp.pprint(std::string(" : "));
-  pp.pprint(this->rhs);
-  pp.pprint(')');
+PRETTY_PRINT(TernaryExpression)
+{
+  PPRINT('(');
+  PPRINT(this->condition);
+  PPRINT(std::string(" ? "));
+  PPRINT(this->lhs);
+  PPRINT(std::string(" : "));
+  PPRINT(this->rhs);
+  PPRINT(')');
 }
 
 BasicType::BasicType(std::string type) {
@@ -104,20 +107,21 @@ BasicType::BasicType(std::string type) {
   }
 }
 
-void BasicType::prettyPrint(PrettyPrinter & pp) {
+PRETTY_PRINT(BasicType)
+{
   switch(type) {
     case INT:
-      pp.pprint(std::string("int"));
-      pp.pprint(' ');
+      PPRINT(std::string("int"));
+      PPRINT(' ');
       break;
     case CHAR:
-      pp.pprint(std::string("char"));
-      pp.pprint(' ');
+      PPRINT(std::string("char"));
+      PPRINT(' ');
       break;
     default :
       /*case VOID: */
-      pp.pprint(std::string("void"));
-      pp.pprint(' ');
+      PPRINT(std::string("void"));
+      PPRINT(' ');
       break;
   }
 }
@@ -138,27 +142,27 @@ StructType::StructType(std::string name, StructContent content) : name(name), co
 }
 
 PRETTY_PRINT(StructType) {
-  pp.pprint(std::string("struct"));
+  PPRINT(std::string("struct"));
 
   if (name.length() > 0) {
-    pp.pprint(name);
+    PPRINT(name);
   }
 
-  pp.pprint('{');
-  pp.pprint('\n');
+  PPRINT('{');
+  PPRINT('\n');
   
   for (auto typeSubDeclarationPair : content) {
-    pp.pprint(typeSubDeclarationPair.first);
+    PPRINT(typeSubDeclarationPair.first);
     for (auto subDeclarationPair : typeSubDeclarationPair.second) {
-      pp.pprint(subDeclarationPair.first);
+      PPRINT(subDeclarationPair.first);
       if (subDeclarationPair.second) {
-        pp.pprint(' '); //TODO: this seems wrong
-        pp.pprint(subDeclarationPair.second);
+        PPRINT(' '); //TODO: this seems wrong
+        PPRINT(subDeclarationPair.second);
       }
     }
   }
-  pp.pprint('\n');
-  pp.pprint('}');
+  PPRINT('\n');
+  PPRINT('}');
 }
 
 CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
@@ -169,29 +173,27 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 
 PRETTY_PRINT(CompoundStatement) {
   // TODO: unfinished, add special case for last statement regarding newline
-  pp.pprint('{');
-  pp.addIndentLevel();
-  pp.pprint('\n');
+  PPRINT('{');
+  PPRINT('\n');
   for (auto statement : this->subStatements) {
-    pp.pprint(statement);
-    pp.pprint('\n');
+    PPRINT(statement);
+    PPRINT('\n');
   }
-  pp.removeIndentLevel();
-  pp.pprint('}');
+  PPRINT('}');
 }
 
 PRETTY_PRINT(Pointer) {
   for(int n=0; n<counter; n++) {
-    pp.pprint('*');
+    PPRINT('*');
   }
 }
 
 PRETTY_PRINT(ExpressionStatement) {
   // TODO : check whether this is working
   if (expression != NULL) {
-    pp.pprint(expression);
+    PPRINT(expression);
   }
-  pp.pprint(';');
+  PPRINT(';');
 }
 
 SelectionStatement::SelectionStatement(SubExpression ex, SubStatement ifStat) {
@@ -210,68 +212,66 @@ SelectionStatement::SelectionStatement(
 
 
 PRETTY_PRINT(SelectionStatement) {
-  pp.pprint(std::string("if ("));
-  pp.pprint(expression);
-  pp.pprint(')');
-  pp.addIndentLevel();
-  pp.pprint('\n');
-  pp.pprint(ifStatement);
-  pp.removeIndentLevel();
-  pp.pprint('\n');
+  PPRINT(std::string("if ("));
+  PPRINT(expression);
+  PPRINT(')');
+  PPRINT('\n');
+  PPRINT(ifStatement);
+  PPRINT('\n');
 
   if (elseStatement) {
-    pp.pprint(elseStatement);
+    PPRINT(elseStatement);
   }
 }
 
 PRETTY_PRINT(GotoStatement) {
-  pp.pprint(std::string("goto "));
-  pp.pprint(label);
-  pp.pprint(';');
+  PPRINT(std::string("goto "));
+  PPRINT(label);
+  PPRINT(';');
 }
 
 PRETTY_PRINT(ContinueStatement) {
-  pp.pprint(std::string("continue;"));
+  PPRINT(std::string("continue;"));
 }
 
 PRETTY_PRINT(BreakStatement) {
-  pp.pprint(std::string("break;"));
+  PPRINT(std::string("break;"));
 }
 
 PRETTY_PRINT(ReturnStatement) {
-  pp.pprint(std::string("return "));
+  PPRINT(std::string("return "));
   if (expression != NULL) {
-    pp.pprint(expression);
+    PPRINT(expression);
   }
-  pp.pprint(';');
+  PPRINT(';');
 }
 
 PRETTY_PRINT(IterationStatement) {
   if (kind == WHILE) {
-    pp.pprint(std::string("while ("));
-    pp.pprint(expression);
-    pp.pprint(std::string("))"));
-    pp.pprint(statement);
+    PPRINT(std::string("while ("));
+    PPRINT(expression);
+    PPRINT(std::string("))"));
+    PPRINT(statement);
   } else { // kind == DO
-    pp.pprint(std::string("do "));
-    pp.pprint(statement);
-    pp.pprint(std::string("while ("));
-    pp.pprint(expression);
-    pp.pprint(std::string("));"));
+    PPRINT(std::string("do "));
+    PPRINT(statement);
+    PPRINT(std::string("while ("));
+    PPRINT(expression);
+    PPRINT(std::string("));"));
   }
 }
 
 PRETTY_PRINT(LabeledStatement) {
-  pp.pprint(name);
-  pp.pprint(std::string(": "));
-  pp.pprint(statement);
+  PPRINT(name);
+  PPRINT(std::string(": "));
+  PPRINT(statement);
 }
 
 PRETTY_PRINT(IdentifierList) {
-  pp.pprint(nameList[0]);
+  PPRINT(nameList[0]);
   for(int n = 1; n < (int) nameList.size(); n++) {
-    pp.pprint(',');
-    pp.pprint(nameList[n]);
+    PPRINT(',');
+    PPRINT(nameList[n]);
   }
 }
 
@@ -279,9 +279,9 @@ PRETTY_PRINT(Declarator)
 {
   // TODO : unfinished
   for (auto i = 0; i < this->pointerCounter; ++i) {
-    pp.pprint('*');
+    PPRINT('*');
   }
-  pp.pprint(this->directDeclarator);
+  PPRINT(this->directDeclarator);
 }
 
 Declaration::Declaration(TypeNode t, SubDeclarator declarator)
@@ -292,9 +292,9 @@ Declaration::Declaration(TypeNode t)
 
 PRETTY_PRINT(Declaration)
 {
-  pp.pprint(type);
-  pp.pprint(' ');
-  pp.pprint(declarator);
+  PPRINT(type);
+  PPRINT(' ');
+  PPRINT(declarator);
 }
 
 
@@ -321,29 +321,29 @@ TranslationUnit::TranslationUnit(
 PRETTY_PRINT(TranslationUnit) {
   /*TODO: unfinished */
   for(auto externalDeclaration : externalDeclarations) {
-    pp.pprint(externalDeclaration);
+    PPRINT(externalDeclaration);
   }
 }
 
 PRETTY_PRINT(ExternalDeclaration) {
   /*TODO: unfinished */
-  pp.pprint(this->type);
+  PPRINT(this->type);
   if (this->declarator) {
-    pp.pprint(this->declarator);
+    PPRINT(this->declarator);
     if (this->compoundStatement) {
-      pp.pprint(this->compoundStatement);
+      PPRINT(this->compoundStatement);
       return; // so that we don't print a semicolon
     }
   }
-  pp.pprint(';'); // declarations end with an ;
-  pp.pprint('\n');
+  PPRINT(';'); // declarations end with an ;
+  PPRINT('\n');
 }
 
 PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/
-  pp.pprint(this->identifier);
+  PPRINT(this->identifier);
   if (help) {
-    pp.pprint(help);
+    PPRINT(help);
   }
 }
 
@@ -359,9 +359,9 @@ Parameter::Parameter(TypeNode type)
 
 PRETTY_PRINT(Parameter) {
   /*TODO: unfinished*/
-  pp.pprint(type);
+  PPRINT(type);
   if (declarator) {
-    pp.pprint(declarator);
+    PPRINT(declarator);
   }
 }
 
@@ -369,9 +369,9 @@ PRETTY_PRINT(Parameter) {
 PRETTY_PRINT(DeclaratorDirectDeclarator)
 {
   /*TODO: unfinished*/
-  pp.pprint(declarator);
+  PPRINT(declarator);
   if (help) {
-    pp.pprint(help);
+    PPRINT(help);
   }
 }
 
@@ -421,25 +421,25 @@ PRETTY_PRINT(DirectDeclaratorHelp)
     case EPSILON:
       return;
     case IDENTIFIERLIST:
-      pp.pprint(idList);
+      PPRINT(idList);
     case EMPTYLIST:
       break;
     case PARAMETERLIST:
-      pp.pprint('(');
+      PPRINT('(');
       auto size = paramList.size();
       for (auto parameter: paramList) {
-        pp.pprint(parameter);
+        PPRINT(parameter);
         size--;
         if (size > 0) {
-          pp.pprint(std::string(", "));
+          PPRINT(std::string(", "));
         }
       }
-      pp.pprint(')');
+      PPRINT(')');
   }
   if (help) {
-    pp.pprint('(');
-    pp.pprint(help);
-    pp.pprint(')');
+    PPRINT('(');
+    PPRINT(help);
+    PPRINT(')');
   }
 }  
 
@@ -450,12 +450,13 @@ SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand)
 
 PRETTY_PRINT(SizeOfExpression)
 {
-  pp.pprint(std::string("sizeof "));
-  pp.pprint('(');
-  pp.pprint(operand.first);
+  PPRINT(std::string("sizeof "));
+  PPRINT('(');
+  PPRINT(operand.first);
   if (operand.second) {
-    pp.pprint(operand.second);
+    PPRINT(operand.second);
   }
-  pp.pprint(')');
+  PPRINT(')');
 }
+#undef PPRINT
 #undef PRETTY_PRINT

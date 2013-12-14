@@ -9,31 +9,34 @@ namespace Parsing {
 class PrettyPrinter {
   public:
     PrettyPrinter();
-    void addIndentLevel();
-    void removeIndentLevel();
 
-    template<typename T> void pprint(T node) {
-      node.prettyPrint(*this);
+    template<typename T> void pprint(T node, unsigned int indentLevel) const {
+      node.prettyPrint(*this, indentLevel);
     }
 
-    template<typename S> void pprint(std::shared_ptr<S> nodeptr) {
+    template<typename S> void pprint(std::shared_ptr<S> nodeptr, unsigned int indentLevel) const 
+    {
       if(nodeptr) {
-        nodeptr->prettyPrint(*this);
+        nodeptr->prettyPrint(*this, indentLevel);
       } else {
-        pprint(std::string("\n"));
-        pprint(std::string("******************************************\n"));
-        pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"));
-        pprint(std::string("*Should have been ") + typeid(S).name() + "\n");
-        pprint(std::string("******************************************\n"));
-        pprint(std::string("\n"));
+        pprint(std::string("\n"), indentLevel);
+        pprint(std::string("******************************************\n"),
+            indentLevel);
+        pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"),
+            indentLevel);
+        pprint(std::string("*Should have been ") + typeid(S).name() + "\n",
+            indentLevel);
+        pprint(std::string("******************************************\n"),
+            indentLevel);
+        pprint(std::string("\n"),
+            indentLevel);
       }
     }
-  private:
-    int indentLevel;
-
 };
 
-template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) {
+template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op, unsigned int indentLevel) const
+{
+  (void) indentLevel;
   switch (op) {
     case PunctuatorType::PLUS:
       std::cout << "+";
@@ -116,7 +119,8 @@ template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) 
   }
 }
 
-template<> inline void PrettyPrinter::pprint<char>(char c) {
+template<> inline void PrettyPrinter::pprint<char>(char c, unsigned int indentLevel) const 
+{
   switch (c) {
     case '\n':
       std::cout << '\n';
@@ -130,8 +134,10 @@ template<> inline void PrettyPrinter::pprint<char>(char c) {
   }
 }
 
-template<> inline void PrettyPrinter::pprint<std::string>(std::string s)
+template<> inline void PrettyPrinter::pprint<std::string>(std::string s, unsigned int indentLevel) const
 {
+  (void) indentLevel;
+  // TODO: replace newline in s with newline + indentLevel times tab char
   std::cout << s;
 }
 

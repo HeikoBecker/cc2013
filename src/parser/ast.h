@@ -9,7 +9,7 @@
 #include "pprinter.h"
 
 /* This macro allows an easy switching of pprint in all methods*/
-#define PPRINTABLE  void prettyPrint(PrettyPrinter & pp) override;
+#define PPRINTABLE  void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel = 0) override;
 
 /**
  * This macro is meant to simplify a later transition from virtual inheritance
@@ -29,10 +29,10 @@ class AstNode
 {
   public:
     virtual ~AstNode() {};
-    virtual void prettyPrint(PrettyPrinter & pp) {
-      pp.pprint(std::string("\nIMPLEMENTATION MISSING!\n"));
-      pp.pprint(std::string(typeid(*this).name()));
-      pp.pprint('\n');
+    virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel) {
+      pp.pprint(std::string("\nIMPLEMENTATION MISSING!\n"), indentLevel);
+      pp.pprint(std::string(typeid(*this).name()), indentLevel);
+      pp.pprint('\n', indentLevel);
     };
 };
 
@@ -300,9 +300,10 @@ typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclaratorHelp;
 
 class ASTNODE(DirectDeclarator) { 
   public:
-    virtual void prettyPrint(PrettyPrinter & pp) {
-      AstNode::prettyPrint(pp);
-      pp.pprint(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"));
+    virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel) {
+      AstNode::prettyPrint(pp, indentLevel);
+      pp.pprint(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"),
+                            indentLevel);
     };
 };
 
@@ -439,9 +440,7 @@ class EXPRESSION(SizeOfExpression)
     std::pair<TypeNode, SubDeclarator> operand;
 };
 
-
-
-
-
 }
+
+#undef PPRINTABLE
 #endif
