@@ -588,23 +588,7 @@ void Parser::directAbstractDeclarator() {
 }
 
 void Parser::directAbstractDeclaratorHelp() {
-  expect("(");
-  scan();
-  
-  if (testp(")")) {
-    scan();
-    if(testp("(")) {
-      directAbstractDeclaratorHelp();
-    }
-  } else {
-    parameterList();
-    expect(")");
-    scan();
-
-    if(testp("(")) {
-      directAbstractDeclaratorHelp();
-    }
-  }
+  directDeclaratorHelp(true);
 }
 
 /*
