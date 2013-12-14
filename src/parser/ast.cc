@@ -96,9 +96,19 @@ BasicType::BasicType(std::string type) {
 
 void BasicType::prettyPrint(PrettyPrinter & pp) {
   switch(type) {
-    case INT: pp.pprint(std::string("int")); break;
-    case CHAR: pp.pprint(std::string("char")); break;
-    default : /*case VOID: */ pp.pprint(std::string("void")); break;
+    case INT:
+      pp.pprint(std::string("int"));
+      pp.pprint(' ');
+      break;
+    case CHAR:
+      pp.pprint(std::string("char"));
+      pp.pprint(' ');
+      break;
+    default :
+      /*case VOID: */
+      pp.pprint(std::string("void"));
+      pp.pprint(' ');
+      break;
   }
 }
 
