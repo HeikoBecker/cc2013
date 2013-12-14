@@ -124,7 +124,7 @@ template<> inline void PrettyPrinter::pprint<char>(char c, unsigned int indentLe
   switch (c) {
     case '\n':
       std::cout << '\n';
-      for (int i = indentLevel; i >= 0; i--) {
+      for (int i = indentLevel; i > 0; i--) {
         std::cout << '\t';
       }
       break;
