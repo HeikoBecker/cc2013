@@ -657,7 +657,7 @@ void Parser::typeName() {
 declarator ->   pointer direct-declarator
               | direct-declarator
 */
-SubDeclarator Parser::declarator() {
+SubDeclarator Parser::declarator(bool abstract) {
   int counter = 0;
 
   if(test(TokenType::PUNCTUATOR,"*")) {
@@ -668,7 +668,7 @@ SubDeclarator Parser::declarator() {
   }
 
   Pointer pointer(counter);
-  SubDirectDeclarator dec = directDeclarator();
+  SubDirectDeclarator dec = directDeclarator(abstract);
 
   return make_shared<Declarator>(counter, dec);
 }
@@ -678,8 +678,8 @@ direct-declarator -> identifier direct-declarator_help
                    | "(" declarator ")" direct-declarator_help
 
 */
-SubDirectDeclarator Parser::directDeclarator() {
-  if (testType(TokenType::IDENTIFIER)) {
+SubDirectDeclarator Parser::directDeclarator(bool abstract) {
+  if (!abstract && testType(TokenType::IDENTIFIER)) {
     std::string identifier = m_nextsym->value();
     scan();
 
@@ -703,7 +703,7 @@ SubDirectDeclarator Parser::directDeclarator() {
     }
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      SubDirectDeclaratorHelp help = directDeclaratorHelp();
+      SubDirectDeclaratorHelp help = directDeclaratorHelp(abstract);
       return make_shared<DeclaratorDirectDeclarator>(dec,help);
     } else {
       return make_shared<DeclaratorDirectDeclarator>(dec);
@@ -719,8 +719,8 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
                           |  "(" ")" direct-declarator_help
                                        | EPSILON
 */
-SubDirectDeclaratorHelp Parser::directDeclaratorHelp() {
-  if (testp(PunctuatorType::LEFTPARENTHESIS)) {
+SubDirectDeclaratorHelp Parser::directDeclaratorHelp(bool abstract) {
+  if (testp(PunctuatorType::LEFTPARENTHESIS)) { // TODO: use expect instead of testp
     scan();
 
     decltype(directDeclaratorHelp()) declHelp;
@@ -729,7 +729,7 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp() {
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        declHelp = directDeclaratorHelp();
+        declHelp = directDeclaratorHelp(abstract);
         return make_shared<DirectDeclaratorHelp>(declHelp);
       } else {
         return make_shared<DirectDeclaratorHelp>();
@@ -741,11 +741,11 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp() {
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        declHelp = directDeclaratorHelp();
+        declHelp = directDeclaratorHelp(abstract);
         return make_shared<DirectDeclaratorHelp>(params, declHelp);
       }
       return make_shared<DirectDeclaratorHelp>(params);
-    } else if(testType(TokenType::IDENTIFIER)) {
+    } else if(!abstract && testType(TokenType::IDENTIFIER)) {
       auto ids = identifierList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
       scan();
