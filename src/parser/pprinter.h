@@ -118,7 +118,15 @@ template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) 
 }
 
 template<> inline void PrettyPrinter::pprint<char>(char c) {
-  out << c;
+  switch (c) {
+    case '\n':
+      out << '\n';
+      for (int i = indentLevel; i >= 0; i--) {
+        out << '\t';
+      }
+    default:
+      out << c;
+  }
 }
 
 template<> inline void PrettyPrinter::pprint<std::string>(std::string s)
