@@ -410,14 +410,16 @@ PRETTY_PRINT(DirectDeclaratorHelp)
     case EMPTYLIST:
       break;
     case PARAMETERLIST:
+      pp.pprint('(');
       for (auto parameter: paramList) {
         pp.pprint(parameter);
-        pp.pprint(", "); // TODO: don't print this for the last one
+        pp.pprint(std::string(", ")); // TODO: don't print this for the last one
       }
+      pp.pprint(')');
   }
   if (help) {
     pp.pprint('(');
     pp.pprint(help);
-    pp.pprint('(');
+    pp.pprint(')');
   }
 }  
