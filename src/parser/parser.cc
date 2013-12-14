@@ -729,30 +729,34 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp() {
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         declHelp = directDeclaratorHelp();
+        return make_shared<DirectDeclaratorHelp>(declHelp);
+      } else {
+        return make_shared<DirectDeclaratorHelp>();
       }
 
     } else if (testTypeSpecifier()) { // parameter-list
-      parameterList();
+      auto params = parameterList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        directDeclaratorHelp();
+        declHelp = directDeclaratorHelp();
+        return make_shared<DirectDeclaratorHelp>(params, declHelp);
       }
+      return make_shared<DirectDeclaratorHelp>(params);
     } else if(testType(TokenType::IDENTIFIER)) {
-      identifierList();
+      auto ids = identifierList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        directDeclaratorHelp();
+        declHelp = directDeclaratorHelp();
+        return make_shared<DirectDeclaratorHelp>(ids, declHelp);
       }
+      return make_shared<DirectDeclaratorHelp>(ids);
     } else {
       expectedAnyOf();
     }
-
-    // TODO : give right parameter
-    return make_shared<DirectDeclaratorHelp>();
 
   } else {
     expectedAnyOf(std::string("direct-declatror_help : '(' expected"));

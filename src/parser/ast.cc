@@ -150,8 +150,12 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 PRETTY_PRINT(CompoundStatement) {
 
   pp.pprint('{');
-
-  // TODO print children here
+  pp.addIndentLevel();
+  for (auto statement : this->subStatements) {
+    pp.pprint(statement);
+    pp.pprint('\n');
+  }
+  pp.removeIndentLevel();
   pp.pprint('}');
 }
 
@@ -301,6 +305,9 @@ PRETTY_PRINT(ExternalDeclaration) {
 PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/
   pp.pprint(this->identifier);
+  if (help) {
+    pp.pprint(help);
+  }
 }
 
 Parameter::Parameter(TypeNode type, SubDeclarator declarator)
@@ -382,6 +389,8 @@ PRETTY_PRINT(DirectDeclaratorHelp)
       }
   }
   if (help) {
+    pp.pprint('(');
     pp.pprint(help);
+    pp.pprint('(');
   }
 }  

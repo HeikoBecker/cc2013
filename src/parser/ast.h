@@ -27,7 +27,7 @@ class AstNode
   public:
     virtual ~AstNode() {};
     virtual void prettyPrint(PrettyPrinter & pp) {
-      pp.pprint(std::string("IMPLEMENTATION MISSING!\n"));
+      pp.pprint(std::string("\nIMPLEMENTATION MISSING!\n"));
       pp.pprint(std::string(typeid(*this).name()));
       pp.pprint('\n');
     };
