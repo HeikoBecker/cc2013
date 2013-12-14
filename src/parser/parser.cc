@@ -559,13 +559,7 @@ std::vector<ParameterNode> Parser::parameterList() {
    | EPSILON
    */
 void Parser::abstractDeclarator() {
-  while(testp("*")) {
-    scan();
-  } 
-
-  if (testp("(")) {
-    directAbstractDeclarator();
-  }
+  declarator(true);
 }
 
 /*
