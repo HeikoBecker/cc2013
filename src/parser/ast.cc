@@ -437,9 +437,12 @@ SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand)
 
 PRETTY_PRINT(SizeOfExpression)
 {
+  pp.pprint(std::string("sizeof "));
+  pp.pprint('(');
   pp.pprint(operand.first);
   if (operand.second) {
     pp.pprint(operand.second);
   }
+  pp.pprint(')');
 }
 #undef PRETTY_PRINT
