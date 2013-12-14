@@ -144,13 +144,14 @@ StructType::StructType(std::string name, StructContent content) : name(name), co
 }
 
 PRETTY_PRINT(StructType) {
-  PPRINT(std::string("struct"));
+  PPRINT(std::string("struct "));
 
   if (name.length() > 0) {
     PPRINT(name);
   }
 
   PPRINT('{');
+  ADDINDENT();
   PPRINT('\n');
   
   for (auto typeSubDeclarationPair : content) {
@@ -163,6 +164,7 @@ PRETTY_PRINT(StructType) {
       }
     }
   }
+  REMOVEINDENT();
   PPRINT('\n');
   PPRINT('}');
 }
