@@ -541,7 +541,7 @@ std::vector<ParameterNode> Parser::parameterList() {
   parameters.push_back(parameter);
   while(testp(PunctuatorType::COMMA)) {
     scan();
-    parameterDeclaration();
+    parameters.push_back(parameterDeclaration());
   }
   return parameters;
 }

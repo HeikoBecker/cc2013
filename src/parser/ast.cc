@@ -411,9 +411,13 @@ PRETTY_PRINT(DirectDeclaratorHelp)
       break;
     case PARAMETERLIST:
       pp.pprint('(');
+      auto size = paramList.size();
       for (auto parameter: paramList) {
         pp.pprint(parameter);
-        pp.pprint(std::string(", ")); // TODO: don't print this for the last one
+        size--;
+        if (size > 0) {
+          pp.pprint(std::string(", "));
+        }
       }
       pp.pprint(')');
   }
