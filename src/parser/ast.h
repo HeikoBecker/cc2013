@@ -256,20 +256,44 @@ enum DirectDeclaratorHelpEnum {
   EPSILON
 };
 
+/* required forward declaration + typedef forward declaration for
+ * DirectDeclaratorHelp*/
+class Parameter;
+typedef std::shared_ptr<Parameter> ParameterNode;
+
+
 /* TODO: If we want to use only one class for DirectDeclaratorHelp
  * we would need to implement something like Boost::Variant
  * to efficiently store the members
  * or at least some clever use of placement new
  *
  * For now, we will just go with wasting space
+ *
+ *
+ * TODO:
+ * Furthermore it should be unnecessary to ahve a DirectDeclaratorHelper,
+ * which has a DirectDeclaratorHelper as a child
+ * This sounds like something that should be solved with a list/vector
  */
 class ASTNODE(DirectDeclaratorHelp) {
   public:
-    DirectDeclaratorHelp() { };
-    // TODO : implement the lists
+    DirectDeclaratorHelp();
+    DirectDeclaratorHelp(std::shared_ptr<DirectDeclaratorHelp> help);
+    DirectDeclaratorHelp(std::vector<ParameterNode> paramList);
+    DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
+        std::shared_ptr<DirectDeclaratorHelp> help);
+    DirectDeclaratorHelp(SubIdentifierList idList);
+    DirectDeclaratorHelp(SubIdentifierList idList, 
+                         std::shared_ptr<DirectDeclaratorHelp> help);
+  private:
+    DirectDeclaratorHelpEnum helperType;
+    std::shared_ptr<DirectDeclaratorHelp> help;
+    // those are mutually exclusive:
+    std::vector<ParameterNode> paramList;
+    SubIdentifierList idList;
 };
 
-typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclartorHelp;
+typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclaratorHelp;
 
 class ASTNODE(DirectDeclarator) { 
   public:
@@ -296,7 +320,7 @@ typedef std::shared_ptr<Declarator> SubDeclarator;
 class DIRECTDECLARATOR(IdentifierDirectDeclarator) { 
   public:
    
-    IdentifierDirectDeclarator(std::string str, SubDirectDeclartorHelp h) : identifier(str), help(h) { } ;
+    IdentifierDirectDeclarator(std::string str, SubDirectDeclaratorHelp h) : identifier(str), help(h) { } ;
 
     IdentifierDirectDeclarator(std::string str) : identifier(str) { } ;
 
@@ -306,12 +330,12 @@ class DIRECTDECLARATOR(IdentifierDirectDeclarator) {
   
   private:
     std::string identifier;
-    SubDirectDeclartorHelp help;
+    SubDirectDeclaratorHelp help;
 };
 
 class DIRECTDECLARATOR(DeclaratorDirectDeclarator) { 
   public:
-    DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclartorHelp h) :
+    DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclaratorHelp h) :
       declarator(d), help(h) { } ;
     void prettyPrint(PrettyPrinter & pp) override;
     // TODO pretty Print
@@ -320,7 +344,7 @@ class DIRECTDECLARATOR(DeclaratorDirectDeclarator) {
     
   private:
     SubDeclarator declarator;
-    SubDirectDeclartorHelp help;
+    SubDirectDeclaratorHelp help;
 };
 
 typedef std::shared_ptr<Type> TypeNode;

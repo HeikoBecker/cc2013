@@ -326,3 +326,24 @@ PRETTY_PRINT(DeclaratorDirectDeclarator)
   pp.pprint(declarator);
   pp.pprint(help);
 }
+
+
+
+DirectDeclaratorHelp::DirectDeclaratorHelp() {}
+
+DirectDeclaratorHelp::DirectDeclaratorHelp(
+    SubDirectDeclaratorHelp help) : help(help){}
+
+DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList)
+  : paramList(paramList) {}
+
+DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
+                                           SubDirectDeclaratorHelp help)
+  :help(help), paramList(paramList) {}
+
+DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList)
+  : idList(idList) {}
+
+DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList,
+                                           SubDirectDeclaratorHelp help)
+  : help(help), idList(idList) {}

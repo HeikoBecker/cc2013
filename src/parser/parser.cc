@@ -683,7 +683,7 @@ SubDirectDeclarator Parser::directDeclarator() {
     scan();
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      SubDirectDeclartorHelp help =  directDeclaratorHelp();
+      SubDirectDeclaratorHelp help =  directDeclaratorHelp();
       return make_shared<IdentifierDirectDeclarator>(identifier, help);
     } else {
       return make_shared<IdentifierDirectDeclarator>(identifier);
@@ -702,7 +702,7 @@ SubDirectDeclarator Parser::directDeclarator() {
     }
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      SubDirectDeclartorHelp help = directDeclaratorHelp();
+      SubDirectDeclaratorHelp help = directDeclaratorHelp();
       return make_shared<DeclaratorDirectDeclarator>(dec,help);
     } else {
       return make_shared<DeclaratorDirectDeclarator>(dec);
@@ -718,7 +718,7 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
                           |  "(" ")" direct-declarator_help
                                        | EPSILON
 */
-SubDirectDeclartorHelp Parser::directDeclaratorHelp() {
+SubDirectDeclaratorHelp Parser::directDeclaratorHelp() {
   if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     scan();
 
