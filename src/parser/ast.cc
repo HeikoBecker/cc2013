@@ -194,7 +194,11 @@ PRETTY_PRINT(SelectionStatement) {
   pp.pprint(std::string("if ("));
   pp.pprint(expression);
   pp.pprint(')');
+  pp.addIndentLevel();
+  pp.pprint('\n');
   pp.pprint(ifStatement);
+  pp.removeIndentLevel();
+  pp.pprint('\n');
 
   if (hasElseStatement) {
     pp.pprint(elseStatement);
