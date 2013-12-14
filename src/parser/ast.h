@@ -427,6 +427,15 @@ class TYPE(StructType) {
 
 typedef std::shared_ptr<StructType> StructNode;
 
+class EXPRESSION(SizeOfExpression)
+{
+  public:
+    SizeOfExpression(std::pair<TypeNode, SubDeclarator>);
+    void prettyPrint(PrettyPrinter & pp) override;
+  private:
+    std::pair<TypeNode, SubDeclarator> operand;
+};
+
 
 
 

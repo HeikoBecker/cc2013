@@ -429,3 +429,17 @@ PRETTY_PRINT(DirectDeclaratorHelp)
     pp.pprint(')');
   }
 }  
+
+SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand)
+  : operand(operand) 
+{
+}
+
+PRETTY_PRINT(SizeOfExpression)
+{
+  pp.pprint(operand.first);
+  if (operand.second) {
+    pp.pprint(operand.second);
+  }
+}
+#undef PRETTY_PRINT
