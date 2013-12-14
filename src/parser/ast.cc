@@ -269,6 +269,13 @@ Declaration::Declaration(TypeNode t, SubDeclarator declarator)
 Declaration::Declaration(TypeNode t)
   :type(t){}
 
+PRETTY_PRINT(Declaration)
+{
+  pp.pprint(type);
+  pp.pprint(' ');
+  pp.pprint(declarator);
+}
+
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,

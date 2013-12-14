@@ -353,6 +353,7 @@ class ASTNODE(Declaration) {
   public:
     Declaration(TypeNode t, SubDeclarator declarator);
     Declaration(TypeNode t);
+    void prettyPrint(PrettyPrinter & pp) override;
   private:
     TypeNode type;
     SubDeclarator declarator;
