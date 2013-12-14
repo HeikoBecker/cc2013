@@ -84,11 +84,11 @@ void TernaryExpression::prettyPrint(PrettyPrinter & pp) {
 BasicType::BasicType(std::string type) {
   
   if (type == "int") {
-    type = INT;
+    this->type = INT;
   } else if (type == "char") {
-    type = CHAR;
+    this->type = CHAR;
   } else if (type == "void") {
-    type = VOID;
+    this->type = VOID;
   } else {
     throw type + " is not a Basic Type";
   }
