@@ -259,7 +259,7 @@ PRETTY_PRINT(IterationStatement) {
   if (kind == WHILE) {
     PPRINT(std::string("while ("));
     PPRINT(expression);
-    PPRINT(std::string("))"));
+    PPRINT(std::string(")")); //FIXME: <- whitespace is required here, but only if this is followed by {
     PPRINT(statement);
   } else { // kind == DO
     PPRINT(std::string("do "));
@@ -338,6 +338,7 @@ PRETTY_PRINT(TranslationUnit) {
   /*TODO: unfinished */
   for(auto externalDeclaration : externalDeclarations) {
     PPRINT(externalDeclaration);
+    PPRINT('\n');
   }
 }
 
