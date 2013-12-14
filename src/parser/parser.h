@@ -100,7 +100,7 @@ namespace Parsing {
       std::vector<ParameterNode> parameterList();
       ParameterNode parameterDeclaration();
       SubIdentifierList identifierList();
-      void typeName();
+      std::pair<TypeNode, SubDeclarator>  typeName();
       ExternalDeclarationNode externalDeclaration();
       TUNode translationUnit();
 

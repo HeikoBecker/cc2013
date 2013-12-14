@@ -615,11 +615,13 @@ SubIdentifierList Parser::identifierList() {
   return make_shared<IdentifierList>(myList);
 }
 
-void Parser::typeName() {
-  specifierQualifierList();
+std::pair<TypeNode, SubDeclarator>  Parser::typeName() {
+  auto type = specifierQualifierList();
 
   if (!testp(")")) {
-    abstractDeclarator();
+    return make_pair(type, abstractDeclarator());
+  } else {
+    return make_pair(type, SubDeclarator());
   }
 }
 
