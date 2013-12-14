@@ -219,11 +219,14 @@ PRETTY_PRINT(SelectionStatement) {
   PPRINT(std::string("if ("));
   PPRINT(expression);
   PPRINT(')');
+  ADDINDENT();
   PPRINT('\n');
   PPRINT(ifStatement);
+  REMOVEINDENT();
   PPRINT('\n');
 
   if (elseStatement) {
+    PPRINT(std::string("else "));
     PPRINT(elseStatement);
   }
 }
