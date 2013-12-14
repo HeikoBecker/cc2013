@@ -168,9 +168,10 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 }
 
 PRETTY_PRINT(CompoundStatement) {
-
+  // TODO: unfinished, add special case for last statement regarding newline
   pp.pprint('{');
   pp.addIndentLevel();
+  pp.pprint('\n');
   for (auto statement : this->subStatements) {
     pp.pprint(statement);
     pp.pprint('\n');
