@@ -576,15 +576,7 @@ void Parser::abstractDeclarator() {
    | EPSILON
    */
 void Parser::directAbstractDeclarator() {
-  expect("(");
-  scan();
-  abstractDeclarator();
-  expect(")");
-  scan();
-
-  if(testp("(")) {
-    directAbstractDeclaratorHelp();
-  }
+  directDeclarator(true);
 }
 
 void Parser::directAbstractDeclaratorHelp() {
