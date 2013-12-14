@@ -375,10 +375,10 @@ SubExpression Parser::sizeOfType() {
   // TODO: actually construct AST class
   scan(); // read starting parenthesis
   // read type
-  typeName();
+  auto type = typeName();
   expect(PunctuatorType::RIGHTPARENTHESIS);
   scan();  // read closing parenthesis
-  return SubExpression{};
+  return make_shared<SizeOfExpression>(type);
 }
 
 SubExpression Parser::expression(int minPrecedence = 0) {
