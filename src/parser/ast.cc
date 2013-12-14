@@ -3,6 +3,8 @@
 
 #define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
 #define PPRINT(X)  do {pp.pprint((X), indentLevel);} while(0);
+#define ADDINDENT()  do {indentLevel++;} while(0);
+#define REMOVEINDENT()  do {indentLevel--;} while(0);
 
 
 using namespace Parsing;
@@ -174,11 +176,13 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 PRETTY_PRINT(CompoundStatement) {
   // TODO: unfinished, add special case for last statement regarding newline
   PPRINT('{');
+  ADDINDENT();
   PPRINT('\n');
   for (auto statement : this->subStatements) {
     PPRINT(statement);
     PPRINT('\n');
   }
+  REMOVEINDENT();
   PPRINT('}');
 }
 
@@ -459,4 +463,6 @@ PRETTY_PRINT(SizeOfExpression)
   PPRINT(')');
 }
 #undef PPRINT
+#undef ADDINDENT
+#undef REMOVEINDENT
 #undef PRETTY_PRINT
