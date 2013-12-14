@@ -71,30 +71,46 @@ template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) 
       break;
     case PunctuatorType::LESS:
       out << " < ";
+      break;
     case PunctuatorType::GREATER:
       out << " > ";
+      break;
     case PunctuatorType::ARRAY_ACCESS:
       out << " [] ";
+      break;
     case PunctuatorType::MEMBER_ACCESS:
       out << " . ";
+      break;
     case PunctuatorType::ARROW:
       out << " -> ";
+      break;
     case PunctuatorType::SIZEOF:
       out << " sizeof ";
+      break;
     case PunctuatorType::LEFTSQBRACKET:
       out << " [ ";
+      break;
     case PunctuatorType::RIGHTSQBRACKET:
       out << " ] ";
+      break;
     case PunctuatorType::LEFTCURLYBRACE:
       out << " { ";
+      break;
     case PunctuatorType::RIGHTCURLYBRACE:
       out << " } ";
+      break;
     case PunctuatorType::COMMA:
       out << " , ";
+      break;
     case PunctuatorType::AMPERSAND:
       out << " & ";
+      break;
     case PunctuatorType::NOT:
       out << " ! ";
+      break;
+    case PunctuatorType::ILLEGAL:
+      out << " ILLEGAL ";
+      break;
     default:
       out << "ERROR"; //TODO
       break;

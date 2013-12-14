@@ -1,4 +1,5 @@
 #include "token.h"
+#include <iostream>
 using namespace Lexing;
 
 Token::Token(TokenType type, Pos posinfo, std::string value)
