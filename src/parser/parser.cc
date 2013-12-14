@@ -397,6 +397,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
   }  
   while (  (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence)
          || isTernary) {
+    auto punctype = static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype();
     int precNext;
     if (isTernary) {
       precNext = 2;
@@ -409,7 +410,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     scan(); // this will either read the binary operator or ":" if we're parsing the ternary operator
     auto rhs = expression(precNext);
     if (!isTernary) {
-      expr = make_shared<BinaryExpression>(expr, rhs, PunctuatorType::ILLEGAL);
+      expr = make_shared<BinaryExpression>(expr, rhs, punctype);
     } else {
       expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs);
     }
