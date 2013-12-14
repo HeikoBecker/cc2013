@@ -312,7 +312,6 @@ typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 class ASTNODE(Declarator) {
   public:
     Declarator(int cnt, SubDirectDeclarator ast) : pointerCounter(cnt), directDeclarator(ast) { };
-    int fixCompileError() {return pointerCounter;};
     PPRINTABLE
   private:
     int pointerCounter;
