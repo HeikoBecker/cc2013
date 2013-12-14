@@ -558,8 +558,8 @@ std::vector<ParameterNode> Parser::parameterList() {
    |   "(" ")" direct-abstract-declarator_help
    | EPSILON
    */
-void Parser::abstractDeclarator() {
-  declarator(/*abstract =*/true);
+auto Parser::abstractDeclarator() -> decltype(Parser::declarator())  {
+  return declarator(/*abstract =*/true);
 }
 
 /*
@@ -569,12 +569,12 @@ void Parser::abstractDeclarator() {
    |   "(" ")" direct-abstract-declarator_help
    | EPSILON
    */
-void Parser::directAbstractDeclarator() {
-  directDeclarator(/*abstract =*/true);
+auto Parser::directAbstractDeclarator() -> decltype(Parser::directDeclarator()) {
+  return directDeclarator(/*abstract =*/true);
 }
 
-void Parser::directAbstractDeclaratorHelp() {
-  directDeclaratorHelp(/*abstract =*/true);
+auto Parser::directAbstractDeclaratorHelp() -> decltype(Parser::directAbstractDeclaratorHelp()) {
+  return directDeclaratorHelp(/*abstract =*/true);
 }
 
 /*

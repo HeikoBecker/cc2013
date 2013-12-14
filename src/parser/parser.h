@@ -84,8 +84,12 @@ namespace Parsing {
       SubExpression sizeOfType();
       SubExpression constantExpression();
       DeclarationNode declaration();
+      SubDeclarator declarator(bool abstract = false);
+      SubDeclarator abstractDeclarator();
       SubDirectDeclarator directDeclarator(bool abstract = false);
+      SubDirectDeclarator directAbstractDeclarator();
       SubDirectDeclaratorHelp directDeclaratorHelp(bool abstract = false);
+      SubDirectDeclaratorHelp directAbstractDeclaratorHelp();
       TypeNode typeSpecifier();
       StructNode structOrUnionSpecifier();
       std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> structDeclaration();
@@ -97,15 +101,11 @@ namespace Parsing {
       ParameterNode parameterDeclaration();
       SubIdentifierList identifierList();
       void typeName();
-      SubDeclarator declarator(bool abstract = false);
       ExternalDeclarationNode externalDeclaration();
       TUNode translationUnit();
 
       SubCompoundStatement compoundStatement();
       SubExpressionStatement expressionStatement();
-      void abstractDeclarator();
-      void directAbstractDeclarator();
-      void directAbstractDeclaratorHelp();
   };
 }
 
