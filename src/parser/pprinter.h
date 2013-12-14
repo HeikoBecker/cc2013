@@ -51,11 +51,17 @@ template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) 
     case PunctuatorType::EQUAL:
       out << " == ";
       break;
+    case PunctuatorType::NEQUAL:
+      out << " != ";
+      break;
     case PunctuatorType::QMARK:
       out << " ? ";
       break;
     case PunctuatorType::COLON:
       out << " : ";
+      break;
+    case PunctuatorType::SEMICOLON:
+      out << " ; ";
       break;
     case PunctuatorType::LAND:
       out << " && ";
@@ -65,6 +71,30 @@ template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) 
       break;
     case PunctuatorType::LESS:
       out << " < ";
+    case PunctuatorType::GREATER:
+      out << " > ";
+    case PunctuatorType::ARRAY_ACCESS:
+      out << " [] ";
+    case PunctuatorType::MEMBER_ACCESS:
+      out << " . ";
+    case PunctuatorType::ARROW:
+      out << " -> ";
+    case PunctuatorType::SIZEOF:
+      out << " sizeof ";
+    case PunctuatorType::LEFTSQBRACKET:
+      out << " [ ";
+    case PunctuatorType::RIGHTSQBRACKET:
+      out << " ] ";
+    case PunctuatorType::LEFTCURLYBRACE:
+      out << " { ";
+    case PunctuatorType::RIGHTCURLYBRACE:
+      out << " } ";
+    case PunctuatorType::COMMA:
+      out << " , ";
+    case PunctuatorType::AMPERSAND:
+      out << " & ";
+    case PunctuatorType::NOT:
+      out << " ! ";
     default:
       out << "ERROR"; //TODO
       break;
