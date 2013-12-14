@@ -559,7 +559,7 @@ std::vector<ParameterNode> Parser::parameterList() {
    | EPSILON
    */
 void Parser::abstractDeclarator() {
-  declarator(true);
+  declarator(/*abstract =*/true);
 }
 
 /*
@@ -570,11 +570,11 @@ void Parser::abstractDeclarator() {
    | EPSILON
    */
 void Parser::directAbstractDeclarator() {
-  directDeclarator(true);
+  directDeclarator(/*abstract =*/true);
 }
 
 void Parser::directAbstractDeclaratorHelp() {
-  directDeclaratorHelp(true);
+  directDeclaratorHelp(/*abstract =*/true);
 }
 
 /*
