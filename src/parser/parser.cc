@@ -735,15 +735,6 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp(bool abstract) {
 
 }
 
-void Parser::directOrAbstractDeclarator(bool isDirect) {
-  if (isDirect) {
-    // so we have no compile error 
-    directDeclarator();
-  } else {
-    expectedAnyOf(std::string("abstract declarator is not implemented yet"));
-  }
-}
-
 /**
 compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
