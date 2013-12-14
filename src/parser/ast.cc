@@ -315,10 +315,17 @@ PRETTY_PRINT(TranslationUnit) {
 }
 
 PRETTY_PRINT(ExternalDeclaration) {
-    /*TODO: unfinished */
-    pp.pprint(this->type);
-  pp.pprint(this->declarator);
-  pp.pprint(this->compoundStatement);
+  /*TODO: unfinished */
+  pp.pprint(this->type);
+  if (this->declarator) {
+    pp.pprint(this->declarator);
+    if (this->compoundStatement) {
+      pp.pprint(this->compoundStatement);
+      return; // so that we don't print a semicolon
+    }
+  }
+  pp.pprint(';'); // declarations end with an ;
+  pp.pprint('\n');
 }
 
 PRETTY_PRINT(IdentifierDirectDeclarator) {
@@ -405,6 +412,7 @@ PRETTY_PRINT(DirectDeclaratorHelp)
     case PARAMETERLIST:
       for (auto parameter: paramList) {
         pp.pprint(parameter);
+        pp.pprint(", "); // TODO: don't print this for the last one
       }
   }
   if (help) {
