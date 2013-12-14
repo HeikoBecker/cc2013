@@ -811,11 +811,10 @@ std::vector<BlockItem> Parser::blockItemList() {
 block-item ->   declaration
               | statement
 */
+/* TODO: BlockItem is still an AstNode! */
 BlockItem Parser::blockItem() {
   if (testTypeSpecifier()) {
-    declaration();
-    /* TODO: declaration doesn't return an AstNode yet! */
-    return make_shared<AstNode>();
+    return declaration();
   } else {
     return statement();
   }
