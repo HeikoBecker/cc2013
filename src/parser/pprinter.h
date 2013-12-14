@@ -1,7 +1,7 @@
 #ifndef PARSER_PPRINTER_H
 #define PARSER_PPRINTER_H
 #include <memory>
-#include <ostream>
+#include <iostream>
 #include "../lexer/punctuatortype.h"
 
 namespace Parsing {
@@ -30,89 +30,88 @@ class PrettyPrinter {
     }
   private:
     int indentLevel;
-    std::ostream& out;
 
 };
 
 template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) {
   switch (op) {
     case PunctuatorType::PLUS:
-      out << "+";
+      std::cout << "+";
       break;
     case PunctuatorType::MINUS:
-      out << "-";
+      std::cout << "-";
       break;
     case PunctuatorType::STAR:
-      out << "*";
+      std::cout << "*";
       break;
     case PunctuatorType::ASSIGN:
-      out << "=";
+      std::cout << "=";
       break;
     case PunctuatorType::EQUAL:
-      out << "==";
+      std::cout << "==";
       break;
     case PunctuatorType::NEQUAL:
-      out << "!=";
+      std::cout << "!=";
       break;
     case PunctuatorType::QMARK:
-      out << "?";
+      std::cout << "?";
       break;
     case PunctuatorType::COLON:
-      out << ":";
+      std::cout << ":";
       break;
     case PunctuatorType::SEMICOLON:
-      out << ";";
+      std::cout << ";";
       break;
     case PunctuatorType::LAND:
-      out << "&&";
+      std::cout << "&&";
       break;
     case PunctuatorType::LOR:
-      out << "||";
+      std::cout << "||";
       break;
     case PunctuatorType::LESS:
-      out << "<";
+      std::cout << "<";
       break;
     case PunctuatorType::GREATER:
-      out << ">";
+      std::cout << ">";
       break;
     case PunctuatorType::ARRAY_ACCESS:
-      out << "[]";
+      std::cout << "[]";
       break;
     case PunctuatorType::MEMBER_ACCESS:
-      out << ".";
+      std::cout << ".";
       break;
     case PunctuatorType::ARROW:
-      out << "->";
+      std::cout << "->";
       break;
     case PunctuatorType::SIZEOF:
-      out << "sizeof";
+      std::cout << "sizeof";
       break;
     case PunctuatorType::LEFTSQBRACKET:
-      out << "[";
+      std::cout << "[";
       break;
     case PunctuatorType::RIGHTSQBRACKET:
-      out << "]";
+      std::cout << "]";
       break;
     case PunctuatorType::LEFTCURLYBRACE:
-      out << "{";
+      std::cout << "{";
       break;
     case PunctuatorType::RIGHTCURLYBRACE:
-      out << "}";
+      std::cout << "}";
       break;
     case PunctuatorType::COMMA:
-      out << ",";
+      std::cout << ",";
       break;
     case PunctuatorType::AMPERSAND:
-      out << "&";
+      std::cout << "&";
       break;
     case PunctuatorType::NOT:
-      out << "!";
+      std::cout << "!";
       break;
     case PunctuatorType::ILLEGAL:
-      out << "ILLEGAL";
+      std::cout << "ILLEGAL";
       break;
     default:
-      out << "ERROR"; //TODO
+      std::cout << "ERROR"; //TODO
       break;
   }
 }
@@ -120,18 +119,20 @@ template<> inline void PrettyPrinter::pprint<PunctuatorType>(PunctuatorType op) 
 template<> inline void PrettyPrinter::pprint<char>(char c) {
   switch (c) {
     case '\n':
-      out << '\n';
+      std::cout << '\n';
       for (int i = indentLevel; i >= 0; i--) {
-        out << '\t';
+        std::cout << '\t';
       }
+      break;
     default:
-      out << c;
+      std::cout << c;
+      break;
   }
 }
 
 template<> inline void PrettyPrinter::pprint<std::string>(std::string s)
 {
-  out << s;
+  std::cout << s;
 }
 
 }
