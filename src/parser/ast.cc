@@ -18,6 +18,10 @@
 #endif
 #define ADDINDENT()  do {indentLevel++;} while(0);
 #define REMOVEINDENT()  do {indentLevel--;} while(0);
+#define RESETINDENT() \
+  auto reset = indentLevel;\
+  indentLevel = 0;
+#define RESTOREINDENT() indentLevel = reset;
 
 
 using namespace Parsing;
@@ -296,8 +300,12 @@ PRETTY_PRINT(IterationStatement) {
 }
 
 PRETTY_PRINT(LabeledStatement) {
+  RESETINDENT();
+  PPRINT('\n');
   PPRINT(name);
-  PPRINT(std::string(": "));
+  PPRINT(std::string(":"));
+  RESTOREINDENT();
+  PPRINT('\n');
   PPRINT(statement);
 }
 
@@ -334,7 +342,6 @@ Declaration::Declaration(TypeNode t)
 PRETTY_PRINT(Declaration)
 {
   PPRINT(type);
-  PPRINT(' ');
   PPRINT(' ');
   if (declarator) {
     PPRINT(declarator);
