@@ -481,9 +481,13 @@ PRETTY_PRINT(Parameter) {
 
 PRETTY_PRINT(DeclaratorDirectDeclarator)
 {
-  /*TODO: unfinished*/
+  /*TODO: recheck parentheses, but I think this is correct*/
+  if (help) {
+    PPRINT('(');
+  }
   PPRINT(declarator);
   if (help) {
+    PPRINT(')');
     PPRINT(help);
   }
 }
