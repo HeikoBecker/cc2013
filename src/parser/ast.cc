@@ -2,7 +2,20 @@
 #include "pprinter.h"
 
 #define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
+#ifdef DEBUG
+/* Beware of macro magic
+ * This prints the name of function calling PPRINT, it's argument and finally
+ * any output produced by the function
+ */
+#define PPRINT(X)  do { \
+  pp.pprint(std::string("\n")+__PRETTY_FUNCTION__+"\t: ", 0);\
+  pp.pprint(std::string(#X) + ": ", 0);\
+  pp.pprint((X), indentLevel);\
+  pp.pprint('\n',0);\
+} while(0);
+#else
 #define PPRINT(X)  do {pp.pprint((X), indentLevel);} while(0);
+#endif
 #define ADDINDENT()  do {indentLevel++;} while(0);
 #define REMOVEINDENT()  do {indentLevel--;} while(0);
 
