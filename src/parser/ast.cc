@@ -169,10 +169,10 @@ PRETTY_PRINT(StructType) {
 
   if (name.length() > 0) {
     PPRINT(name);
-    PPRINT(' ');
   }
 
   if (!content.empty()) {
+    PPRINT('\n');
     PPRINT('{');
     ADDINDENT();
     PPRINT('\n');
@@ -185,7 +185,7 @@ PRETTY_PRINT(StructType) {
       for (auto subDeclarationPair : typeSubDeclarationPair.second) {
         PPRINT(subDeclarationPair.first);
         if (subDeclarationPair.second) {
-          PPRINT(' '); //TODO: this seems wrong
+          //PPRINT(' '); //TODO: this seems wrong
           PPRINT(subDeclarationPair.second);
         }
         PPRINT(';'); // <- FIXME: no idea if this belongs here, but probably correct
