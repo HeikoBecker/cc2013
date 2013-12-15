@@ -249,7 +249,7 @@ PRETTY_PRINT(SelectionStatement) {
   REMOVEINDENT();
 
   if (elseStatement) {
-    PPRINT('\n');
+    PPRINT(' ');
     PPRINT(std::string("else "));
     PPRINT(elseStatement);
   }
@@ -339,6 +339,7 @@ Declaration::Declaration(TypeNode t)
 
 PRETTY_PRINT(Declaration)
 {
+  PPRINT('\n');
   PPRINT(type);
   PPRINT(' ');
   if (declarator) {
