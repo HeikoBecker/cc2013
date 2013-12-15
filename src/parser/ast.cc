@@ -208,6 +208,7 @@ PRETTY_PRINT(CompoundStatement) {
   if (!g_skipNewLineBeforeBlockStatement) {
     PPRINT('\n');
   } else {
+    PPRINT(' ');
     g_skipNewLineBeforeBlockStatement = false; //FIXME: global variable!
   }
   PPRINT('{');
@@ -254,6 +255,7 @@ PRETTY_PRINT(SelectionStatement) {
   auto suppressedIndent = false;
   if (g_skipNewLineBeforeSelectionStatement) {
     g_skipNewLineBeforeSelectionStatement = false;
+    PPRINT(' ');
   } else {
     PPRINT('\n');
   }
@@ -286,7 +288,6 @@ PRETTY_PRINT(SelectionStatement) {
     } else {
       ADDINDENT();
     }
-    PPRINT(' ');
     PPRINT(elseStatement);
     if (!suppressedIndent) {
       REMOVEINDENT(); // only remove indentLevel if we have added one
