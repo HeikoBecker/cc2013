@@ -127,16 +127,13 @@ PRETTY_PRINT(BasicType)
   switch(type) {
     case INT:
       PPRINT(std::string("int"));
-      PPRINT(' ');
       break;
     case CHAR:
       PPRINT(std::string("char"));
-      PPRINT(' ');
       break;
     default :
       /*case VOID: */
       PPRINT(std::string("void"));
-      PPRINT(' ');
       break;
   }
 }
@@ -157,6 +154,7 @@ StructType::StructType(std::string name, StructContent content) : name(name), co
 }
 
 PRETTY_PRINT(StructType) {
+  // TODO: this looks way too complicated
   PPRINT(std::string("struct "));
 
   if (name.length() > 0) {
@@ -164,24 +162,29 @@ PRETTY_PRINT(StructType) {
     PPRINT(' ');
   }
 
-  PPRINT('{');
-  ADDINDENT();
-  PPRINT('\n');
-  
-  for (auto typeSubDeclarationPair : content) {
-    PPRINT(typeSubDeclarationPair.first);
-    for (auto subDeclarationPair : typeSubDeclarationPair.second) {
-      PPRINT(subDeclarationPair.first);
-      if (subDeclarationPair.second) {
-        PPRINT(' '); //TODO: this seems wrong
-        PPRINT(subDeclarationPair.second);
+  if (!content.empty()) {
+    PPRINT('{');
+    ADDINDENT();
+    PPRINT('\n');
+
+    for (auto typeSubDeclarationPair : content) {
+      PPRINT(typeSubDeclarationPair.first);
+      if (!typeSubDeclarationPair.second.empty()) {
+        PPRINT(' '); // print space between type and following stuff
       }
-      PPRINT(';'); // <- FIXME: no idea if this belongs here, but probably correct
+      for (auto subDeclarationPair : typeSubDeclarationPair.second) {
+        PPRINT(subDeclarationPair.first);
+        if (subDeclarationPair.second) {
+          PPRINT(' '); //TODO: this seems wrong
+          PPRINT(subDeclarationPair.second);
+        }
+        PPRINT(';'); // <- FIXME: no idea if this belongs here, but probably correct
+      }
     }
+    REMOVEINDENT();
+    PPRINT('\n');
+    PPRINT('}');
   }
-  REMOVEINDENT();
-  PPRINT('\n');
-  PPRINT('}');
 }
 
 CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
@@ -332,6 +335,7 @@ PRETTY_PRINT(Declaration)
 {
   PPRINT(type);
   PPRINT(' ');
+  PPRINT(' ');
   if (declarator) {
     PPRINT(declarator);
   }
@@ -371,6 +375,7 @@ PRETTY_PRINT(ExternalDeclaration) {
   /*TODO: unfinished */
   PPRINT(this->type);
   if (this->declarator) {
+    PPRINT(' ');
     PPRINT('('); // <- WTF, that's a really coding style
     PPRINT(this->declarator);
     PPRINT(')');
@@ -406,6 +411,7 @@ PRETTY_PRINT(Parameter) {
   /*TODO: unfinished*/
   PPRINT(type);
   if (declarator) {
+    PPRINT(' ');
     PPRINT(declarator);
   }
 }
