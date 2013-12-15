@@ -276,10 +276,14 @@ PRETTY_PRINT(SelectionStatement) {
   if (!suppressedIndent) {
     REMOVEINDENT();
   }
-  suppressedIndent = false;
 
   if (elseStatement) {
-    PPRINT('\n');
+    if (suppressedIndent) {
+      PPRINT(' ');
+      suppressedIndent = false;
+    } else {
+      PPRINT('\n');
+    }
     PPRINT(std::string("else"));
     // don't set a new indent level if we have a selection statement
     if (std::dynamic_pointer_cast<SelectionStatement>(elseStatement)) {
