@@ -1,6 +1,8 @@
 #include "ast.h"
 #include "pprinter.h"
 
+bool g_skipNewLine = false; // TODO: FIXME: global variables are BAD!
+
 #define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
 #ifdef DEBUG
 /* Beware of macro magic
@@ -202,7 +204,11 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 
 PRETTY_PRINT(CompoundStatement) {
   // TODO: unfinished, add special case for last statement regarding newline
-  PPRINT('\n');
+  if (!g_skipNewLine) {
+    PPRINT('\n');
+  } else {
+    g_skipNewLine = false; //FIXME: global variable!
+  }
   PPRINT('{');
   ADDINDENT();
   for (auto statement : subStatements) {
@@ -254,12 +260,13 @@ PRETTY_PRINT(SelectionStatement) {
   if (elseStatement) {
     PPRINT('\n');
     PPRINT(std::string("else"));
+    ADDINDENT();
     if (std::dynamic_pointer_cast<CompoundStatement>(elseStatement)) {
-     PPRINT(' ');
-    } else {
-      PPRINT('\n');
+      g_skipNewLine = true;
     }
+    PPRINT(' ');
     PPRINT(elseStatement);
+    REMOVEINDENT();
   }
 }
 
@@ -311,7 +318,6 @@ PRETTY_PRINT(LabeledStatement) {
   PPRINT(name);
   PPRINT(std::string(":"));
   RESTOREINDENT();
-  PPRINT('\n');
   PPRINT(statement);
 }
 
@@ -395,6 +401,7 @@ PRETTY_PRINT(ExternalDeclaration) {
     PPRINT(')');
     if (this->compoundStatement) {
       PPRINT(this->compoundStatement);
+      PPRINT('\n');
       return; // so that we don't print a semicolon
     }
   }
