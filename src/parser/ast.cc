@@ -423,10 +423,13 @@ TranslationUnit::TranslationUnit(
     ) : externalDeclarations(externalDeclarations) {}
 
 PRETTY_PRINT(TranslationUnit) {
-  /*TODO: unfinished */
+  auto size = externalDeclarations.size();
   for(auto externalDeclaration : externalDeclarations) {
     PPRINT(externalDeclaration);
-    PPRINT('\n');
+    if (size > 1) {
+      PPRINT('\n');
+      size--;
+    }
   }
 }
 
