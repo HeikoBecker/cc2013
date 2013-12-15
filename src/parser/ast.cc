@@ -66,7 +66,7 @@ PRETTY_PRINT(UnaryExpression)
 {
   PPRINT('(');
   PPRINT(this->op);
-  if (this->op == PunctuatorType::SIZEOF) {
+  if (this->op == PunctuatorType::SIZEOF && !(std::dynamic_pointer_cast<SizeOfExpression>(operand))) {
     PPRINT(' ');
   }
   PPRINT(this->operand);
