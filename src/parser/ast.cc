@@ -202,15 +202,8 @@ PRETTY_PRINT(CompoundStatement) {
   PPRINT('{');
   ADDINDENT();
   PPRINT('\n');
-  auto statement = this->subStatements.begin();
-  auto afterLastStatement = this->subStatements.end();
-  while (statement != afterLastStatement) { 
-    PPRINT(*statement);
-    auto next = ++statement;
-    if (next != afterLastStatement) {
-      PPRINT('\n');
-    }
-    statement = next;
+  for (auto statement : subStatements) {
+    PPRINT(statement);
   }
   REMOVEINDENT();
   PPRINT('\n');
@@ -225,6 +218,7 @@ PRETTY_PRINT(Pointer) {
 
 PRETTY_PRINT(ExpressionStatement) {
   // TODO : check whether this is working
+  PPRINT('\n');
   if (expression != NULL) {
     PPRINT(expression);
   }
@@ -251,32 +245,35 @@ PRETTY_PRINT(SelectionStatement) {
   PPRINT(expression);
   PPRINT(')');
   ADDINDENT();
-  PPRINT('\n');
   PPRINT(ifStatement);
   REMOVEINDENT();
-  PPRINT('\n');
 
   if (elseStatement) {
+    PPRINT('\n');
     PPRINT(std::string("else "));
     PPRINT(elseStatement);
   }
 }
 
 PRETTY_PRINT(GotoStatement) {
+  PPRINT('\n');
   PPRINT(std::string("goto "));
   PPRINT(label);
   PPRINT(';');
 }
 
 PRETTY_PRINT(ContinueStatement) {
+  PPRINT('\n');
   PPRINT(std::string("continue;"));
 }
 
 PRETTY_PRINT(BreakStatement) {
+  PPRINT('\n');
   PPRINT(std::string("break;"));
 }
 
 PRETTY_PRINT(ReturnStatement) {
+  PPRINT('\n');
   PPRINT(std::string("return "));
   if (expression != NULL) {
     PPRINT(expression);
@@ -285,6 +282,7 @@ PRETTY_PRINT(ReturnStatement) {
 }
 
 PRETTY_PRINT(IterationStatement) {
+  PPRINT('\n');
   if (kind == WHILE) {
     PPRINT(std::string("while ("));
     PPRINT(expression);
