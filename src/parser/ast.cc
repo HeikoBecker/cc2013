@@ -63,6 +63,9 @@ PRETTY_PRINT(UnaryExpression)
 {
   PPRINT('(');
   PPRINT(this->op);
+  if (this->op == PunctuatorType::SIZEOF) {
+    PPRINT(' ');
+  }
   PPRINT(this->operand);
   PPRINT(')');
 }
@@ -507,7 +510,6 @@ SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand)
 
 PRETTY_PRINT(SizeOfExpression)
 {
-  PPRINT(std::string("sizeof "));
   PPRINT('(');
   PPRINT(operand.first);
   if (operand.second) {
