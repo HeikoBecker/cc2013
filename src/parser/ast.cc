@@ -438,9 +438,13 @@ PRETTY_PRINT(ExternalDeclaration) {
   PPRINT(this->type);
   if (this->declarator) {
     PPRINT(' ');
-    PPRINT('('); // <- WTF, that's a really coding style
+    if (compoundStatement) {
+      PPRINT('('); // <- WTF, that's a really coding style
+    }
     PPRINT(this->declarator);
-    PPRINT(')');
+    if (compoundStatement) {
+      PPRINT(')');
+    }
     if (this->compoundStatement) {
       PPRINT(this->compoundStatement);
       PPRINT('\n');
@@ -481,14 +485,13 @@ PRETTY_PRINT(Parameter) {
 
 PRETTY_PRINT(DeclaratorDirectDeclarator)
 {
-  /*TODO: recheck parentheses, but I think this is correct*/
   if (help) {
     PPRINT('(');
   }
   PPRINT(declarator);
   if (help) {
-    PPRINT(')');
     PPRINT(help);
+    PPRINT(')');
   }
 }
 
