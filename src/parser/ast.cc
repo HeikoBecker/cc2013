@@ -202,9 +202,9 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 
 PRETTY_PRINT(CompoundStatement) {
   // TODO: unfinished, add special case for last statement regarding newline
+  PPRINT('\n');
   PPRINT('{');
   ADDINDENT();
-  PPRINT('\n');
   for (auto statement : subStatements) {
     PPRINT(statement);
   }
@@ -252,8 +252,13 @@ PRETTY_PRINT(SelectionStatement) {
   REMOVEINDENT();
 
   if (elseStatement) {
-    PPRINT(' ');
-    PPRINT(std::string("else "));
+    PPRINT('\n');
+    PPRINT(std::string("else"));
+    if (std::dynamic_pointer_cast<CompoundStatement>(elseStatement)) {
+     PPRINT(' ');
+    } else {
+      PPRINT('\n');
+    }
     PPRINT(elseStatement);
   }
 }
@@ -389,7 +394,6 @@ PRETTY_PRINT(ExternalDeclaration) {
     PPRINT(this->declarator);
     PPRINT(')');
     if (this->compoundStatement) {
-      PPRINT('\n');
       PPRINT(this->compoundStatement);
       return; // so that we don't print a semicolon
     }
