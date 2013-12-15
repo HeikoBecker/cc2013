@@ -1,7 +1,8 @@
 #include "ast.h"
 #include "pprinter.h"
 
-bool g_skipNewLine = false; // TODO: FIXME: global variables are BAD!
+bool g_skipNewLineBeforeBlockStatement = false; // TODO: FIXME: global variables are BAD!
+bool g_skipNewLineBeforeSelectionStatement = false; // TODO: FIXME: global variables are BAD!
 
 #define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
 #ifdef DEBUG
@@ -204,10 +205,10 @@ CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
 
 PRETTY_PRINT(CompoundStatement) {
   // TODO: unfinished, add special case for last statement regarding newline
-  if (!g_skipNewLine) {
+  if (!g_skipNewLineBeforeBlockStatement) {
     PPRINT('\n');
   } else {
-    g_skipNewLine = false; //FIXME: global variable!
+    g_skipNewLineBeforeBlockStatement = false; //FIXME: global variable!
   }
   PPRINT('{');
   ADDINDENT();
@@ -250,23 +251,46 @@ SelectionStatement::SelectionStatement(
 
 
 PRETTY_PRINT(SelectionStatement) {
+  auto suppressedIndent = false;
+  if (g_skipNewLineBeforeSelectionStatement) {
+    g_skipNewLineBeforeSelectionStatement = false;
+  } else {
+    PPRINT('\n');
+  }
   PPRINT(std::string("if ("));
   PPRINT(expression);
   PPRINT(')');
-  ADDINDENT();
+  if (std::dynamic_pointer_cast<CompoundStatement>(ifStatement)) {
+    suppressedIndent = true;
+    g_skipNewLineBeforeBlockStatement = true;
+  }
+  if (!suppressedIndent) {
+    ADDINDENT();
+  }
   PPRINT(ifStatement);
-  REMOVEINDENT();
+  if (!suppressedIndent) {
+    REMOVEINDENT();
+  }
+  suppressedIndent = false;
 
   if (elseStatement) {
     PPRINT('\n');
     PPRINT(std::string("else"));
-    ADDINDENT();
-    if (std::dynamic_pointer_cast<CompoundStatement>(elseStatement)) {
-      g_skipNewLine = true;
+    // don't set a new indent level if we have a selection statement
+    if (std::dynamic_pointer_cast<SelectionStatement>(elseStatement)) {
+      g_skipNewLineBeforeSelectionStatement = true;
+      suppressedIndent = true;
+    } else if (std::dynamic_pointer_cast<CompoundStatement>(elseStatement)) {
+      suppressedIndent = true;
+      g_skipNewLineBeforeBlockStatement = true;
+    } else {
+      ADDINDENT();
     }
     PPRINT(' ');
     PPRINT(elseStatement);
-    REMOVEINDENT();
+    if (!suppressedIndent) {
+      REMOVEINDENT(); // only remove indentLevel if we have added one
+    }
   }
 }
 
