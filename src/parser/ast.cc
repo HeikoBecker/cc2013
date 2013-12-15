@@ -333,7 +333,10 @@ PRETTY_PRINT(IterationStatement) {
   if (kind == WHILE) {
     PPRINT(std::string("while ("));
     PPRINT(expression);
-    PPRINT(std::string(")")); //FIXME: <- whitespace is required here, but only if this is followed by {
+    PPRINT(std::string(")"));
+    if (std::dynamic_pointer_cast<CompoundStatement>(statement)) {
+      g_skipNewLineBeforeBlockStatement = true;
+    }
     PPRINT(statement);
   } else { // kind == DO
     PPRINT(std::string("do "));
