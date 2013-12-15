@@ -353,7 +353,14 @@ PRETTY_PRINT(LabeledStatement) {
   PPRINT(name);
   PPRINT(std::string(":"));
   RESTOREINDENT();
-  PPRINT(statement);
+  if (   std::dynamic_pointer_cast<LabeledStatement>(statement)
+      || std::dynamic_pointer_cast<ReturnStatement>(statement)) {
+    PPRINT(statement);
+  } else {
+    ADDINDENT();
+    PPRINT(statement);
+    REMOVEINDENT();
+  }
 }
 
 PRETTY_PRINT(IdentifierList) {
