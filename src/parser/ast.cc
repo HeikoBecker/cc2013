@@ -317,7 +317,7 @@ PRETTY_PRINT(Declarator)
     PPRINT('*');
   }
   PPRINT(this->directDeclarator);
-  for (auto i = this->pointerCounter; i>1; --i) {
+  for (auto i = this->pointerCounter; i>0; --i) {
     PPRINT(')');
   }
 }
