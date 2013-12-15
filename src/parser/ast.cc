@@ -86,6 +86,7 @@ FunctionCall::FunctionCall(SubExpression funcName,
 
 PRETTY_PRINT(FunctionCall)
 {
+  PPRINT('(');
   PPRINT(funcName);
   PPRINT('(');
   if (!arguments.empty()) {
@@ -94,9 +95,11 @@ PRETTY_PRINT(FunctionCall)
         PPRINT(argument);
         if (--size != 0) {
           PPRINT(',');
+          PPRINT(' ');
         }
       }
   }
+  PPRINT(')');
   PPRINT(')');
 }
 
