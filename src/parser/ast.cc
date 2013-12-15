@@ -43,6 +43,12 @@ PRETTY_PRINT(BinaryExpression)
   PPRINT('(');
   PPRINT(this->lhs);
   switch (this->op) {
+    case PunctuatorType::ARRAY_ACCESS:
+      PPRINT('[');
+      PPRINT(this->rhs);
+      PPRINT(']');
+      return;
+      //break;
     case PunctuatorType::ARROW:
     case PunctuatorType::MEMBER_ACCESS:
       PPRINT(op);
