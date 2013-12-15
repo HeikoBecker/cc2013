@@ -375,10 +375,7 @@ PRETTY_PRINT(Declarator)
 {
   // TODO : unfinished, probably also broken
   for (auto i = this->pointerCounter; i>0; --i) {
-    if (i>0)
-    {
-      PPRINT('(');
-    }
+    PPRINT('(');
     PPRINT('*');
   }
   PPRINT(this->directDeclarator);
