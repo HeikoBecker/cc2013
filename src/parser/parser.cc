@@ -385,6 +385,8 @@ SubExpression Parser::expression(int minPrecedence = 0) {
   auto expr = computeAtom();
   // handle ternary operator
   auto isTernary = false;
+  // TODO: if we don't use Booleans isTernary and wasTernary can be merged
+  auto wasTernary = false;
   SubExpression ternaryHelper;
   if (testp(PunctuatorType::QMARK)) {
     scan();
@@ -402,6 +404,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     if (isTernary) {
       precNext = 2;
       isTernary = false;
+      wasTernary = true;
     } else {
       precNext = (isRightAssociative(*m_nextsym))
                  ? getPrec(*m_nextsym)
@@ -409,7 +412,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     }
     scan(); // this will either read the binary operator or ":" if we're parsing the ternary operator
     auto rhs = expression(precNext);
-    if (!isTernary) {
+    if (!wasTernary) {
       expr = make_shared<BinaryExpression>(expr, rhs, punctype);
     } else {
       expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs);
