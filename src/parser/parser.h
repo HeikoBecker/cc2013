@@ -24,6 +24,11 @@ namespace Parsing {
       ParsingException(std::string message) : std::runtime_error(message){};
   };
 
+  enum class ThreeValueBool {
+    DONTCARE, 
+    ABSTRACT,
+    NOTABSTRACT
+  };
 
   /* class for the Parsing
    * the parser takes a list of tokens
@@ -84,11 +89,11 @@ namespace Parsing {
       SubExpression sizeOfType();
       SubExpression constantExpression();
       DeclarationNode declaration();
-      SubDeclarator declarator(bool abstract = false);
+      SubDeclarator declarator(ThreeValueBool abstract = ThreeValueBool::ABSTRACT);
       SubDeclarator abstractDeclarator();
-      SubDirectDeclarator directDeclarator(bool abstract = false);
+      SubDirectDeclarator directDeclarator(ThreeValueBool abstract = ThreeValueBool::ABSTRACT);
       SubDirectDeclarator directAbstractDeclarator();
-      SubDirectDeclaratorHelp directDeclaratorHelp(bool abstract = false);
+      SubDirectDeclaratorHelp directDeclaratorHelp(ThreeValueBool abstract = ThreeValueBool::ABSTRACT);
       SubDirectDeclaratorHelp directAbstractDeclaratorHelp();
       TypeNode typeSpecifier();
       StructNode structOrUnionSpecifier();
