@@ -1,0 +1,4 @@
+int main(void) {
+  return sizeof(int *);
+  return sizeof(int (*));
+}
