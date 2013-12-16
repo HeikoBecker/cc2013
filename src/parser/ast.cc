@@ -385,7 +385,9 @@ PRETTY_PRINT(Declarator)
     PPRINT('(');
     PPRINT('*');
   }
-  PPRINT(this->directDeclarator);
+  if (directDeclarator) {
+    PPRINT(this->directDeclarator);
+  }
   for (auto i = this->pointerCounter; i>0; --i) {
     PPRINT(')');
   }
