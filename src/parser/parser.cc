@@ -591,8 +591,7 @@ ParameterNode Parser::parameterDeclaration() {
   if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
     return make_shared<Parameter>(type);
   } else {
-    auto decl = declarator();
-    // TODO distinguish abstract-declarator
+    auto decl = declarator(ThreeValueBool::DONTCARE);
     return make_shared<Parameter>(type, decl);
   }
 }
@@ -643,9 +642,12 @@ SubDeclarator Parser::declarator(ThreeValueBool abstract) {
   }
 
   Pointer pointer(counter); // TODO: Is this still needed?
-  SubDirectDeclarator dec = directDeclarator(abstract);
-
-  return make_shared<Declarator>(counter, dec);
+  if (!testp(PunctuatorType::RIGHTPARENTHESIS) && abstract != ThreeValueBool::ABSTRACT) {
+    SubDirectDeclarator dec = directDeclarator(abstract);
+    return make_shared<Declarator>(counter, dec);
+  } else {
+    return make_shared<Declarator>(counter, decltype(directDeclarator(abstract))());
+  }
 }
 
 /*
@@ -684,7 +686,13 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
       return make_shared<DeclaratorDirectDeclarator>(dec);
     }
   } else {
-    expectedAnyOf(std::string("error in direct Declarator"));
+    if (abstract == ThreeValueBool::ABSTRACT) {
+      expectedAnyOf(std::string("error in abstract direct Declarator"));
+    } else if (abstract == ThreeValueBool::NOTABSTRACT) {
+      expectedAnyOf(std::string("error in direct Declarator"));
+    } else {
+      expectedAnyOf(std::string("error in dontcare direct Declarator"));
+    }
   }
 }
 
