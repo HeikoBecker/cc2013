@@ -47,6 +47,7 @@ PRETTY_PRINT(BinaryExpression)
       PPRINT('[');
       PPRINT(this->rhs);
       PPRINT(']');
+      PPRINT(')');
       return;
       //break;
     case PunctuatorType::ARROW:
