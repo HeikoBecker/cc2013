@@ -654,7 +654,8 @@ SubDeclarator Parser::declarator(ThreeValueBool abstract) {
   }
 
   Pointer pointer(counter); // TODO: Is this still needed?
-  if (!testp(PunctuatorType::RIGHTPARENTHESIS) && abstract != ThreeValueBool::ABSTRACT) {
+  // TODO: is the if below correct?
+  if (!testp(PunctuatorType::RIGHTPARENTHESIS) || abstract != ThreeValueBool::ABSTRACT) {
     SubDirectDeclarator dec = directDeclarator(abstract);
     return make_shared<Declarator>(counter, dec);
   } else {
