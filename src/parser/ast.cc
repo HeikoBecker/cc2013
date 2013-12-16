@@ -350,7 +350,7 @@ PRETTY_PRINT(IterationStatement) {
     PPRINT(statement);
     PPRINT(std::string("while ("));
     PPRINT(expression);
-    PPRINT(std::string("));"));
+    PPRINT(std::string(");"));
   }
 }
 
