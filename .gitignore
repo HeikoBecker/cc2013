@@ -5,3 +5,4 @@ compiler.files
 compiler.includes
 /build
 *.swp
+*.pyc
