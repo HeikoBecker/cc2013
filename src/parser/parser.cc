@@ -44,19 +44,31 @@ void Parser::expect(std::string s) {
 
 void Parser::expect(PunctuatorType puncutator) {
   if (!testp(puncutator)) {
-    reportError();
+    auto msg = std::string("Expected ");
+    msg += "TODO";
+    msg += std::string(" but got ");
+    msg += m_nextsym->value();
+    reportError(msg);
   }
 }
 
 void Parser::expect(KeywordType keyword) {
   if (!testk(keyword)) {
-    reportError();
+    auto msg = std::string("Expected ");
+    msg += "TODO";
+    msg += std::string(" but got ");
+    msg += m_nextsym->value();
+    reportError(msg);
   }
 }
 
 void Parser::expect(TokenType tokenType) {
   if (getNextType() != tokenType) {
-    reportError();
+    auto msg = std::string("Expected ");
+    msg += "TODO";
+    msg += std::string(" but got ");
+    msg += m_nextsym->value();
+    reportError(msg);
   }
 }
 
