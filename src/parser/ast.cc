@@ -185,9 +185,9 @@ PRETTY_PRINT(StructType) {
     PPRINT('\n');
     PPRINT('{');
     ADDINDENT();
-    PPRINT('\n');
 
     for (auto typeSubDeclarationPair : content) {
+      PPRINT('\n');
       PPRINT(typeSubDeclarationPair.first);
       if (!typeSubDeclarationPair.second.empty()) {
         PPRINT(' '); // print space between type and following stuff
