@@ -656,7 +656,9 @@ direct-declarator -> identifier direct-declarator_help
 
 */
 SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
-  if ((abstract == ThreeValueBool::NOTABSTRACT || abstract == ThreeValueBool::DONTCARE) && testType(TokenType::IDENTIFIER)) {
+  if (   (   abstract == ThreeValueBool::NOTABSTRACT
+          || abstract == ThreeValueBool::DONTCARE)
+      && testType(TokenType::IDENTIFIER)) {
     std::string identifier = m_nextsym->value();
     scan();
 
