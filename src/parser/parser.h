@@ -89,11 +89,11 @@ namespace Parsing {
       SubExpression sizeOfType();
       SubExpression constantExpression();
       DeclarationNode declaration();
-      SubDeclarator declarator(ThreeValueBool abstract = ThreeValueBool::ABSTRACT);
+      SubDeclarator declarator(ThreeValueBool abstract = ThreeValueBool::NOTABSTRACT);
       SubDeclarator abstractDeclarator();
-      SubDirectDeclarator directDeclarator(ThreeValueBool abstract = ThreeValueBool::ABSTRACT);
+      SubDirectDeclarator directDeclarator(ThreeValueBool abstract = ThreeValueBool::NOTABSTRACT);
       SubDirectDeclarator directAbstractDeclarator();
-      SubDirectDeclaratorHelp directDeclaratorHelp(ThreeValueBool abstract = ThreeValueBool::ABSTRACT);
+      SubDirectDeclaratorHelp directDeclaratorHelp(ThreeValueBool abstract = ThreeValueBool::NOTABSTRACT);
       SubDirectDeclaratorHelp directAbstractDeclaratorHelp();
       TypeNode typeSpecifier();
       StructNode structOrUnionSpecifier();
