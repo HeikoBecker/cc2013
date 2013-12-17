@@ -460,6 +460,7 @@ PRETTY_PRINT(ExternalDeclaration) {
       return; // so that we don't print a semicolon
     }
   }
+  // TODO: move semicolon printing to declarations
   PPRINT(';'); // declarations end with an ;
   PPRINT('\n');
 }
