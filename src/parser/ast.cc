@@ -1,5 +1,6 @@
 #include "ast.h"
 #include "pprinter.h"
+#include "parser.h"
 
 bool g_skipNewLineBeforeBlockStatement = false; // TODO: FIXME: global variables are BAD!
 bool g_skipNewLineBeforeSelectionStatement = false; // TODO: FIXME: global variables are BAD!
@@ -138,7 +139,7 @@ BasicType::BasicType(std::string type) {
   } else if (type == "void") {
     this->type = VOID;
   } else {
-    throw type + " is not a Basic Type";
+    throw ParsingException(type + " is not a Basic Type");
   }
 }
 

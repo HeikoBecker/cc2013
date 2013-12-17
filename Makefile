@@ -29,8 +29,8 @@ DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
 
 all: $(BIN)
 
-debug: CFLAGS += -DDEBUG -g -Wextra -pedantic-errors
-debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors
+debug: CFLAGS += -DDEBUG -g -Wextra -pedantic-errors -O0
+debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors -O0
 debug: $(BIN)
 
 -include $(CFG).cfg
