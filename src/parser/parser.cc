@@ -188,6 +188,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   }
 
   // it is a functionDefition! 
+  expect("{");
   auto compStat = compoundStatement();
   return make_shared<ExternalDeclaration>(type, decl, compStat);
 }
