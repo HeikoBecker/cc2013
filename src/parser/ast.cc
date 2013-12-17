@@ -457,11 +457,17 @@ PRETTY_PRINT(ExternalDeclaration) {
     if (this->compoundStatement) {
       PPRINT(this->compoundStatement);
       PPRINT('\n');
+#ifdef DEBUG
+      PPRINT(std::string("ExternalDeclaration END"));
+#endif
       return; // so that we don't print a semicolon
     }
   }
   // TODO: move semicolon printing to declarations
   PPRINT(';'); // declarations end with an ;
+#ifdef DEBUG
+      PPRINT(std::string("ExternalDeclaration END"));
+#endif
   PPRINT('\n');
 }
 

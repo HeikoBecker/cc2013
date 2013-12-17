@@ -1,0 +1,1 @@
+struct name { int test;} { }
