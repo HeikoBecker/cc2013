@@ -10,6 +10,8 @@
 #include "../lexer/punctuatortype.h"
 #include "../lexer/keywordtokentype.h"
 
+#define OBTAIN_POS() auto pos = m_nextsym->pos();
+
 using namespace Lexing;
 using namespace Parsing;
 
@@ -162,42 +164,45 @@ AstRoot Parser::parse() {
 }
 
 TUNode Parser::translationUnit() {
+  OBTAIN_POS();
   std::vector<ExternalDeclarationNode> externalDeclarations {};
   while (!testType(TokenType::END)) {
      externalDeclarations.push_back(externalDeclaration());
   }
-  return make_shared<TranslationUnit>(externalDeclarations);
+  return make_shared<TranslationUnit>(externalDeclarations, pos);
 }
 
 ExternalDeclarationNode Parser::externalDeclaration() {
 
   // functionDefintion or declaration ?
+  OBTAIN_POS();
   auto type = typeSpecifier();
 
   if (testp(";")) {
     // it was a declaration
     scan();
-    return make_shared<ExternalDeclaration>(type);
+    return make_shared<ExternalDeclaration>(type, pos);
   }
   auto decl = declarator();
 
   if (testp(";")) {
     scan();
     // it was a declaration()
-    return make_shared<ExternalDeclaration>(type, decl);
+    return make_shared<ExternalDeclaration>(type, decl, pos);
   }
 
   // it is a functionDefition! 
   expect("{");
   auto compStat = compoundStatement();
-  return make_shared<ExternalDeclaration>(type, decl, compStat);
+  return make_shared<ExternalDeclaration>(type, decl, compStat, pos);
 }
 
 TypeNode Parser::typeSpecifier() {
+  OBTAIN_POS();
   if (testk("struct")) {
     return structOrUnionSpecifier();
   } else {
-    auto type = std::make_shared<BasicType>(m_nextsym->value());
+    auto type = std::make_shared<BasicType>(m_nextsym->value(), pos);
     scan();
     return type;
   }
@@ -279,6 +284,7 @@ static inline bool isRightAssociative(Token t) {
 }
 
 SubExpression Parser::postfixExpression(SubExpression child) {
+  OBTAIN_POS();
     auto cont = true;
     while (cont) {
       if (testp(PunctuatorType::LEFTPARENTHESIS)) { //function call operator
@@ -303,20 +309,20 @@ SubExpression Parser::postfixExpression(SubExpression child) {
         }
         expect(PunctuatorType::RIGHTPARENTHESIS);
         scan(); // now we've read the closing ")"
-        child = make_shared<FunctionCall>(child, arguments);
+        child = make_shared<FunctionCall>(child, arguments, pos);
       } else if (testp(PunctuatorType::LEFTSQBRACKET)) { //array access(?). TODO: Are expressions supported in []?
         scan();
         auto index = expression(0);
         expect(PunctuatorType::RIGHTSQBRACKET);
         scan();
-        child = make_shared<BinaryExpression>(child,index, PunctuatorType::ARRAY_ACCESS);
+        child = make_shared<BinaryExpression>(child,index, PunctuatorType::ARRAY_ACCESS, pos);
       } else if (testp(PunctuatorType::ARROW) || testp(PunctuatorType::MEMBER_ACCESS)) { // member access
         PunctuatorType p = (testp(PunctuatorType::MEMBER_ACCESS)) ? PunctuatorType::MEMBER_ACCESS
                                         : PunctuatorType::ARROW;
         scan();
         expect(TokenType::IDENTIFIER);
-        auto var = make_shared<VariableUsage>(m_nextsym->value());
-        child = make_shared<BinaryExpression>(child, var, p);
+        auto var = make_shared<VariableUsage>(m_nextsym->value(), pos);
+        child = make_shared<BinaryExpression>(child, var, p, pos);
         scan();
       } else {
         cont = !cont;
@@ -326,6 +332,7 @@ SubExpression Parser::postfixExpression(SubExpression child) {
 }
 
 SubExpression Parser::computeAtom() {
+  OBTAIN_POS();
   if (testp(PunctuatorType::LEFTPARENTHESIS)) { 
     // parse expression in parentheses
     scan();
@@ -340,7 +347,7 @@ SubExpression Parser::computeAtom() {
              || m_nextsym->type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
     // maybe followed by one of ., ->, [], ()
-    auto var = std::make_shared<VariableUsage>(m_nextsym->value());
+    auto var = std::make_shared<VariableUsage>(m_nextsym->value(), pos);
     auto cont = m_nextsym->type() == TokenType::IDENTIFIER;
     scan();
     auto child = SubExpression(var);
@@ -374,7 +381,7 @@ SubExpression Parser::computeAtom() {
     } else {
       operand = expression(precNext);
     }
-    return make_shared<UnaryExpression>(op, operand);
+    return make_shared<UnaryExpression>(op, operand, pos);
   } else {
     // something went wrong
     // TODO: LATER: return error expression object
@@ -385,16 +392,18 @@ SubExpression Parser::computeAtom() {
 }
 
 SubExpression Parser::sizeOfType() {
+  OBTAIN_POS();
   // TODO: actually construct AST class
   scan(); // read starting parenthesis
   // read type
   auto type = typeName();
   expect(PunctuatorType::RIGHTPARENTHESIS);
   scan();  // read closing parenthesis
-  return make_shared<SizeOfExpression>(type);
+  return make_shared<SizeOfExpression>(type, pos);
 }
 
 SubExpression Parser::expression(int minPrecedence = 0) {
+  OBTAIN_POS();
   auto expr = computeAtom();
   // handle ternary operator
   auto isTernary = false;
@@ -426,9 +435,9 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     scan(); // this will either read the binary operator or ":" if we're parsing the ternary operator
     auto rhs = expression(precNext);
     if (!wasTernary) {
-      expr = make_shared<BinaryExpression>(expr, rhs, punctype);
+      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos);
     } else {
-      expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs);
+      expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs, pos);
     }
   }
   return expr;
@@ -436,15 +445,16 @@ SubExpression Parser::expression(int minPrecedence = 0) {
 
 DeclarationNode Parser::declaration() {
 
+  OBTAIN_POS();
   auto type = typeSpecifier();
   if (testp(";")) {
     scan();
-    return std::make_shared<Declaration>(type);
+    return std::make_shared<Declaration>(type, pos);
   } else {
     auto decl = declarator();
     expect(PunctuatorType::SEMICOLON);
     scan();
-    return std::make_shared<Declaration>(type, decl);
+    return std::make_shared<Declaration>(type, decl, pos);
   }
 }
 
@@ -454,6 +464,7 @@ struct-or-union-specifier -> "struct" identifier "{" struct-declarations-list "}
                                                         | "struct"  identifier
 */
 StructNode Parser::structOrUnionSpecifier() {
+  OBTAIN_POS();
   expect("struct");
   scan();
 
@@ -467,16 +478,16 @@ StructNode Parser::structOrUnionSpecifier() {
       auto structDecLst = structDeclarationList();
       expect(PunctuatorType::RIGHTCURLYBRACE);
       scan();
-      return make_shared<StructType>(name, structDecLst);
+      return make_shared<StructType>(name, structDecLst, pos);
     }
 
-    return make_shared<StructType>(name);
+    return make_shared<StructType>(name, pos);
   } else if(testp("{")) {
     scan();
     auto structDecLst = structDeclarationList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
-    return make_shared<StructType>("",structDecLst);
+    return make_shared<StructType>("",structDecLst, pos);
   } else {
     expectedAnyOf();
   }
@@ -600,12 +611,13 @@ auto Parser::directAbstractDeclaratorHelp() -> decltype(Parser::directAbstractDe
  | declarations-specifiers
 */
 ParameterNode Parser::parameterDeclaration() {
+  OBTAIN_POS();
   auto type = typeSpecifier();
   if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
-    return make_shared<Parameter>(type);
+    return make_shared<Parameter>(type, pos);
   } else {
     auto decl = declarator(ThreeValueBool::DONTCARE);
-    return make_shared<Parameter>(type, decl);
+    return make_shared<Parameter>(type, decl, pos);
   }
 }
 /*
@@ -613,6 +625,7 @@ identifier-list ->  identifier
                   | identifier "," identifier-list
 */
 SubIdentifierList Parser::identifierList() {
+  OBTAIN_POS();
   std::vector<std::string> myList;
 
   expect(TokenType::IDENTIFIER);
@@ -627,7 +640,7 @@ SubIdentifierList Parser::identifierList() {
     scan();
   }
 
-  return make_shared<IdentifierList>(myList);
+  return make_shared<IdentifierList>(myList, pos);
 }
 
 std::pair<TypeNode, SubDeclarator>  Parser::typeName() {
@@ -645,6 +658,7 @@ declarator ->   pointer direct-declarator
               | direct-declarator
 */
 SubDeclarator Parser::declarator(ThreeValueBool abstract) {
+  OBTAIN_POS();
   int counter = 0;
 
   if(test(TokenType::PUNCTUATOR,"*")) {
@@ -654,13 +668,15 @@ SubDeclarator Parser::declarator(ThreeValueBool abstract) {
     }
   }
 
-  Pointer pointer(counter); // TODO: Is this still needed?
+  Pointer pointer(counter, pos); // TODO: Is this still needed?
   // TODO: is the if below correct?
   if (!testp(PunctuatorType::RIGHTPARENTHESIS) || abstract != ThreeValueBool::ABSTRACT) {
     SubDirectDeclarator dec = directDeclarator(abstract);
-    return make_shared<Declarator>(counter, dec);
+    return make_shared<Declarator>(counter, dec, pos);
   } else {
-    return make_shared<Declarator>(counter, decltype(directDeclarator(abstract))());
+    return make_shared<Declarator>(counter,
+        decltype(directDeclarator(abstract))(),
+        pos);
   }
 }
 
@@ -670,6 +686,7 @@ direct-declarator -> identifier direct-declarator_help
 
 */
 SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
+  OBTAIN_POS();
   if (   (   abstract == ThreeValueBool::NOTABSTRACT
           || abstract == ThreeValueBool::DONTCARE)
       && testType(TokenType::IDENTIFIER)) {
@@ -678,9 +695,9 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
       SubDirectDeclaratorHelp help =  directDeclaratorHelp(ThreeValueBool::NOTABSTRACT);
-      return make_shared<IdentifierDirectDeclarator>(identifier, help);
+      return make_shared<IdentifierDirectDeclarator>(identifier, help, pos);
     } else {
-      return make_shared<IdentifierDirectDeclarator>(identifier);
+      return make_shared<IdentifierDirectDeclarator>(identifier, pos);
     }
 
   } else if (testp(PunctuatorType::LEFTPARENTHESIS)) {
@@ -697,9 +714,9 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
       SubDirectDeclaratorHelp help = directDeclaratorHelp(abstract);
-      return make_shared<DeclaratorDirectDeclarator>(dec,help);
+      return make_shared<DeclaratorDirectDeclarator>(dec,help, pos);
     } else {
-      return make_shared<DeclaratorDirectDeclarator>(dec);
+      return make_shared<DeclaratorDirectDeclarator>(dec, pos);
     }
   } else {
     if (abstract == ThreeValueBool::ABSTRACT) {
@@ -719,6 +736,7 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
                                        | EPSILON
 */
 SubDirectDeclaratorHelp Parser::directDeclaratorHelp(ThreeValueBool abstract) {
+  OBTAIN_POS();
   if (testp(PunctuatorType::LEFTPARENTHESIS)) { // TODO: use expect instead of testp
     scan();
 
@@ -729,9 +747,9 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp(ThreeValueBool abstract) {
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         declHelp = directDeclaratorHelp(abstract);
-        return make_shared<DirectDeclaratorHelp>(declHelp);
+        return make_shared<DirectDeclaratorHelp>(declHelp, pos);
       } else {
-        return make_shared<DirectDeclaratorHelp>();
+        return make_shared<DirectDeclaratorHelp>(pos);
       }
 
     } else if (testTypeSpecifier()) { // parameter-list
@@ -741,9 +759,9 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp(ThreeValueBool abstract) {
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         declHelp = directDeclaratorHelp(abstract);
-        return make_shared<DirectDeclaratorHelp>(params, declHelp);
+        return make_shared<DirectDeclaratorHelp>(params, declHelp ,pos);
       }
-      return make_shared<DirectDeclaratorHelp>(params);
+      return make_shared<DirectDeclaratorHelp>(params, pos);
     } else if((abstract == ThreeValueBool::NOTABSTRACT || abstract == ThreeValueBool::DONTCARE) && testType(TokenType::IDENTIFIER)) {
       auto ids = identifierList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
@@ -751,9 +769,9 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp(ThreeValueBool abstract) {
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
         declHelp = directDeclaratorHelp(ThreeValueBool::NOTABSTRACT);
-        return make_shared<DirectDeclaratorHelp>(ids, declHelp);
+        return make_shared<DirectDeclaratorHelp>(ids, declHelp, pos);
       }
-      return make_shared<DirectDeclaratorHelp>(ids);
+      return make_shared<DirectDeclaratorHelp>(ids, pos);
     } else {
       expectedAnyOf();
     }
@@ -769,6 +787,7 @@ compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
 */
 SubCompoundStatement Parser::compoundStatement() {
+  OBTAIN_POS();
 
   expect(PunctuatorType::LEFTCURLYBRACE);
   scan();
@@ -776,12 +795,12 @@ SubCompoundStatement Parser::compoundStatement() {
   decltype(blockItemList()) subStatements {}; 
   if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
     scan();
-    return make_shared<CompoundStatement>(subStatements);
+    return make_shared<CompoundStatement>(subStatements, pos);
   } else {
     subStatements = blockItemList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
-    return make_shared<CompoundStatement>(subStatements);
+    return make_shared<CompoundStatement>(subStatements, pos);
   }
 }
 
@@ -847,9 +866,10 @@ SubStatement Parser::statement() {
  expression-statement -> ";" | expression ";"
  */
 SubExpressionStatement Parser::expressionStatement() {
+  OBTAIN_POS();
   if (testp(PunctuatorType::SEMICOLON)) {
     scan();
-    return make_shared<ExpressionStatement>();
+    return make_shared<ExpressionStatement>(pos);
   } else {
     SubExpression ex = expression();
 
@@ -859,7 +879,7 @@ SubExpressionStatement Parser::expressionStatement() {
       expectedAnyOf();
     }
 
-    return make_shared<ExpressionStatement>(ex);
+    return make_shared<ExpressionStatement>(ex, pos);
   }
 }
 
@@ -867,6 +887,7 @@ SubExpressionStatement Parser::expressionStatement() {
 labeled-statement -> identifier : statement
 */
 SubLabeledStatement Parser::labeledStatement() {
+  OBTAIN_POS();
   if(testType(TokenType::IDENTIFIER)) {
     std::string label = m_nextsym->value();
     scan();
@@ -875,7 +896,7 @@ SubLabeledStatement Parser::labeledStatement() {
 
     SubStatement st = statement();
 
-    return make_shared<LabeledStatement>(label,st);
+    return make_shared<LabeledStatement>(label,st, pos);
   } else {
     expectedAnyOf(std::string("labeled-statement : identifier expected"));
   }
@@ -887,6 +908,7 @@ iteration-statement ->  "while" "(" expression ")" statement
 
 */
 SubIterationStatement Parser::iterationStatement() {
+  OBTAIN_POS();
   if(testk(KeywordType::WHILE)) {
     scan();
     expect(PunctuatorType::LEFTPARENTHESIS);
@@ -895,7 +917,7 @@ SubIterationStatement Parser::iterationStatement() {
     expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     SubStatement st = statement();
-    return make_shared<IterationStatement>(ex, st, IterationEnum::WHILE);
+    return make_shared<IterationStatement>(ex, st, IterationEnum::WHILE, pos);
   } else if (testk(KeywordType::DO)) {
     scan();
     SubStatement st = statement();
@@ -909,7 +931,7 @@ SubIterationStatement Parser::iterationStatement() {
     expect(";");
     scan();
 
-    return make_shared<IterationStatement>(ex, st, IterationEnum::DOWHILE);
+    return make_shared<IterationStatement>(ex, st, IterationEnum::DOWHILE, pos);
 
   } else {
     expectedAnyOf(std::string("iteration-statement : no match found"));
@@ -923,6 +945,7 @@ selection-statement ->   "if" "(" expression ")" statement
 */
 
 SubSelectionStatement Parser::selectionStatement() {
+  OBTAIN_POS();
   if (testk(KeywordType::IF)) {
     scan();
 
@@ -936,9 +959,9 @@ SubSelectionStatement Parser::selectionStatement() {
     if(testk(KeywordType::ELSE)) {
       scan();
       SubStatement st2 = statement();
-      return make_shared<SelectionStatement>(ex, st1, st2);
+      return make_shared<SelectionStatement>(ex, st1, st2, pos);
     } else {
-      return make_shared<SelectionStatement>(ex, st1);
+      return make_shared<SelectionStatement>(ex, st1, pos);
     }
   } else {
     expectedAnyOf(std::string("selectionStatement: no match"));
@@ -954,11 +977,12 @@ jump-statement ->
   "return" ";"
 */
 SubJumpStatement Parser::jumpStatement() {
+  OBTAIN_POS();
   if (testk(KeywordType::GOTO)) {
     scan();
     if(testType(TokenType::IDENTIFIER)) {
 
-      SubJumpStatement gotoStatement = make_shared<GotoStatement>(m_nextsym->value());
+      SubJumpStatement gotoStatement = make_shared<GotoStatement>(m_nextsym->value(), pos);
       scan();
 
       expect(";");
@@ -973,25 +997,25 @@ SubJumpStatement Parser::jumpStatement() {
     expect(";");
     scan();
 
-    return make_shared<ContinueStatement>();
+    return make_shared<ContinueStatement>(pos);
   } else if (testk(KeywordType::BREAK)) {
     scan();
     expect(";");
     scan();
-    return make_shared<BreakStatement>();
+    return make_shared<BreakStatement>(pos);
   } else if (testk(KeywordType::RETURN)){
     scan();
 
     if(testp(PunctuatorType::SEMICOLON)) {
       scan();
 
-      return make_shared<ReturnStatement>();
+      return make_shared<ReturnStatement>(pos);
     } else {
       SubExpression sub = expression();
       expect(";");
       scan();
 
-      return make_shared<ReturnStatement>(sub);
+      return make_shared<ReturnStatement>(sub, pos);
     }
   } else {
     expectedAnyOf(std::string("jump-statement : unexpected token"));

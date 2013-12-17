@@ -6,10 +6,14 @@
 #include <vector>
 #include <typeinfo>
 #include "../lexer/punctuatortype.h"
+#include "../pos.h"
 #include "pprinter.h"
 
 /* This macro allows an easy switching of pprint in all methods*/
 #define PPRINTABLE  void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel = 0) override;
+
+/* This macro is used in intermediate classes */
+#define CONS_INTER(X) protected : X(Pos pos) : AstNode(pos){};
 
 /**
  * This macro is meant to simplify a later transition from virtual inheritance
@@ -27,6 +31,8 @@ namespace Parsing {
 
 class AstNode
 {
+  protected:
+    AstNode(Pos pos) : m_pos(std::move(pos)) {};
   public:
     virtual ~AstNode() {};
     virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel) {
@@ -34,9 +40,15 @@ class AstNode
       pp.pprint(std::string(typeid(*this).name()), indentLevel);
       pp.pprint('\n', indentLevel);
     };
+    Pos inline pos() {return m_pos;}
+  private:
+    Pos m_pos;
 };
 
-class ASTNODE(Expression) { };
+class ASTNODE(Expression) 
+{
+    CONS_INTER(Expression)
+};
 
 typedef std::shared_ptr<AstNode> AstChild;
 typedef std::shared_ptr<AstNode> AstRoot;
@@ -49,7 +61,8 @@ class EXPRESSION(BinaryExpression)
   public:
     BinaryExpression(SubExpression lhs,
                      SubExpression rhs,
-                     PunctuatorType op);
+                     PunctuatorType op,
+                     Pos pos);
     PPRINTABLE
   private:
     SubExpression lhs;
@@ -61,7 +74,8 @@ class EXPRESSION(UnaryExpression)
 {
   public:
    UnaryExpression(PunctuatorType op,
-       SubExpression operand);
+       SubExpression operand,
+       Pos pos);
    PPRINTABLE
   private:
    SubExpression operand;
@@ -71,7 +85,7 @@ class EXPRESSION(UnaryExpression)
 class EXPRESSION(VariableUsage)
 {
   public:
-    VariableUsage(std::string name);
+    VariableUsage(std::string name, Pos pos);
     PPRINTABLE
   private:
     std::string name;
@@ -81,7 +95,8 @@ class EXPRESSION(FunctionCall)
 {
   public:
     FunctionCall(SubExpression funcName,
-                 std::vector<SubExpression> arguments);
+                 std::vector<SubExpression> arguments,
+                 Pos pos);
     PPRINTABLE
   private:
     SubExpression funcName;
@@ -93,7 +108,8 @@ class EXPRESSION(TernaryExpression)
   public:
     TernaryExpression(SubExpression condition,
                       SubExpression lhs, 
-                      SubExpression rhs);
+                      SubExpression rhs,
+                      Pos);
     PPRINTABLE
   private:
     SubExpression condition;
@@ -101,12 +117,15 @@ class EXPRESSION(TernaryExpression)
     SubExpression rhs;
 };
 
-class ASTNODE(Type) {};
+class ASTNODE(Type)
+{
+  CONS_INTER(Type)
+};
 
 class TYPE(BasicType) {
   // this type includes int/char/void  
   public:
-    BasicType(std::string str);
+    BasicType(std::string str, Pos pos);
     PPRINTABLE
   
   private:
@@ -119,14 +138,17 @@ class TYPE(BasicType) {
     ReturnType type;
 };
 
-class ASTNODE(Statement) {};
+class ASTNODE(Statement) 
+{
+  CONS_INTER(Statement)
+};
 
 typedef std::shared_ptr<Statement> SubStatement;
 
 class STATEMENT(CompoundStatement) {
   public:
     // TODO add inner blocks here
-    CompoundStatement(std::vector<BlockItem> subStatements);
+    CompoundStatement(std::vector<BlockItem> subStatements, Pos pos);
     PPRINTABLE
   private:
     std::vector<BlockItem> subStatements;
@@ -134,8 +156,8 @@ class STATEMENT(CompoundStatement) {
 
 class STATEMENT(ExpressionStatement) {
   public:
-    ExpressionStatement() { };
-    ExpressionStatement(SubExpression ex) :expression(ex) { };
+    ExpressionStatement(Pos pos);
+    ExpressionStatement(SubExpression ex, Pos pos);
     PPRINTABLE
 
   private:
@@ -144,7 +166,7 @@ class STATEMENT(ExpressionStatement) {
 
 class ASTNODE(Pointer) {
   public:
-    Pointer(int counter) : counter(counter) { } ;
+    Pointer(int counter, Pos pos) : AstNode(pos), counter(counter) {};
     PPRINTABLE
 
   private:
@@ -154,11 +176,12 @@ class ASTNODE(Pointer) {
 class STATEMENT(SelectionStatement) {
   public:
     PPRINTABLE
-    SelectionStatement(SubExpression ex, SubStatement ifStatement);
+    SelectionStatement(SubExpression ex, SubStatement ifStatement, Pos pos);
     SelectionStatement(
       SubExpression ex, 
       SubStatement ifStatement, 
-      SubStatement elseStatement
+      SubStatement elseStatement, 
+      Pos pos
     );
 
   // TODO : get rid of hasElseStatement ?
@@ -168,12 +191,15 @@ class STATEMENT(SelectionStatement) {
     SubStatement elseStatement;
 };
 
-class STATEMENT(JumpStatement) { };
+class STATEMENT(JumpStatement) { 
+  protected:
+    JumpStatement(Pos pos) : Statement(pos) {};
+};
 
 class JUMPSTATEMENT(GotoStatement) {
   public:
     PPRINTABLE
-    GotoStatement(std::string label) : label(label) {};
+    GotoStatement(std::string label, Pos pos);
 
   private:
     std::string label;
@@ -182,20 +208,20 @@ class JUMPSTATEMENT(GotoStatement) {
 class JUMPSTATEMENT(ContinueStatement) {
   public:
     PPRINTABLE
-    ContinueStatement() { };
+    ContinueStatement(Pos pos);
 };
 
 class JUMPSTATEMENT(BreakStatement) {
   public:
     PPRINTABLE
-    BreakStatement() { };
+    BreakStatement(Pos pos);
 };
 
 class JUMPSTATEMENT(ReturnStatement) {
   public:
     PPRINTABLE
-    ReturnStatement() { };
-    ReturnStatement(SubExpression ex) :expression(ex) { };
+    ReturnStatement(Pos pos);
+    ReturnStatement(SubExpression ex, Pos pos);
   
   private:
     SubExpression expression;
@@ -216,7 +242,10 @@ typedef std::shared_ptr<SelectionStatement> SubSelectionStatement;
 
 class STATEMENT(IterationStatement) { 
   public:
-    IterationStatement(SubExpression ex, SubStatement st, IterationEnum k): expression(ex), statement(st), kind(k) { };
+    IterationStatement(SubExpression ex,
+        SubStatement st,
+        IterationEnum k,
+        Pos pos);
     PPRINTABLE
 
   private:
@@ -227,7 +256,7 @@ class STATEMENT(IterationStatement) {
 
 class STATEMENT(LabeledStatement) {
   public:
-    LabeledStatement(std::string str, SubStatement st) : name(str), statement(st) { };
+    LabeledStatement(std::string str, SubStatement st, Pos pos);
     PPRINTABLE
 
   private:
@@ -241,7 +270,7 @@ typedef std::shared_ptr<IterationStatement> SubIterationStatement;
 
 class ASTNODE(IdentifierList) {
   public:
-    IdentifierList(std::vector<std::string > list) : nameList(list) { };
+    IdentifierList(std::vector<std::string > list, Pos pos);
     PPRINTABLE
 
   private:
@@ -279,14 +308,16 @@ typedef std::shared_ptr<Parameter> ParameterNode;
  */
 class ASTNODE(DirectDeclaratorHelp) {
   public:
-    DirectDeclaratorHelp();
-    DirectDeclaratorHelp(std::shared_ptr<DirectDeclaratorHelp> help);
-    DirectDeclaratorHelp(std::vector<ParameterNode> paramList);
+    DirectDeclaratorHelp(Pos pos);
+    DirectDeclaratorHelp(std::shared_ptr<DirectDeclaratorHelp> help, Pos pos);
+    DirectDeclaratorHelp(std::vector<ParameterNode> paramList, Pos pos);
     DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
-        std::shared_ptr<DirectDeclaratorHelp> help);
-    DirectDeclaratorHelp(SubIdentifierList idList);
+        std::shared_ptr<DirectDeclaratorHelp> help,
+        Pos pos);
+    DirectDeclaratorHelp(SubIdentifierList idList, Pos pos);
     DirectDeclaratorHelp(SubIdentifierList idList, 
-                         std::shared_ptr<DirectDeclaratorHelp> help);
+                         std::shared_ptr<DirectDeclaratorHelp> help,
+                         Pos pos);
     PPRINTABLE
   private:
     DirectDeclaratorHelpEnum helperType;
@@ -299,6 +330,7 @@ class ASTNODE(DirectDeclaratorHelp) {
 typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclaratorHelp;
 
 class ASTNODE(DirectDeclarator) { 
+  CONS_INTER(DirectDeclarator)
   public:
     virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel) {
       AstNode::prettyPrint(pp, indentLevel);
@@ -311,7 +343,7 @@ typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 
 class ASTNODE(Declarator) {
   public:
-    Declarator(int cnt, SubDirectDeclarator ast) : pointerCounter(cnt), directDeclarator(ast) { };
+    Declarator(int cnt, SubDirectDeclarator ast, Pos pos);
     PPRINTABLE
   private:
     int pointerCounter;
@@ -323,9 +355,11 @@ typedef std::shared_ptr<Declarator> SubDeclarator;
 class DIRECTDECLARATOR(IdentifierDirectDeclarator) { 
   public:
    
-    IdentifierDirectDeclarator(std::string str, SubDirectDeclaratorHelp h) : identifier(str), help(h) { } ;
+    IdentifierDirectDeclarator(std::string str,
+        SubDirectDeclaratorHelp h,
+        Pos pos);
 
-    IdentifierDirectDeclarator(std::string str) : identifier(str) { } ;
+    IdentifierDirectDeclarator(std::string str, Pos pos);
 
     PPRINTABLE
   // TODO pretty Print
@@ -338,12 +372,12 @@ class DIRECTDECLARATOR(IdentifierDirectDeclarator) {
 
 class DIRECTDECLARATOR(DeclaratorDirectDeclarator) { 
   public:
-    DeclaratorDirectDeclarator(SubDeclarator d, SubDirectDeclaratorHelp h) :
-      declarator(d), help(h) { } ;
+    DeclaratorDirectDeclarator(SubDeclarator d,
+        SubDirectDeclaratorHelp h,
+        Pos pos);
     PPRINTABLE
     // TODO pretty Print
- DeclaratorDirectDeclarator(SubDeclarator d) :
-      declarator(d){ } ;
+ DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
     
   private:
     SubDeclarator declarator;
@@ -354,8 +388,8 @@ typedef std::shared_ptr<Type> TypeNode;
 
 class ASTNODE(Declaration) {
   public:
-    Declaration(TypeNode t, SubDeclarator declarator);
-    Declaration(TypeNode t);
+    Declaration(TypeNode t, SubDeclarator declarator, Pos pos);
+    Declaration(TypeNode t, Pos pos);
     PPRINTABLE
   private:
     TypeNode type;
@@ -368,10 +402,12 @@ class ASTNODE(ExternalDeclaration) {
   public:
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
-                        SubCompoundStatement compoundStatement);
+                        SubCompoundStatement compoundStatement,
+                        Pos pos);
     ExternalDeclaration(TypeNode type,
-                        SubDeclarator declarator);
-    ExternalDeclaration(TypeNode type);
+                        SubDeclarator declarator,
+                        Pos pos);
+    ExternalDeclaration(TypeNode type, Pos pos);
     PPRINTABLE
   private:
     TypeNode type;
@@ -383,7 +419,8 @@ typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;
 
 class ASTNODE(TranslationUnit) {
   public:
-    TranslationUnit(std::vector<ExternalDeclarationNode> externalDeclarations);
+    TranslationUnit(std::vector<ExternalDeclarationNode> externalDeclarations, 
+        Pos pos);
     PPRINTABLE
   private:
     std::vector<ExternalDeclarationNode> externalDeclarations;
@@ -393,8 +430,8 @@ typedef std::shared_ptr<TranslationUnit> TUNode;
 
 class ASTNODE(Parameter) {
   public:
-    Parameter(TypeNode type, SubDeclarator declarator);
-    Parameter(TypeNode type);
+    Parameter(TypeNode type, SubDeclarator declarator, Pos pos);
+    Parameter(TypeNode type, Pos pos);
     PPRINTABLE
   private:
     TypeNode type;
@@ -419,9 +456,9 @@ typedef std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubE
 class TYPE(StructType) {
   // TODO Add content
   public:
-    StructType();
-    StructType(std::string name);
-    StructType(std::string name, StructContent content);
+    StructType(Pos pos);
+    StructType(std::string name, Pos pos);
+    StructType(std::string name, StructContent content, Pos pos);
     PPRINTABLE
   private:
     std::string name;
@@ -433,7 +470,7 @@ typedef std::shared_ptr<StructType> StructNode;
 class EXPRESSION(SizeOfExpression)
 {
   public:
-    SizeOfExpression(std::pair<TypeNode, SubDeclarator>);
+    SizeOfExpression(std::pair<TypeNode, SubDeclarator>, Pos pos);
     PPRINTABLE
   private:
     std::pair<TypeNode, SubDeclarator> operand;

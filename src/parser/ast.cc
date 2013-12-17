@@ -32,7 +32,9 @@ using namespace Parsing;
 
 BinaryExpression::BinaryExpression(SubExpression lhs,
                                    SubExpression rhs,
-                                   PunctuatorType op) :
+                                   PunctuatorType op,
+                                   Pos pos) :
+  Expression(pos),
   lhs(lhs),
   rhs(rhs),
   op(op)
@@ -65,8 +67,8 @@ PRETTY_PRINT(BinaryExpression)
   PPRINT(')');
 }
 
-UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand) :
-  operand(operand), op(op)
+UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos pos) :
+  Expression(pos), operand(operand), op(op)
 {
 }
 
@@ -81,7 +83,8 @@ PRETTY_PRINT(UnaryExpression)
   PPRINT(')');
 }
 
-VariableUsage::VariableUsage(std::string name) : name(name) {;}
+VariableUsage::VariableUsage(std::string name, Pos pos) 
+  : Expression(pos), name(name) {;}
 
 PRETTY_PRINT(VariableUsage)
 {
@@ -89,8 +92,8 @@ PRETTY_PRINT(VariableUsage)
 }
 
 FunctionCall::FunctionCall(SubExpression funcName,
-                           std::vector<SubExpression> arguments)
-        : funcName(funcName), arguments(arguments) {;}
+                           std::vector<SubExpression> arguments, Pos pos)
+        : Expression(pos), funcName(funcName), arguments(arguments) {;}
 
 PRETTY_PRINT(FunctionCall)
 {
@@ -113,8 +116,9 @@ PRETTY_PRINT(FunctionCall)
 
 TernaryExpression::TernaryExpression(SubExpression condition, 
                                      SubExpression lhs, 
-                                     SubExpression rhs)
-     : condition(condition), lhs(lhs), rhs(rhs)
+                                     SubExpression rhs,
+                                     Pos pos)
+     : Expression(pos), condition(condition), lhs(lhs), rhs(rhs)
 {
  //TODO: type checking
 }
@@ -130,7 +134,8 @@ PRETTY_PRINT(TernaryExpression)
   PPRINT(')');
 }
 
-BasicType::BasicType(std::string type) {
+BasicType::BasicType(std::string type, Pos pos) : Type(pos)
+{
   
   if (type == "int") {
     this->type = INT;
@@ -159,19 +164,20 @@ PRETTY_PRINT(BasicType)
   }
 }
 
-StructType::StructType(std::string name) : name(name) {
+StructType::StructType(std::string name, Pos pos) : Type(pos), name(name) {
   // default string is empty
   content = StructContent();
 }
 
 
-StructType::StructType() {
+StructType::StructType(Pos pos) : Type(pos) {
   // default string is empty
   name = std::string("");
   content = StructContent();
 }
 
-StructType::StructType(std::string name, StructContent content) : name(name), content(content) {
+StructType::StructType(std::string name, StructContent content, Pos pos)
+  : Type(pos), name(name), content(content) {
 }
 
 PRETTY_PRINT(StructType) {
@@ -208,8 +214,8 @@ PRETTY_PRINT(StructType) {
   }
 }
 
-CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements)
-  : subStatements(std::move(subStatements))
+CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements, Pos pos)
+  : Statement(pos), subStatements(std::move(subStatements))
 {
 
 }
@@ -247,7 +253,10 @@ PRETTY_PRINT(ExpressionStatement) {
   PPRINT(';');
 }
 
-SelectionStatement::SelectionStatement(SubExpression ex, SubStatement ifStat) {
+SelectionStatement::SelectionStatement(SubExpression ex,
+    SubStatement ifStat,
+    Pos pos) : Statement(pos)
+{
   expression = ex;
   ifStatement = ifStat;
 }
@@ -255,7 +264,9 @@ SelectionStatement::SelectionStatement(SubExpression ex, SubStatement ifStat) {
 SelectionStatement::SelectionStatement(
   SubExpression ex, 
   SubStatement ifStat, 
-  SubStatement elseStat) {
+  SubStatement elseStat,
+  Pos pos) : Statement(pos)
+{
   expression = ex;
   ifStatement = ifStat;
   elseStatement = elseStat;
@@ -394,11 +405,11 @@ PRETTY_PRINT(Declarator)
   }
 }
 
-Declaration::Declaration(TypeNode t, SubDeclarator declarator)
-  :type(t),declarator(declarator){}
+Declaration::Declaration(TypeNode t, SubDeclarator declarator, Pos pos)
+  : AstNode(pos), type(t),declarator(declarator){}
 
-Declaration::Declaration(TypeNode t)
-  :type(t){}
+Declaration::Declaration(TypeNode t, Pos pos)
+  : AstNode(pos), type(t){}
 
 PRETTY_PRINT(Declaration)
 {
@@ -414,23 +425,27 @@ PRETTY_PRINT(Declaration)
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
-                        SubCompoundStatement compoundStatement)
-  : type(type), declarator(declarator), compoundStatement(compoundStatement)
+                        SubCompoundStatement compoundStatement,
+                        Pos pos)
+  : AstNode(pos), type(type), declarator(declarator),
+    compoundStatement(compoundStatement)
 {}
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
-                        SubDeclarator declarator)
-  : type(type), declarator(declarator)
+                        SubDeclarator declarator,
+                        Pos pos)
+  : AstNode(pos), type(type), declarator(declarator)
 {}
 
-ExternalDeclaration::ExternalDeclaration(TypeNode type)
-  : type(type)
+ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos)
+  : AstNode(pos), type(type)
 {}
 
 
 TranslationUnit::TranslationUnit(
-    std::vector<ExternalDeclarationNode> externalDeclarations
-    ) : externalDeclarations(externalDeclarations) {}
+    std::vector<ExternalDeclarationNode> externalDeclarations,
+    Pos pos
+    ) : AstNode(pos), externalDeclarations(externalDeclarations) {}
 
 PRETTY_PRINT(TranslationUnit) {
   auto size = externalDeclarations.size();
@@ -480,13 +495,13 @@ PRETTY_PRINT(IdentifierDirectDeclarator) {
   }
 }
 
-Parameter::Parameter(TypeNode type, SubDeclarator declarator)
-  : type(type), declarator(declarator) {
+Parameter::Parameter(TypeNode type, SubDeclarator declarator, Pos pos)
+  : AstNode(pos), type(type), declarator(declarator) {
   
 }
 
-Parameter::Parameter(TypeNode type)
-  : type(type) {
+Parameter::Parameter(TypeNode type, Pos pos)
+  : AstNode(pos), type(type) {
   
 }
 
@@ -514,39 +529,44 @@ PRETTY_PRINT(DeclaratorDirectDeclarator)
 
 
 
-DirectDeclaratorHelp::DirectDeclaratorHelp() 
+DirectDeclaratorHelp::DirectDeclaratorHelp(Pos pos) 
+  : AstNode(pos)
 {
   helperType = EPSILON;
 }
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(
-    SubDirectDeclaratorHelp help) : help(help)
+    SubDirectDeclaratorHelp help,
+    Pos pos
+    ) : AstNode(pos), help(help)
 {
   helperType = EMPTYLIST;
 }
 
-DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList)
-  : paramList(paramList) 
+DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
+    Pos pos)
+  : AstNode(pos), paramList(paramList) 
 {  
   helperType = PARAMETERLIST; 
 }
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
-                                           SubDirectDeclaratorHelp help)
-  :help(help), paramList(paramList) 
+                                           SubDirectDeclaratorHelp help, Pos pos)
+  : AstNode(pos), help(help), paramList(paramList) 
 {
   helperType = PARAMETERLIST;
 }
 
-DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList)
-  : idList(idList) 
+DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList, Pos pos)
+  : AstNode(pos), idList(idList) 
 {
   helperType = IDENTIFIERLIST;
 }
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList,
-                                           SubDirectDeclaratorHelp help)
-  : help(help), idList(idList)
+                                           SubDirectDeclaratorHelp help,
+                                           Pos pos)
+  : AstNode(pos), help(help), idList(idList)
 {
   helperType = IDENTIFIERLIST;
 }
@@ -580,8 +600,8 @@ PRETTY_PRINT(DirectDeclaratorHelp)
   }
 }  
 
-SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand)
-  : operand(operand) 
+SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand, Pos pos)
+  : Expression(pos), operand(operand) 
 {
 }
 
@@ -594,6 +614,62 @@ PRETTY_PRINT(SizeOfExpression)
   }
   PPRINT(')');
 }
+
+ReturnStatement::ReturnStatement(Pos pos) : JumpStatement(pos) {}
+ReturnStatement::ReturnStatement(SubExpression ex, Pos pos) 
+  : JumpStatement(pos), expression(ex) {}
+
+
+ContinueStatement::ContinueStatement(Pos pos) : JumpStatement(pos) {};
+
+BreakStatement::BreakStatement(Pos pos) : JumpStatement(pos) {};
+
+GotoStatement::GotoStatement(std::string label, Pos pos) 
+  : JumpStatement(pos), label(label) {};
+
+IterationStatement::IterationStatement(SubExpression ex,
+    SubStatement st,
+    IterationEnum k,
+    Pos pos)
+  : Statement(pos), expression(ex), statement(st), kind(k) {}
+
+
+LabeledStatement::LabeledStatement(std::string str, SubStatement st, Pos pos)
+  : Statement(pos), name(str), statement(st) {};
+
+
+ExpressionStatement::ExpressionStatement(Pos pos) : Statement(pos) {};
+ExpressionStatement::ExpressionStatement(SubExpression ex, Pos pos) 
+  : Statement(pos), expression(ex) {};
+
+
+
+DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
+        SubDirectDeclaratorHelp h,
+        Pos pos) 
+  : DirectDeclarator(pos), declarator(d), help(h) {};
+
+
+DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
+        Pos pos) 
+  : DirectDeclarator(pos), declarator(d) {};
+
+
+IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,
+    SubDirectDeclaratorHelp h,
+    Pos pos) : DirectDeclarator(pos), identifier(str), help(h) {}
+
+IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,
+    Pos pos) : DirectDeclarator(pos), identifier(str) {}
+
+IdentifierList::IdentifierList(std::vector<std::string > list, Pos pos)
+  : AstNode(pos), nameList(list) {}
+
+
+Declarator::Declarator(int cnt, SubDirectDeclarator ast, Pos pos)
+  : AstNode(pos), pointerCounter(cnt), directDeclarator(ast) {}
+
+
 #undef PPRINT
 #undef ADDINDENT
 #undef REMOVEINDENT
