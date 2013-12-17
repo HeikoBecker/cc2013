@@ -144,7 +144,7 @@ BasicType::BasicType(std::string type, Pos pos) : Type(pos)
   } else if (type == "void") {
     this->type = VOID;
   } else {
-    throw ParsingException(type + " is not a Basic Type");
+    throw ParsingException(type + " is not a Basic Type", pos);
   }
 }
 

@@ -25,9 +25,10 @@ Parser::Parser(FILE* f, char const *name)
 }
 
 [[noreturn]] inline void Parser::reportError(std::string msg = "Parsing error") {
-  errorf(m_nextsym->pos(), msg.c_str());
+  //errorf(m_nextsym->pos(), msg.c_str()); FIXME: decide where to use exceptions
   // TODO: the full featured parser should continue
-  throw ParsingException(msg);
+  OBTAIN_POS();
+  throw ParsingException(msg, pos);
 }
 
 [[noreturn]] void Parser::expectedAnyOf(std::string msg = "Parsing error") {

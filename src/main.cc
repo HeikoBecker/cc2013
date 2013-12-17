@@ -100,7 +100,7 @@ int main(int, char** const argv)
       }
     }
   } catch (Parsing::ParsingException const& e) {
-    errorf(e.what());
+    errorf(e.what(), e.pos);
     /* no need to handle it; TODO: avoid throwing an exception at all */
   } catch (Lexing::LexingException const& e) {
     std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
