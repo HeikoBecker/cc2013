@@ -622,12 +622,12 @@ ReturnStatement::ReturnStatement(SubExpression ex, Pos pos)
   : JumpStatement(pos), expression(ex) {}
 
 
-ContinueStatement::ContinueStatement(Pos pos) : JumpStatement(pos) {};
+ContinueStatement::ContinueStatement(Pos pos) : JumpStatement(pos) {}
 
-BreakStatement::BreakStatement(Pos pos) : JumpStatement(pos) {};
+BreakStatement::BreakStatement(Pos pos) : JumpStatement(pos) {}
 
 GotoStatement::GotoStatement(std::string label, Pos pos) 
-  : JumpStatement(pos), label(label) {};
+  : JumpStatement(pos), label(label) {}
 
 IterationStatement::IterationStatement(SubExpression ex,
     SubStatement st,
@@ -637,24 +637,24 @@ IterationStatement::IterationStatement(SubExpression ex,
 
 
 LabeledStatement::LabeledStatement(std::string str, SubStatement st, Pos pos)
-  : Statement(pos), name(str), statement(st) {};
+  : Statement(pos), name(str), statement(st) {}
 
 
-ExpressionStatement::ExpressionStatement(Pos pos) : Statement(pos) {};
+ExpressionStatement::ExpressionStatement(Pos pos) : Statement(pos) {}
 ExpressionStatement::ExpressionStatement(SubExpression ex, Pos pos) 
-  : Statement(pos), expression(ex) {};
+  : Statement(pos), expression(ex) {}
 
 
 
 DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
         SubDirectDeclaratorHelp h,
         Pos pos) 
-  : DirectDeclarator(pos), declarator(d), help(h) {};
+  : DirectDeclarator(pos), declarator(d), help(h) {}
 
 
 DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
         Pos pos) 
-  : DirectDeclarator(pos), declarator(d) {};
+  : DirectDeclarator(pos), declarator(d) {}
 
 
 IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,
