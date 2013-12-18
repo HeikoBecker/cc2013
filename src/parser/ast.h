@@ -463,7 +463,7 @@ class TYPE(StructType) {
     StructType(Pos pos);
     StructType(std::string name, Pos pos);
     StructType(std::string name, StructContent content, Pos pos);
-    virtual bool canBeInFunctionDeclaration() { return !hasDeclaration; };
+    bool canBeInFunctionDeclaration() { return !hasDeclaration; };
     PPRINTABLE
 
   private:
