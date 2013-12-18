@@ -167,17 +167,19 @@ PRETTY_PRINT(BasicType)
 StructType::StructType(std::string name, Pos pos) : Type(pos), name(name) {
   // default string is empty
   content = StructContent();
+  hasDeclaration = false;
 }
-
 
 StructType::StructType(Pos pos) : Type(pos) {
   // default string is empty
   name = std::string("");
   content = StructContent();
+  hasDeclaration = false;
 }
 
 StructType::StructType(std::string name, StructContent content, Pos pos)
   : Type(pos), name(name), content(content) {
+  hasDeclaration = true;
 }
 
 PRETTY_PRINT(StructType) {

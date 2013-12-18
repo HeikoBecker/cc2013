@@ -177,6 +177,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
   // functionDefintion or declaration ?
   OBTAIN_POS();
+
   auto type = typeSpecifier();
 
   if (testp(";")) {
@@ -191,13 +192,16 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     // it was a declaration()
     return make_shared<ExternalDeclaration>(type, decl, pos);
   }
-
-  // it is a functionDefition! 
+  // it is a functionDefition!
+  if (!type->canBeInFunctionDeclaration()) {
+    throw "struct { is an error";
+  }
   expect("{");
   auto compStat = compoundStatement();
   return make_shared<ExternalDeclaration>(type, decl, compStat, pos);
 }
 
+// canBeFunction is true at the beginning
 TypeNode Parser::typeSpecifier() {
   OBTAIN_POS();
   if (testk("struct")) {
