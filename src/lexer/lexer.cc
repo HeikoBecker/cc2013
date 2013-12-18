@@ -1,7 +1,8 @@
 #include <sstream>
 #include <iostream>
 #include <cstdio>
-#include <cctype>
+//#include <cctype>
+#include <locale> // for std::isX functions
 #include "lexer.h"
 #include "token.h"
 
@@ -195,7 +196,7 @@ bool Lexer::consumeQuoted() {
 
 bool Lexer::consumeIdent() {
   while (tracker.advance()) {
-    if (isalpha(tracker.current()) || 
+    if (std::isalpha(tracker.current()) || 
       isdigit(tracker.current()) || 
       '_' == tracker.current()) {
       // create token
@@ -217,7 +218,7 @@ bool Lexer::consumeDecimal() {
     if (isdigit(tracker.current())) {
       appendToToken(tracker.current());
     } else {
-      if (isalpha(tracker.current())) {
+      if (std::isalpha(tracker.current())) {
         throw LexingException("Decimal constant contains illegal character.", tracker.currentPosition());
       }
       tracker.rewind();
@@ -234,7 +235,7 @@ bool Lexer::consumeIdentOrDecConstant() {
     // found 0 constant
     // TODO: is checking for alpha really enough?
     if (tracker.advance()) {
-      if (isalpha(tracker.current())) {
+      if (std::isalpha(tracker.current())) {
           throw LexingException(
             "0 constant must not be followed by character.",
             tracker.currentPosition()
@@ -245,10 +246,10 @@ bool Lexer::consumeIdentOrDecConstant() {
     appendToToken('0');
     storeToken(TokenType::CONSTANT);
     return true;
-  } else if(isalpha(tracker.current()) || '_' == tracker.current()) {
+  } else if(std::isalpha(tracker.current()) || '_' == tracker.current()) {
     appendToToken(tracker.current());
     return consumeIdent();
-  } else if (isdigit(tracker.current())) {
+  } else if (std::isdigit(tracker.current())) {
     // if it were 0, it would have been catched by the previous rule
     appendToToken(tracker.current());
     return consumeDecimal();
