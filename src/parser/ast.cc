@@ -200,6 +200,8 @@ PRETTY_PRINT(StructType) {
       PPRINT(typeSubDeclarationPair.first);
       if (!typeSubDeclarationPair.second.empty()) {
         PPRINT(' '); // print space between type and following stuff
+      } else {
+        PPRINT(';');
       }
       for (auto subDeclarationPair : typeSubDeclarationPair.second) {
         PPRINT(subDeclarationPair.first);
