@@ -194,7 +194,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   }
   // it is a functionDefition!
   if (!type->canBeInFunctionDeclaration()) {
-    throw "struct { is an error";
+    reportError("struct { is an error");
   }
   expect("{");
   auto compStat = compoundStatement();
