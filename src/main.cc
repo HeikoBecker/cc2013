@@ -103,12 +103,12 @@ int main(int, char** const argv)
     errorf(e.pos, e.what());
     /* no need to handle it; TODO: avoid throwing an exception at all */
   } catch (Lexing::LexingException const& e) {
-    std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
-      << "\n"
-      << "Encountered fatal error:" << "\n"
-      << e.what()
-      << "\n";
-    return 1;
+    errorf(e.where(), e.what());
+    //std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
+      //<< "\n"
+      //<< "Encountered fatal error:" << "\n"
+      //<< e.what()
+      //<< "\n";
   } catch (std::exception const& e) {
     errorf("caught exception: %s", e.what());
   } catch (...) {
