@@ -34,7 +34,7 @@ const std::unordered_set<std::string> Lexer::keywords =
 bool Lexer::consumePunctuator() {
 #define MAXOPLENGTH 3
   auto count_matches = 0;
-  auto partial = std::string(1, static_cast<unsigned char>(tracker.current()));
+  auto partial = std::string(1, tracker.current());
   //TODO: can be done in a more efficient way by checking which operators can
   //actually be part of a "larger" operator
   // check if in punctuator set
@@ -43,14 +43,14 @@ bool Lexer::consumePunctuator() {
     matched = (punctuators.find(partial) != punctuators.end());
     if (matched) {
       count_matches++;
-      if ((tracker.fgetc()) != EOF) {
-        partial += static_cast<unsigned char>(tracker.current());
+      if ((tracker.advance())) {
+        partial += tracker.current();
       } else {
         //TODO handle EOF...
       }
     } else if (count_matches > 0) {
       // already had one match, but now got start another token
-      tracker.ungetc();
+      tracker.rewind();
       // remove last character; it was added in the previous
       // iteration, but not actually part of the punctuator
       partial.pop_back();
@@ -67,18 +67,18 @@ bool Lexer::consumePunctuator() {
 
 bool Lexer::consumeComment() {
   if (tracker.current()== '/') {
-    int next = tracker.fgetc();
-    if ((next != EOF)) {
-      if (next == '*') {
+    if (tracker.advance()) {
+      if (tracker.current() == '*') {
         //found old-style coment
         // consume until */
-        while ((tracker.fgetc() != EOF)) {
+        while ((tracker.advance())) {
           if ('*' == tracker.current()) {
-            next = tracker.fgetc();
-            if ('/' == next) {
-              return true;
-            } else {
-              tracker.ungetc();
+            if (tracker.advance()) {
+              if ('/' == tracker.current()) {
+                return true;
+              } else {
+                tracker.rewind();
+              }
             }
           }
         }
@@ -86,10 +86,10 @@ bool Lexer::consumeComment() {
           "Reached end of file while trying to find end of comment", 
           tracker.currentPosition ()
         );
-      } else if (next == '/') {
+      } else if (tracker.current() == '/') {
         // found new-style comment
         // consume until newline
-        while ((tracker.fgetc() != EOF)) {
+        while ((tracker.advance())) {
           if ('\n' == tracker.current()) {
             return true;
           }
@@ -98,21 +98,21 @@ bool Lexer::consumeComment() {
           "Reached end of file while trying to find end of comment", 
           tracker.currentPosition ()
         );
-      } else {
-        tracker.ungetc(true);
+      } else { //tracker.current() is neither / nor *
+        tracker.rewind();
       }
-    } else {
-      tracker.ungetc();
-    }
+    } 
   }
   return false;
 }
 
 bool Lexer::consumeWhitespace() {
   while (std::isspace(tracker.current())) {
-    tracker.fgetc();
+    if (!tracker.advance()) {
+      return false; // reached the end of the file
+    }
   }
-  return (tracker.current() == EOF);
+  return true;
 }
 
 bool Lexer::consumeQuoted() {
@@ -124,10 +124,10 @@ bool Lexer::consumeQuoted() {
     return false;
   }
   appendToToken(tracker.current());
-  while (tracker.fgetc() != EOF) {
+  while (tracker.advance()) {
     if (tracker.current() == '\\') {
       //start of escape sequence, do a readahead
-      if ((tracker.fgetc() == EOF)) {
+      if (!tracker.advance()) {
         // report error, got EOF while waiting for end
         // of escape sequence
         throw LexingException(
@@ -194,50 +194,54 @@ bool Lexer::consumeQuoted() {
 }
 
 bool Lexer::consumeIdent() {
-  while (tracker.fgetc() != EOF) {
+  while (tracker.advance()) {
     if (isalpha(tracker.current()) || 
       isdigit(tracker.current()) || 
       '_' == tracker.current()) {
       // create token
       appendToToken(tracker.current());
     } else {
-      tracker.ungetc();
+      tracker.rewind();
       auto isKeyword = (keywords.find(curword) != keywords.end());
       storeToken(isKeyword ? TokenType::KEYWORD : TokenType::IDENTIFIER);
       return true;
     }
   }
   // handle EOf
-  return false;
+  storeToken(TokenType::IDENTIFIER); // there is no single char keyword
+  return true;
 }
 
 bool Lexer::consumeDecimal() {
-  while (tracker.fgetc() != EOF) {
+  while (tracker.advance()) {
     if (isdigit(tracker.current())) {
       appendToToken(tracker.current());
     } else {
       if (isalpha(tracker.current())) {
         throw LexingException("Decimal constant contains illegal character.", tracker.currentPosition());
       }
-      tracker.ungetc();
+      tracker.rewind();
       storeToken(TokenType::CONSTANT);
       return true;
     }
   }
-  return false;
+  storeToken(TokenType::CONSTANT);
+  return true;
 }
 
 bool Lexer::consumeIdentOrDecConstant() {
   if ('0' == tracker.current()) {
     // found 0 constant
     // TODO: is checking for alpha really enough?
-    if (isalpha(tracker.fgetc())) {
-      throw LexingException(
-        "0 constant must not be followed by character.",
-        tracker.currentPosition()
-      );
+    if (tracker.advance()) {
+      if (isalpha(tracker.current())) {
+          throw LexingException(
+            "0 constant must not be followed by character.",
+            tracker.currentPosition()
+            );
+          }
     }
-    tracker.ungetc();
+    tracker.rewind();
     appendToToken('0');
     storeToken(TokenType::CONSTANT);
     return true;
@@ -255,7 +259,7 @@ bool Lexer::consumeIdentOrDecConstant() {
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
 std::shared_ptr<Token> Lexer::getNextToken() {
-  while ((tracker.fgetc() != EOF)) {
+  while (tracker.advance()) {
     if (consumeWhitespace() || consumeComment()) {
       continue;
     }
@@ -331,20 +335,25 @@ FileTracker::FileTracker(FILE* f, char const *name)
   m_position.line = 1;
 }
 
-int FileTracker::fgetc() {
+bool FileTracker::advance() {
+  auto tmp = std::fgetc(stream);
+  if (tmp == EOF) {
+    std::ungetc(tmp, stream);
+    return false;
+  }
   m_lastChar = m_current;
   m_lastCollumn = m_position.column;
-  m_current = std::fgetc(stream);
+  m_current = tmp;
   if ('\n' == m_current) {
     m_position.line++;
     m_position.column = 0;
   } else {
     m_position.column++;
   }
-  return m_current;
+  return true;
 }
 
-int FileTracker::ungetc(bool reset) {
+void FileTracker::rewind() {
   if ('\n' == m_current) {
     m_position.line--;
     m_position.column = m_lastCollumn;
@@ -352,10 +361,10 @@ int FileTracker::ungetc(bool reset) {
     m_position.column--;
   }
   auto result =  std::ungetc(m_current, stream);
-  if (reset) {
-    m_current = m_lastChar;
+  if (result == EOF) {
+    ABORT;
   }
-  return result;
+  m_current = m_lastChar;
 }
 
 void FileTracker::storePosition() {
