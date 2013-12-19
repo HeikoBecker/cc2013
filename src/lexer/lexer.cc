@@ -262,8 +262,8 @@ bool Lexer::consumeIdentOrDecConstant() {
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
 std::shared_ptr<Token> Lexer::getNextToken() {
-  while (tracker.advance()) {
-    if (consumeWhitespace() || consumeComment()) {
+  if (tracker.advance()) {
+    while (consumeWhitespace() || consumeComment()) {
       continue;
     }
 
