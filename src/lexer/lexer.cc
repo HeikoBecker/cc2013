@@ -262,26 +262,26 @@ bool Lexer::consumeIdentOrDecConstant() {
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
 std::shared_ptr<Token> Lexer::getNextToken() {
-  if (tracker.advance()) {
-    while (consumeWhitespace() || consumeComment()) {
-      continue;
+  do {
+    if (!tracker.advance()) {
+      return genToken(TokenType::END);
     }
+  } while (consumeWhitespace() || consumeComment());
 
-    tracker.storePosition();
-    // new token begins after whitespace
-    if (consumeQuoted() ||
-        consumeIdentOrDecConstant() ||
-        consumeComment() ||
-        consumePunctuator()) {
-      return curtoken;
-    } else {
-      // report error
-      std::ostringstream msg;
-      msg << "Got illegal token: " 
-          << static_cast<unsigned char>(tracker.current ()) 
-          << std::endl;
-      throw LexingException(msg.str(), tracker.currentPosition ());
-    }
+  tracker.storePosition();
+  // new token begins after whitespace
+  if (consumeQuoted() ||
+      consumeIdentOrDecConstant() ||
+      consumeComment() ||
+      consumePunctuator()) {
+    return curtoken;
+  } else {
+    // report error
+    std::ostringstream msg;
+    msg << "Got illegal token: " 
+      << static_cast<unsigned char>(tracker.current ()) 
+      << std::endl;
+    throw LexingException(msg.str(), tracker.currentPosition ());
   }
   return genToken(TokenType::END);
 }
@@ -365,6 +365,9 @@ bool FileTracker::advance() {
 }
 
 void FileTracker::rewind() {
+#ifdef DEBUG
+  std::cerr << "rewinding...\n";
+#endif
   if ('\n' == m_current) {
     m_position.line--;
     m_position.column = m_lastCollumn;
