@@ -376,7 +376,7 @@ void Lexing::printToken(const Token token) {
       tokentype = "constant";
       break;
     case TokenType::STRINGLITERAL:
-      tokentype = "stringliteral";
+      tokentype = "string-literal";
       break;
     case TokenType::PUNCTUATOR:
       tokentype = "punctuator";
