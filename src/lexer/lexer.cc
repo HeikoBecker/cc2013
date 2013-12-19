@@ -108,11 +108,13 @@ bool Lexer::consumeComment() {
 }
 
 bool Lexer::consumeWhitespace() {
+  if (!std::isspace(tracker.current())) return false;
   while (std::isspace(tracker.current())) {
     if (!tracker.advance()) {
-      return false; // reached the end of the file
+      return true; // reached the end of the file
     }
   }
+  tracker.rewind();
   return true;
 }
 
@@ -334,17 +336,25 @@ void Lexer::storeToken(TokenType type) {
 FileTracker::FileTracker(FILE* f, char const *name) 
   : stream(f), m_position(Pos(name)), m_storedPosition(Pos(name)) {
   m_position.line = 1;
+  m_position.column = 0;
 }
 
 bool FileTracker::advance() {
   auto tmp = std::fgetc(stream);
   if (tmp == EOF) {
     std::ungetc(tmp, stream);
+#ifdef DEBUG
+    std::cerr << "Reached EOF\n";
+#endif
     return false;
   }
+#ifdef DEBUG
+  std::cerr << "Advancing... "
+            << "got " << static_cast<unsigned char>(tmp) << "\n";
+#endif
   m_lastChar = m_current;
+  m_current = static_cast<unsigned char>(tmp);
   m_lastCollumn = m_position.column;
-  m_current = tmp;
   if ('\n' == m_current) {
     m_position.line++;
     m_position.column = 0;
