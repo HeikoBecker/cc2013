@@ -243,8 +243,8 @@ bool Lexer::consumeIdentOrDecConstant() {
             tracker.currentPosition()
             );
           }
+      tracker.rewind();
     }
-    tracker.rewind();
     appendToToken('0');
     storeToken(TokenType::CONSTANT);
     return true;
