@@ -48,6 +48,7 @@ class AstNode
 class ASTNODE(Expression) 
 {
     CONS_INTER(Expression)
+
 };
 
 typedef std::shared_ptr<AstNode> AstChild;
@@ -120,6 +121,9 @@ class EXPRESSION(TernaryExpression)
 class ASTNODE(Type)
 {
   CONS_INTER(Type)
+
+  public:
+    virtual bool canBeInFunctionDeclaration() { return true; };
 };
 
 class TYPE(BasicType) {
@@ -459,10 +463,13 @@ class TYPE(StructType) {
     StructType(Pos pos);
     StructType(std::string name, Pos pos);
     StructType(std::string name, StructContent content, Pos pos);
+    bool canBeInFunctionDeclaration() { return !hasDeclaration; };
     PPRINTABLE
+
   private:
     std::string name;
     StructContent content; 
+    bool hasDeclaration;
 };
 
 typedef std::shared_ptr<StructType> StructNode;

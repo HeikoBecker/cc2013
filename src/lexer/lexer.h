@@ -27,14 +27,14 @@ namespace Lexing {
   {
     public:
       FileTracker(FILE* f, char const *name);
-      int fgetc();
-      int ungetc(bool reset = false);
-      int current() const {return m_current;}
+      bool advance();
+      void rewind();
+      unsigned char current() const {return m_current;}
       Pos currentPosition() const {return m_position;}
       Pos storedPosition() const {return  m_storedPosition;}
       void storePosition();
     private:
-      int m_current;
+      unsigned char m_current;
       FILE* stream;
       Pos m_position;
       Pos m_storedPosition;
