@@ -47,7 +47,9 @@ bool Lexer::consumePunctuator() {
       if ((tracker.advance())) {
         partial += tracker.current();
       } else {
-        //TODO handle EOF...
+        curword += partial;
+        storeToken(TokenType::PUNCTUATOR);
+        return true;
       }
     } else if (count_matches > 0) {
       // already had one match, but now got start another token
