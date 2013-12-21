@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <memory>
 #include "ast.h"
+#include "semantic.h"
 #include "../lexer/token.h"
 
 namespace Lexing {
@@ -47,6 +48,7 @@ namespace Parsing {
       unique_ptr<Lexer> m_lexer;
       shared_ptr<Token> m_nextsym;
       shared_ptr<Token> m_lookahead;
+      shared_ptr<SemanticTree> semanticTree;
 
       // function concerning reading
       shared_ptr<Token> getNextSymbol();

@@ -5,7 +5,6 @@
 #include <cctype>
 #include <utility> // for std::move
 #include "parser.h"
-#include "semantic.h"
 #include "../diagnostic.h"
 #include "../lexer/lexer.h"
 #include "../lexer/punctuatortype.h"
@@ -22,7 +21,7 @@ Parser::Parser(FILE* f, char const *name)
   :  m_lexer(unique_ptr<Lexer>(new Lexer(f,name))) ,
      m_nextsym(m_lexer->getNextToken()), m_lookahead(m_lexer->getNextToken())
 {
-
+  semanticTree = make_shared<SemanticTree>();
 }
 
 [[noreturn]] inline void Parser::reportError(std::string msg = "Parsing error") {
@@ -479,21 +478,27 @@ StructNode Parser::structOrUnionSpecifier() {
 
     scan();
     if (testp("{")) {
+      semanticTree->addChild();
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
       auto structDecLst = structDeclarationList();
       expect(PunctuatorType::RIGHTCURLYBRACE);
       scan();
-      return make_shared<StructType>(name, structDecLst, pos);
+      auto ret =  make_shared<StructType>(name, structDecLst, pos);
+      semanticTree->goUp();
+      return ret;
     }
 
     return make_shared<StructType>(name, pos);
   } else if(testp("{")) {
+    semanticTree->addChild();
     scan();
     auto structDecLst = structDeclarationList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
-    return make_shared<StructType>("",structDecLst, pos);
+    auto ret = make_shared<StructType>("",structDecLst, pos);
+    semanticTree->goUp();
+    return ret;
   } else {
     expectedAnyOf();
   }
@@ -795,18 +800,26 @@ compound-statement -> "{" block-item-list "}"
 SubCompoundStatement Parser::compoundStatement() {
   OBTAIN_POS();
 
+  // add a new child to the semantic tree
+  // and go to that child
+  semanticTree->addChild();
+
   expect(PunctuatorType::LEFTCURLYBRACE);
   scan();
 
   decltype(blockItemList()) subStatements {}; 
   if (testp(PunctuatorType::RIGHTCURLYBRACE)) {
     scan();
-    return make_shared<CompoundStatement>(subStatements, pos);
+    auto statement = make_shared<CompoundStatement>(subStatements, pos);
+    semanticTree->goUp();
+    return statement;
   } else {
     subStatements = blockItemList();
     expect(PunctuatorType::RIGHTCURLYBRACE);
     scan();
-    return make_shared<CompoundStatement>(subStatements, pos);
+    auto statement = make_shared<CompoundStatement>(subStatements, pos);
+    semanticTree->goUp();
+    return statement;
   }
 }
 
