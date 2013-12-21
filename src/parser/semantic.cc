@@ -27,7 +27,7 @@ void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
   }
 }
 
-void SemanticTree::addDeclaration(string name, TypeNode typeNode) {
+void SemanticTree::addDeclaration(string name, TypeNode typeNode, Pos pos) {
   TypeStack *st;
 
   if (declarationMap.find(name) == declarationMap.end()) {
@@ -40,14 +40,14 @@ void SemanticTree::addDeclaration(string name, TypeNode typeNode) {
 
     // NO redefinitions
     if (st->size() > 0 && st->top().first == currentPos) {
-      throw "no redefinition of " + name;
+      throw Parsing::ParsingException("no redefinition of " + name, pos);
     } else {
       declarationMap[name]->push(make_pair(currentPos, typeNode));
     }
   }
 }
 
-TypeNode SemanticTree::lookUpType(string name) {
+TypeNode SemanticTree::lookUpType(string name, Pos pos) {
   if (declarationMap.find(name) != declarationMap.end()) {
     TypeStack *st =  declarationMap[name];
 
@@ -55,11 +55,11 @@ TypeNode SemanticTree::lookUpType(string name) {
     // delete not active nodes
 
     if (st->size() == 0) {
-      throw name+ "is not declared in this scope";
+      throw Parsing::ParsingException(name+ "is not declared in this scope", pos);
     } else {
       return st->top().second;
     }
   } else {
-    throw name+ "is not declared in this scope";
+    throw Parsing::ParsingException(name+ "is not declared in this scope", pos);
   }
 }

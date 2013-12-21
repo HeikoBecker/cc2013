@@ -8,6 +8,7 @@
 #include <memory>
 #include "ast.h"
 #include "semantic.h"
+#include "parserException.h"
 #include "../lexer/token.h"
 
 namespace Lexing {
@@ -18,14 +19,6 @@ using namespace std;
 using namespace Lexing;
 
 namespace Parsing {
-
-  class ParsingException: public std::runtime_error 
-  {
-    public:
-      ParsingException(std::string message, Pos pos) 
-        : std::runtime_error(message), pos(pos) {};
-      Pos pos;
-  };
 
   enum class ThreeValueBool {
     DONTCARE, 

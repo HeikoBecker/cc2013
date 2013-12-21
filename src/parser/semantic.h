@@ -6,6 +6,7 @@
 #include <vector>
 #include <stack>
 #include "ast.h"
+#include "parserException.h"
 
 using namespace std;
 using namespace Parsing;
@@ -48,8 +49,8 @@ class SemanticTree {
     void addChild();
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
-    void addDeclaration(string name, TypeNode typeNode);
-    TypeNode lookUpType(string name);
+    void addDeclaration(string name, TypeNode typeNode, Pos pos);
+    TypeNode lookUpType(string name, Pos pos);
 };
 
 #endif
