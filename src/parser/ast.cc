@@ -368,8 +368,12 @@ PRETTY_PRINT(IterationStatement) {
     PPRINT(std::string(")"));
     if (std::dynamic_pointer_cast<CompoundStatement>(statement)) {
       g_skipNewLineBeforeBlockStatement = true;
+      PPRINT(statement);
+    } else {
+      ADDINDENT();
+      PPRINT(statement);
+      REMOVEINDENT();
     }
-    PPRINT(statement);
   } else { // kind == DO
     PPRINT(std::string("do "));
     PPRINT(statement);
@@ -385,13 +389,10 @@ PRETTY_PRINT(LabeledStatement) {
   PPRINT(name);
   PPRINT(std::string(":"));
   RESTOREINDENT();
-  if (   std::dynamic_pointer_cast<LabeledStatement>(statement)
-      || std::dynamic_pointer_cast<ReturnStatement>(statement)) {
+  if (std::dynamic_pointer_cast<LabeledStatement>(statement)) {
     PPRINT(statement);
   } else {
-    ADDINDENT();
     PPRINT(statement);
-    REMOVEINDENT();
   }
 }
 
