@@ -1,6 +1,6 @@
 int a;
 int b;
-char b;
+char c;
 struct complexNumbers {
   int real;
   int imag;

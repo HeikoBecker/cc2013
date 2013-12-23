@@ -10,6 +10,7 @@ SemanticTree::SemanticTree() {
 
 void SemanticTree::addChild() {
   nodes.push_back(SemanticNode(currentPos));
+  counter++;
   currentPos = counter - 1;
 }
 
@@ -27,16 +28,21 @@ void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
   }
 }
 
-void SemanticTree::addDeclaration(string name, TypeNode typeNode, Pos pos) {
+void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
   TypeStack *st;
 
+#ifdef DEBUG
+  cout<<" SEMANTIC ADD : DEPTH: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<typeNode<<endl;
+#endif
   if (declarationMap.find(name) == declarationMap.end()) {
-    st = new stack<pair<int, TypeNode> >();
+    st = new stack<pair<int, string> >();
+    st->push(make_pair(currentPos, name));
     declarationMap[name] = st;
   } else {
     st = declarationMap[name];
 
     deleteNotActiveNodes(st);
+
 
     // NO redefinitions
     if (st->size() > 0 && st->top().first == currentPos) {
@@ -47,7 +53,7 @@ void SemanticTree::addDeclaration(string name, TypeNode typeNode, Pos pos) {
   }
 }
 
-TypeNode SemanticTree::lookUpType(string name, Pos pos) {
+string SemanticTree::lookUpType(string name, Pos pos) {
   if (declarationMap.find(name) != declarationMap.end()) {
     TypeStack *st =  declarationMap[name];
 

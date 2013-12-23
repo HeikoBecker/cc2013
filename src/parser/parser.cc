@@ -183,6 +183,10 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   if (testp(";")) {
     // it was a declaration
     scan();
+
+    // TODO : make lookuptable for struct
+    // or is this not allowed in our grammar
+
     return make_shared<ExternalDeclaration>(type, pos);
   }
   auto decl = declarator();
@@ -190,7 +194,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   if (testp(";")) {
     scan();
     // it was a declaration()
-    return make_shared<ExternalDeclaration>(type, decl, pos);
+    return make_shared<ExternalDeclaration>(type, decl, pos, semanticTree);
   }
   // it is a functionDefition!
   if (!type->canBeInFunctionDeclaration()) {
@@ -198,7 +202,8 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   }
   expect("{");
   auto compStat = compoundStatement();
-  return make_shared<ExternalDeclaration>(type, decl, compStat, pos);
+  return make_shared<ExternalDeclaration>(type, decl, compStat, 
+                                          pos, semanticTree);
 }
 
 // canBeFunction is true at the beginning
@@ -449,7 +454,6 @@ SubExpression Parser::expression(int minPrecedence = 0) {
 }
 
 DeclarationNode Parser::declaration() {
-
   OBTAIN_POS();
   auto type = typeSpecifier();
   if (testp(";")) {
@@ -459,7 +463,7 @@ DeclarationNode Parser::declaration() {
     auto decl = declarator();
     expect(PunctuatorType::SEMICOLON);
     scan();
-    return std::make_shared<Declaration>(type, decl, pos);
+    return std::make_shared<Declaration>(type, decl, pos, semanticTree);
   }
 }
 

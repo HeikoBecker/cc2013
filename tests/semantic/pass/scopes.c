@@ -2,11 +2,28 @@ int main() {
   // look at diffent scopes
   int a;
   a = 4;
-  // print(a)
+  print(a);
+  {
+    char a;
+    a = 5;
+    print(a);
+
+    {
+      {
+      int a;
+      }
+      int a;
+    }
+
+  }
+
   {
     int a;
-    a = 5;
-    // print(a)
+    {
+      char a;
+    }
+
   }
-  // print(a)
+
+  print(a);
 }

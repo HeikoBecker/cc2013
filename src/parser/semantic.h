@@ -5,13 +5,16 @@
 #include <map>
 #include <vector>
 #include <stack>
-#include "ast.h"
+#include "../pos.h"
 #include "parserException.h"
 
 using namespace std;
 using namespace Parsing;
 
-typedef stack<pair<int, TypeNode> > TypeStack;
+// TODO change string to TypeNode
+// conflict in C++ dependencies
+
+typedef stack<pair<int, string> > TypeStack;
 
 class SemanticTree {
 
@@ -49,8 +52,8 @@ class SemanticTree {
     void addChild();
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
-    void addDeclaration(string name, TypeNode typeNode, Pos pos);
-    TypeNode lookUpType(string name, Pos pos);
+    void addDeclaration(string name, string typeNode, Pos pos);
+    string lookUpType(string name, Pos pos);
 };
 
 #endif

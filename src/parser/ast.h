@@ -8,6 +8,7 @@
 #include "../lexer/punctuatortype.h"
 #include "../pos.h"
 #include "pprinter.h"
+#include "semantic.h"
 
 /* This macro allows an easy switching of pprint in all methods*/
 #define PPRINTABLE  void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel = 0) override;
@@ -124,12 +125,14 @@ class ASTNODE(Type)
 
   public:
     virtual bool canBeInFunctionDeclaration() { return true; };
+    virtual string toString() { return "unknown"; }
 };
 
 class TYPE(BasicType) {
   // this type includes int/char/void  
   public:
     BasicType(std::string str, Pos pos);
+    string toString();
     PPRINTABLE
   
   private:
@@ -341,6 +344,9 @@ class ASTNODE(DirectDeclarator) {
       pp.pprint(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"),
                             indentLevel);
     };
+    virtual string getIdentifier() {
+      return "NONAME";
+    }
 };
 
 typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
@@ -348,6 +354,7 @@ typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 class ASTNODE(Declarator) {
   public:
     Declarator(int cnt, SubDirectDeclarator ast, Pos pos);
+    string getIdentifier() { return directDeclarator->getIdentifier(); }
     PPRINTABLE
   private:
     int pointerCounter;
@@ -364,6 +371,9 @@ class DIRECTDECLARATOR(IdentifierDirectDeclarator) {
         Pos pos);
 
     IdentifierDirectDeclarator(std::string str, Pos pos);
+    virtual string getIdentifier() {
+      return identifier;
+    }
 
     PPRINTABLE
   // TODO pretty Print
@@ -392,12 +402,14 @@ typedef std::shared_ptr<Type> TypeNode;
 
 class ASTNODE(Declaration) {
   public:
-    Declaration(TypeNode t, SubDeclarator declarator, Pos pos);
+    Declaration(TypeNode t, SubDeclarator declarator, 
+                Pos pos, shared_ptr<SemanticTree> semanticTree);
     Declaration(TypeNode t, Pos pos);
     PPRINTABLE
   private:
     TypeNode type;
     SubDeclarator declarator;
+    shared_ptr<SemanticTree> semanticTree;
 };
 
 typedef std::shared_ptr<Declaration> DeclarationNode;
@@ -407,16 +419,21 @@ class ASTNODE(ExternalDeclaration) {
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
                         SubCompoundStatement compoundStatement,
-                        Pos pos);
+                        Pos pos,
+                        shared_ptr<SemanticTree> semanticTree
+                        );
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
-                        Pos pos);
+                        Pos pos,
+                        shared_ptr<SemanticTree> semanticTree
+                        );
     ExternalDeclaration(TypeNode type, Pos pos);
     PPRINTABLE
   private:
     TypeNode type;
     SubDeclarator declarator;
     SubCompoundStatement compoundStatement;
+    shared_ptr<SemanticTree> semanticTree;
 };
 
 typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;
@@ -450,8 +467,6 @@ class ASTNODE(Declarator) {
   public:
     Declarator(Pointer ptr, DirectDeclarator) : name(str), statement(st) { };
     PPRINTABLE
-
-
 }
 */
 
@@ -464,6 +479,16 @@ class TYPE(StructType) {
     StructType(std::string name, Pos pos);
     StructType(std::string name, StructContent content, Pos pos);
     bool canBeInFunctionDeclaration() { return !hasDeclaration; };
+    
+    // TODO : only calculate once
+    virtual string getIdentifier() {
+      return "struct_" + name;
+    }
+
+    string toString() {
+      return name;
+    }
+
     PPRINTABLE
 
   private:

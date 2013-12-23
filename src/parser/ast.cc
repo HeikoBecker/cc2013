@@ -136,7 +136,6 @@ PRETTY_PRINT(TernaryExpression)
 
 BasicType::BasicType(std::string type, Pos pos) : Type(pos)
 {
-  
   if (type == "int") {
     this->type = INT;
   } else if (type == "char") {
@@ -145,6 +144,16 @@ BasicType::BasicType(std::string type, Pos pos) : Type(pos)
     this->type = VOID;
   } else {
     throw ParsingException(type + " is not a Basic Type", pos);
+  }
+}
+
+string BasicType::toString() {
+  if (this->type == INT) {
+    return "int";
+  } else if (type == CHAR) {
+    return "char";
+  } else { // if (type == VOID) {
+    return "void";
   }
 }
 
@@ -409,8 +418,11 @@ PRETTY_PRINT(Declarator)
   }
 }
 
-Declaration::Declaration(TypeNode t, SubDeclarator declarator, Pos pos)
-  : AstNode(pos), type(t),declarator(declarator){}
+Declaration::Declaration(TypeNode t, SubDeclarator declarator, Pos pos, shared_ptr<SemanticTree> semanticTree)
+  : AstNode(pos), type(t),declarator(declarator), semanticTree(semanticTree) {
+    string identifier = declarator->getIdentifier();
+    semanticTree->addDeclaration(identifier, type->toString(), pos);
+}
 
 Declaration::Declaration(TypeNode t, Pos pos)
   : AstNode(pos), type(t){}
@@ -430,20 +442,34 @@ PRETTY_PRINT(Declaration)
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
                         SubCompoundStatement compoundStatement,
-                        Pos pos)
+                        Pos pos,
+                        shared_ptr<SemanticTree> semanticTree
+                        )
   : AstNode(pos), type(type), declarator(declarator),
-    compoundStatement(compoundStatement)
-{}
+    compoundStatement(compoundStatement), semanticTree(semanticTree)
+{
+    semanticTree->addDeclaration(declarator->getIdentifier(), 
+                                 type->toString(), pos);
+}
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
-                        Pos pos)
-  : AstNode(pos), type(type), declarator(declarator)
-{}
+                        Pos pos,
+                        shared_ptr<SemanticTree> semanticTree
+                        )
+  : AstNode(pos), type(type), declarator(declarator),
+    semanticTree(semanticTree)
+{
+  if (semanticTree) {
+    semanticTree->addDeclaration(declarator->getIdentifier(), type->toString(), pos);
+  }
+  
+}
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos)
   : AstNode(pos), type(type)
-{}
+{
+}
 
 
 TranslationUnit::TranslationUnit(
