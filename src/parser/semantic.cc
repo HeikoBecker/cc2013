@@ -35,20 +35,22 @@ void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
 #endif
   if (declarationMap.find(name) == declarationMap.end()) {
     st = new stack<pair<int, string> >();
-    st->push(make_pair(currentPos, name));
+    st->push(make_pair(currentPos, typeNode));
     declarationMap[name] = st;
   } else {
     st = declarationMap[name];
 
     deleteNotActiveNodes(st);
 
-
     // NO redefinitions
     if (st->size() > 0 && st->top().first == currentPos) {
-      throw Parsing::ParsingException("no redefinition of " + name, pos);
-    } else {
-      declarationMap[name]->push(make_pair(currentPos, typeNode));
-    }
+      if (currentPos !=0 || st->top().second != typeNode) {
+        throw Parsing::ParsingException("no redefinition of " + name, pos);
+      }
+    } 
+
+    declarationMap[name]->push(make_pair(currentPos, typeNode));
+    
   }
 }
 

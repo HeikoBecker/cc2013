@@ -1,4 +1,4 @@
 int main() {
   int a;
-  int a; // a has been already declared
+  char a; // a has been already declared
 }
