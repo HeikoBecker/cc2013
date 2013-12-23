@@ -97,8 +97,8 @@ namespace Parsing {
       std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> structDeclaration();
       std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>>> structDeclarationList();
       TypeNode specifierQualifierList();
-      std::vector<std::pair<SubDeclarator,SubExpression>> structDeclaratorList();
-      std::pair<SubDeclarator,SubExpression> structDeclarator();
+      std::vector<std::pair<SubDeclarator,SubExpression>> structDeclaratorList(TypeNode type);
+      std::pair<SubDeclarator,SubExpression> structDeclarator(TypeNode type);
       std::vector<ParameterNode> parameterList();
       ParameterNode parameterDeclaration();
       SubIdentifierList identifierList();

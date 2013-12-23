@@ -525,7 +525,7 @@ std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> Parser:
       scan();
       return std::make_pair(type, empty);
     } else {
-     auto sdecll = structDeclaratorList();
+     auto sdecll = structDeclaratorList(type);
      expect(PunctuatorType::SEMICOLON);
      scan();
      return make_pair(type, sdecll);
@@ -542,18 +542,20 @@ TypeNode Parser::specifierQualifierList() {
   return typeSpecifier();
 }
 
-std::vector<std::pair<SubDeclarator,SubExpression>> Parser::structDeclaratorList() {
-  decltype(structDeclaratorList()) structDeclarators {};
-  structDeclarators.push_back(structDeclarator());
+std::vector<std::pair<SubDeclarator,SubExpression>> 
+  Parser::structDeclaratorList(TypeNode type) {
+  decltype(structDeclaratorList(type)) structDeclarators {};
+
+  structDeclarators.push_back(structDeclarator(type));
 
   while(testp(",")) {
     scan();
-    structDeclarators.push_back(structDeclarator());
+    structDeclarators.push_back(structDeclarator(type));
   }
   return structDeclarators;
 }
 
-std::pair<SubDeclarator,SubExpression> Parser::structDeclarator() {
+std::pair<SubDeclarator,SubExpression> Parser::structDeclarator(TypeNode type) {
   if (testp(":")) {
     /* TODO: when can this ever happen?!?
      * A structDeclarator without a declarator?
@@ -563,6 +565,11 @@ std::pair<SubDeclarator,SubExpression> Parser::structDeclarator() {
     return std::make_pair(SubDeclarator(), constantExpression());
   } else {
     auto decl = declarator();
+    
+    OBTAIN_POS();
+    string identifier = decl->getIdentifier();
+    semanticTree->addDeclaration(identifier, type->toString(), pos);
+
     if (testp(":")) {
       scan();
       return std::make_pair(decl, constantExpression());

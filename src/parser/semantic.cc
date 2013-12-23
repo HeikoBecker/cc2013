@@ -30,9 +30,8 @@ void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
 
 void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
   TypeStack *st;
-
 #ifdef DEBUG
-  cout<<" SEMANTIC ADD : DEPTH: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<typeNode<<endl;
+  cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<typeNode<<endl;
 #endif
   if (declarationMap.find(name) == declarationMap.end()) {
     st = new stack<pair<int, string> >();
