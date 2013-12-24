@@ -392,7 +392,10 @@ class DIRECTDECLARATOR(DeclaratorDirectDeclarator) {
     PPRINTABLE
     // TODO pretty Print
  DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
-    
+     virtual string getIdentifier() {
+      return declarator->getIdentifier();
+    }
+
   private:
     SubDeclarator declarator;
     SubDirectDeclaratorHelp help;

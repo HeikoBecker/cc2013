@@ -33,7 +33,6 @@ void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
 #ifdef DEBUG
   cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<typeNode<<endl;
 #endif
-
   if (name == "NONAME") {
     return ;
   }
