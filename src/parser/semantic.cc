@@ -33,6 +33,11 @@ void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
 #ifdef DEBUG
   cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<typeNode<<endl;
 #endif
+
+  if (name == "NONAME") {
+    return ;
+  }
+
   if (declarationMap.find(name) == declarationMap.end()) {
     st = new stack<pair<int, string> >();
     st->push(make_pair(currentPos, typeNode));
