@@ -85,14 +85,14 @@ bool Parser::testTypeSpecifier() {
 
 void Parser::debugOutput() {
   // print current token
-#ifdef DEBUG
-  cout<<"SCAN :";
-  if (getNextType() == TokenType::END) {
-    cout<<"END OF TOKENS REACHED"<<endl;
-  } else {
-     printToken(*getNextSymbol());
-  }
-#endif
+// #ifdef DEBUG
+//  cout<<"SCAN :";
+//  if (getNextType() == TokenType::END) {
+//    cout<<"END OF TOKENS REACHED"<<endl;
+//  } else {
+//     printToken(*getNextSymbol());
+//  }
+// #endif
 }
 
 std::shared_ptr<Token> Parser::getNextSymbol() {
@@ -331,7 +331,7 @@ SubExpression Parser::postfixExpression(SubExpression child) {
                                         : PunctuatorType::ARROW;
         scan();
         expect(TokenType::IDENTIFIER);
-        auto var = make_shared<VariableUsage>(m_nextsym->value(), pos);
+        auto var = make_shared<VariableUsage>(m_nextsym->value(), pos, semanticTree);
         child = make_shared<BinaryExpression>(child, var, p, pos);
         scan();
       } else {
@@ -357,7 +357,7 @@ SubExpression Parser::computeAtom() {
              || m_nextsym->type() == TokenType::CONSTANT) {
     // 'normal ' atom, variable or constant
     // maybe followed by one of ., ->, [], ()
-    auto var = std::make_shared<VariableUsage>(m_nextsym->value(), pos);
+    auto var = std::make_shared<VariableUsage>(m_nextsym->value(), pos, semanticTree);
     auto cont = m_nextsym->type() == TokenType::IDENTIFIER;
     scan();
     auto child = SubExpression(var);

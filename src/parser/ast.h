@@ -17,32 +17,96 @@
 
 namespace Parsing {
 
+typedef shared_ptr<SemanticTree> SemanticTreeNode;
+
+class EXPRESSION(BinaryExpression)
+{
+  public:
+    BinaryExpression(SubExpression lhs,
+                     SubExpression rhs,
+                     PunctuatorType op,
+                     Pos pos);
+    PPRINTABLE
+  private:
+    SubExpression lhs;
+    SubExpression rhs;
+    PunctuatorType op;
+};
+
+class EXPRESSION(UnaryExpression)
+{
+  public:
+   UnaryExpression(PunctuatorType op,
+       SubExpression operand,
+       Pos pos);
+   PPRINTABLE
+  private:
+   SubExpression operand;
+   PunctuatorType op;
+};
+
+class EXPRESSION(VariableUsage)
+{
+  public:
+    VariableUsage(std::string name, Pos pos, SemanticTreeNode semanticTree);
+    PPRINTABLE
+  private:
+    std::string name;
+    SemanticTreeNode semanticTree;
+
+};
+
+class EXPRESSION(FunctionCall)
+{
+  public:
+    FunctionCall(SubExpression funcName,
+                 std::vector<SubExpression> arguments,
+                 Pos pos);
+    PPRINTABLE
+  private:
+    SubExpression funcName;
+    std::vector<SubExpression> arguments;
+};
+
+class EXPRESSION(TernaryExpression)
+{
+  public:
+    TernaryExpression(SubExpression condition,
+                      SubExpression lhs, 
+                      SubExpression rhs,
+                      Pos);
+    PPRINTABLE
+  private:
+    SubExpression condition;
+    SubExpression lhs;
+    SubExpression rhs;
+};
+
 class ASTNODE(Declaration) {
   public:
     Declaration(TypeNode t, SubDeclarator declarator, 
-                Pos pos, shared_ptr<SemanticTree> semanticTree);
+                Pos pos, SemanticTreeNode semanticTree);
     Declaration(TypeNode t, Pos pos);
     PPRINTABLE
   private:
     TypeNode type;
     SubDeclarator declarator;
-    shared_ptr<SemanticTree> semanticTree;
+    SemanticTreeNode semanticTree;
 };
 
 typedef std::shared_ptr<Declaration> DeclarationNode;
-
 class ASTNODE(ExternalDeclaration) {
   public:
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
                         SubCompoundStatement compoundStatement,
                         Pos pos,
-                        shared_ptr<SemanticTree> semanticTree
+                        SemanticTreeNode semanticTree
                         );
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
                         Pos pos,
-                        shared_ptr<SemanticTree> semanticTree
+                        SemanticTreeNode semanticTree
                         );
     ExternalDeclaration(TypeNode type, Pos pos);
     PPRINTABLE
@@ -50,7 +114,7 @@ class ASTNODE(ExternalDeclaration) {
     TypeNode type;
     SubDeclarator declarator;
     SubCompoundStatement compoundStatement;
-    shared_ptr<SemanticTree> semanticTree;
+    SemanticTreeNode semanticTree;
 };
 
 typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;

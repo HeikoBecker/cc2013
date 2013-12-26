@@ -35,14 +35,12 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
 
   string name = declarator->getIdentifier();
   int pointerCounter = declarator->getCounter();
-
 #ifdef DEBUG
   string type = typeNode->toString();
 
   for(int n=0; n<pointerCounter; n++) { type+="*"; };
   cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type<<endl;
 #endif
-
   if (name == "NONAME") {
     return ;
   }
@@ -59,7 +57,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     // NO redefinitions
     if (st->size() > 0 && st->top().first == currentPos) {
       if (currentPos !=0 || 
-          !(st->top().second.first == typeNode && st->top().second.second == pointerCounter)) {
+          !(st->top().second.first->toString() == typeNode->toString() && st->top().second.second == pointerCounter)) {
         throw Parsing::ParsingException("no redefinition of " + name, pos);
       }
     } 
