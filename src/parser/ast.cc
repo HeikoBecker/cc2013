@@ -421,9 +421,7 @@ PRETTY_PRINT(Declarator)
 
 Declaration::Declaration(TypeNode t, SubDeclarator declarator, Pos pos, shared_ptr<SemanticTree> semanticTree)
   : AstNode(pos), type(t),declarator(declarator), semanticTree(semanticTree) {
-    string identifier = declarator->getIdentifier();
-    semanticTree->addDeclaration(identifier, type->toString(),
-    declarator->getCounter(), pos);
+    semanticTree->addDeclaration(type, declarator, pos);
 }
 
 
@@ -451,10 +449,7 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
   : AstNode(pos), type(type), declarator(declarator),
     compoundStatement(compoundStatement), semanticTree(semanticTree)
 {
-    semanticTree->addDeclaration(declarator->getIdentifier(), 
-                                 type->toString(), 
-                                 declarator->getCounter(),  
-                                 pos);
+    semanticTree->addDeclaration(type, declarator, pos);
 }
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
@@ -465,11 +460,9 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
   : AstNode(pos), type(type), declarator(declarator),
     semanticTree(semanticTree)
 {
+  // TODO : I dont think we need that anymore ..
   if (semanticTree) {
-    semanticTree->addDeclaration(declarator->getIdentifier(), 
-                                 type->toString(),
-                                 declarator->getCounter(), 
-                                 pos);
+    semanticTree->addDeclaration(type, declarator, pos);
   }
   
 }

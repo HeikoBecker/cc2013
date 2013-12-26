@@ -1,5 +1,7 @@
 #include "semantic.h"
 
+namespace Parsing {
+
 SemanticTree::SemanticTree() {
   counter = 0;
   currentPos = 0;
@@ -28,11 +30,14 @@ void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
   }
 }
 
-void SemanticTree::addDeclaration(string name, string typeNode, int pointerCounter, Pos pos) {
+void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
   TypeStack *st;
 
+  string name = declarator->getIdentifier();
+  int pointerCounter = declarator->getCounter();
+
 #ifdef DEBUG
-  string type = typeNode;
+  string type = typeNode->toString();
 
   for(int n=0; n<pointerCounter; n++) { type+="*"; };
   cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type<<endl;
@@ -43,7 +48,7 @@ void SemanticTree::addDeclaration(string name, string typeNode, int pointerCount
   }
 
   if (declarationMap.find(name) == declarationMap.end()) {
-    st = new stack<pair<int, pair<string,int> > >();
+    st = new stack<pair<int, pair<TypeNode, int> > >();
     st->push(make_pair(currentPos, make_pair(typeNode, pointerCounter) ));
     declarationMap[name] = st;
   } else {
@@ -64,7 +69,7 @@ void SemanticTree::addDeclaration(string name, string typeNode, int pointerCount
   }
 }
 
-pair<string,int> SemanticTree::lookUpType(string name, Pos pos) {
+pair<TypeNode, int> SemanticTree::lookUpType(string name, Pos pos) {
   if (declarationMap.find(name) != declarationMap.end()) {
     TypeStack *st =  declarationMap[name];
 
@@ -79,4 +84,6 @@ pair<string,int> SemanticTree::lookUpType(string name, Pos pos) {
   } else {
     throw Parsing::ParsingException(name+ "is not declared in this scope", pos);
   }
+}
+
 }
