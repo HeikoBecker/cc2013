@@ -355,6 +355,7 @@ class ASTNODE(Declarator) {
   public:
     Declarator(int cnt, SubDirectDeclarator ast, Pos pos);
     string getIdentifier() { return directDeclarator->getIdentifier(); }
+    int getCounter() { return pointerCounter; }
     PPRINTABLE
   private:
     int pointerCounter;

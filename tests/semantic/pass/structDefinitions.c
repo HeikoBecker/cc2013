@@ -1,4 +1,6 @@
 int a;
+int* b;
+int* b;
 
 struct A {
   int a; 
@@ -14,5 +16,8 @@ struct B {
 } s2;
 
 int main() {
-
+  int *a;
+  int **b;
+  int **c;
+  int ***d;
 }

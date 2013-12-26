@@ -422,8 +422,10 @@ PRETTY_PRINT(Declarator)
 Declaration::Declaration(TypeNode t, SubDeclarator declarator, Pos pos, shared_ptr<SemanticTree> semanticTree)
   : AstNode(pos), type(t),declarator(declarator), semanticTree(semanticTree) {
     string identifier = declarator->getIdentifier();
-    semanticTree->addDeclaration(identifier, type->toString(), pos);
+    semanticTree->addDeclaration(identifier, type->toString(),
+    declarator->getCounter(), pos);
 }
+
 
 Declaration::Declaration(TypeNode t, Pos pos)
   : AstNode(pos), type(t){}
@@ -450,7 +452,9 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
     compoundStatement(compoundStatement), semanticTree(semanticTree)
 {
     semanticTree->addDeclaration(declarator->getIdentifier(), 
-                                 type->toString(), pos);
+                                 type->toString(), 
+                                 declarator->getCounter(),  
+                                 pos);
 }
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
@@ -462,7 +466,10 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
     semanticTree(semanticTree)
 {
   if (semanticTree) {
-    semanticTree->addDeclaration(declarator->getIdentifier(), type->toString(), pos);
+    semanticTree->addDeclaration(declarator->getIdentifier(), 
+                                 type->toString(),
+                                 declarator->getCounter(), 
+                                 pos);
   }
   
 }
@@ -699,7 +706,6 @@ IdentifierList::IdentifierList(std::vector<std::string > list, Pos pos)
 
 Declarator::Declarator(int cnt, SubDirectDeclarator ast, Pos pos)
   : AstNode(pos), pointerCounter(cnt), directDeclarator(ast) {}
-
 
 #undef PPRINT
 #undef ADDINDENT

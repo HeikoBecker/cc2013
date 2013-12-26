@@ -28,18 +28,23 @@ void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
   }
 }
 
-void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
+void SemanticTree::addDeclaration(string name, string typeNode, int pointerCounter, Pos pos) {
   TypeStack *st;
+
 #ifdef DEBUG
-  cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<typeNode<<endl;
+  string type = typeNode;
+
+  for(int n=0; n<pointerCounter; n++) { type+="*"; };
+  cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type<<endl;
 #endif
+
   if (name == "NONAME") {
     return ;
   }
 
   if (declarationMap.find(name) == declarationMap.end()) {
-    st = new stack<pair<int, string> >();
-    st->push(make_pair(currentPos, typeNode));
+    st = new stack<pair<int, pair<string,int> > >();
+    st->push(make_pair(currentPos, make_pair(typeNode, pointerCounter) ));
     declarationMap[name] = st;
   } else {
     st = declarationMap[name];
@@ -48,17 +53,18 @@ void SemanticTree::addDeclaration(string name, string typeNode, Pos pos) {
 
     // NO redefinitions
     if (st->size() > 0 && st->top().first == currentPos) {
-      if (currentPos !=0 || st->top().second != typeNode) {
+      if (currentPos !=0 || 
+          !(st->top().second.first == typeNode && st->top().second.second == pointerCounter)) {
         throw Parsing::ParsingException("no redefinition of " + name, pos);
       }
     } 
 
-    declarationMap[name]->push(make_pair(currentPos, typeNode));
+    declarationMap[name]->push(make_pair(currentPos, make_pair(typeNode, pointerCounter)));
     
   }
 }
 
-string SemanticTree::lookUpType(string name, Pos pos) {
+pair<string,int> SemanticTree::lookUpType(string name, Pos pos) {
   if (declarationMap.find(name) != declarationMap.end()) {
     TypeStack *st =  declarationMap[name];
 

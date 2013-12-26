@@ -14,7 +14,7 @@ using namespace Parsing;
 // TODO change string to TypeNode
 // conflict in C++ dependencies
 
-typedef stack<pair<int, string> > TypeStack;
+typedef stack<pair<int, pair<string, int> > > TypeStack;
 
 class SemanticTree {
 
@@ -52,8 +52,9 @@ class SemanticTree {
     void addChild();
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
-    void addDeclaration(string name, string typeNode, Pos pos);
-    string lookUpType(string name, Pos pos);
+    void addDeclaration(string name, string typeNode, 
+                        int pointerCounter, Pos pos);
+    pair<string,int> lookUpType(string name, Pos pos);
 };
 
 #endif
