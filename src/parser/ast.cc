@@ -97,7 +97,24 @@ VariableUsage::VariableUsage(std::string name, Pos pos,
 #endif
 }
 
+Literal::Literal(std::string name, Pos pos)
+  : Expression(pos), name(name) {}
+
+Constant::Constant(std::string name, Pos pos)
+  : Expression(pos), name(name) {}
+
+
 PRETTY_PRINT(VariableUsage)
+{
+  PPRINT(this->name);
+}
+
+PRETTY_PRINT(Literal)
+{
+  PPRINT(this->name);
+}
+
+PRETTY_PRINT(Constant)
 {
   PPRINT(this->name);
 }

@@ -53,7 +53,24 @@ class EXPRESSION(VariableUsage)
   private:
     std::string name;
     SemanticTreeNode semanticTree;
+};
 
+class EXPRESSION(Literal)
+{
+  public:
+    Literal(std::string name, Pos pos);
+    PPRINTABLE
+  private:
+    std::string name;
+};
+
+class EXPRESSION(Constant)
+{
+  public:
+    Constant(std::string name, Pos pos);
+    PPRINTABLE
+  private:
+    std::string name;
 };
 
 class EXPRESSION(FunctionCall)

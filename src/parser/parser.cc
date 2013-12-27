@@ -352,19 +352,27 @@ SubExpression Parser::computeAtom() {
     // handle postfix-expression
     child = postfixExpression(child);
     return child;
-  } else if (   m_nextsym->type() == TokenType::IDENTIFIER 
-             || m_nextsym->type() == TokenType::STRINGLITERAL
-             || m_nextsym->type() == TokenType::CONSTANT) {
-    // 'normal ' atom, variable or constant
+  } else if ( m_nextsym->type() == TokenType::IDENTIFIER ) {
+    // 'normal ' atom, variable 
     // maybe followed by one of ., ->, [], ()
     auto var = std::make_shared<VariableUsage>(m_nextsym->value(), pos, semanticTree);
-    auto cont = m_nextsym->type() == TokenType::IDENTIFIER;
     scan();
     auto child = SubExpression(var);
     // handle postfix-expression
-    if (cont) {
-      child = postfixExpression(child);
-    }
+    child = postfixExpression(child);
+    return child;
+  } else if ( m_nextsym->type() == TokenType::CONSTANT) {
+    // 'normal ' atom, constant
+    auto var = std::make_shared<Constant>(m_nextsym->value(), pos);
+    //auto var = std::make_shared<Literal>(m_nextsym->value(), pos);
+    scan();
+    auto child = SubExpression(var);
+    return child;
+  } else if (m_nextsym->type() == TokenType::STRINGLITERAL) {
+    // 'normal ' atom, literal
+    auto var = std::make_shared<Literal>(m_nextsym->value(), pos);
+    scan();
+    auto child = SubExpression(var);
     return child;
   } else if (testp(   PunctuatorType::STAR) 
                    || testp(PunctuatorType::MINUS) 
