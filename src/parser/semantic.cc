@@ -75,12 +75,12 @@ pair<TypeNode, int> SemanticTree::lookUpType(string name, Pos pos) {
     // delete not active nodes
 
     if (st->size() == 0) {
-      throw Parsing::ParsingException(name+ "is not declared in this scope", pos);
+      throw Parsing::ParsingException(name+ " is not declared in this scope", pos);
     } else {
       return st->top().second;
     }
   } else {
-    throw Parsing::ParsingException(name+ "is not declared in this scope", pos);
+    throw Parsing::ParsingException(name+ " is not declared in this scope", pos);
   }
 }
 
