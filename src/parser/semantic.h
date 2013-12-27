@@ -9,7 +9,7 @@
 #include "parserException.h"
 #include "astNode.h"
 #include "typeNode.h"
-#include "declaratorNode.H"
+#include "declaratorNode.h"
 
 using namespace std;
 
