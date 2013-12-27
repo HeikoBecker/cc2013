@@ -134,7 +134,6 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       SubDeclarator declarator;
       SubDirectDeclaratorHelp help;
   };
-
 }
 
 #endif
