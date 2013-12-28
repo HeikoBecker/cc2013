@@ -110,8 +110,6 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       }
 
       PPRINTABLE
-        // TODO pretty Print
-        // handle SubDirectDeclaratorHelp not given
 
     private:
         std::string identifier;
@@ -124,7 +122,6 @@ typedef std::shared_ptr<Parameter> ParameterNode;
           SubDirectDeclaratorHelp h,
           Pos pos);
       PPRINTABLE
-        // TODO pretty Print
         DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
       virtual std::string getIdentifier() {
         return declarator->getIdentifier();
