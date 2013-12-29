@@ -550,10 +550,10 @@ PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/
   PPRINT(this->identifier);
   auto numDiDeHelp = help.size();
+  // TODO: we might need to print helpers which are not the last one in
+  // parentheses
   while (numDiDeHelp) {
-    PPRINT('(');
     PPRINT(help.at(--numDiDeHelp));
-    PPRINT(')');
   }
 }
 
