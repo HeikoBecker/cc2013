@@ -49,19 +49,11 @@ typedef std::shared_ptr<Parameter> ParameterNode;
   class ASTNODE(DirectDeclaratorHelp) {
     public:
       DirectDeclaratorHelp(Pos pos);
-      DirectDeclaratorHelp(std::shared_ptr<DirectDeclaratorHelp> help, Pos pos);
       DirectDeclaratorHelp(std::vector<ParameterNode> paramList, Pos pos);
-      DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
-          std::shared_ptr<DirectDeclaratorHelp> help,
-          Pos pos);
       DirectDeclaratorHelp(SubIdentifierList idList, Pos pos);
-      DirectDeclaratorHelp(SubIdentifierList idList, 
-          std::shared_ptr<DirectDeclaratorHelp> help,
-          Pos pos);
       PPRINTABLE
     private:
         DirectDeclaratorHelpEnum helperType;
-        std::shared_ptr<DirectDeclaratorHelp> help;
         // those are mutually exclusive:
         std::vector<ParameterNode> paramList;
         SubIdentifierList idList;
@@ -101,7 +93,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
     public:
 
       IdentifierDirectDeclarator(std::string str,
-          SubDirectDeclaratorHelp h,
+          std::vector<SubDirectDeclaratorHelp> h,
           Pos pos);
 
       IdentifierDirectDeclarator(std::string str, Pos pos);
@@ -113,13 +105,13 @@ typedef std::shared_ptr<Parameter> ParameterNode;
 
     private:
         std::string identifier;
-        SubDirectDeclaratorHelp help;
+        std::vector<SubDirectDeclaratorHelp> help;
   };
 
   class DIRECTDECLARATOR(DeclaratorDirectDeclarator) { 
     public:
       DeclaratorDirectDeclarator(SubDeclarator d,
-          SubDirectDeclaratorHelp h,
+          std::vector<SubDirectDeclaratorHelp> h,
           Pos pos);
       PPRINTABLE
         DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
@@ -129,7 +121,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
 
     private:
       SubDeclarator declarator;
-      SubDirectDeclaratorHelp help;
+      std::vector<SubDirectDeclaratorHelp> help;
   };
 }
 

@@ -630,8 +630,8 @@ auto Parser::directAbstractDeclarator() -> decltype(Parser::directDeclarator()) 
   return directDeclarator(ThreeValueBool::ABSTRACT);
 }
 
-auto Parser::directAbstractDeclaratorHelp() -> decltype(Parser::directAbstractDeclaratorHelp()) {
-  return directDeclaratorHelp(ThreeValueBool::ABSTRACT);
+auto Parser::directAbstractDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs) -> decltype(Parser::directAbstractDeclaratorHelp(hs)) {
+  directDeclaratorHelp(hs, ThreeValueBool::ABSTRACT);
 }
 
 /*
@@ -724,7 +724,8 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
     scan();
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      SubDirectDeclaratorHelp help =  directDeclaratorHelp(ThreeValueBool::NOTABSTRACT);
+      std::vector<SubDirectDeclaratorHelp> help;
+      directDeclaratorHelp(help, ThreeValueBool::NOTABSTRACT);
       return make_shared<IdentifierDirectDeclarator>(identifier, help, pos);
     } else {
       return make_shared<IdentifierDirectDeclarator>(identifier, pos);
@@ -743,7 +744,8 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
     }
 
     if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-      SubDirectDeclaratorHelp help = directDeclaratorHelp(abstract);
+      std::vector<SubDirectDeclaratorHelp> help;
+      directDeclaratorHelp(help, abstract);
       return make_shared<DeclaratorDirectDeclarator>(dec,help, pos);
     } else {
       return make_shared<DeclaratorDirectDeclarator>(dec, pos);
@@ -765,21 +767,20 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
                           |  "(" ")" direct-declarator_help
                                        | EPSILON
 */
-SubDirectDeclaratorHelp Parser::directDeclaratorHelp(ThreeValueBool abstract) {
+void Parser::directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs ,ThreeValueBool abstract) {
   OBTAIN_POS();
   if (testp(PunctuatorType::LEFTPARENTHESIS)) { // TODO: use expect instead of testp
     scan();
 
-    decltype(directDeclaratorHelp()) declHelp;
     // 1. option
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        declHelp = directDeclaratorHelp(abstract);
-        return make_shared<DirectDeclaratorHelp>(declHelp, pos);
+        directDeclaratorHelp(hs, abstract);
+        hs.emplace_back(make_shared<DirectDeclaratorHelp>(pos));
       } else {
-        return make_shared<DirectDeclaratorHelp>(pos);
+        hs.emplace_back(make_shared<DirectDeclaratorHelp>(pos));
       }
 
     } else if (testTypeSpecifier()) { // parameter-list
@@ -788,20 +789,22 @@ SubDirectDeclaratorHelp Parser::directDeclaratorHelp(ThreeValueBool abstract) {
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        declHelp = directDeclaratorHelp(abstract);
-        return make_shared<DirectDeclaratorHelp>(params, declHelp ,pos);
+        directDeclaratorHelp(hs, abstract);
+        hs.emplace_back(make_shared<DirectDeclaratorHelp>(params, pos));
+      } else {
+        hs.emplace_back(make_shared<DirectDeclaratorHelp>(params, pos));
       }
-      return make_shared<DirectDeclaratorHelp>(params, pos);
     } else if((abstract == ThreeValueBool::NOTABSTRACT || abstract == ThreeValueBool::DONTCARE) && testType(TokenType::IDENTIFIER)) {
       auto ids = identifierList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
       scan();
 
       if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        declHelp = directDeclaratorHelp(ThreeValueBool::NOTABSTRACT);
-        return make_shared<DirectDeclaratorHelp>(ids, declHelp, pos);
+        directDeclaratorHelp(hs, ThreeValueBool::NOTABSTRACT);
+        hs.emplace_back(make_shared<DirectDeclaratorHelp>(ids, pos));
+      } else {
+        hs.emplace_back(make_shared<DirectDeclaratorHelp>(ids, pos));
       }
-      return make_shared<DirectDeclaratorHelp>(ids, pos);
     } else {
       expectedAnyOf();
     }

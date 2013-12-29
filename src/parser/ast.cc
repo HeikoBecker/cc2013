@@ -549,9 +549,12 @@ PRETTY_PRINT(ExternalDeclaration) {
 PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/
   PPRINT(this->identifier);
-  if (help) {
-    PPRINT(help);
-  } 
+  auto numDiDeHelp = help.size();
+  while (numDiDeHelp) {
+    PPRINT('(');
+    PPRINT(help.at(--numDiDeHelp));
+    PPRINT(')');
+  }
 }
 
 Parameter::Parameter(TypeNode type, SubDeclarator declarator, Pos pos)
@@ -576,28 +579,34 @@ PRETTY_PRINT(Parameter) {
 
 PRETTY_PRINT(DeclaratorDirectDeclarator)
 {
-  if (help) {
+  // TODO: broken
+  size_t numDiDeHelp = help.size();
+  if (numDiDeHelp > 0) {
     PPRINT('(');
   }
   PPRINT(declarator);
-  if (help) {
-    PPRINT(help);
+  if (numDiDeHelp > 0) {
+    PPRINT(help.at(--numDiDeHelp));
+    while (numDiDeHelp) {
+      PPRINT('(');
+      PPRINT(help.at(--numDiDeHelp));
+      PPRINT(')');
+    }
     PPRINT(')');
   }
 }
 
 
 
-DirectDeclaratorHelp::DirectDeclaratorHelp(Pos pos) 
-  : AstNode(pos)
-{
-  helperType = EPSILON;
-}
+//DirectDeclaratorHelp::DirectDeclaratorHelp(Pos pos) 
+  //: AstNode(pos)
+//{
+  //helperType = EPSILON;
+//}
 
 DirectDeclaratorHelp::DirectDeclaratorHelp(
-    SubDirectDeclaratorHelp help,
     Pos pos
-    ) : AstNode(pos), help(help)
+    ) : AstNode(pos)
 {
   helperType = EMPTYLIST;
 }
@@ -609,23 +618,8 @@ DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
   helperType = PARAMETERLIST; 
 }
 
-DirectDeclaratorHelp::DirectDeclaratorHelp(std::vector<ParameterNode> paramList,
-                                           SubDirectDeclaratorHelp help, Pos pos)
-  : AstNode(pos), help(help), paramList(paramList) 
-{
-  helperType = PARAMETERLIST;
-}
-
 DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList, Pos pos)
   : AstNode(pos), idList(idList) 
-{
-  helperType = IDENTIFIERLIST;
-}
-
-DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList,
-                                           SubDirectDeclaratorHelp help,
-                                           Pos pos)
-  : AstNode(pos), help(help), idList(idList)
 {
   helperType = IDENTIFIERLIST;
 }
@@ -661,11 +655,6 @@ PRETTY_PRINT(DirectDeclaratorHelp)
         }
       }
       PPRINT(')');
-  }
-  if (help) {
-    PPRINT('(');
-    PPRINT(help);
-    PPRINT(')');
   }
 }  
 
@@ -714,7 +703,7 @@ ExpressionStatement::ExpressionStatement(SubExpression ex, Pos pos)
 
 
 DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
-        SubDirectDeclaratorHelp h,
+        std::vector<SubDirectDeclaratorHelp> h,
         Pos pos) 
   : DirectDeclarator(pos), declarator(d), help(h) {}
 
@@ -725,7 +714,7 @@ DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
 
 
 IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,
-    SubDirectDeclaratorHelp h,
+    std::vector<SubDirectDeclaratorHelp> h,
     Pos pos) : DirectDeclarator(pos), identifier(str), help(h) {}
 
 IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,

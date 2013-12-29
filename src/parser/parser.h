@@ -90,8 +90,9 @@ namespace Parsing {
       SubDeclarator abstractDeclarator();
       SubDirectDeclarator directDeclarator(ThreeValueBool abstract = ThreeValueBool::NOTABSTRACT);
       SubDirectDeclarator directAbstractDeclarator();
-      SubDirectDeclaratorHelp directDeclaratorHelp(ThreeValueBool abstract = ThreeValueBool::NOTABSTRACT);
-      SubDirectDeclaratorHelp directAbstractDeclaratorHelp();
+      void directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs,
+                                ThreeValueBool abstract = ThreeValueBool::NOTABSTRACT);
+      void directAbstractDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs);
       TypeNode typeSpecifier();
       StructNode structOrUnionSpecifier();
       std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> structDeclaration();
