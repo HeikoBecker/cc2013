@@ -629,13 +629,9 @@ PRETTY_PRINT(DirectDeclaratorHelp)
 {
   switch (helperType) {
     case EPSILON:
-      /*TODO: this is probably only a very fragile hack:
-       * The reasoning for the following code is that if there's 'nothing' after a
-       * identifier-direct-declarator, we must have read a parameterless function
-       * TODO: check if this is always the case
-       * */
+      // TODO: the EPSILON case should not be necessary anymore
 #ifdef DEBUG
-      PPRINT(std::string("===============fragile hack!=====================\n"));
+      PPRINT(std::string("should never happen!\n"));
 #endif
       PPRINT('(');
       PPRINT(')');
@@ -643,6 +639,8 @@ PRETTY_PRINT(DirectDeclaratorHelp)
     case IDENTIFIERLIST:
       PPRINT(idList);
     case EMPTYLIST:
+      PPRINT('(');
+      PPRINT(')');
       break;
     case PARAMETERLIST:
       PPRINT('(');
