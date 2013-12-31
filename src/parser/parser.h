@@ -107,7 +107,7 @@ namespace Parsing {
       ExternalDeclarationNode externalDeclaration();
       TUNode translationUnit();
 
-      SubCompoundStatement compoundStatement();
+      SubCompoundStatement compoundStatement(vector<ParameterNode> param = vector<ParameterNode>() );
       SubExpressionStatement expressionStatement();
   };
 }

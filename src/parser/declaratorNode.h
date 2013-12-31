@@ -51,6 +51,8 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       DirectDeclaratorHelp(Pos pos);
       DirectDeclaratorHelp(std::vector<ParameterNode> paramList, Pos pos);
       DirectDeclaratorHelp(SubIdentifierList idList, Pos pos);
+      std::vector<ParameterNode> getParameter() { return paramList; }
+
       PPRINTABLE
     private:
         DirectDeclaratorHelpEnum helperType;
@@ -72,6 +74,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       virtual std::string getIdentifier() {
         return "NONAME";
       }
+      virtual std::vector<ParameterNode> getParameter() { return std::vector<ParameterNode>(); }
   };
 
   typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
@@ -81,6 +84,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       Declarator(int cnt, SubDirectDeclarator ast, Pos pos);
       std::string getIdentifier() { return directDeclarator->getIdentifier(); }
       int getCounter() { return pointerCounter; }
+      std::vector<ParameterNode> getParameter() { return directDeclarator->getParameter(); }
       PPRINTABLE
     private:
         int pointerCounter;
@@ -99,6 +103,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       IdentifierDirectDeclarator(std::string str, Pos pos);
       virtual std::string getIdentifier() {
         return identifier;
+      }
+
+      virtual std::vector<ParameterNode> getParameter() { 
+        if (help.size() == 0) {
+          return std::vector<ParameterNode>(); 
+        } else {
+          return help[0]->getParameter();
+        }
       }
 
       PPRINTABLE

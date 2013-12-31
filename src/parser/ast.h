@@ -151,6 +151,8 @@ class ASTNODE(Parameter) {
   public:
     Parameter(TypeNode type, SubDeclarator declarator, Pos pos);
     Parameter(TypeNode type, Pos pos);
+    TypeNode getType() { return type; }
+    SubDeclarator getDeclarator() { return declarator; }
     PPRINTABLE
   private:
     TypeNode type;

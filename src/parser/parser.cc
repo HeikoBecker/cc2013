@@ -175,7 +175,7 @@ TUNode Parser::translationUnit() {
 
 ExternalDeclarationNode Parser::externalDeclaration() {
 
-  // functionDefintion or declaration ?
+  // functionDefinition or declaration ?
   OBTAIN_POS();
 
   auto type = typeSpecifier();
@@ -201,7 +201,10 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     reportError("struct { is an error");
   }
   expect("{");
-  auto compStat = compoundStatement();
+
+  auto parameter = decl->getParameter();
+  auto compStat = compoundStatement(parameter);
+
   return make_shared<ExternalDeclaration>(type, decl, compStat, 
                                           pos, semanticTree);
 }
@@ -819,12 +822,17 @@ void Parser::directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs ,Thr
 compound-statement -> "{" block-item-list "}"
                      |  "{" "}"
 */
-SubCompoundStatement Parser::compoundStatement() {
+SubCompoundStatement Parser::compoundStatement(vector<ParameterNode> paramList ) {
   OBTAIN_POS();
 
   // add a new child to the semantic tree
   // and go to that child
   semanticTree->addChild();
+
+  // add variables for the function
+  for (auto par : paramList) {
+    semanticTree->addDeclaration(par->getType(), par->getDeclarator(), pos);
+  }
 
   expect(PunctuatorType::LEFTCURLYBRACE);
   scan();
