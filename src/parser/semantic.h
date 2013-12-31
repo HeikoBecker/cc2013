@@ -48,7 +48,7 @@ class SemanticTree {
     int currentPos;
     int counter;
     map<string, TypeStack *> declarationMap;
-
+    int loopDepth; // depth inside loop
 
   public:
     SemanticTree();
@@ -57,6 +57,9 @@ class SemanticTree {
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
     void addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
+    void increaseLoopDepth();
+    void decreaseLoopDepth();
+    bool isInLoop();
     pair<TypeNode, int> lookUpType(string name, Pos pos);
 };
 

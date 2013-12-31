@@ -4,10 +4,10 @@ namespace Parsing {
 
 SemanticTree::SemanticTree() {
   counter = 0;
+  loopDepth = 0;
   currentPos = 0;
   nodes.push_back(SemanticNode(-1));
   counter++;
-
 }
 
 void SemanticTree::addChild() {
@@ -28,6 +28,18 @@ void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
       ) {
     st->pop();
   }
+}
+
+bool SemanticTree::isInLoop() {
+  return loopDepth > 0;
+}
+
+void SemanticTree::increaseLoopDepth() {
+  loopDepth++;
+}
+
+void SemanticTree::decreaseLoopDepth() {
+  loopDepth--;
 }
 
 void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {

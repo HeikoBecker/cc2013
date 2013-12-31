@@ -945,7 +945,7 @@ SubLabeledStatement Parser::labeledStatement() {
 
     SubStatement st = statement();
 
-    return make_shared<LabeledStatement>(label,st, pos);
+    return make_shared<LabeledStatement>(label, st, pos);
   } else {
     expectedAnyOf(std::string("labeled-statement : identifier expected"));
   }
@@ -958,6 +958,10 @@ iteration-statement ->  "while" "(" expression ")" statement
 */
 SubIterationStatement Parser::iterationStatement() {
   OBTAIN_POS();
+
+  // we can have break and continue here
+  semanticTree->increaseLoopDepth();
+
   if(testk(KeywordType::WHILE)) {
     scan();
     expect(PunctuatorType::LEFTPARENTHESIS);
@@ -966,6 +970,7 @@ SubIterationStatement Parser::iterationStatement() {
     expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     SubStatement st = statement();
+    semanticTree->decreaseLoopDepth();
     return make_shared<IterationStatement>(ex, st, IterationEnum::WHILE, pos);
   } else if (testk(KeywordType::DO)) {
     scan();
@@ -979,7 +984,7 @@ SubIterationStatement Parser::iterationStatement() {
     scan();
     expect(";");
     scan();
-
+    semanticTree->decreaseLoopDepth();
     return make_shared<IterationStatement>(ex, st, IterationEnum::DOWHILE, pos);
 
   } else {
@@ -1042,12 +1047,19 @@ SubJumpStatement Parser::jumpStatement() {
       expectedAnyOf(std::string("jump-statement: identifier expected"));
     }
   } else if (testk(KeywordType::CONTINUE)) {
+    if (!semanticTree->isInLoop()) {
+      reportError("continue must be inside a loop");
+    }
+
     scan();
     expect(";");
     scan();
 
     return make_shared<ContinueStatement>(pos);
   } else if (testk(KeywordType::BREAK)) {
+    if (!semanticTree->isInLoop()) {
+      reportError("break must be inside a loop");
+    }
     scan();
     expect(";");
     scan();
