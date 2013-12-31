@@ -161,6 +161,15 @@ std::shared_ptr<Token> Parser::scan() {
 AstRoot Parser::parse() {
   auto tu = translationUnit();
   expect(TokenType::END);
+
+  // check for goto-statement label at the end
+  
+  auto res = semanticTree->checkGotoLabels();
+  
+  if (!res.first) {
+    reportError("The label " + res.second + " is not defined");
+  }
+
   return tu;
 }
 
@@ -944,7 +953,12 @@ SubLabeledStatement Parser::labeledStatement() {
     scan();
 
     SubStatement st = statement();
+    bool unique = semanticTree->addLabel(label);
 
+    if(!unique) {
+      reportError("The label " + label + " is already defined");
+    }
+    
     return make_shared<LabeledStatement>(label, st, pos);
   } else {
     expectedAnyOf(std::string("labeled-statement : identifier expected"));
@@ -1036,6 +1050,8 @@ SubJumpStatement Parser::jumpStatement() {
     scan();
     if(testType(TokenType::IDENTIFIER)) {
 
+      semanticTree->addGotoLabel(m_nextsym->value());
+
       SubJumpStatement gotoStatement = make_shared<GotoStatement>(m_nextsym->value(), pos);
       scan();
 
@@ -1087,4 +1103,3 @@ SubExpression Parser::constantExpression() {
   // TODO: use constant expression
   return expression();
 }
-

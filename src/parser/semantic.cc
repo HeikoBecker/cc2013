@@ -21,6 +21,19 @@ void SemanticTree::goUp() {
   currentPos = nodes[currentPos].getParentIndex();
 }
 
+void SemanticTree::addGotoLabel(string str) {
+  gotoLabels.push_back(str);
+}
+
+pair<bool, string> SemanticTree::checkGotoLabels() {
+  for (auto str : gotoLabels) {
+    if (labelMap.find(str) == labelMap.end()) {
+      return make_pair(false, str);
+    }
+  }
+
+  return make_pair(true, "");
+}
 
 void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
   while (st->size() > 0 && 
@@ -40,6 +53,14 @@ void SemanticTree::increaseLoopDepth() {
 
 void SemanticTree::decreaseLoopDepth() {
   loopDepth--;
+}
+
+bool SemanticTree::addLabel(string label) {
+  if (labelMap.find(label) == labelMap.end()) {
+    labelMap.insert(label);
+    return true;
+  } 
+  return false;
 }
 
 void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {

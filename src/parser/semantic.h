@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include <vector>
 #include <stack>
 #include "../pos.h"
@@ -48,18 +49,23 @@ class SemanticTree {
     int currentPos;
     int counter;
     map<string, TypeStack *> declarationMap;
+    set<string> labelMap;
+    vector<string> gotoLabels;
     int loopDepth; // depth inside loop
 
   public:
     SemanticTree();
-
+    // returns true, if the label could be added
+    bool addLabel(string label);
     void addChild();
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
     void addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
     void increaseLoopDepth();
     void decreaseLoopDepth();
+    void addGotoLabel(string str);
     bool isInLoop();
+    pair<bool, string> checkGotoLabels();
     pair<TypeNode, int> lookUpType(string name, Pos pos);
 };
 
