@@ -10,6 +10,10 @@
 
 using namespace Lexing;
 
+namespace {
+  bool notDoneYet = false;
+}
+
 // GCC 4.8.1 complains when using auto instead of the explicit type
 // this does not make sense :-(
 const std::unordered_set<std::string> Lexer::punctuators = 
@@ -34,16 +38,23 @@ const std::unordered_set<std::string> Lexer::keywords =
 
 bool Lexer::consumePunctuator() {
 #define MAXOPLENGTH 3
-  auto count_matches = 0;
-  auto partial = std::string(1, tracker.current());
+  auto foundPuntcutor = false;
+  auto matched = false;
+  static std::string partial;
+  if (notDoneYet) {
+    foundPuntcutor = true;
+    notDoneYet = false;
+  } else {
+    partial = std::string(1, tracker.current());
+  }
   //TODO: can be done in a more efficient way by checking which operators can
   //actually be part of a "larger" operator
   // check if in punctuator set
-  auto matched = false;
   do {
     matched = (punctuators.find(partial) != punctuators.end());
+    // check also for partial
     if (matched) {
-      count_matches++;
+      foundPuntcutor = true;
       if ((tracker.advance())) {
         partial += tracker.current();
       } else {
@@ -51,7 +62,31 @@ bool Lexer::consumePunctuator() {
         storeToken(TokenType::PUNCTUATOR);
         return true;
       }
-    } else if (count_matches > 0) {
+    } else if( partial == "%:%" || partial == "..") {
+      // WARNING: tricky code
+      // those are not legal punctuators, but part of something that could
+      // become legal
+      if (tracker.advance()) {
+        partial += tracker.current();
+        if (punctuators.find(partial) != punctuators.end()) {
+          curword = partial;
+          storeToken(TokenType::PUNCTUATOR);
+          return true;
+        }
+      }
+      notDoneYet = true; // we've read also a part of the next token
+      if (partial.substr(0,1) == "..") {
+        // partial == ..SOME_CHARACTER, SOME_CHARACTER might be espilon
+        partial = partial.substr(1); // partial is now everything after the first dot
+        curword = "."; // curword must be . now, else partial wouldn't have been ..
+      } else {
+        // partial == %:%SOME_CHARACTER
+        partial = partial.substr(2); // partial is now everything after %:
+        curword += "%:";
+      }
+      storeToken(TokenType::PUNCTUATOR);
+      return true;
+    } else if (foundPuntcutor) {
       // already had one match, but now got start another token
       tracker.rewind();
       // remove last character; it was added in the previous
@@ -63,8 +98,7 @@ bool Lexer::consumePunctuator() {
     } else {
       return false;
     }
-  } while (count_matches <= MAXOPLENGTH);
-  return false;
+  } while (true);
 #undef MAXOPLENGTH 
 }
 
@@ -264,6 +298,14 @@ bool Lexer::consumeIdentOrDecConstant() {
 Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword() {}
 
 std::shared_ptr<Token> Lexer::getNextToken() {
+  if (notDoneYet) {
+    if (consumePunctuator()) {
+      throw LexingException("Lexer logic is flawed! This should never happen!\n",
+          tracker.currentPosition());
+    }
+    notDoneYet = false;
+    return curtoken;
+  }
   do {
     if (!tracker.advance()) {
       return genToken(TokenType::END);
