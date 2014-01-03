@@ -1,0 +1,4 @@
+linecomment_at_eof.c:1:1: identifier bla
+linecomment_at_eof.c:1:5: constant 9
+linecomment_at_eof.c:1:7: constant 8
+linecomment_at_eof.c:1:9: punctuator ?

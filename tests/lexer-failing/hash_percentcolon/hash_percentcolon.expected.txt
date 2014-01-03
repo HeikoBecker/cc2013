@@ -1,0 +1,7 @@
+hash_percentcolon.c:1:1: punctuator %:%:
+hash_percentcolon.c:2:1: punctuator #
+hash_percentcolon.c:3:1: punctuator ##
+hash_percentcolon.c:4:1: punctuator %:
+hash_percentcolon.c:4:3: punctuator %
+hash_percentcolon.c:5:1: identifier ui
+hash_percentcolon.c:5:4: punctuator %:
