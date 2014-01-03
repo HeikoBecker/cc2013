@@ -1,7 +1,12 @@
-BUILDDIR ?= build
-CFG      ?= default
-NAME     ?= c4
-SRCDIR   ?= src
+BUILDDIR    ?= build
+CFG         ?= default
+LLVM_CONFIG ?= llvm-config
+NAME        ?= c4
+SRCDIR      ?= src
+
+all:
+
+-include $(CFG).cfg
 
 Q ?= @
 
@@ -20,8 +25,13 @@ SRC    := $(sort $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/lexer/*.cc) $(w
 OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 
-CFLAGS   += -Wall -W -Werror -O2
+LLVM_CFLAGS  := $(shell $(LLVM_CONFIG) --cppflags)
+LLVM_LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags --libs core)
+
+CFLAGS   += $(LLVM_CFLAGS) -Wall -W -Werror -O2
+
 CXXFLAGS += $(CFLAGS) -std=c++11
+LDFLAGS  += $(LLVM_LDFLAGS)
 
 DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
 
@@ -34,7 +44,6 @@ debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors -O0
 debug: $(BIN)
 
 -include $(CFG).cfg
-
 -include $(DEP)
 
 clean:
@@ -43,7 +52,7 @@ clean:
 
 $(BIN): $(OBJ)
 	@echo "===> LD $@"
-	$(Q)$(CXX) -o $(BIN) $(OBJ)
+	$(Q)$(CXX) -o $(BIN) $(OBJ) $(LDFLAGS)
 
 $(BINDIR)/%.o: $(SRCDIR)/%.cc
 	@echo "===> CXX $<"
