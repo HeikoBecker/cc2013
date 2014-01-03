@@ -1,0 +1,16 @@
+cr_linebreak_only.c:1:132: keyword int
+cr_linebreak_only.c:1:136: identifier main
+cr_linebreak_only.c:1:140: punctuator (
+cr_linebreak_only.c:1:141: keyword void
+cr_linebreak_only.c:1:145: punctuator )
+cr_linebreak_only.c:1:147: punctuator {
+cr_linebreak_only.c:2:2: keyword int
+cr_linebreak_only.c:2:6: identifier x
+cr_linebreak_only.c:2:7: punctuator ;
+cr_linebreak_only.c:3:2: identifier x
+cr_linebreak_only.c:3:4: punctuator =
+cr_linebreak_only.c:3:6: identifier x
+cr_linebreak_only.c:3:7: punctuator +
+cr_linebreak_only.c:3:8: constant 1
+cr_linebreak_only.c:3:9: punctuator ;
+cr_linebreak_only.c:4:1: punctuator }

@@ -1,0 +1,21 @@
+escape.c:1:1: string-literal "\n fully legal \x123. "
+escape.c:2:1: string-literal "\v \' \" \? \\"
+escape.c:3:1: string-literal "\a \b \f \n \r \t \v"
+escape.c:4:1: string-literal "\012"
+escape.c:5:1: constant '\n'
+escape.c:5:6: identifier fully
+escape.c:5:12: identifier legal
+escape.c:5:18: constant '\x123'
+escape.c:6:1: constant '\v'
+escape.c:6:6: constant '\''
+escape.c:6:11: constant '\"'
+escape.c:6:16: constant '\?'
+escape.c:6:21: constant '\\'
+escape.c:7:1: constant '\a'
+escape.c:7:6: constant '\b'
+escape.c:7:11: constant '\f'
+escape.c:7:16: constant '\n'
+escape.c:7:21: constant '\r'
+escape.c:7:26: constant '\t'
+escape.c:7:31: constant '\v'
+escape.c:8:1: constant '\012'

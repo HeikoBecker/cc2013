@@ -1,0 +1,11 @@
+constants2.c:1:1: constant 1.25E-1
+constants2.c:1:8: constant .2
+constants2.c:1:11: constant .234
+constants2.c:1:16: constant 0
+constants2.c:2:1: constant '\x12af'
+constants2.c:2:10: string-literal "\xAB45"
+constants2.c:2:19: constant 12.
+constants2.c:3:1: string-literal ""
+constants2.c:3:4: constant 0.12
+constants2.c:3:9: constant 0
+constants2.c:3:10: constant 0

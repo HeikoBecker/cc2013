@@ -1,0 +1,15 @@
+constants_input.c:1:1: string-literal "String literal"
+constants_input.c:1:18: constant 12345
+constants_input.c:1:24: string-literal "auto"
+constants_input.c:2:1: constant 1.25
+constants_input.c:2:6: constant 0
+constants_input.c:3:1: constant 2.45E-2
+constants_input.c:3:9: constant 1E4
+constants_input.c:3:13: constant 3.5e+4
+constants_input.c:4:1: string-literal "escape the \" quote!"
+constants_input.c:5:1: constant 0
+constants_input.c:5:2: constant 0
+constants_input.c:6:1: constant 100
+constants_input.c:7:1: constant 0.1
+constants_input.c:8:1: constant 0.
+constants_input.c:9:1: constant 10.
