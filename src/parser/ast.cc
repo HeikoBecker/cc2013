@@ -88,13 +88,7 @@ VariableUsage::VariableUsage(std::string name, Pos pos,
   : Expression(pos), name(name), semanticTree(semanticTree) {
     
 
-#ifdef DEBUG
- cout <<"USAGE " + name<<endl;
-#endif
- pair<TypeNode, int> p = semanticTree->lookUpType(name, pos);
-#ifdef DEBUG
- cout<<"TYPE : "<<p.first->toString()<<" POINTER : "<<p.second<<endl;
-#endif
+  // pair<TypeNode, int> p = semanticTree->lookUpType(name, pos);
 }
 
 Literal::Literal(std::string name, Pos pos)
