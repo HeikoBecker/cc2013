@@ -1,0 +1,12 @@
+escape_sequences.c:1:1: string-literal "\\\n\"\a\b\f\r\t\v\?\'"
+escape_sequences.c:2:1: constant '\\'
+escape_sequences.c:3:1: constant '\n'
+escape_sequences.c:4:1: constant '\"'
+escape_sequences.c:5:1: constant '\a'
+escape_sequences.c:6:1: constant '\b'
+escape_sequences.c:7:1: constant '\f'
+escape_sequences.c:8:1: constant '\r'
+escape_sequences.c:9:1: constant '\t'
+escape_sequences.c:10:1: constant '\v'
+escape_sequences.c:11:1: constant '\?'
+escape_sequences.c:12:1: constant '\''

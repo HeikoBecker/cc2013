@@ -1,8 +1,0 @@
-newline_after_token.c:1:1: keyword int
-newline_after_token.c:2:1: string-literal "hallo\a\n"
-newline_after_token.c:3:1: punctuator >>=
-newline_after_token.c:4:1: punctuator .
-newline_after_token.c:4:2: punctuator .
-newline_after_token.c:4:3: punctuator .
-newline_after_token.c:5:1: constant 25
-newline_after_token.c:6:1: constant '\r'
