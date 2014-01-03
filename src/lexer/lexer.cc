@@ -190,9 +190,58 @@ bool Lexer::consumeQuoted() {
             appendToToken('\\');
             appendToToken(tracker.current());
             break;
+          case 'x':
+            // read hexadecimal number
+            appendToToken('\\');
+            appendToToken('x');
+            tracker.advance();
+            if (std::isxdigit(static_cast<int>(tracker.current()))) {
+              appendToToken(tracker.current());
+              tracker.advance();
+              while (std::isxdigit(static_cast<int>(tracker.current()))) {
+                appendToToken(tracker.current());
+                tracker.advance();
+              }
+              tracker.rewind(); //if we got here, we read a non-hexdigit-char
+              break;
+            } else {
+              // we read an x, but it's not followed by a hex digit
+            throw LexingException( std::string("Invalid escape sequence, \\x"
+                  " was followed by ") + static_cast<char>(tracker.current())
+                  + " which is not a hexdigit" 
+                , tracker.currentPosition());
+            }
+            break;
+          case '0':
+          case '1':
+          case '2':
+          case '3':
+          case '4':
+          case '5':
+          case '6':
+          case '7': {
+              // octal escape sequence
+              auto cnt = 1;
+              appendToToken('\\');
+              appendToToken(tracker.current());
+              do {
+                tracker.advance();
+                if (   isdigit(static_cast<int>(tracker.current()))
+                    && tracker.current() != '8'
+                    && tracker.current() != '9') {
+                  appendToToken(tracker.current());
+                } else {
+                  tracker.rewind();
+                  break;
+                }
+              } while (cnt <= 3);
+            }
+            break;
           default:
             //report error
-            throw LexingException("Invalid format specifier", tracker.currentPosition());
+            throw LexingException( std::string("Invalid escape sequence \\") 
+                                  + static_cast<char>(tracker.current())
+                , tracker.currentPosition());
         }
       }
     } else if ('\n' == tracker.current()) {
