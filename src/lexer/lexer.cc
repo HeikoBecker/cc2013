@@ -131,10 +131,7 @@ bool Lexer::consumeComment() {
             return true;
           }
         }
-        throw LexingException(
-          "Reached end of file while trying to find end of comment", 
-          tracker.currentPosition ()
-        );
+        return true;
       } else { //tracker.current() is neither / nor *
         tracker.rewind();
       }
