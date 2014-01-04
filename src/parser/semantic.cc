@@ -64,39 +64,42 @@ bool SemanticTree::addLabel(string label) {
 }
 
 void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
-  TypeStack *st;
+  if (declarator && typeNode) {
+    TypeStack *st;
 
-  string name = declarator->getIdentifier();
-  int pointerCounter = declarator->getCounter();
+    string name = declarator->getIdentifier();
+    int pointerCounter = declarator->getCounter();
 #ifdef DEBUG
-  string type = typeNode->toString();
+    string type = typeNode->toString();
 
-  for(int n=0; n<pointerCounter; n++) { type+="*"; };
-  cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type<<endl;
+    for(int n=0; n<pointerCounter; n++) { type+="*"; };
+    cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type<<endl;
 #endif
-  if (name == "NONAME") {
-    return ;
-  }
+    if (name == "NONAME") {
+      return ;
+    }
 
-  if (declarationMap.find(name) == declarationMap.end()) {
-    st = new stack<pair<int, pair<TypeNode, int> > >();
-    st->push(make_pair(currentPos, make_pair(typeNode, pointerCounter) ));
-    declarationMap[name] = st;
+    if (declarationMap.find(name) == declarationMap.end()) {
+      st = new stack<pair<int, pair<TypeNode, int> > >();
+      st->push(make_pair(currentPos, make_pair(typeNode, pointerCounter) ));
+      declarationMap[name] = st;
+    } else {
+      st = declarationMap[name];
+
+      deleteNotActiveNodes(st);
+
+      // NO redefinitions
+      if (st->size() > 0 && st->top().first == currentPos) {
+        if (currentPos !=0 || 
+            !(st->top().second.first->toString() == typeNode->toString() && st->top().second.second == pointerCounter)) {
+          throw Parsing::ParsingException("no redefinition of " + name, pos);
+        }
+      } 
+
+      declarationMap[name]->push(make_pair(currentPos, make_pair(typeNode, pointerCounter)));
+    }
   } else {
-    st = declarationMap[name];
-
-    deleteNotActiveNodes(st);
-
-    // NO redefinitions
-    if (st->size() > 0 && st->top().first == currentPos) {
-      if (currentPos !=0 || 
-          !(st->top().second.first->toString() == typeNode->toString() && st->top().second.second == pointerCounter)) {
-        throw Parsing::ParsingException("no redefinition of " + name, pos);
-      }
-    } 
-
-    declarationMap[name]->push(make_pair(currentPos, make_pair(typeNode, pointerCounter)));
-    
+    // TODO should this throw an error
   }
 }
 
