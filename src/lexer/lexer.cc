@@ -348,7 +348,7 @@ Lexer::Lexer(FILE* f, char const *name) : tracker(FileTracker(f, name)), curword
 
 std::shared_ptr<Token> Lexer::getNextToken() {
   if (notDoneYet) {
-    if (consumePunctuator()) {
+    if (!consumePunctuator()) {
       throw LexingException("Lexer logic is flawed! This should never happen!\n",
           tracker.currentPosition());
     }
