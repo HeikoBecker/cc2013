@@ -128,6 +128,18 @@ bool Lexer::consumeComment() {
         // consume until newline
         while ((tracker.advance())) {
           if ('\n' == tracker.current()) {
+            // Unix and MacOS X end of line
+            return true;
+          } else if ('\r' == tracker.current()) {
+            if (tracker.advance()) {
+              if (tracker.current() == '\n') {
+                // Windows line ending
+                return true;
+              } else  {
+                tracker.rewind();
+              }
+            }
+            // MacOS <= 9 end of line
             return true;
           }
         }
