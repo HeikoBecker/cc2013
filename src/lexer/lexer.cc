@@ -130,17 +130,6 @@ bool Lexer::consumeComment() {
           if ('\n' == tracker.current()) {
             // Unix and MacOS X end of line
             return true;
-          } else if ('\r' == tracker.current()) {
-            if (tracker.advance()) {
-              if (tracker.current() == '\n') {
-                // Windows line ending
-                return true;
-              } else  {
-                tracker.rewind();
-              }
-            }
-            // MacOS <= 9 end of line
-            return true;
           }
         }
         return true;
@@ -457,11 +446,24 @@ bool FileTracker::advance() {
   m_lastChar = m_current;
   m_current = static_cast<unsigned char>(tmp);
   m_lastCollumn = m_position.column;
+  m_position.column++;
   if ('\n' == m_current) {
+    // UNIX line ending
+    m_position.line++; // TODO: avoid code duplication for newlines
+    m_position.column = 0;
+  } else if ('\r' == m_current) {
+    auto tmp2 = std::fgetc(stream);
+    if (tmp2 != EOF) {
+      if (tmp2 == static_cast<int>('\n')) {
+        // Windows line ending
+      } else  {
+        std::ungetc(tmp2, stream);
+      }
+      // MacOS <= 9
+    }
     m_position.line++;
     m_position.column = 0;
-  } else {
-    m_position.column++;
+    m_current = '\n';
   }
   return true;
 }
