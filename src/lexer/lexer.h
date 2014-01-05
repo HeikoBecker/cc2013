@@ -33,6 +33,7 @@ namespace Lexing {
       Pos currentPosition() const {return m_position;}
       Pos storedPosition() const {return  m_storedPosition;}
       void storePosition();
+      void storePosition(Pos newpos) {m_storedPosition = newpos;};
     private:
       unsigned char m_current;
       FILE* stream;

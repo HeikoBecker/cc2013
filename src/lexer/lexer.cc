@@ -13,6 +13,7 @@ using namespace Lexing;
 
 namespace {
   bool notDoneYet = false;
+  Pos tmpPos = Pos("@illegal",0,0);
 }
 
 // GCC 4.8.1 complains when using auto instead of the explicit type
@@ -45,6 +46,7 @@ bool Lexer::consumePunctuator() {
   if (notDoneYet) {
     foundPuntcutor = true;
     notDoneYet = false;
+    tracker.storePosition(tmpPos);
   } else {
     partial = std::string(1, tracker.current());
   }
@@ -67,6 +69,7 @@ bool Lexer::consumePunctuator() {
       // WARNING: tricky code
       // those are not legal punctuators, but part of something that could
       // become legal
+      tmpPos = tracker.currentPosition();
       if (tracker.advance()) {
         partial += tracker.current();
         if (punctuators.find(partial) != punctuators.end()) {
