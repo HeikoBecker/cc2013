@@ -212,6 +212,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   expect("{");
 
   auto parameter = decl->getParameter();
+  semanticTree->addDeclaration(type, decl, pos);
   auto compStat = compoundStatement(parameter);
 
   return make_shared<ExternalDeclaration>(type, decl, compStat, 

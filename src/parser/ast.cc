@@ -84,7 +84,7 @@ VariableUsage::VariableUsage(std::string name, Pos pos,
   : Expression(pos), name(name), semanticTree(semanticTree) {
     
 
-  // pair<TypeNode, int> p = semanticTree->lookUpType(name, pos);
+  //pair<TypeNode, int> p = semanticTree->lookUpType(name, pos);
 }
 
 Literal::Literal(std::string name, Pos pos)
@@ -468,7 +468,6 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
   : AstNode(pos), type(type), declarator(declarator),
     compoundStatement(compoundStatement), semanticTree(semanticTree)
 {
-    semanticTree->addDeclaration(type, declarator, pos);
 }
 
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
