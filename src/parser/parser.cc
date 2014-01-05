@@ -273,7 +273,7 @@ static inline int getPrec(Token t, bool isUnary = false) {
   } else if ( t.value() == ":") {
     return 15;
   } else {
-    std::cout << t.value() << std::endl;
+    debug(GENERAL) << t.value();
     return -1;
   }
 }
@@ -289,6 +289,7 @@ static inline bool isBinaryOperator(Token t) {
       || t.value() == "-"
       || t.value() == "*"
       || t.value() == "="
+      || t.value() == "?"
       ) {
     return true;
   } else {
@@ -435,39 +436,29 @@ SubExpression Parser::sizeOfType() {
 SubExpression Parser::expression(int minPrecedence = 0) {
   OBTAIN_POS();
   auto expr = computeAtom();
-  // handle ternary operator
-  auto isTernary = false;
-  // TODO: if we don't use Booleans isTernary and wasTernary can be merged
-  auto wasTernary = false;
   SubExpression ternaryHelper;
-  if (testp(PunctuatorType::QMARK)) {
-    scan();
-    isTernary = true;
-    ternaryHelper = expression(/*TODO: which precedence should this be*/0);
-    // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
-    // operator
-    expect(PunctuatorType::COLON);
-    // TODO: do we need to change the value of minPrecedence here?
-  }  
-  while (  (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence)
-         || isTernary) {
+  while (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence) {
     auto punctype = static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype();
+    auto isTernary = punctype == PunctuatorType::QMARK;
     int precNext;
     if (isTernary) {
+      auto prec_ternary = getPrec(*m_nextsym);
+      expect("?");
+      scan(); // read the ?
+      ternaryHelper = expression(prec_ternary);
+      expect(":");
       precNext = 2;
-      isTernary = false;
-      wasTernary = true;
     } else {
       precNext = (isRightAssociative(*m_nextsym))
-                 ? getPrec(*m_nextsym)
-                 : getPrec(*m_nextsym) + 1;
+        ? getPrec(*m_nextsym)
+        : getPrec(*m_nextsym) + 1;
     }
     scan(); // this will either read the binary operator or ":" if we're parsing the ternary operator
     auto rhs = expression(precNext);
-    if (!wasTernary) {
-      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos);
-    } else {
+    if (isTernary) {
       expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs, pos);
+    } else {
+      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos);
     }
   }
   return expr;
