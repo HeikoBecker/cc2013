@@ -371,8 +371,9 @@ PRETTY_PRINT(BreakStatement) {
 
 PRETTY_PRINT(ReturnStatement) {
   PPRINT('\n');
-  PPRINT(std::string("return "));
+  PPRINT(std::string("return"));
   if (expression != NULL) {
+    PPRINT(' ');
     PPRINT(expression);
   }
   PPRINT(';');
