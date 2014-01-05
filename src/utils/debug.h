@@ -1,10 +1,16 @@
+#ifndef UTILS_DEBUG_H
+#define UTILS_DEBUG_H
+#pragma once
+
 #include <iostream>
 #include <sstream>
 
 typedef enum debugFilter {
   LEXER   = 0x001,
   PARSER  = 0x002,
-  CODEGEN = 0x003
+  PRINT_AST     = 0x003,
+  CODEGEN = 0x004,
+  GENERAL = 0x005,
 } debugFilter;
 
 #ifdef DEBUG
@@ -29,4 +35,5 @@ struct debug {
         return *this;
     }
 };
+#endif
 #endif

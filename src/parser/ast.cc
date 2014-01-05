@@ -1,25 +1,21 @@
 #include "ast.h"
 #include "pprinter.h"
 #include "parser.h"
+#include "../utils/debug.h"
 
 bool g_skipNewLineBeforeBlockStatement = false; // TODO: FIXME: global variables are BAD!
 bool g_skipNewLineBeforeSelectionStatement = false; // TODO: FIXME: global variables are BAD!
 
 #define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
-#ifdef DEBUG
 /* Beware of macro magic
  * This prints the name of function calling PPRINT, it's argument and finally
  * any output produced by the function
  */
 #define PPRINT(X)  do { \
-  pp.pprint(std::string("\n")+__PRETTY_FUNCTION__+"\t: ", 0);\
-  pp.pprint(std::string(#X) + ": ", 0);\
+  debug(PRINT_AST) << __PRETTY_FUNCTION__ << "\t: "\
+        << std::string(#X) << ":";\
   pp.pprint((X), indentLevel);\
-  pp.pprint('\n',0);\
 } while(0);
-#else
-#define PPRINT(X)  do {pp.pprint((X), indentLevel);} while(0);
-#endif
 #define ADDINDENT()  do {indentLevel++;} while(0);
 #define REMOVEINDENT()  do {indentLevel--;} while(0);
 #define RESETINDENT() \
@@ -526,17 +522,13 @@ PRETTY_PRINT(ExternalDeclaration) {
     if (this->compoundStatement) {
       PPRINT(this->compoundStatement);
       PPRINT('\n');
-#ifdef DEBUG
-      PPRINT(std::string("ExternalDeclaration END"));
-#endif
+      debug(PARSER) << "ExternalDeclaration END";
       return; // so that we don't print a semicolon
     }
   }
   // TODO: move semicolon printing to declarations
   PPRINT(';'); // declarations end with an ;
-#ifdef DEBUG
-      PPRINT(std::string("ExternalDeclaration END"));
-#endif
+  debug(PARSER) << "ExternalDeclaration END";
   PPRINT('\n');
 }
 
@@ -624,9 +616,7 @@ PRETTY_PRINT(DirectDeclaratorHelp)
   switch (helperType) {
     case EPSILON:
       // TODO: the EPSILON case should not be necessary anymore
-#ifdef DEBUG
-      PPRINT(std::string("should never happen!\n"));
-#endif
+      debug(PARSER) << "should never happen!\n";
       PPRINT('(');
       PPRINT(')');
       return;
