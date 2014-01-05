@@ -5,6 +5,7 @@
 #include <locale> // for std::isX functions
 #include "lexer.h"
 #include "token.h"
+#include "../utils/debug.h"
 
 #define ABORT do {throw std::exception();} while (false)
 
@@ -434,15 +435,11 @@ bool FileTracker::advance() {
   auto tmp = std::fgetc(stream);
   if (tmp == EOF) {
     std::ungetc(tmp, stream);
-#ifdef DEBUG
-    std::cerr << "Reached EOF\n";
-#endif
+    debug(LEXER) << "Reached EOF";
     return false;
   }
-#ifdef DEBUG
-  std::cerr << "Advancing... "
-            << "got " << static_cast<unsigned char>(tmp) << "\n";
-#endif
+  debug(LEXER) << "Advancing... "
+            << "got " << static_cast<unsigned char>(tmp);
   m_lastChar = m_current;
   m_current = static_cast<unsigned char>(tmp);
   m_lastCollumn = m_position.column;
@@ -469,9 +466,7 @@ bool FileTracker::advance() {
 }
 
 void FileTracker::rewind() {
-#ifdef DEBUG
-  std::cerr << "rewinding...\n";
-#endif
+  debug(LEXER) << "rewinding...\n";
   if ('\n' == m_current) {
     m_position.line--;
     m_position.column = m_lastCollumn;
