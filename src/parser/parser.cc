@@ -209,7 +209,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   if (!type->canBeInFunctionDeclaration()) {
     reportError("struct { is an error");
   }
-  expect("{");
+  expect(PunctuatorType::LEFTCURLYBRACE);
 
   auto parameter = decl->getParameter();
   semanticTree->addDeclaration(type, decl, pos);
@@ -493,7 +493,7 @@ StructNode Parser::structOrUnionSpecifier() {
     auto name = m_nextsym->value();
 
     scan();
-    if (testp("{")) {
+    if (testp(PunctuatorType::LEFTCURLYBRACE)) {
       semanticTree->addChild();
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
@@ -506,7 +506,7 @@ StructNode Parser::structOrUnionSpecifier() {
     }
 
     return make_shared<StructType>(name, pos);
-  } else if(testp("{")) {
+  } else if(testp(PunctuatorType::LEFTCURLYBRACE)) {
     semanticTree->addChild();
     scan();
     auto structDecLst = structDeclarationList();
@@ -525,7 +525,7 @@ std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpressio
   std::vector<decltype(structDeclaration())> declarations{}; 
   do {
     declarations.push_back(structDeclaration());
-  } while (!testp("}")); 
+  } while (!testp(PunctuatorType::RIGHTCURLYBRACE)); 
   return declarations;
 }
 
@@ -680,7 +680,7 @@ SubIdentifierList Parser::identifierList() {
 std::pair<TypeNode, SubDeclarator>  Parser::typeName() {
   auto type = specifierQualifierList();
 
-  if (!testp(")")) {
+  if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
     return make_pair(type, abstractDeclarator());
   } else {
     return make_pair(type, SubDeclarator());
@@ -983,10 +983,10 @@ SubIterationStatement Parser::iterationStatement() {
     SubStatement st = statement();
     expect("while");
     scan();
-    expect("(");
+    expect(PunctuatorType::LEFTPARENTHESIS);
     scan();
     SubExpression ex = expression();
-    expect(")");
+    expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     expect(";");
     scan();
@@ -1009,10 +1009,10 @@ SubSelectionStatement Parser::selectionStatement() {
   if (testk(KeywordType::IF)) {
     scan();
 
-    expect("(");
+    expect(PunctuatorType::LEFTPARENTHESIS);
     scan();
     SubExpression ex = expression();
-    expect(")");
+    expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     SubStatement st1 = statement();
 
