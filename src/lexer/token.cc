@@ -30,7 +30,7 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       m_puncttype = PunctuatorType::LAND;
     } else if (value == "||") {
       m_puncttype = PunctuatorType::LOR;
-    } else if (value == "(" || value == "<%") {
+    } else if (value == "(") {
       m_puncttype = PunctuatorType::LEFTPARENTHESIS;
     } else if (value == ")" ) {
       m_puncttype = PunctuatorType::RIGHTPARENTHESIS;
