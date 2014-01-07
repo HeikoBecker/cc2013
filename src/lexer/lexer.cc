@@ -107,6 +107,7 @@ bool Lexer::consumePunctuator() {
 }
 
 bool Lexer::consumeComment() {
+  tmpPos = tracker.currentPosition();
   if (tracker.current()== '/') {
     if (tracker.advance()) {
       if (tracker.current() == '*') {
@@ -125,7 +126,7 @@ bool Lexer::consumeComment() {
         }
         throw LexingException(
           "Reached end of file while trying to find end of comment", 
-          tracker.currentPosition ()
+          tmpPos
         );
       } else if (tracker.current() == '/') {
         // found new-style comment
