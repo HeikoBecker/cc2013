@@ -5,6 +5,7 @@
 #include <locale> // for std::isX functions
 #include "lexer.h"
 #include "token.h"
+#include "../utils/debug.h"
 
 #define ABORT do {throw std::exception();} while (false)
 
@@ -12,6 +13,7 @@ using namespace Lexing;
 
 namespace {
   bool notDoneYet = false;
+  Pos tmpPos = Pos("@illegal",0,0);
 }
 
 // GCC 4.8.1 complains when using auto instead of the explicit type
@@ -44,6 +46,7 @@ bool Lexer::consumePunctuator() {
   if (notDoneYet) {
     foundPuntcutor = true;
     notDoneYet = false;
+    tracker.storePosition(tmpPos);
   } else {
     partial = std::string(1, tracker.current());
   }
@@ -66,6 +69,7 @@ bool Lexer::consumePunctuator() {
       // WARNING: tricky code
       // those are not legal punctuators, but part of something that could
       // become legal
+      tmpPos = tracker.currentPosition();
       if (tracker.advance()) {
         partial += tracker.current();
         if (punctuators.find(partial) != punctuators.end()) {
@@ -103,6 +107,7 @@ bool Lexer::consumePunctuator() {
 }
 
 bool Lexer::consumeComment() {
+  tmpPos = tracker.currentPosition();
   if (tracker.current()== '/') {
     if (tracker.advance()) {
       if (tracker.current() == '*') {
@@ -121,20 +126,18 @@ bool Lexer::consumeComment() {
         }
         throw LexingException(
           "Reached end of file while trying to find end of comment", 
-          tracker.currentPosition ()
+          tmpPos
         );
       } else if (tracker.current() == '/') {
         // found new-style comment
         // consume until newline
         while ((tracker.advance())) {
           if ('\n' == tracker.current()) {
+            // Unix and MacOS X end of line
             return true;
           }
         }
-        throw LexingException(
-          "Reached end of file while trying to find end of comment", 
-          tracker.currentPosition ()
-        );
+        return true;
       } else { //tracker.current() is neither / nor *
         tracker.rewind();
       }
@@ -436,31 +439,38 @@ bool FileTracker::advance() {
   auto tmp = std::fgetc(stream);
   if (tmp == EOF) {
     std::ungetc(tmp, stream);
-#ifdef DEBUG
-    std::cerr << "Reached EOF\n";
-#endif
+    debug(LEXER) << "Reached EOF";
     return false;
   }
-#ifdef DEBUG
-  std::cerr << "Advancing... "
-            << "got " << static_cast<unsigned char>(tmp) << "\n";
-#endif
+  debug(LEXER) << "Advancing... "
+            << "got " << static_cast<unsigned char>(tmp);
   m_lastChar = m_current;
   m_current = static_cast<unsigned char>(tmp);
   m_lastCollumn = m_position.column;
+  m_position.column++;
   if ('\n' == m_current) {
+    // UNIX line ending
+    m_position.line++; // TODO: avoid code duplication for newlines
+    m_position.column = 0;
+  } else if ('\r' == m_current) {
+    auto tmp2 = std::fgetc(stream);
+    if (tmp2 != EOF) {
+      if (tmp2 == static_cast<int>('\n')) {
+        // Windows line ending
+      } else  {
+        std::ungetc(tmp2, stream);
+      }
+      // MacOS <= 9
+    }
     m_position.line++;
     m_position.column = 0;
-  } else {
-    m_position.column++;
+    m_current = '\n';
   }
   return true;
 }
 
 void FileTracker::rewind() {
-#ifdef DEBUG
-  std::cerr << "rewinding...\n";
-#endif
+  debug(LEXER) << "rewinding...\n";
   if ('\n' == m_current) {
     m_position.line--;
     m_position.column = m_lastCollumn;

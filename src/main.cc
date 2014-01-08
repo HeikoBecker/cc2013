@@ -6,6 +6,7 @@
 #include "parser/parser.h"
 #include <iostream>
 #include "parser/pprinter.h"
+#include "utils/debug.h"
 
 enum class Mode {
   TOKENIZE,
@@ -71,15 +72,11 @@ int main(int, char** const argv)
           case Mode::PARSE:
           {
             auto parser = Parsing::Parser{f, name};
-#ifdef DEBUG
             if (parser.parse()) {
-              printf("PARSING SUCCESSFUL\n");
+              debug(GENERAL) << "PARSING SUCCESSFUL\n";
             } else {
               PANIC("PARSING FAILED\n");
             }
-#else
-            parser.parse();
-#endif
             break;
           }
           case Mode::PRINT_AST:

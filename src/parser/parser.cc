@@ -214,9 +214,10 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     reportError("FunctionDefinition has to be either (void) or all parameters have to be declared");
   }
 
-  expect("{");
+  expect(PunctuatorType::LEFTCURLYBRACE);
 
   auto parameter = decl->getParameter();
+  semanticTree->addDeclaration(type, decl, pos);
   auto compStat = compoundStatement(parameter);
 
   return make_shared<ExternalDeclaration>(type, decl, compStat, 
@@ -278,7 +279,7 @@ static inline int getPrec(Token t, bool isUnary = false) {
   } else if ( t.value() == ":") {
     return 15;
   } else {
-    std::cout << t.value() << std::endl;
+    debug(GENERAL) << t.value();
     return -1;
   }
 }
@@ -294,6 +295,7 @@ static inline bool isBinaryOperator(Token t) {
       || t.value() == "-"
       || t.value() == "*"
       || t.value() == "="
+      || t.value() == "?"
       ) {
     return true;
   } else {
@@ -440,39 +442,29 @@ SubExpression Parser::sizeOfType() {
 SubExpression Parser::expression(int minPrecedence = 0) {
   OBTAIN_POS();
   auto expr = computeAtom();
-  // handle ternary operator
-  auto isTernary = false;
-  // TODO: if we don't use Booleans isTernary and wasTernary can be merged
-  auto wasTernary = false;
   SubExpression ternaryHelper;
-  if (testp(PunctuatorType::QMARK)) {
-    scan();
-    isTernary = true;
-    ternaryHelper = expression(/*TODO: which precedence should this be*/0);
-    // m_nextsym now has to be a : -- else this wouldn't be a valid ternary
-    // operator
-    expect(PunctuatorType::COLON);
-    // TODO: do we need to change the value of minPrecedence here?
-  }  
-  while (  (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence)
-         || isTernary) {
+  while (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence) {
     auto punctype = static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype();
+    auto isTernary = punctype == PunctuatorType::QMARK;
     int precNext;
     if (isTernary) {
+      auto prec_ternary = getPrec(*m_nextsym);
+      expect("?");
+      scan(); // read the ?
+      ternaryHelper = expression(prec_ternary);
+      expect(":");
       precNext = 2;
-      isTernary = false;
-      wasTernary = true;
     } else {
       precNext = (isRightAssociative(*m_nextsym))
-                 ? getPrec(*m_nextsym)
-                 : getPrec(*m_nextsym) + 1;
+        ? getPrec(*m_nextsym)
+        : getPrec(*m_nextsym) + 1;
     }
     scan(); // this will either read the binary operator or ":" if we're parsing the ternary operator
     auto rhs = expression(precNext);
-    if (!wasTernary) {
-      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos);
-    } else {
+    if (isTernary) {
       expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs, pos);
+    } else {
+      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos);
     }
   }
   return expr;
@@ -506,7 +498,7 @@ StructNode Parser::structOrUnionSpecifier() {
     auto name = m_nextsym->value();
 
     scan();
-    if (testp("{")) {
+    if (testp(PunctuatorType::LEFTCURLYBRACE)) {
       semanticTree->addChild();
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
@@ -519,7 +511,7 @@ StructNode Parser::structOrUnionSpecifier() {
     }
 
     return make_shared<StructType>(name, pos);
-  } else if(testp("{")) {
+  } else if(testp(PunctuatorType::LEFTCURLYBRACE)) {
     semanticTree->addChild();
     scan();
     auto structDecLst = structDeclarationList();
@@ -538,7 +530,7 @@ std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpressio
   std::vector<decltype(structDeclaration())> declarations{}; 
   do {
     declarations.push_back(structDeclaration());
-  } while (!testp("}")); 
+  } while (!testp(PunctuatorType::RIGHTCURLYBRACE)); 
   return declarations;
 }
 
@@ -693,7 +685,7 @@ SubIdentifierList Parser::identifierList() {
 std::pair<TypeNode, SubDeclarator>  Parser::typeName() {
   auto type = specifierQualifierList();
 
-  if (!testp(")")) {
+  if (!testp(PunctuatorType::RIGHTPARENTHESIS)) {
     return make_pair(type, abstractDeclarator());
   } else {
     return make_pair(type, SubDeclarator());
@@ -999,10 +991,10 @@ SubIterationStatement Parser::iterationStatement() {
     SubStatement st = statement();
     expect("while");
     scan();
-    expect("(");
+    expect(PunctuatorType::LEFTPARENTHESIS);
     scan();
     SubExpression ex = expression();
-    expect(")");
+    expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     expect(";");
     scan();
@@ -1025,10 +1017,10 @@ SubSelectionStatement Parser::selectionStatement() {
   if (testk(KeywordType::IF)) {
     scan();
 
-    expect("(");
+    expect(PunctuatorType::LEFTPARENTHESIS);
     scan();
     SubExpression ex = expression();
-    expect(")");
+    expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
     SubStatement st1 = statement();
 

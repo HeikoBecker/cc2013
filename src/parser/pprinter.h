@@ -3,6 +3,7 @@
 #include <memory>
 #include <iostream>
 #include "../lexer/punctuatortype.h"
+#include "../utils/debug.h"
 
 namespace Parsing {
 

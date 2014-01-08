@@ -1,4 +1,5 @@
 #include "semantic.h"
+#include "../utils/debug.h"
 
 namespace Parsing {
 
@@ -73,7 +74,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     string type = typeNode->toString();
 
     for(int n=0; n<pointerCounter; n++) { type+="*"; };
-    cout<<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type<<endl;
+    debug(PARSER) <<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type ;
 #endif
     if (name == "NONAME") {
       return ;

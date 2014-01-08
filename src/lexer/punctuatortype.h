@@ -35,4 +35,5 @@ enum class PunctuatorType {
   NOT, // !
   ILLEGAL, 
 };
+
 #endif
