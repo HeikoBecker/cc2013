@@ -692,7 +692,74 @@ ExpressionStatement::ExpressionStatement(Pos pos) : Statement(pos) {}
 ExpressionStatement::ExpressionStatement(SubExpression ex, Pos pos) 
   : Statement(pos), expression(ex) {}
 
+bool Parameter::hasDeclarator() {
+  return declarator ? true : false;
+}
 
+bool Parameter::hasName() {
+  if (declarator) {
+    return declarator->hasName();
+  } 
+
+  return false; 
+}
+
+bool Parameter::isVoid() {
+ return getType()->isVoid() && !hasDeclarator();
+}
+
+
+bool DirectDeclaratorHelp::containsOnlyOneVoidIfSpecified() {
+  if(idList) {
+    // don't accept idList
+    return false;
+  } else {
+
+    int voidCounter  =0;
+
+    for (auto p : paramList) {
+      if(p->isVoid()) {
+        voidCounter++;
+      }
+    }
+
+    if (voidCounter == 0) {
+      return true;
+    } else if (voidCounter == 1){
+      return paramList.size() == 1;
+    } else {
+      return false;
+    }
+  }
+}
+
+bool DirectDeclaratorHelp::canBeFunction() {
+    if(idList) {
+      return false;
+    } else {
+      int len = paramList.size();
+      // empty is ok
+      if (len == 0) {
+        return true;
+      } else if (len == 1) {
+        // void is ok
+        if (paramList[0]->isVoid()) {
+          return true;
+        } 
+
+        return paramList[0]->hasName();
+      } else {
+        // all declarators have to have a name
+        for (int n=0; n<len; n++) {
+          if(!paramList[n]->hasName()) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return true;
+}
 
 DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
         std::vector<SubDirectDeclaratorHelp> h,

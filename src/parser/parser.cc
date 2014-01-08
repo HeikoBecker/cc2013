@@ -209,6 +209,11 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   if (!type->canBeInFunctionDeclaration()) {
     reportError("struct { is an error");
   }
+
+  if (!decl->canBeFunctionDefinition()) {
+    reportError("FunctionDefinition has to be either (void) or all parameters have to be declared");
+  }
+
   expect("{");
 
   auto parameter = decl->getParameter();
@@ -712,7 +717,10 @@ SubDeclarator Parser::declarator(ThreeValueBool abstract) {
 
   Pointer pointer(counter, pos); // TODO: Is this still needed?
   // TODO: is the if below correct?
-  if (!testp(PunctuatorType::RIGHTPARENTHESIS) || abstract != ThreeValueBool::ABSTRACT) {
+  if ((!testp(PunctuatorType::RIGHTPARENTHESIS)
+       ) || 
+      abstract != ThreeValueBool::ABSTRACT) {
+
     SubDirectDeclarator dec = directDeclarator(abstract);
     return make_shared<Declarator>(counter, dec, pos);
   } else {

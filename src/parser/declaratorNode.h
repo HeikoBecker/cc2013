@@ -52,7 +52,9 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       DirectDeclaratorHelp(std::vector<ParameterNode> paramList, Pos pos);
       DirectDeclaratorHelp(SubIdentifierList idList, Pos pos);
       std::vector<ParameterNode> getParameter() { return paramList; }
-
+      bool canBeFunction();
+      bool containsOnlyOneVoidIfSpecified();
+       
       PPRINTABLE
     private:
         DirectDeclaratorHelpEnum helperType;
@@ -75,6 +77,12 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return "NONAME";
       }
       virtual std::vector<ParameterNode> getParameter() { return std::vector<ParameterNode>(); }
+      virtual bool canBeFunctionDefinition() {
+        return false;
+      }
+      virtual bool hasName() {
+        return false;
+      }
   };
 
   typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
@@ -85,6 +93,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       std::string getIdentifier() { return directDeclarator->getIdentifier(); }
       int getCounter() { return pointerCounter; }
       std::vector<ParameterNode> getParameter() { return directDeclarator->getParameter(); }
+      bool canBeFunctionDefinition() { return directDeclarator->canBeFunctionDefinition();}
+      bool hasName() {
+        if(directDeclarator) {
+          return directDeclarator->hasName();
+        }
+
+        return false;
+      }
       PPRINTABLE
     private:
         int pointerCounter;
@@ -113,6 +129,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         }
       }
 
+      bool hasName() {
+        return true;
+      }
+
+      virtual bool canBeFunctionDefinition() {
+        return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
+      }
+
       PPRINTABLE
 
     private:
@@ -129,6 +153,22 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
       virtual std::string getIdentifier() {
         return declarator->getIdentifier();
+      }
+
+      virtual bool canBeFunctionDefinition() {
+        if (!declarator) {
+          return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
+        } else {
+          return help.size() == 1 && declarator->canBeFunctionDefinition() && help[0]->containsOnlyOneVoidIfSpecified();
+        }
+      }
+
+      bool hasName() {
+        // TODO Check whether this is working
+        if (declarator) {
+          return declarator->hasName();
+        } 
+        return false;
       }
 
     private:

@@ -14,6 +14,7 @@ class ASTNODE(Type)
   public:
     virtual bool canBeInFunctionDeclaration() { return true; };
     virtual std::string toString() { return "unknown"; }
+    virtual bool isVoid() { return false; }
 };
 
 typedef std::shared_ptr<Type> TypeNode;
@@ -23,6 +24,7 @@ class TYPE(BasicType) {
   public:
     BasicType(std::string str, Pos pos);
     std::string toString();
+    bool isVoid() { return type == VOID; }
     PPRINTABLE
   
   private:

@@ -153,6 +153,9 @@ class ASTNODE(Parameter) {
     Parameter(TypeNode type, Pos pos);
     TypeNode getType() { return type; }
     SubDeclarator getDeclarator() { return declarator; }
+    bool hasDeclarator();
+    bool hasName();
+    bool isVoid(); // tests whether there is only (void) and not (int, void) or something
     PPRINTABLE
   private:
     TypeNode type;
