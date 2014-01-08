@@ -159,7 +159,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         if (!declarator) {
           return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
         } else {
-          return help.size() == 1 && declarator->canBeFunctionDefinition() && help[0]->containsOnlyOneVoidIfSpecified();
+          return help.size() <= 1 && declarator->canBeFunctionDefinition() && (help.size()==0 ? true : help[0]->containsOnlyOneVoidIfSpecified());
         }
       }
 

@@ -774,7 +774,6 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
 
     scan();
     
-
     SubDeclarator dec = declarator(abstract);
 
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
