@@ -762,7 +762,10 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
   } else if (testp(PunctuatorType::LEFTPARENTHESIS)) {
     
     // bugfix
-    if(testLookAheadType()) {
+    if( 
+      (abstract == ThreeValueBool::ABSTRACT ||
+      abstract == ThreeValueBool::DONTCARE) &&
+      testLookAheadType()) {
       SubDeclarator dec2;
       std::vector<SubDirectDeclaratorHelp> help;
       directDeclaratorHelp(help, abstract);
