@@ -128,6 +128,15 @@ bool Parser::testLookAheadP(string val) {
          m_lookahead->type() == TokenType::PUNCTUATOR;
 }
 
+
+bool Parser::testLookAheadType() {
+  return (m_lookahead->value() == "int"     || 
+          m_lookahead->value() == "char"    || 
+          m_lookahead->value() == "void"    || 
+          m_lookahead->value() == "struct") && 
+         m_lookahead->type() == TokenType::KEYWORD;
+}
+
 bool Parser::testp(PunctuatorType puncutator) {
   if (testType(TokenType::PUNCTUATOR)) {
     return     std::static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype() 
@@ -605,6 +614,7 @@ std::vector<ParameterNode> Parser::parameterList() {
   decltype(parameterList()) parameters {};
   auto parameter = parameterDeclaration();
   parameters.push_back(parameter);
+
   while(testp(PunctuatorType::COMMA)) {
     scan();
     parameters.push_back(parameterDeclaration());
@@ -652,6 +662,8 @@ auto Parser::directAbstractDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> &
 ParameterNode Parser::parameterDeclaration() {
   OBTAIN_POS();
   auto type = typeSpecifier();
+
+
   if (testp(PunctuatorType::COMMA) || testp(PunctuatorType::RIGHTPARENTHESIS)) {
     return make_shared<Parameter>(type, pos);
   } else {
@@ -709,17 +721,21 @@ SubDeclarator Parser::declarator(ThreeValueBool abstract) {
 
   Pointer pointer(counter, pos); // TODO: Is this still needed?
   // TODO: is the if below correct?
-  if ((!testp(PunctuatorType::RIGHTPARENTHESIS)
-       ) || 
-      abstract != ThreeValueBool::ABSTRACT) {
+  if (testp(PunctuatorType::RIGHTPARENTHESIS)
+    || testp(PunctuatorType::COMMA) // in parameterlist
 
-    SubDirectDeclarator dec = directDeclarator(abstract);
-    return make_shared<Declarator>(counter, dec, pos);
-  } else {
-    return make_shared<Declarator>(counter,
+    
+    ) {
+
+ return make_shared<Declarator>(counter,
         decltype(directDeclarator(abstract))(),
         pos);
-  }
+
+
+  } else {
+    SubDirectDeclarator dec = directDeclarator(abstract);
+    return make_shared<Declarator>(counter, dec, pos);
+ }
 }
 
 /*
@@ -744,8 +760,17 @@ SubDirectDeclarator Parser::directDeclarator(ThreeValueBool abstract) {
     }
 
   } else if (testp(PunctuatorType::LEFTPARENTHESIS)) {
-    scan();
+    
+    // bugfix
+    if(testLookAheadType()) {
+      SubDeclarator dec2;
+      std::vector<SubDirectDeclaratorHelp> help;
+      directDeclaratorHelp(help, abstract);
+      return make_shared<DeclaratorDirectDeclarator>(dec2,help, pos);
+    }
 
+    scan();
+    
 
     SubDeclarator dec = declarator(abstract);
 
@@ -781,8 +806,11 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
 */
 void Parser::directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs ,ThreeValueBool abstract) {
   OBTAIN_POS();
+
+
   if (testp(PunctuatorType::LEFTPARENTHESIS)) { // TODO: use expect instead of testp
     scan();
+
 
     // 1. option
     if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
@@ -796,6 +824,7 @@ void Parser::directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs ,Thr
       }
 
     } else if (testTypeSpecifier()) { // parameter-list
+      
       auto params = parameterList();
       expect(PunctuatorType::RIGHTPARENTHESIS);
       scan();

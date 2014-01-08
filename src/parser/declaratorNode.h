@@ -149,8 +149,8 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       DeclaratorDirectDeclarator(SubDeclarator d,
           std::vector<SubDirectDeclaratorHelp> h,
           Pos pos);
+      DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
       PPRINTABLE
-        DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
       virtual std::string getIdentifier() {
         return declarator->getIdentifier();
       }

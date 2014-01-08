@@ -756,7 +756,6 @@ DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
         Pos pos) 
   : DirectDeclarator(pos), declarator(d), help(h) {}
 
-
 DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
         Pos pos) 
   : DirectDeclarator(pos), declarator(d) {}
