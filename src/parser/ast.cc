@@ -494,7 +494,14 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos)
 TranslationUnit::TranslationUnit(
     std::vector<ExternalDeclarationNode> externalDeclarations,
     Pos pos
-    ) : AstNode(pos), externalDeclarations(externalDeclarations) {}
+    ) : AstNode(pos), externalDeclarations(externalDeclarations) 
+{
+  if (externalDeclarations.empty()) {
+    // initialize position to 1
+    pos.line = pos.column = 1;
+    throw ParsingException("A translationUnit must not be empty!", pos);
+  }
+}
 
 PRETTY_PRINT(TranslationUnit) {
   auto size = externalDeclarations.size();
