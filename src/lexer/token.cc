@@ -3,7 +3,19 @@
 using namespace Lexing;
 
 Token::Token(TokenType type, Pos posinfo, std::string value)
-: m_type(type), m_posinfo(posinfo), m_value(value) {}
+: m_type(type), m_posinfo(posinfo), m_value(value)
+{
+  /* FIXME:
+   * If we reach EOF, at least colum is 0; In this case, the number is
+   * unfortunately not printed at all. Therefore we set it to 1...
+   */
+  if (m_posinfo.line == 0) {
+    m_posinfo.line = 1;
+  }
+  if (m_posinfo.column == 0) {
+    m_posinfo.column = 1;
+  }
+}
 
 
 PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)

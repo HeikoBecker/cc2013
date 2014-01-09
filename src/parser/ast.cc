@@ -497,8 +497,6 @@ TranslationUnit::TranslationUnit(
     ) : AstNode(pos), externalDeclarations(externalDeclarations) 
 {
   if (externalDeclarations.empty()) {
-    // initialize position to 1
-    pos.line = pos.column = 1;
     throw ParsingException("A translationUnit must not be empty!", pos);
   }
 }
