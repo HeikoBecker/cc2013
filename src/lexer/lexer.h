@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <stdexcept>
 #include <memory>
-#include "../pos.h"
+#include "../utils/pos.h"
 #include "token.h"
 
 namespace Lexing {

@@ -5,7 +5,7 @@
 #include <cctype>
 #include <utility> // for std::move
 #include "parser.h"
-#include "../diagnostic.h"
+#include "../utils/diagnostic.h"
 #include "../lexer/lexer.h"
 #include "../lexer/punctuatortype.h"
 #include "../lexer/keywordtokentype.h"

@@ -6,7 +6,7 @@
 #include <set>
 #include <vector>
 #include <stack>
-#include "../pos.h"
+#include "../utils/pos.h"
 #include "parserException.h"
 #include "astNode.h"
 #include "typeNode.h"

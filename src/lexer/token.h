@@ -5,7 +5,7 @@
 #include "punctuatortype.h"
 #include "keywordtokentype.h"
 
-#include "../pos.h"
+#include "../utils/pos.h"
 
 namespace Lexing {
   enum class TokenType {

@@ -6,7 +6,7 @@
 #include <vector>
 #include <typeinfo>
 #include "../lexer/punctuatortype.h"
-#include "../pos.h"
+#include "../utils/pos.h"
 #include "pprinter.h"
 #include "semantic.h"
 #include "astNode.h"

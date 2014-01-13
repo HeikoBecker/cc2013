@@ -1,7 +1,7 @@
 #include <stdexcept>
 
-#include "diagnostic.h"
-#include "util.h"
+#include "utils/diagnostic.h"
+#include "utils/util.h"
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 #include <iostream>
