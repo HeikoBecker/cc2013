@@ -41,6 +41,8 @@ void Parser::expect(std::string s) {
     msg += s;
     msg += std::string(" but got ");
     msg += m_nextsym->value();
+    if (m_nextsym->type() == TokenType::END)
+      msg += "EOF!";
     reportError(msg);
   }
 }
@@ -51,6 +53,8 @@ void Parser::expect(PunctuatorType puncutator) {
     msg += "TODO";
     msg += std::string(" but got ");
     msg += m_nextsym->value();
+        if (m_nextsym->type() == TokenType::END)
+      msg += "EOF!";
     reportError(msg);
   }
 }
@@ -61,6 +65,8 @@ void Parser::expect(KeywordType keyword) {
     msg += "TODO";
     msg += std::string(" but got ");
     msg += m_nextsym->value();
+        if (m_nextsym->type() == TokenType::END)
+      msg += "EOF!";
     reportError(msg);
   }
 }

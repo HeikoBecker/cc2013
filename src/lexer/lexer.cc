@@ -360,6 +360,7 @@ std::shared_ptr<Token> Lexer::getNextToken() {
   }
   do {
     if (!tracker.advance()) {
+      tracker.storePosition();
       return genToken(TokenType::END);
     }
   } while (consumeWhitespace() || consumeComment());
