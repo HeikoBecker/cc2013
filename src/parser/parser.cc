@@ -460,7 +460,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
       auto prec_ternary = getPrec(*m_nextsym);
       expect("?");
       scan(); // read the ?
-      ternaryHelper = expression(prec_ternary);
+      ternaryHelper = expression(1/*prec_ternary*/); //FIXME: with prec_ternary (== 2) it doesn't work; but this is a hack...
       expect(":");
       precNext = 2;
     } else {
