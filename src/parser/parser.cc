@@ -463,7 +463,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     auto isTernary = punctype == PunctuatorType::QMARK;
     int precNext;
     if (isTernary) {
-      auto prec_ternary = getPrec(*m_nextsym);
+      //auto prec_ternary = getPrec(*m_nextsym);
       expect("?");
       scan(); // read the ?
       ternaryHelper = expression(1/*prec_ternary*/); //FIXME: with prec_ternary (== 2) it doesn't work; but this is a hack...
