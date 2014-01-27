@@ -2,7 +2,7 @@
 #define UTIL_H
 
 #include <cassert>
-#include <cstdint>
+#include <stdint.h>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
