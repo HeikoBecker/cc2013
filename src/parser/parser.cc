@@ -32,6 +32,8 @@ Parser::Parser(FILE* f, char const *name)
 }
 
 [[noreturn]] void Parser::expectedAnyOf(std::string msg = "Parsing error") {
+  msg += std::string("\nLast read symbol was ");
+  msg += m_nextsym->value();
   reportError(msg);
 }
 
