@@ -147,12 +147,17 @@ SemanticDeclarationNode convert(
    }
 }
 
+// checks whether two types declarations are the same 
+bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
+  // TODO this will not work for structs right now
+  return (a->toString()) == (b->toString());
+}
+
 
 void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
 
   if (declarator && typeNode) {
     string name = declarator->getIdentifier();
-    int pointerCounter = declarator->getCounter();
     string type = typeNode->toString();
 
     SemanticDeclarationNode decl = convert( convertHelp(typeNode, declarator), declarator);
@@ -163,18 +168,13 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     // This is the old code 
     TypeStack *st;
 
-#ifdef DEBUG
-
-    for(int n=0; n<pointerCounter; n++) { type+="*"; };
-    debug(PARSER) <<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type ;
-#endif
     if (name == "NONAME") {
       return ;
     }
 
     if (declarationMap.find(name) == declarationMap.end()) {
-      st = new stack<pair<int, pair<TypeNode, int> > >();
-      st->push(make_pair(currentPos, make_pair(typeNode, pointerCounter) ));
+      st = new stack<pair<int, SemanticDeclarationNode> >();
+      st->push(make_pair(currentPos, decl ));
       declarationMap[name] = st;
     } else {
       st = declarationMap[name];
@@ -184,19 +184,21 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
       // NO redefinitions
       if (st->size() > 0 && st->top().first == currentPos) {
         if (currentPos !=0 || 
-            !(st->top().second.first->toString() == typeNode->toString() && st->top().second.second == pointerCounter)) {
+            !(
+            hasSameType(st->top().second, decl)
+            )) {
           throw Parsing::ParsingException("no redefinition of " + name, pos);
         }
       } 
 
-      declarationMap[name]->push(make_pair(currentPos, make_pair(typeNode, pointerCounter)));
+      declarationMap[name]->push(make_pair(currentPos, decl ));
     }
   } else {
-    // TODO should this throw an error
+    // TODO should this throw an error ?
   }
 }
 
-pair<TypeNode, int> SemanticTree::lookUpType(string name, Pos pos) {
+SemanticDeclarationNode SemanticTree::lookUpType(string name, Pos pos) {
   if (declarationMap.find(name) != declarationMap.end()) {
     TypeStack *st =  declarationMap[name];
 

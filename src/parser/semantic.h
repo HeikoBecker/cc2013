@@ -19,15 +19,6 @@ using namespace std;
 
 namespace Parsing {
 
-
-enum SemanticType {
-  INT,
-  CHAR,
-  VOID,
-  POINTER,
-  FUNCTION
-};
-
 class SemanticDeclaration {
 public: 
   virtual string toString() {
@@ -36,9 +27,7 @@ public:
 
 };
 
-
 typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;
-
 
 class IntDeclaration : public SemanticDeclaration {
 public: 
@@ -113,7 +102,6 @@ private:
 
 };
 
-
 class StructDeclaration : public SemanticDeclaration {
   // TODO : implement 
 public:  
@@ -122,7 +110,7 @@ public:
   }
 };
 
-typedef stack<pair<int, pair<TypeNode, int> > > TypeStack;
+typedef stack<pair<int, SemanticDeclarationNode> > TypeStack;
 
 class SemanticTree {
 
@@ -173,7 +161,7 @@ class SemanticTree {
     void addGotoLabel(string str);
     bool isInLoop();
     pair<bool, string> checkGotoLabels();
-    pair<TypeNode, int> lookUpType(string name, Pos pos);
+    SemanticDeclarationNode lookUpType(string name, Pos pos);
 };
 
 }
