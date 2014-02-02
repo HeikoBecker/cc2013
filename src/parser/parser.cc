@@ -180,7 +180,6 @@ AstRoot Parser::parse() {
   expect(TokenType::END);
 
   // check for goto-statement label at the end
-  
   auto res = semanticTree->checkGotoLabels();
   
   if (!res.first) {
@@ -215,6 +214,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
     return make_shared<ExternalDeclaration>(type, pos);
   }
+
   auto decl = declarator();
 
   if (testp(";")) {
@@ -489,7 +489,9 @@ SubExpression Parser::expression(int minPrecedence = 0) {
 
 DeclarationNode Parser::declaration() {
   OBTAIN_POS();
+
   auto type = typeSpecifier();
+
   if (testp(";")) {
     scan();
     return std::make_shared<Declaration>(type, pos);

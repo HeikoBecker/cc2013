@@ -147,20 +147,6 @@ class ASTNODE(TranslationUnit) {
 
 typedef std::shared_ptr<TranslationUnit> TUNode;
 
-class ASTNODE(Parameter) {
-  public:
-    Parameter(TypeNode type, SubDeclarator declarator, Pos pos);
-    Parameter(TypeNode type, Pos pos);
-    TypeNode getType() { return type; }
-    SubDeclarator getDeclarator() { return declarator; }
-    bool hasDeclarator();
-    bool hasName();
-    bool isVoid(); // tests whether there is only (void) and not (int, void) or something
-    PPRINTABLE
-  private:
-    TypeNode type;
-    SubDeclarator declarator;
-};
 
 typedef std::shared_ptr<Parameter> ParameterNode;
 

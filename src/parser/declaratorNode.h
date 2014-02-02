@@ -30,6 +30,12 @@ enum DirectDeclaratorHelpEnum {
 
 /* required forward declaration + typedef forward declaration for
  * DirectDeclaratorHelp*/
+
+class Declarator;
+typedef std::shared_ptr<Declarator> SubDeclarator;
+
+
+
 class Parameter;
 typedef std::shared_ptr<Parameter> ParameterNode;
 
@@ -83,16 +89,24 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       virtual bool hasName() {
         return false;
       }
+
+      virtual SubDeclarator getSubDeclarator() {
+        // return empty 
+        SubDeclarator s;
+        return s;
+      }
+
   };
 
   typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 
-  class ASTNODE(Declarator) {
+   class ASTNODE(Declarator) {
     public:
       Declarator(int cnt, SubDirectDeclarator ast, Pos pos);
       std::string getIdentifier() { return directDeclarator->getIdentifier(); }
       int getCounter() { return pointerCounter; }
-      std::vector<ParameterNode> getParameter() { return directDeclarator->getParameter(); }
+      std::vector<ParameterNode> getParameter() { 
+        return directDeclarator->getParameter(); }
       bool canBeFunctionDefinition() { return directDeclarator->canBeFunctionDefinition();}
       bool hasName() {
         if(directDeclarator) {
@@ -101,13 +115,23 @@ typedef std::shared_ptr<Parameter> ParameterNode;
 
         return false;
       }
+
+      virtual SubDeclarator getSubDeclarator() {
+        // return empty 
+        if (directDeclarator) {
+          return directDeclarator->getSubDeclarator();
+        }
+        SubDeclarator s;
+        return s;
+      }
+
+      // get SubDeclarator
       PPRINTABLE
     private:
         int pointerCounter;
         SubDirectDeclarator directDeclarator;
   };
 
-  typedef std::shared_ptr<Declarator> SubDeclarator;
 
   class DIRECTDECLARATOR(IdentifierDirectDeclarator) { 
     public:
@@ -122,6 +146,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       }
 
       virtual std::vector<ParameterNode> getParameter() { 
+
         if (help.size() == 0) {
           return std::vector<ParameterNode>(); 
         } else {
@@ -136,6 +161,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       virtual bool canBeFunctionDefinition() {
         return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
       }
+
+      virtual SubDeclarator getSubDeclarator() {
+        // return empty 
+        SubDeclarator s;
+        return s;
+      }
+
+
 
       PPRINTABLE
 
@@ -163,6 +196,13 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         }
       }
 
+      virtual std::vector<ParameterNode> getParameter() { 
+        if (help.size() == 0) {
+          return std::vector<ParameterNode>(); 
+        } else {
+          return help[0]->getParameter();
+        }
+      }
       bool hasName() {
         // TODO Check whether this is working
         if (declarator) {
@@ -171,10 +211,32 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return false;
       }
 
+      virtual SubDeclarator getSubDeclarator() {
+        return declarator;
+      }
+
+
     private:
       SubDeclarator declarator;
       std::vector<SubDirectDeclaratorHelp> help;
   };
+
+
+class ASTNODE(Parameter) {
+  public:
+    Parameter(TypeNode type, SubDeclarator declarator, Pos pos);
+    Parameter(TypeNode type, Pos pos);
+    TypeNode getType() { return type; }
+    SubDeclarator getDeclarator() { return declarator; }
+    bool hasDeclarator();
+    bool hasName();
+    bool isVoid(); // tests whether there is only (void) and not (int, void) or something
+    PPRINTABLE
+  private:
+    TypeNode type;
+    SubDeclarator declarator;
+};
+
 }
 
 #endif

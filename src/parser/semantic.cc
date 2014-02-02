@@ -64,14 +64,106 @@ bool SemanticTree::addLabel(string label) {
   return false;
 }
 
-void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
-  if (declarator && typeNode) {
-    TypeStack *st;
 
+SemanticDeclarationNode convertHelp(TypeNode typeNode, SubDeclarator declarator) {
+  
+  int pointerCounter = 0;
+
+  if (declarator) {
+    pointerCounter = declarator->getCounter();
+  }
+
+   SemanticDeclarationNode myDeclaration;
+
+   string type;
+   // it is a basic type
+   type = typeNode->toString();
+   if (type == "int") {
+     myDeclaration = make_shared<IntDeclaration>();
+   } else if (type == "char") {
+     myDeclaration = make_shared<CharDeclaration>();
+   } else if (type == "void") {
+     // TODO This might be an error, but does not need to be
+     // depends on the contex
+     myDeclaration = make_shared<VoidDeclaration>();
+   } else {
+     // TODO structs
+     myDeclaration = make_shared<StructDeclaration>();
+   }
+
+   if (pointerCounter != 0) {
+     myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
+   } 
+
+   return myDeclaration;
+}
+
+
+SemanticDeclarationNode convert(
+  SemanticDeclarationNode myDeclaration, 
+  SubDeclarator declarator) {
+
+   // cout<<"TYPE : " << myDeclaration->toString()<<endl;
+
+   if (declarator && declarator->canBeFunctionDefinition()) {
+     // it is a function
+     // get the parameter
+     vector<ParameterNode> parameter = declarator->getParameter();
+     vector<SemanticDeclarationNode> nodes;
+
+     // cout <<"Number of paramters : "<< parameter.size()<<endl;
+
+     for (ParameterNode par : parameter) {
+       TypeNode type = par->getType();
+       SubDeclarator decl = par->getDeclarator();
+
+       nodes.push_back(
+        convert( convertHelp(type,decl), decl ));
+     }
+
+     auto decl = declarator->getSubDeclarator();
+
+
+     if (decl) {
+       // cout<<"Declator is NOT empty !"<<endl;
+
+      SemanticDeclarationNode returnType = make_shared<FunctionDeclaration>(myDeclaration, nodes);
+
+      TypeNode tHelp;
+      SemanticDeclarationNode innerFun = convert(returnType, decl);
+
+      // TODO test that this is a function
+
+      return innerFun;
+      // TODO here we still have something to do
+     } else {
+      // cout<<" Declarator is empty " <<endl;
+      return make_shared<FunctionDeclaration>(myDeclaration, nodes);
+     }
+
+
+   } else {
+    return myDeclaration;
+   }
+}
+
+
+void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
+
+  if (declarator && typeNode) {
     string name = declarator->getIdentifier();
     int pointerCounter = declarator->getCounter();
-#ifdef DEBUG
     string type = typeNode->toString();
+
+    SemanticDeclarationNode decl = convert( convertHelp(typeNode, declarator), declarator);
+#ifdef DEBUG
+    cout<<" DECL : "<<decl->toString()<<endl;
+#endif
+
+    // This is the old code 
+    TypeStack *st;
+
+#ifdef DEBUG
 
     for(int n=0; n<pointerCounter; n++) { type+="*"; };
     debug(PARSER) <<" SEMANTIC ADD : NUMBER: "<<currentPos<<" IDENTIFIER: "<<name<<" TYPE:"<<type ;
