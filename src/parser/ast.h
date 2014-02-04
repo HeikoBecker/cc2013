@@ -173,7 +173,8 @@ class TYPE(StructType) {
 
   private:
     std::string name;
-    StructContent content; 
+    StructContent content;
+    std::vector<std::pair<TypeNode, SubDeclarator>> mycontent;
     bool hasDeclaration;
 };
 

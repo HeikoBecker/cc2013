@@ -74,6 +74,7 @@ string BasicType::toString() {
 
 StructType::StructType(std::string name, Pos pos) : Type(pos), name(name) {
   // default string is empty
+  mycontent = std::vector<std::pair<TypeNode, SubDeclarator>> ();
   content = StructContent();
   hasDeclaration = false;
 }
@@ -82,12 +83,18 @@ StructType::StructType(Pos pos) : Type(pos) {
   // default string is empty
   name = std::string("");
   content = StructContent();
+  mycontent = std::vector<std::pair<TypeNode, SubDeclarator>> ();
   hasDeclaration = false;
 }
 
-StructType::StructType(std::string name, StructContent content, Pos pos)
-  : Type(pos), name(name), content(content) {
+StructType::StructType(std::string name, StructContent strcontent, Pos pos)
+  : Type(pos), name(name), content(strcontent) {
+  mycontent = std::vector<std::pair<TypeNode, SubDeclarator>> ();
   hasDeclaration = true;
+
+  for(auto cont : strcontent) {
+    mycontent.push_back(make_pair(cont.first,cont.second[0].first));
+  }
 }
 
 CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements, Pos pos)
