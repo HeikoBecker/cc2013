@@ -64,95 +64,107 @@ bool SemanticTree::addLabel(string label) {
   return false;
 }
 
-
-SemanticDeclarationNode convertHelp(TypeNode typeNode, SubDeclarator declarator) {
-  
-  int pointerCounter = 0;
-
-  if (declarator) {
-    pointerCounter = declarator->getCounter();
-  }
-
-   SemanticDeclarationNode myDeclaration;
-
-   string type;
-   // it is a basic type
-   type = typeNode->toString();
-   if (type == "int") {
-     myDeclaration = make_shared<IntDeclaration>();
-   } else if (type == "char") {
-     myDeclaration = make_shared<CharDeclaration>();
-   } else if (type == "void") {
-     // TODO This might be an error, but does not need to be
-     // depends on the contex
-     myDeclaration = make_shared<VoidDeclaration>();
-   } else {
-     // TODO structs
-     myDeclaration = make_shared<StructDeclaration>();
-   }
-
-   if (pointerCounter != 0) {
-     myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
-   } 
-
-   return myDeclaration;
-}
-
-
-SemanticDeclarationNode convert(
-  SemanticDeclarationNode myDeclaration, 
-  SubDeclarator declarator) {
-
-   // cout<<"TYPE : " << myDeclaration->toString()<<endl;
-
-   if (declarator && declarator->canBeFunctionDefinition()) {
-     // it is a function
-     // get the parameter
-     vector<ParameterNode> parameter = declarator->getParameter();
-     vector<SemanticDeclarationNode> nodes;
-
-     // cout <<"Number of paramters : "<< parameter.size()<<endl;
-
-     for (ParameterNode par : parameter) {
-       TypeNode type = par->getType();
-       SubDeclarator decl = par->getDeclarator();
-
-       nodes.push_back(
-        convert( convertHelp(type,decl), decl ));
-     }
-
-     auto decl = declarator->getSubDeclarator();
-
-
-     if (decl) {
-       // cout<<"Declator is NOT empty !"<<endl;
-
-      SemanticDeclarationNode returnType = make_shared<FunctionDeclaration>(myDeclaration, nodes);
-
-      TypeNode tHelp;
-      SemanticDeclarationNode innerFun = convert(returnType, decl);
-
-      // TODO test that this is a function
-
-      return innerFun;
-      // TODO here we still have something to do
-     } else {
-      // cout<<" Declarator is empty " <<endl;
-      return make_shared<FunctionDeclaration>(myDeclaration, nodes);
-     }
-
-
-   } else {
-    return myDeclaration;
-   }
-}
-
 // checks whether two types declarations are the same 
 bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
   // TODO this will not work for structs right now
   return (a->toString()) == (b->toString());
 }
 
+SemanticDeclarationNode helpConvert(
+  TypeNode typeNode, 
+  SubDeclarator declarator, 
+  SemanticDeclarationNode ret) {
+
+
+   SemanticDeclarationNode myDeclaration;
+
+
+  if (!declarator) {
+   string type = typeNode->toString();
+     if (type == "int") {
+       myDeclaration = make_shared<IntDeclaration>();
+     } else if (type == "char") {
+       myDeclaration = make_shared<CharDeclaration>();
+     } else if (type == "void") {
+       // TODO This might be an error, but does not need to be
+       // depends on the contex
+       myDeclaration = make_shared<VoidDeclaration>();
+     } else {
+       // TODO structs
+       myDeclaration = make_shared<StructDeclaration>();
+     }
+     return myDeclaration;
+  }
+
+
+
+
+
+   TypeNode t = typeNode;
+   SubDeclarator decl = declarator;
+   pair<int,bool> res = declarator->getPointers();
+
+   if (ret) {
+     myDeclaration = ret; 
+
+     int pointerCounter = res.first;
+    if (pointerCounter != 0) {
+      myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
+    } 
+
+   } else {
+
+     int pointerCounter = res.first;
+
+     string type;
+     // it is a basic type
+     type = typeNode->toString();
+     if (type == "int") {
+       myDeclaration = make_shared<IntDeclaration>();
+     } else if (type == "char") {
+       myDeclaration = make_shared<CharDeclaration>();
+     } else if (type == "void") {
+       // TODO This might be an error, but does not need to be
+       // depends on the contex
+       myDeclaration = make_shared<VoidDeclaration>();
+     } else {
+       // TODO structs
+       myDeclaration = make_shared<StructDeclaration>();
+     }
+
+    if (pointerCounter != 0) {
+      myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
+    } 
+   }
+
+   if (res.second) {
+
+
+    auto h = declarator->getNextDeclarator();
+
+    // TODO add parameter here
+    //
+    auto pa = declarator->getNextParameter();
+
+
+    auto  par = std::vector<SemanticDeclarationNode>(); 
+
+    for(auto p : pa) {
+      SemanticDeclarationNode empty;
+      par.push_back(helpConvert(p->getType(), p->getDeclarator(),empty));
+    }
+
+
+    auto ret = make_shared<FunctionDeclaration>(myDeclaration, par);
+
+    if (h) {
+       return helpConvert(t, h, ret);
+    } else {
+      return ret;
+    }
+   } 
+     return myDeclaration;
+}
 
 void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
 
@@ -160,7 +172,10 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     string name = declarator->getIdentifier();
     string type = typeNode->toString();
 
-    SemanticDeclarationNode decl = convert( convertHelp(typeNode, declarator), declarator);
+    SemanticDeclarationNode ret;
+    auto decl = helpConvert(typeNode, declarator, ret);
+
+
 #ifdef DEBUG
     cout<<" DECL : "<<decl->toString()<<endl;
 #endif

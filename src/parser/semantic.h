@@ -51,7 +51,6 @@ public:
  virtual string toString() {
     return "void";
   }
-
 };
 
 class PointerDeclaration : public SemanticDeclaration {
@@ -66,7 +65,7 @@ class PointerDeclaration : public SemanticDeclaration {
     }
   
   virtual string toString() {
-    return child->toString()+"*";
+    return "*" + child->toString();
   }
     
   private:

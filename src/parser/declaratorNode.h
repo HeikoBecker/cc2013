@@ -7,6 +7,8 @@
 #include "statementNode.h"
 #include "typeNode.h"
 
+using namespace std;
+
 namespace Parsing {
 
 class ASTNODE(IdentifierList) {
@@ -70,6 +72,9 @@ typedef std::shared_ptr<Parameter> ParameterNode;
   };
 
   typedef std::shared_ptr<DirectDeclaratorHelp> SubDirectDeclaratorHelp;
+  class DirectDeclarator;
+
+  typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 
   class ASTNODE(DirectDeclarator) { 
     CONS_INTER(DirectDeclarator)
@@ -83,6 +88,9 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return "NONAME";
       }
       virtual std::vector<ParameterNode> getParameter() { return std::vector<ParameterNode>(); }
+
+
+      virtual std::vector<ParameterNode> getNextParameter() { return std::vector<ParameterNode>(); }
       virtual bool canBeFunctionDefinition() {
         return false;
       }
@@ -90,15 +98,30 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return false;
       }
 
+      virtual bool isFunction() {
+        return false;
+      }
+
+      virtual pair<int,bool>  getPointers() {
+        return make_pair(0, false);
+      }
+
       virtual SubDeclarator getSubDeclarator() {
         // return empty 
+        throw "Exception";
+        SubDeclarator s;
+        return s;
+      }
+
+      virtual SubDeclarator getNextDeclarator() {
+        // return empty 
+        throw "exception";
         SubDeclarator s;
         return s;
       }
 
   };
 
-  typedef std::shared_ptr<DirectDeclarator> SubDirectDeclarator;
 
    class ASTNODE(Declarator) {
     public:
@@ -106,7 +129,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       std::string getIdentifier() { return directDeclarator->getIdentifier(); }
       int getCounter() { return pointerCounter; }
       std::vector<ParameterNode> getParameter() { 
-        return directDeclarator->getParameter(); }
+        return directDeclarator->getParameter(); 
+      }
+
+
+      std::vector<ParameterNode> getNextParameter() { 
+        return directDeclarator->getNextParameter(); 
+      }
+
       bool canBeFunctionDefinition() { return directDeclarator->canBeFunctionDefinition();}
       bool hasName() {
         if(directDeclarator) {
@@ -116,18 +146,37 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return false;
       }
 
-      virtual SubDeclarator getSubDeclarator() {
+      pair<int,bool> getPointers() {
+        if(directDeclarator) {
+          auto p =  directDeclarator->getPointers();
+          p.first = p.first + pointerCounter;
+          return p;
+        }
+
+        return make_pair(pointerCounter, false);
+      }
+
+      SubDeclarator getNextDeclarator() {
+        // return empty 
+        if (directDeclarator) {
+          return directDeclarator->getNextDeclarator();
+        }
+        return empty;
+      }
+
+      SubDeclarator getSubDeclarator() {
         // return empty 
         if (directDeclarator) {
           return directDeclarator->getSubDeclarator();
         }
-        SubDeclarator s;
-        return s;
+        return empty;
       }
 
       // get SubDeclarator
       PPRINTABLE
     private:
+        // always empty
+        SubDeclarator empty;
         int pointerCounter;
         SubDirectDeclarator directDeclarator;
   };
@@ -145,8 +194,22 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return identifier;
       }
 
-      virtual std::vector<ParameterNode> getParameter() { 
+      pair<int, bool> getPointers() {
+        // we are finished in our goal
+        return make_pair(0, help.size() != 0);
+      }
 
+
+      virtual std::vector<ParameterNode> getNextParameter() { 
+        if (help.size() == 0) {
+          // this should never happen
+          return std::vector<ParameterNode>(); 
+        } else {
+          return help[0]->getParameter();
+        }
+      }
+
+      virtual std::vector<ParameterNode> getParameter() { 
         if (help.size() == 0) {
           return std::vector<ParameterNode>(); 
         } else {
@@ -158,21 +221,31 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return true;
       }
 
-      virtual bool canBeFunctionDefinition() {
+      bool canBeFunctionDefinition() {
         return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
       }
 
-      virtual SubDeclarator getSubDeclarator() {
+      SubDeclarator getSubDeclarator() {
         // return empty 
-        SubDeclarator s;
+        return s;
+      }
+
+      SubDeclarator getNextDeclarator() {
+        // return empty 
         return s;
       }
 
 
 
+
+      bool isFunction() {
+        return help.size() !=0;
+      }
+
       PPRINTABLE
 
     private:
+        SubDeclarator s;
         std::string identifier;
         std::vector<SubDirectDeclaratorHelp> help;
   };
@@ -188,6 +261,15 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return declarator->getIdentifier();
       }
 
+      pair<int, bool> getPointers() {
+
+        if (help.size() == 0 ) {
+          return declarator->getPointers();
+        }
+
+        return make_pair(0, true);
+      }
+
       virtual bool canBeFunctionDefinition() {
         if (!declarator) {
           return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
@@ -196,6 +278,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         }
       }
 
+      virtual std::vector<ParameterNode> getNextParameter() { 
+        if (help.size() == 0) {
+          // this should never happen
+          return declarator->getNextParameter();
+        } else {
+          return help[0]->getParameter();
+        }
+      }
       virtual std::vector<ParameterNode> getParameter() { 
         if (help.size() == 0) {
           return std::vector<ParameterNode>(); 
@@ -215,6 +305,13 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return declarator;
       }
 
+      SubDeclarator getNextDeclarator() {
+        if(help.size() == 0) {
+          return declarator->getSubDeclarator();
+        } else {
+          return declarator;
+        }
+      }
 
     private:
       SubDeclarator declarator;
