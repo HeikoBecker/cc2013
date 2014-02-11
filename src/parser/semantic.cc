@@ -7,19 +7,52 @@ SemanticTree::SemanticTree() {
   counter = 0;
   loopDepth = 0;
   currentPos = 0;
-  nodes.push_back(SemanticNode(-1));
+  nodes.push_back(make_shared<SemanticNode>(-1));
   counter++;
 }
 
-void SemanticTree::addChild() {
-  nodes.push_back(SemanticNode(currentPos));
+void SemanticTree::addChild(string name) {
+  nodes.push_back(make_shared<SemanticNode>(currentPos));
+ 
+  // save the struct definitions
+  if (name != "@@") {
+
+    if(structMap.find(name) == structMap.end()) {
+      stack<int> st = stack<int>();
+      st.push(counter);
+      structMap[name] = st;
+    } else {
+
+      SubSemanticNode helpNode;
+
+      // delete not active nodes
+      while(!structMap[name].empty()) {
+        int id = structMap[name].top();
+        int parent = nodes[id]->getParentIndex();
+        if (nodes[parent]->isActive()) {
+          helpNode = nodes[id];
+          break;
+        } else {
+          structMap[name].pop();
+        }
+      }
+
+      // add it to the Map
+      if (structMap[name].empty() || nodes[structMap[name].top()]->getParentIndex() != currentPos) {
+          structMap[name].push(counter);
+      } else {
+        throw "no redefinition of "+ name;
+      }
+    }
+  }
+
   counter++;
   currentPos = counter - 1;
 }
 
 void SemanticTree::goUp() {
-  nodes[currentPos].disable();
-  currentPos = nodes[currentPos].getParentIndex();
+  nodes[currentPos]->disable();
+  currentPos = nodes[currentPos]->getParentIndex();
 }
 
 void SemanticTree::addGotoLabel(string str) {
@@ -38,7 +71,7 @@ pair<bool, string> SemanticTree::checkGotoLabels() {
 
 void SemanticTree::deleteNotActiveNodes(TypeStack *st) {
   while (st->size() > 0 && 
-      !nodes[st->top().first].isActive()
+      !nodes[st->top().first]->isActive()
       ) {
     st->pop();
   }
@@ -70,17 +103,10 @@ bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
   return (a->toString()) == (b->toString());
 }
 
-SemanticDeclarationNode helpConvert(
-  TypeNode typeNode, 
-  SubDeclarator declarator, 
-  SemanticDeclarationNode ret) {
-
-
+SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode) {
    SemanticDeclarationNode myDeclaration;
 
-
-  if (!declarator) {
-   string type = typeNode->toString();
+    string type = typeNode->toString();
      if (type == "int") {
        myDeclaration = make_shared<IntDeclaration>();
      } else if (type == "char") {
@@ -91,13 +117,43 @@ SemanticDeclarationNode helpConvert(
        myDeclaration = make_shared<VoidDeclaration>();
      } else {
        // TODO structs
-       myDeclaration = make_shared<StructDeclaration>();
+       string name = "@" + type;
+        
+       SubSemanticNode helpNode;
+
+       while(!structMap[name].empty()) {
+        int id = structMap[name].top();
+       // cout<<"Id : "<<id<<endl;
+        int parent = nodes[id]->getParentIndex();
+        if (nodes[parent]->isActive()) {
+          helpNode = nodes[id];
+          break;
+        } else {
+          structMap[name].pop();
+        }
+       }
+
+       if (helpNode) {
+        myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode);
+       } else {
+        throw " struct is not recognized";
+       }
      }
-     return myDeclaration;
+   return myDeclaration;
+}
+
+SemanticDeclarationNode SemanticTree::helpConvert(
+  TypeNode typeNode, 
+  SubDeclarator declarator, 
+  SemanticDeclarationNode ret) {
+
+
+   SemanticDeclarationNode myDeclaration;
+
+
+  if (!declarator) {
+    return createType(typeNode);
   }
-
-
-
 
 
    TypeNode t = typeNode;
@@ -116,21 +172,7 @@ SemanticDeclarationNode helpConvert(
 
      int pointerCounter = res.first;
 
-     string type;
-     // it is a basic type
-     type = typeNode->toString();
-     if (type == "int") {
-       myDeclaration = make_shared<IntDeclaration>();
-     } else if (type == "char") {
-       myDeclaration = make_shared<CharDeclaration>();
-     } else if (type == "void") {
-       // TODO This might be an error, but does not need to be
-       // depends on the contex
-       myDeclaration = make_shared<VoidDeclaration>();
-     } else {
-       // TODO structs
-       myDeclaration = make_shared<StructDeclaration>();
-     }
+     myDeclaration = createType(typeNode);
 
     if (pointerCounter != 0) {
       myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
@@ -175,10 +217,9 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     SemanticDeclarationNode ret;
     auto decl = helpConvert(typeNode, declarator, ret);
 
-
-#ifdef DEBUG
+// #ifdef DEBUG
     cout<<" DECL : "<<decl->toString()<<endl;
-#endif
+// #endif
 
     // This is the old code 
     TypeStack *st;
@@ -207,6 +248,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
       } 
 
       declarationMap[name]->push(make_pair(currentPos, decl ));
+      nodes[currentPos]->addDeclaration(name, decl);
     }
   } else {
     // TODO should this throw an error ?

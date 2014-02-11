@@ -14,10 +14,12 @@
 
 using namespace std;
 
-// TODO change string to TypeNode
 // conflict in C++ dependencies
 
 namespace Parsing {
+
+class SemanticNode;
+typedef shared_ptr<SemanticNode> SubSemanticNode;
 
 class SemanticDeclaration {
 public: 
@@ -44,7 +46,6 @@ public :
 };
 
 
-// TODO : i am not sure
 // void is not allowed, but void**
 class VoidDeclaration : public SemanticDeclaration {
 public: 
@@ -102,45 +103,58 @@ private:
 };
 
 class StructDeclaration : public SemanticDeclaration {
-  // TODO : implement 
+  
 public:  
-  virtual string toString() {
-    return "struct ";
+  // name e.g. @S
+  StructDeclaration(string n, SubSemanticNode s) {
+    name = n;
+    node = s;
   }
+  
+  string toString() {
+    return name;
+  }
+private:
+  string name;
+  SubSemanticNode node;
 };
 
 typedef stack<pair<int, SemanticDeclarationNode> > TypeStack;
 
-class SemanticTree {
+class SemanticNode {
+  public:
+    SemanticNode(int parent) : parent(parent), active(true) { };
 
+    void disable() {
+      active = false;
+    }
 
-  class SemanticNode {
-    public:
-      SemanticNode(int parent) : parent(parent), active(true) { };
+    int getParentIndex() {
+      return parent;
+    }
 
-      void disable() {
-        active = false;
-      }
+    bool isActive() {
+      return active;
+    }
 
-      int getParentIndex() {
-        return parent;
-      }
-
-      bool isActive() {
-        return active;
-      }
-
-    private:
-      int parent;
-      bool active;
-  };
+    void addDeclaration(string s, SemanticDeclarationNode node) {
+      decl[s] = node;
+    }
 
   private:
-    vector<SemanticNode> nodes;
+    int parent;
+    bool active;
+    map<string, SemanticDeclarationNode> decl;
+};
+
+class SemanticTree {
+
+  private:
+    vector<shared_ptr<SemanticNode> > nodes;
     int currentPos;
     int counter;
     map<string, TypeStack *> declarationMap;
-
+    map<string, stack<int> > structMap;
     int loopDepth; // depth inside loop for checking break; continue;
 
     // map for goto 
@@ -151,7 +165,7 @@ class SemanticTree {
     SemanticTree();
     // returns true, if the label could be added
     bool addLabel(string label);
-    void addChild();
+    void addChild(string name="@@");
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
     void addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
@@ -159,6 +173,12 @@ class SemanticTree {
     void decreaseLoopDepth();
     void addGotoLabel(string str);
     bool isInLoop();
+    SemanticDeclarationNode createType(TypeNode t);
+    SemanticDeclarationNode helpConvert(
+  TypeNode typeNode, 
+  SubDeclarator declarator, 
+  SemanticDeclarationNode ret);
+
     pair<bool, string> checkGotoLabels();
     SemanticDeclarationNode lookUpType(string name, Pos pos);
 };

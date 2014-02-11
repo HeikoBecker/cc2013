@@ -513,12 +513,13 @@ StructNode Parser::structOrUnionSpecifier() {
   expect("struct");
   scan();
 
+
   if (testType(TokenType::IDENTIFIER)) {
     auto name = m_nextsym->value();
 
     scan();
     if (testp(PunctuatorType::LEFTCURLYBRACE)) {
-      semanticTree->addChild();
+      semanticTree->addChild("@"+name);
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
       auto structDecLst = structDeclarationList();
@@ -530,15 +531,6 @@ StructNode Parser::structOrUnionSpecifier() {
     }
 
     return make_shared<StructType>(name, pos);
-  } else if(testp(PunctuatorType::LEFTCURLYBRACE)) {
-    semanticTree->addChild();
-    scan();
-    auto structDecLst = structDeclarationList();
-    expect(PunctuatorType::RIGHTCURLYBRACE);
-    scan();
-    auto ret = make_shared<StructType>("",structDecLst, pos);
-    semanticTree->goUp();
-    return ret;
   } else {
     expectedAnyOf();
   }
