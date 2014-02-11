@@ -141,6 +141,14 @@ class SemanticNode {
       decl[s] = node;
     }
 
+    SemanticDeclarationNode getNode(string name) {
+      if (decl.find(name) == decl.end()) {
+        throw name + " not found";
+      } else {
+        return decl[name];
+      }
+    }
+
   private:
     int parent;
     bool active;
