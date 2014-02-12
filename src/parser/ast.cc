@@ -79,7 +79,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
         this->type = optype;
       } else {
         throw ParsingException(std::string("Cannot dereference ") 
-                               + operand->getType()->toString(),
+                               + (operand->getType() ? operand->getType()->toString() : "INITIALIZE ME!"),
                                operand->pos());
       }
       break;
