@@ -1,3 +1,6 @@
+struct A {char x;};
+
 int main(void) {
-  A.x;
+  struct A a;
+  a.x;
 }
