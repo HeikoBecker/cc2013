@@ -1,7 +1,7 @@
 #include "semantic.h"
 #include "../utils/debug.h"
 
-namespace Parsing {
+using namespace Parsing;
 
 SemanticTree::SemanticTree() {
   counter = 0;
@@ -270,6 +270,4 @@ SemanticDeclarationNode SemanticTree::lookUpType(string name, Pos pos) {
   } else {
     throw Parsing::ParsingException(name+ " is not declared in this scope", pos);
   }
-}
-
 }

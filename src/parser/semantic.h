@@ -11,6 +11,7 @@
 #include "astNode.h"
 #include "typeNode.h"
 #include "declaratorNode.h"
+#include "semadecl.h"
 
 using namespace std;
 
@@ -20,104 +21,6 @@ namespace Parsing {
 
 class SemanticNode;
 typedef shared_ptr<SemanticNode> SubSemanticNode;
-
-class SemanticDeclaration {
-public: 
-  virtual string toString() {
-    return "SemanticDeclaration";
-  }
-
-};
-
-typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;
-
-class IntDeclaration : public SemanticDeclaration {
-public: 
- virtual string toString() {
-    return "int";
-  }
-};
-
-class CharDeclaration : public SemanticDeclaration {
-public :
-  virtual string toString() {
-    return "string";
-  }
-};
-
-
-// void is not allowed, but void**
-class VoidDeclaration : public SemanticDeclaration {
-public: 
- virtual string toString() {
-    return "void";
-  }
-};
-
-class PointerDeclaration : public SemanticDeclaration {
-  public:
-   // type is int, char, or void
-    PointerDeclaration(int pointerCounter, SemanticDeclarationNode type) {
-      if (pointerCounter == 0) {
-        child = type;
-      } else {
-        child = make_shared<PointerDeclaration>(pointerCounter-1, type);
-      }
-    }
-  
-  virtual string toString() {
-    return "*" + child->toString();
-  }
-    
-  private:
-    SemanticDeclarationNode child;
-};
-
-class FunctionDeclaration : public SemanticDeclaration {
-
-public:
-  FunctionDeclaration(SemanticDeclarationNode ret, vector<SemanticDeclarationNode> par) :returnChild(ret), parameter(par) { }
-
-  virtual string toString() {
-    string str = "function (";
-    bool first =true;
-    for (SemanticDeclarationNode p : parameter) {
-      if (!first) {
-        str+= ",";
-      }
-      str += p->toString() ;
-
-      first = false;
-    }
-
-    str +=") returning ";
-    str += returnChild->toString();
-
-    return str;
-  }
-
-private:
-    SemanticDeclarationNode returnChild;
-    vector<SemanticDeclarationNode> parameter;
-
-};
-
-class StructDeclaration : public SemanticDeclaration {
-  
-public:  
-  // name e.g. @S
-  StructDeclaration(string n, SubSemanticNode s) {
-    name = n;
-    node = s;
-  }
-  
-  string toString() {
-    return name;
-  }
-private:
-  string name;
-  SubSemanticNode node;
-};
 
 typedef stack<pair<int, SemanticDeclarationNode> > TypeStack;
 
