@@ -95,6 +95,12 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
         this->type = promoteType(operand->getType());
       }
       break;
+    case PunctuatorType::NOT:
+      if (!hasScalarType(operand->getType())) {
+        throw ParsingException("Operator '!' requires an operand of scalar type", operand->pos());
+      }
+      this->type = make_shared<IntDeclaration>();
+     break;
     default:
       break;
   }
