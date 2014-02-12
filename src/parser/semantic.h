@@ -76,7 +76,7 @@ class SemanticTree {
     SemanticTree();
     // returns true, if the label could be added
     bool addLabel(string label);
-    void addChild(string name="@@");
+    void addChild(Pos pos, string name="@@");
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
     void addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
@@ -84,11 +84,11 @@ class SemanticTree {
     void decreaseLoopDepth();
     void addGotoLabel(string str);
     bool isInLoop();
-    SemanticDeclarationNode createType(TypeNode t);
+    SemanticDeclarationNode createType(TypeNode t, Pos pos);
     SemanticDeclarationNode helpConvert(
   TypeNode typeNode, 
   SubDeclarator declarator, 
-  SemanticDeclarationNode ret);
+  SemanticDeclarationNode ret, Pos pos);
 
     pair<bool, string> checkGotoLabels();
     SemanticDeclarationNode lookUpType(string name, Pos pos);
