@@ -99,5 +99,14 @@ class SemanticTree {
     SemanticDeclarationNode lookUpType(string name, Pos pos);
 };
 
+using namespace Parsing;
+
+namespace Semantic {
+  bool hasScalarType(SemanticDeclarationNode) {return true;};
+  bool hasArithmeticType(SemanticDeclarationNode) {return true;};
+  bool hasIntegerType(SemanticDeclarationNode) {return true;};
+  SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;};
+}
+
 }
 #endif

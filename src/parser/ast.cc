@@ -6,6 +6,7 @@
 #include "../utils/debug.h"
 
 using namespace Parsing;
+using namespace Semantic;
 
 BinaryExpression::BinaryExpression(SubExpression lhs,
                                    SubExpression rhs,
@@ -82,6 +83,11 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
                                + (operand->getType() ? operand->getType()->toString() : "INITIALIZE ME!"),
                                operand->pos());
       }
+      break;
+    case PunctuatorType::AMPERSAND:
+      // TODO: check that operand is lvalue, function designator, or operand of
+      // [] or *
+      this->type = make_shared<PointerDeclaration>(1, operand->getType());
       break;
     default:
       break;
