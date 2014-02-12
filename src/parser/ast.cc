@@ -101,6 +101,13 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
       }
       this->type = make_shared<IntDeclaration>();
      break;
+    case PunctuatorType::SIZEOF:
+     if (dynamic_pointer_cast<FunctionDeclaration>(operand->getType())) {
+        throw ParsingException("Illegal application of 'sizeof' to a functon type", operand->pos());
+     }
+     // in real C, it would be size_t, but we don't have that one
+     this->type = make_shared<IntDeclaration>();
+     break;
     default:
       break;
   }
@@ -325,6 +332,9 @@ DirectDeclaratorHelp::DirectDeclaratorHelp(SubIdentifierList idList, Pos pos)
 SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand, Pos pos)
   : Expression(pos), operand(operand) 
 {
+  // TODO: do we need any further checks here? Or is the operand guarantueed to be
+  // valid when the constructor is called
+  this->type = make_shared<IntDeclaration>();
 }
 
 ReturnStatement::ReturnStatement(Pos pos) : JumpStatement(pos) {}
