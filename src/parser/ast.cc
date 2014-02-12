@@ -75,6 +75,26 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       }
       this->type = make_shared<IntDeclaration>();
       break;
+    case PunctuatorType::PLUS: {
+      auto lhs_type = lhs->getType();
+      auto rhs_type = rhs->getType();
+      if (hasArithmeticType(lhs_type) && hasArithmeticType(rhs_type)) {
+        // TODO: apply usual conversions
+        this->type = make_shared<IntDeclaration>();
+        break;
+      }
+      shared_ptr<PointerDeclaration> t;
+      if (hasIntegerType(lhs_type)) {
+        t = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
+      } else if (hasIntegerType(rhs_type)) {
+        t = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
+      }
+      if (t) {
+        this->type = t->pointee();
+        break;
+      }
+      throw ParsingException(std::string("Incompatible types for +"), lhs->pos());
+    }
     default:
       break;
   }
