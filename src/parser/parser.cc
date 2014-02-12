@@ -503,6 +503,8 @@ DeclarationNode Parser::declaration() {
   }
 }
 
+string structInPlace ="";
+
 /*
 struct-or-union-specifier -> "struct" identifier "{" struct-declarations-list "}"
                             | "struct" "{" struct-declarations-list "}"
@@ -519,7 +521,7 @@ StructNode Parser::structOrUnionSpecifier() {
 
     scan();
     if (testp(PunctuatorType::LEFTCURLYBRACE)) {
-      semanticTree->addChild("@"+name);
+      semanticTree->addChild(pos, "@"+name);
       expect(PunctuatorType::LEFTCURLYBRACE);
       scan();
       auto structDecLst = structDeclarationList();
@@ -531,7 +533,24 @@ StructNode Parser::structOrUnionSpecifier() {
     }
 
     return make_shared<StructType>(name, pos);
-  } else {
+  } else  if (testp(PunctuatorType::LEFTCURLYBRACE)) {
+      structInPlace = structInPlace+"u";
+      
+      string name = "@@" + structInPlace;
+      string type = "@" + structInPlace;
+
+
+      semanticTree->addChild(pos, name);
+      expect(PunctuatorType::LEFTCURLYBRACE);
+      scan();
+      auto structDecLst = structDeclarationList();
+      expect(PunctuatorType::RIGHTCURLYBRACE);
+      scan();
+      auto ret =  make_shared<StructType>(type, structDecLst, pos);
+      semanticTree->goUp();
+      return ret;
+    }
+  else {
     expectedAnyOf();
   }
 }
@@ -869,7 +888,7 @@ SubCompoundStatement Parser::compoundStatement(vector<ParameterNode> paramList )
 
   // add a new child to the semantic tree
   // and go to that child
-  semanticTree->addChild();
+  semanticTree->addChild(pos);
 
   // add variables for the function
   for (auto par : paramList) {

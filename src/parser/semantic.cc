@@ -11,9 +11,10 @@ SemanticTree::SemanticTree() {
   counter++;
 }
 
-void SemanticTree::addChild(string name) {
+void SemanticTree::addChild(Pos pos, string name) {
   nodes.push_back(make_shared<SemanticNode>(currentPos));
- 
+
+
   // save the struct definitions
   if (name != "@@") {
 
@@ -41,7 +42,7 @@ void SemanticTree::addChild(string name) {
       if (structMap[name].empty() || nodes[structMap[name].top()]->getParentIndex() != currentPos) {
           structMap[name].push(counter);
       } else {
-        throw "no redefinition of "+ name;
+          throw Parsing::ParsingException("no redefinition of " + name, pos);
       }
     }
   }
@@ -103,7 +104,7 @@ bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
   return (a->toString()) == (b->toString());
 }
 
-SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode) {
+SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
    SemanticDeclarationNode myDeclaration;
 
     string type = typeNode->toString();
@@ -136,7 +137,7 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode) {
        if (helpNode) {
         myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode);
        } else {
-        throw " struct is not recognized";
+          throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
        }
      }
    return myDeclaration;
@@ -145,14 +146,16 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode) {
 SemanticDeclarationNode SemanticTree::helpConvert(
   TypeNode typeNode, 
   SubDeclarator declarator, 
-  SemanticDeclarationNode ret) {
+  SemanticDeclarationNode ret,
+  Pos pos
+  ) {
 
 
    SemanticDeclarationNode myDeclaration;
 
 
   if (!declarator) {
-    return createType(typeNode);
+    return createType(typeNode, pos);
   }
 
 
@@ -172,7 +175,7 @@ SemanticDeclarationNode SemanticTree::helpConvert(
 
      int pointerCounter = res.first;
 
-     myDeclaration = createType(typeNode);
+     myDeclaration = createType(typeNode, pos);
 
     if (pointerCounter != 0) {
       myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
@@ -193,14 +196,14 @@ SemanticDeclarationNode SemanticTree::helpConvert(
 
     for(auto p : pa) {
       SemanticDeclarationNode empty;
-      par.push_back(helpConvert(p->getType(), p->getDeclarator(),empty));
+      par.push_back(helpConvert(p->getType(), p->getDeclarator(),empty, pos));
     }
 
 
     auto ret = make_shared<FunctionDeclaration>(myDeclaration, par);
 
     if (h) {
-       return helpConvert(t, h, ret);
+       return helpConvert(t, h, ret, pos);
     } else {
       return ret;
     }
@@ -215,7 +218,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     string type = typeNode->toString();
 
     SemanticDeclarationNode ret;
-    auto decl = helpConvert(typeNode, declarator, ret);
+    auto decl = helpConvert(typeNode, declarator, ret, pos);
 
 #ifdef DEBUG
     cout<<" DECL : "<<decl->toString()<<endl;
