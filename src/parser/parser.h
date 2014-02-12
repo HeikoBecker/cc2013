@@ -4,7 +4,6 @@
 #include <vector>
 #include <unordered_set>
 #include <sstream>
-#include <stdexcept>
 #include <memory>
 #include "ast.h"
 #include "semantic.h"
