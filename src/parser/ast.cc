@@ -16,6 +16,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
   rhs(rhs),
   op(op)
 {
+  SemanticDeclarationNode pointedToType;
   switch (op) {
     case PunctuatorType::ARRAY_ACCESS:
       // 6.5.2.1
@@ -28,10 +29,21 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
       }
       break;
+    case PunctuatorType::ARROW: {
+      // mostly the same as MEMBER_ACCESS, therefore we just change one variable
+      // and (ab)use fall through
+      if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
+        pointedToType = ltype->pointee();
+      } else {
+        throw ParsingException(std::string(  "Can't use operator -> on ")
+                                           + ltype->toString()
+                                           + ", pointer type required",
+                               lhs->pos());
+      }
     case PunctuatorType::MEMBER_ACCESS:
       // 6.5.2.3
       // first operator shall have an atomic, qualified, or unqualified structure or union type
-      if (auto ltype = std::dynamic_pointer_cast<StructDeclaration>(lhs->getType())) {
+      if (auto ltype = std::dynamic_pointer_cast<StructDeclaration>( (op == PunctuatorType::MEMBER_ACCESS) ?  lhs->getType() : pointedToType )) {
         // identifier must follow
         if (auto identifier = std::dynamic_pointer_cast<VariableUsage>(rhs)) {
           this->type = identifier->getType(ltype->node());
@@ -45,7 +57,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               "Trying to access struct member, but left operand is not a struct, but a "
               + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
       }
-      break;
+      break;}
     default:
       break;
   }

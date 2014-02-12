@@ -54,6 +54,8 @@ namespace Parsing {
         }
       }
 
+      SemanticDeclarationNode pointee() {return child;};
+
       virtual std::string toString() {
         return "*" + child->toString();
       }
