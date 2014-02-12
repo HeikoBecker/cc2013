@@ -234,6 +234,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     if (declarationMap.find(name) == declarationMap.end()) {
       st = new stack<pair<int, SemanticDeclarationNode> >();
       st->push(make_pair(currentPos, decl ));
+      nodes[currentPos]->addDeclaration(name, decl);
       declarationMap[name] = st;
     } else {
       st = declarationMap[name];
