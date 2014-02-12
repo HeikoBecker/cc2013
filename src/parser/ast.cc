@@ -1,6 +1,8 @@
+#include <memory>
 #include "ast.h"
 #include "pprinter.h"
 #include "parser.h"
+#include "parserException.h"
 #include "../utils/debug.h"
 
 using namespace Parsing;
@@ -14,6 +16,16 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
   rhs(rhs),
   op(op)
 {
+  if (op == PunctuatorType::ARRAY_ACCESS) {
+    // left operand must have type pointer to object _type_
+    if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
+      // right operand must have integer type
+    } else {
+      throw ParsingException(std::string(
+              "Left operand does not point to an object, but is a !"
+            + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+    }
+  }
 }
 
 UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos pos) :

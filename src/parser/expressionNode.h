@@ -3,13 +3,18 @@
 #pragma once
 
 #include "astNode.h"
+#include "semadecl.h"
 
 namespace Parsing {
 
 class ASTNODE(Expression) 
 {
+  private:
+    SemanticDeclarationNode type;
+  public:
+    virtual void checkSemanticConstraints() {};
+    virtual SemanticDeclarationNode getType() {return this->type;};
     CONS_INTER(Expression)
-
 };
 
 typedef std::shared_ptr<Expression> SubExpression;
