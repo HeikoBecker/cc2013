@@ -54,6 +54,26 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
 UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos pos) :
   Expression(pos), operand(operand), op(op)
 {
+  switch (op) {
+    // 6.5.3.2 has some strange stuff in section 3 about & and *'s interplay
+    case PunctuatorType::STAR:
+      /* to understand this 
+       * http://stackoverflow.com/questions/6893285/why-do-all-these-crazy-function-pointer-definitions-all-work-what-is-really-goi
+       * is useful (though not a replacement for the standard) */
+      if (auto optype = dynamic_pointer_cast<PointerDeclaration>(operand->getType()))  {
+        this->type = make_shared<PointerDeclaration>(1, operand->getType());
+      } else if (auto optype = dynamic_pointer_cast<FunctionDeclaration>(operand->getType())) {
+        // function  is convertible to pointer to function 
+        this->type = optype;
+      } else {
+        throw ParsingException(std::string("Cannot dereference ") 
+                               + operand->getType()->toString(),
+                               operand->pos());
+      }
+      break;
+    default:
+      break;
+  }
 }
 
 VariableUsage::VariableUsage(std::string name, Pos pos, 
