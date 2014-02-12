@@ -30,7 +30,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
       }
       break;
-    case PunctuatorType::ARROW: {
+    case PunctuatorType::ARROW: 
       // mostly the same as MEMBER_ACCESS, therefore we just change one variable
       // and (ab)use fall through
       if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
@@ -58,7 +58,23 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               "Trying to access struct member, but left operand is not a struct, but a "
               + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
       }
-      break;}
+      break;
+    case PunctuatorType::STAR:
+      // 6.5.5
+      if (!hasArithmeticType(lhs->getType())) { // TODO: should this be put into a function?
+        throw new ParsingException(std::string(
+              "Multiplication requires that the left operand has arithmetic type"),
+            lhs->pos()
+            );
+      }
+      if (!hasArithmeticType(rhs->getType())) {
+        throw new ParsingException(std::string(
+              "Multiplication requires that the right operand has arithmetic type"),
+            rhs->pos()
+            );
+      }
+      this->type = make_shared<IntDeclaration>();
+      break;
     default:
       break;
   }
