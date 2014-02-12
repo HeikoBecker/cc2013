@@ -9,7 +9,7 @@ namespace Parsing {
 
 class ASTNODE(Expression) 
 {
-  private:
+  protected:
     SemanticDeclarationNode type;
   public:
     virtual void checkSemanticConstraints() {};

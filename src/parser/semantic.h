@@ -19,6 +19,11 @@ using namespace std;
 
 namespace Parsing {
 
+class SemanticException: public std::runtime_error {
+  public:
+    SemanticException(const std::string& what_arg) : std::runtime_error(what_arg) {};
+};
+
 class SemanticNode;
 typedef shared_ptr<SemanticNode> SubSemanticNode;
 
@@ -46,7 +51,7 @@ class SemanticNode {
 
     SemanticDeclarationNode getNode(string name) {
       if (decl.find(name) == decl.end()) {
-        throw name + " not found";
+        throw SemanticException(name + " not found");
       } else {
         return decl[name];
       }

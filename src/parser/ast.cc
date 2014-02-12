@@ -16,15 +16,38 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
   rhs(rhs),
   op(op)
 {
-  if (op == PunctuatorType::ARRAY_ACCESS) {
-    // left operand must have type pointer to object _type_
-    if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
-      // right operand must have integer type
-    } else {
-      throw ParsingException(std::string(
+  switch (op) {
+    case PunctuatorType::ARRAY_ACCESS:
+      // 6.5.2.1
+      // left operand must have type pointer to object _type_
+      if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
+        // right operand must have integer type
+      } else {
+        throw ParsingException(std::string(
               "Left operand does not point to an object, but is a !"
-            + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
-    }
+              + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+      }
+      break;
+    case PunctuatorType::MEMBER_ACCESS:
+      // 6.5.2.3
+      // first operator shall have an atomic, qualified, or unqualified structure or union type
+      if (auto ltype = std::dynamic_pointer_cast<StructDeclaration>(lhs->getType())) {
+        // identifier must follow
+        if (auto identifier = std::dynamic_pointer_cast<VariableUsage>(rhs)) {
+          this->type = identifier->getType(ltype->node());
+        } else {
+          throw ParsingException(std::string(
+              "Trying to access struct member, but right operand is not an identifier , but a "
+              + (rhs->getType() ?  rhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+        }
+      } else {
+        throw ParsingException(std::string(
+              "Trying to access struct member, but left operand is not a struct, but a "
+              + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+      }
+      break;
+    default:
+      break;
   }
 }
 
@@ -37,8 +60,26 @@ VariableUsage::VariableUsage(std::string name, Pos pos,
                              SemanticTreeNode semanticTree) 
   : Expression(pos), name(name), semanticTree(semanticTree) {
     
+}
 
-  //pair<TypeNode, int> p = semanticTree->lookUpType(name, pos);
+SemanticDeclarationNode VariableUsage::getType() {
+  if (!this->type) {
+    this->type = semanticTree->lookUpType(name, pos());
+  }
+  return this->type;
+
+}
+
+SemanticDeclarationNode VariableUsage::getType(SubSemanticNode s) {
+  if (!this->type) {
+    try {
+      this->type = s->getNode(this->name);
+    } catch (SemanticException e) {
+        throw ParsingException(std::string("Struct has no member " + name), this->pos());
+    }
+  }
+  return this->type;
+
 }
 
 Literal::Literal(std::string name, Pos pos)

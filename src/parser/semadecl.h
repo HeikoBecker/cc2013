@@ -97,15 +97,16 @@ namespace Parsing {
       // name e.g. @S
       StructDeclaration(std::string n, SubSemanticNode s) {
         name = n;
-        node = s;
+        m_node = s;
       }
 
       std::string toString() {
         return name;
       }
+      SubSemanticNode node() {return m_node;}
     private:
       std::string name;
-      SubSemanticNode node;
+      SubSemanticNode m_node;
   };
 
 

@@ -49,6 +49,10 @@ class EXPRESSION(VariableUsage)
 {
   public:
     VariableUsage(std::string name, Pos pos, SemanticTreeNode semanticTree);
+    SemanticDeclarationNode getType() override;
+    // maps a variable name to its type when it is used in the context of a
+    // struct
+    SemanticDeclarationNode getType(SubSemanticNode structContext);
     PPRINTABLE
   private:
     std::string name;
