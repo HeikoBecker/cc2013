@@ -146,7 +146,12 @@ StructType::StructType(std::string name, StructContent strcontent, Pos pos)
   hasDeclaration = true;
 
   for(auto cont : strcontent) {
-    mycontent.push_back(make_pair(cont.first,cont.second[0].first));
+    if (!cont.second.empty()) {
+      mycontent.push_back(make_pair(cont.first,cont.second[0].first));
+    } else {
+      // TODO: is this an issue? Or can this always happen?
+      // The if check fixes a bug with tests/parser/pass/terminatedStruct.h
+    }
   }
 }
 
