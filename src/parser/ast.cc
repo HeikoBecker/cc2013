@@ -89,6 +89,12 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
       // [] or *
       this->type = make_shared<PointerDeclaration>(1, operand->getType());
       break;
+    case PunctuatorType::MINUS:
+      if (!hasArithmeticType(operand->getType())) {
+        throw ParsingException(std::string("Operator - requires an arithmetic type"), operand->pos());
+        this->type = promoteType(operand->getType());
+      }
+      break;
     default:
       break;
   }
