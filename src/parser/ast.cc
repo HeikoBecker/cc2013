@@ -1,3 +1,4 @@
+#include <sstream>
 #include <memory>
 #include "ast.h"
 #include "pprinter.h"
@@ -268,7 +269,25 @@ Constant::Constant(std::string name, Pos pos)
 
 FunctionCall::FunctionCall(SubExpression funcName,
                            std::vector<SubExpression> arguments, Pos pos)
-        : Expression(pos), funcName(funcName), arguments(arguments) {;}
+        : Expression(pos), funcName(funcName), arguments(arguments) 
+{
+  if (auto function = std::dynamic_pointer_cast<FunctionDeclaration>(funcName->getType())) {
+    auto expected_parameter = function->parameter(); 
+    if (expected_parameter.size() == arguments.size()) {
+    
+    } else {
+      std::ostringstream errmsg;
+      errmsg  << function->toString() << " requires "
+        << expected_parameter.size() << " parameters, but "
+        << arguments.size() << " parameters were given.";
+      throw ParsingException(errmsg.str(), pos);
+    }
+  } else {
+    throw ParsingException(std::string("Trying to call ") 
+        + (funcName->getType() ? funcName->getType()->toString() : "INITIALIZE ME!")
+        + " which is not a function", pos);
+  }
+}
 
 TernaryExpression::TernaryExpression(SubExpression condition, 
                                      SubExpression lhs, 

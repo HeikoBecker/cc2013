@@ -21,7 +21,7 @@ Parser::Parser(FILE* f, char const *name)
   :  m_lexer(unique_ptr<Lexer>(new Lexer(f,name))) ,
      m_nextsym(m_lexer->getNextToken()), m_lookahead(m_lexer->getNextToken())
 {
-  semanticTree = make_shared<SemanticTree>();
+  semanticTree = SemanticForest::filename2SemanticTree(name);
 }
 
 [[noreturn]] inline void Parser::reportError(std::string msg = "Parsing error") {

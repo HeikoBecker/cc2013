@@ -67,12 +67,26 @@ namespace Parsing {
   class FunctionDeclaration : public SemanticDeclaration {
 
     public:
-      FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par) :returnChild(ret), parameter(par) { }
+      FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par) :returnChild(ret), m_parameter(par) 
+    {
+      if (m_parameter.size() == 1) {
+        if (std::dynamic_pointer_cast<VoidDeclaration>(m_parameter.front())) {
+          /* 6.7.6.3:
+           * The special case of an unnamed parameter of type void as the only item in the list
+           * specifies that the function has no parameters.
+           */
+          m_parameter.clear();
+        }
+      } 
+    }
+
+      std::vector<SemanticDeclarationNode> parameter() {return m_parameter;};
+      SemanticDeclarationNode returnType() {return returnChild;};
 
       virtual std::string toString() {
         std::string str = "function (";
         bool first =true;
-        for (SemanticDeclarationNode p : parameter) {
+        for (SemanticDeclarationNode p : m_parameter) {
           if (!first) {
             str+= ",";
           }
@@ -89,7 +103,7 @@ namespace Parsing {
 
     private:
       SemanticDeclarationNode returnChild;
-      std::vector<SemanticDeclarationNode> parameter;
+      std::vector<SemanticDeclarationNode> m_parameter;
 
   };
 
