@@ -61,13 +61,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       break;
     case PunctuatorType::STAR:
       // 6.5.5
-      if (!hasArithmeticType(lhs->getType())) { // TODO: should this be put into a function?
+      if (!hasArithmeticType(lhs)) { // TODO: should this be put into a function?
         throw new ParsingException(std::string(
               "Multiplication requires that the left operand has arithmetic type"),
             lhs->pos()
             );
       }
-      if (!hasArithmeticType(rhs->getType())) {
+      if (!hasArithmeticType(rhs)) {
         throw new ParsingException(std::string(
               "Multiplication requires that the right operand has arithmetic type"),
             rhs->pos()
@@ -78,15 +78,15 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
     case PunctuatorType::PLUS: {
       auto lhs_type = lhs->getType();
       auto rhs_type = rhs->getType();
-      if (hasArithmeticType(lhs_type) && hasArithmeticType(rhs_type)) {
+      if (isArithmeticType(lhs_type) && isArithmeticType(rhs_type)) {
         // TODO: apply usual conversions
         this->type = make_shared<IntDeclaration>();
         break;
       }
       shared_ptr<PointerDeclaration> t;
-      if (hasIntegerType(lhs_type)) {
+      if (isIntegerType(lhs_type)) {
         t = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
-      } else if (hasIntegerType(rhs_type)) {
+      } else if (isIntegerType(rhs_type)) {
         t = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
       }
       if (t) {
@@ -98,13 +98,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
     case PunctuatorType::MINUS: {
       auto lhs_type = lhs->getType();
       auto rhs_type = rhs->getType();
-      if (hasArithmeticType(lhs_type) && hasArithmeticType(rhs_type)) {
+      if (isArithmeticType(lhs_type) && isArithmeticType(rhs_type)) {
         // TODO: apply usual conversions
         this->type = make_shared<IntDeclaration>();
         break;
       }
       auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
-      if (hasIntegerType(rhs_type)) {
+      if (isIntegerType(rhs_type)) {
         if (rhs_as_ptr) {
           this->type = rhs_as_ptr->pointee();
           break;
@@ -118,7 +118,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       throw ParsingException(std::string("Incompatible types for -"), lhs->pos());
     }
     case PunctuatorType::LESS:
-      if (hasRealType(lhs->getType()) && hasRealType(rhs->getType())) {
+      if (hasRealType(lhs) && hasRealType(rhs)) {
         // TODO: apply usual conversions
         this->type = make_shared<IntDeclaration>();
       } else {
@@ -134,7 +134,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       break;
     case PunctuatorType::EQUAL:
     case PunctuatorType::NEQUAL:
-      if (hasRealType(lhs->getType()) && hasRealType(rhs->getType())) {
+      if (hasRealType(lhs) && hasRealType(rhs)) {
         // TODO: apply usual conversions
         this->type = make_shared<IntDeclaration>();
       } else {
@@ -152,7 +152,33 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         }
       }
       break;
+    case PunctuatorType::LAND:
+    case PunctuatorType::LOR:
+      if (!hasScalarType(lhs)) {
+        throw ParsingException(std::string("Logical operator requires operands with scalar type, but left operand is ") + (lhs->getType() ? lhs->getType()->toString() : "INITIALIZE ME!"), lhs->pos());
+      }
+      if (!hasScalarType(lhs)) {
+        throw ParsingException(std::string("Logical operator requires operands with scalar type, but right operand is ") + (rhs->getType() ? rhs->getType()->toString() : "INITIALIZE ME!"), lhs->pos());
+      }
+      this->type = make_shared<IntDeclaration>();
+      break;
+    case PunctuatorType::ASSIGN:
+      // TODO: check that lhs is lvalue
+      /* TODO: this needs more checks! Check the legality of the following
+       *  lhs is pointer, rhs is int
+       *  lhs is pointer, rhs is null pointer constant
+       *  lhs is int, rhs is pointer
+       *  more?
+       */
+      if (!(hasArithmeticType(lhs) && hasArithmeticType(rhs))) {
+        if (lhs->getType() != rhs->getType()) { // TODO: is operator== already implemented?
+          throw ParsingException("More work remaining! ", pos);
+        }
+      }
+      this->type = lhs->getType();
+      break;
     default:
+      throw ParsingException(std::string() + "Implement this! " + PunctuatorType2String(op), pos);
       break;
   }
 }
@@ -183,20 +209,20 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
       this->type = make_shared<PointerDeclaration>(1, operand->getType());
       break;
     case PunctuatorType::MINUS:
-      if (!hasArithmeticType(operand->getType())) {
+      if (!hasArithmeticType(operand)) {
         throw ParsingException(std::string("Operator - requires an arithmetic type"), operand->pos());
         this->type = promoteType(operand->getType());
       }
       break;
     case PunctuatorType::NOT:
-      if (!hasScalarType(operand->getType())) {
+      if (!hasScalarType(operand)) {
         throw ParsingException("Operator '!' requires an operand of scalar type", operand->pos());
       }
       this->type = make_shared<IntDeclaration>();
      break;
     case PunctuatorType::SIZEOF:
      if (dynamic_pointer_cast<FunctionDeclaration>(operand->getType())) {
-        throw ParsingException("Illegal application of 'sizeof' to a functon type", operand->pos());
+        throw ParsingException("Illegal application of 'sizeof' to a function type", operand->pos());
      }
      // in real C, it would be size_t, but we don't have that one
      this->type = make_shared<IntDeclaration>();
