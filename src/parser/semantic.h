@@ -102,10 +102,10 @@ class SemanticTree {
 using namespace Parsing;
 
 namespace Semantic {
-  bool hasScalarType(SemanticDeclarationNode) {return true;};
-  bool hasArithmeticType(SemanticDeclarationNode) {return true;};
-  bool hasIntegerType(SemanticDeclarationNode) {return true;};
-  SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;};
+  inline bool hasScalarType(SemanticDeclarationNode) {return true;};
+  inline bool hasArithmeticType(SemanticDeclarationNode) {return true;};
+  inline bool hasIntegerType(SemanticDeclarationNode) {return true;};
+  inline SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;};
 }
 
 }
