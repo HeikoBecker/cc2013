@@ -30,7 +30,7 @@ namespace Parsing {
   class CharDeclaration : public SemanticDeclaration {
     public :
       virtual std::string toString() {
-        return "string";
+        return "char";
       }
   };
 
