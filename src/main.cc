@@ -5,6 +5,8 @@
 #include "lexer/lexer.h"
 #include "parser/parser.h"
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "parser/pprinter.h"
 #include "utils/debug.h"
 
@@ -96,16 +98,47 @@ int main(int, char** const argv)
           fclose(f);
       }
     }
-  } catch (Parsing::ParsingException const& e) {
+  } catch (Parsing::ParsingException const& e) { // TODO: unify exceptions, by giving them common baseclass
     errorf(e.pos, e.what());
+    auto pos = e.pos;
+    std::ifstream infile(pos.name);
+    auto counter = pos.line;
+    std::string line;
+    while (counter--) {
+      line.clear();
+      if (!std::getline(infile, line)) {
+        std::cerr << "line number is wrong!" << "\n" << std::endl;
+        break;
+      }
+    }
+    infile.close();
+    line += '\n';
+    for (int i = pos.column-1; i > 0; --i) {
+      line += " ";
+    }
+    line += "^^^^";
+    std::cerr << line << std::endl;
     /* no need to handle it; TODO: avoid throwing an exception at all */
   } catch (Lexing::LexingException const& e) {
     errorf(e.where(), e.what());
-    //std::cerr << e.where().name << ":" << e.where().line << ":" << e.where().column << ": error: lexing error!"
-      //<< "\n"
-      //<< "Encountered fatal error:" << "\n"
-      //<< e.what()
-      //<< "\n";
+    auto pos = e.where();
+    std::ifstream infile(pos.name);
+    auto counter = pos.line;
+    std::string line;
+    while (counter--) {
+      line.clear();
+      if (!std::getline(infile, line)) {
+        std::cerr << "line number is wrong!" << "\n" << std::endl;
+        break;
+      }
+    }
+    infile.close();
+    line += '\n';
+    for (int i = pos.column-1; i > 0; --i) {
+      line += " ";
+    }
+    line += "^^^^";
+    std::cerr << line << std::endl;
   } catch (std::exception const& e) {
     errorf("caught exception: %s", e.what());
   } catch (...) {
