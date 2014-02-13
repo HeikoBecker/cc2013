@@ -63,9 +63,18 @@ class SemanticNode {
     map<string, SemanticDeclarationNode> decl;
 };
 
+class SemanticTree;
+
+class SemanticForest {
+  public:
+    static shared_ptr<SemanticTree> filename2SemanticTree(std::string filename);
+};
+
 class SemanticTree {
+  friend class SemanticForest;
 
   private:
+    SemanticTree();
     vector<shared_ptr<SemanticNode> > nodes;
     int currentPos;
     int counter;
@@ -78,7 +87,6 @@ class SemanticTree {
     vector<string> gotoLabels;
 
   public:
-    SemanticTree();
     // returns true, if the label could be added
     bool addLabel(string label);
     void addChild(Pos pos, string name="@@");

@@ -277,6 +277,16 @@ SemanticDeclarationNode SemanticTree::lookUpType(string name, Pos pos) {
   }
 }
 
+shared_ptr<SemanticTree> SemanticForest::filename2SemanticTree(std::string filename)
+{
+  static auto names2trees = map<std::string, shared_ptr<SemanticTree>>();
+  if (names2trees.find(filename) == names2trees.end()) {
+        auto tree = shared_ptr<SemanticTree>(new SemanticTree());
+        names2trees[filename] = tree;
+  }
+  return names2trees[filename];
+}
+
 namespace Semantic {
 bool isNullPtrConstant(SubExpression s) {
   // TODO: this has to check if the constant is actually 0
