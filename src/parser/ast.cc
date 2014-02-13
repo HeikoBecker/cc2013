@@ -310,8 +310,10 @@ FunctionCall::FunctionCall(SubExpression funcName,
                                                  : "INITIALIZE ME!");
           throw ParsingException(errmsg.str(), arguments.at(i)->pos());
         }
-        this->type = function->returnType();
       }
+      // all argument types match => no errors were found
+      // the type of the function call is the return type of the function
+      this->type = function->returnType();
     } else {
       std::ostringstream errmsg;
       errmsg  << function->toString() << " requires "
