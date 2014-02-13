@@ -99,20 +99,20 @@ class SemanticTree {
     SemanticDeclarationNode lookUpType(string name, Pos pos);
 };
 
-using namespace Parsing;
+}
 
 namespace Semantic {
-  inline bool isScalarType(SemanticDeclarationNode) {return true;};
-  inline bool hasScalarType(SubExpression) {return true;};
-  inline bool isArithmeticType(SemanticDeclarationNode) {return true;};
-  inline bool hasArithmeticType(SubExpression) {return true;};
-  inline bool isIntegerType(SemanticDeclarationNode) {return true;};
-  inline bool hasIntegerType(SubExpression) {return true;};
-  inline bool isRealType(SemanticDeclarationNode) {return true;};
-  inline bool hasRealType(SubExpression) {return true;};
+  using namespace Parsing;
+  inline bool isScalarType(SemanticDeclarationNode) {return true;}
+  inline bool hasScalarType(SubExpression) {return true;}
+  inline bool isArithmeticType(SemanticDeclarationNode) {return true;}
+  inline bool hasArithmeticType(SubExpression) {return true;}
+  inline bool isIntegerType(SemanticDeclarationNode) {return true;}
+  inline bool hasIntegerType(SubExpression) {return true;}
+  inline bool isRealType(SemanticDeclarationNode) {return true;}
+  inline bool hasRealType(SubExpression) {return true;}
   bool isNullPtrConstant(SubExpression s);
-  inline SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;};
+  inline SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;}
 }
 
-}
 #endif
