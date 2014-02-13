@@ -228,6 +228,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
      this->type = make_shared<IntDeclaration>();
      break;
     default:
+      throw ParsingException(std::string() + "Implement this! " + PunctuatorType2String(op), pos);
       break;
   }
 }
