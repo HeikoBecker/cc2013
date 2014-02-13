@@ -173,7 +173,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
        *  more?
        */
       if (!(hasArithmeticType(lhs) && hasArithmeticType(rhs))) {
-        if (lhs->getType() != rhs->getType()) { // TODO: is operator== already implemented?
+        if (typeid(lhs->getType()).name() != typeid(rhs->getType()).name()) { // TODO: is operator== already implemented?
           throw ParsingException("More work remaining! ", pos);
         }
       }

@@ -288,6 +288,32 @@ shared_ptr<SemanticTree> SemanticForest::filename2SemanticTree(std::string filen
 }
 
 namespace Semantic {
+
+  
+bool isScalarType(SemanticDeclarationNode) {return true;}
+bool hasScalarType(SubExpression s) {
+  return isScalarType(s->getType());
+}
+bool isArithmeticType(SemanticDeclarationNode s) {
+  /* As we don't support floading point types,
+   * arithmetic types are limited to integral types
+   * those are limited to char and int in our implementation
+   */
+  if (   std::dynamic_pointer_cast<IntDeclaration>(s)
+      || std::dynamic_pointer_cast<CharDeclaration>(s) ) {
+    return true;
+  }
+  return false;
+}
+bool hasArithmeticType(SubExpression s) {
+  return isArithmeticType(s->getType());
+}
+bool isIntegerType(SemanticDeclarationNode) {return true;}
+bool hasIntegerType(SubExpression) {return true;}
+bool isRealType(SemanticDeclarationNode) {return true;}
+bool hasRealType(SubExpression) {return true;}
+bool isNullPtrConstant(SubExpression s);
+
 bool isNullPtrConstant(SubExpression s) {
   // TODO: this has to check if the constant is actually 0
   if (auto s_as_constant = dynamic_pointer_cast<Constant>(s)) {

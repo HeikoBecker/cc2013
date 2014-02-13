@@ -111,14 +111,14 @@ class SemanticTree {
 
 namespace Semantic {
   using namespace Parsing;
-  inline bool isScalarType(SemanticDeclarationNode) {return true;}
-  inline bool hasScalarType(SubExpression) {return true;}
-  inline bool isArithmeticType(SemanticDeclarationNode) {return true;}
-  inline bool hasArithmeticType(SubExpression) {return true;}
-  inline bool isIntegerType(SemanticDeclarationNode) {return true;}
-  inline bool hasIntegerType(SubExpression) {return true;}
-  inline bool isRealType(SemanticDeclarationNode) {return true;}
-  inline bool hasRealType(SubExpression) {return true;}
+  bool isScalarType(SemanticDeclarationNode);
+  bool hasScalarType(SubExpression);
+  bool isArithmeticType(SemanticDeclarationNode);
+  bool hasArithmeticType(SubExpression);
+  bool isIntegerType(SemanticDeclarationNode);
+  bool hasIntegerType(SubExpression);
+  bool isRealType(SemanticDeclarationNode);
+  bool hasRealType(SubExpression);
   bool isNullPtrConstant(SubExpression s);
   SemanticDeclarationNode promoteType(SemanticDeclarationNode s);
 }
