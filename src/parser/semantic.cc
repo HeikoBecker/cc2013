@@ -295,4 +295,16 @@ bool isNullPtrConstant(SubExpression s) {
   }
   return false;
 }
+
+SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {
+  // C defines some promotions
+  // the only one we currently care about is from char to int
+  // FIXME: note that this function doesn't really do type promotion
+  // for this it would need both types
+  // and more semantic knowledge
+  if (dynamic_pointer_cast<CharDeclaration>(s)) {
+    return make_shared<IntDeclaration>();
+  }
+  return s;
+}
 }

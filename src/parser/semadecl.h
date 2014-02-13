@@ -15,7 +15,6 @@ namespace Parsing {
       virtual std::string toString() {
         return "SemanticDeclaration";
       }
-
   };
 
   typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;
@@ -124,7 +123,6 @@ namespace Parsing {
       std::string name;
       SubSemanticNode m_node;
   };
-
 
 }
 

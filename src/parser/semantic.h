@@ -120,7 +120,7 @@ namespace Semantic {
   inline bool isRealType(SemanticDeclarationNode) {return true;}
   inline bool hasRealType(SubExpression) {return true;}
   bool isNullPtrConstant(SubExpression s);
-  inline SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;}
+  SemanticDeclarationNode promoteType(SemanticDeclarationNode s);
 }
 
 #endif

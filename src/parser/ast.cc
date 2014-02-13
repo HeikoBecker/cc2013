@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "parserException.h"
 #include "../utils/debug.h"
+#include "typeinfo"
 
 using namespace Parsing;
 using namespace Semantic;
@@ -261,10 +262,21 @@ SemanticDeclarationNode VariableUsage::getType(SubSemanticNode s) {
 }
 
 Literal::Literal(std::string name, Pos pos)
-  : Expression(pos), name(name) {}
+  : Expression(pos), name(name)
+{
+  /*WARNING: technically, the type is wrong
+   * A stringliteral has actually the type char[]
+   * however, we don't support arrays 
+   * and when used it should decay to char* anyway
+   */
+  this->type = make_shared<PointerDeclaration>(1, make_shared<CharDeclaration>());
+}
 
 Constant::Constant(std::string name, Pos pos)
-  : Expression(pos), name(name) {}
+  : Expression(pos), name(name) 
+{
+  this->type = make_shared<IntDeclaration>();
+}
 
 
 FunctionCall::FunctionCall(SubExpression funcName,
@@ -277,12 +289,23 @@ FunctionCall::FunctionCall(SubExpression funcName,
       // check if argument types match
       // if not, try to convert to desired type
       for (unsigned long i = 0; i < arguments.size(); ++i) {
-        if (expected_parameter.at(i) != arguments.at(i)->getType()) {
-          // TODO: conversion
+          // TODO: typeid is extremly expensive, create a cheaper compare function
+        if (typeid(expected_parameter.at(i)).name() != typeid(arguments.at(i)->getType()).name()) {
+          // TODO: conversion is not correct atm
+          auto promoted_expected = promoteType(expected_parameter.at(i));
+          auto promoted_actually = promoteType(arguments.at(i)->getType());
+          if (typeid(promoted_actually).name() == typeid(promoted_expected).name()) {
+            continue;
+          } else {
+            std::cout << "promoted: expected "
+                      << promoted_expected->toString()
+                      << "got "
+                      << promoted_expected->toString();
+          }
           std::ostringstream errmsg;
           errmsg << "Expected argument of type "
                   << expected_parameter.at(i)->toString()
-                  << " but got"
+                  << " but got "
                   << (arguments.at(i)->getType() ? arguments.at(i)->getType()->toString()
                                                  : "INITIALIZE ME!");
           throw ParsingException(errmsg.str(), arguments.at(i)->pos());
