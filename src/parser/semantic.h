@@ -105,6 +105,8 @@ namespace Semantic {
   inline bool hasScalarType(SemanticDeclarationNode) {return true;};
   inline bool hasArithmeticType(SemanticDeclarationNode) {return true;};
   inline bool hasIntegerType(SemanticDeclarationNode) {return true;};
+  inline bool hasRealType(SemanticDeclarationNode) {return true;};
+  bool isNullPtrConstant(SubExpression s);
   inline SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {return s;};
 }
 

@@ -1,4 +1,5 @@
 #include "semantic.h"
+#include "ast.h"
 #include "../utils/debug.h"
 
 using namespace Parsing;
@@ -274,4 +275,13 @@ SemanticDeclarationNode SemanticTree::lookUpType(string name, Pos pos) {
   } else {
     throw Parsing::ParsingException(name+ " is not declared in this scope", pos);
   }
+}
+
+using namespace Semantic;
+bool isNullPtrConstant(SubExpression s) {
+  // TODO: this has to check if the constant is actually 0
+  if (auto s_as_constant = dynamic_pointer_cast<Constant>(s)) {
+    return true;
+  }
+  return false;
 }

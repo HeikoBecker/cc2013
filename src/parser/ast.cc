@@ -117,6 +117,41 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       }
       throw ParsingException(std::string("Incompatible types for -"), lhs->pos());
     }
+    case PunctuatorType::LESS:
+      if (hasRealType(lhs->getType()) && hasRealType(rhs->getType())) {
+        // TODO: apply usual conversions
+        this->type = make_shared<IntDeclaration>();
+      } else {
+        auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs->getType());
+        auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs->getType());
+        // TODO: function pointer conversion must fail
+        if (lhs_as_ptr && rhs_as_ptr) {
+          this->type = make_shared<IntDeclaration>();
+        } else {
+          throw ParsingException(std::string("Comparision requires both operands to be either pointer to object or to be of real type."), this->pos());
+        }
+      }
+      break;
+    case PunctuatorType::EQUAL:
+    case PunctuatorType::NEQUAL:
+      if (hasRealType(lhs->getType()) && hasRealType(rhs->getType())) {
+        // TODO: apply usual conversions
+        this->type = make_shared<IntDeclaration>();
+      } else {
+        auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs->getType());
+        auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs->getType());
+        /* either both has to be pointers, or one has to be a pointer and the
+         * othe one a null pointer constant (6.5.9 2)
+         */
+        if (   (lhs_as_ptr && rhs_as_ptr)
+            || (lhs_as_ptr && isNullPtrConstant(rhs))
+            || (rhs_as_ptr && isNullPtrConstant(lhs))) {
+          this->type = make_shared<IntDeclaration>();
+        } else {
+          throw ParsingException(std::string("Comparision requires both operands to be either pointer to object or to be of arithmetic type."), this->pos());
+        }
+      }
+      break;
     default:
       break;
   }
