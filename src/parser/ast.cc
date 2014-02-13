@@ -274,7 +274,21 @@ FunctionCall::FunctionCall(SubExpression funcName,
   if (auto function = std::dynamic_pointer_cast<FunctionDeclaration>(funcName->getType())) {
     auto expected_parameter = function->parameter(); 
     if (expected_parameter.size() == arguments.size()) {
-    
+      // check if argument types match
+      // if not, try to convert to desired type
+      for (unsigned long i = 0; i < arguments.size(); ++i) {
+        if (expected_parameter.at(i) != arguments.at(i)->getType()) {
+          // TODO: conversion
+          std::ostringstream errmsg;
+          errmsg << "Expected argument of type "
+                  << expected_parameter.at(i)->toString()
+                  << " but got"
+                  << (arguments.at(i)->getType() ? arguments.at(i)->getType()->toString()
+                                                 : "INITIALIZE ME!");
+          throw ParsingException(errmsg.str(), arguments.at(i)->pos());
+        }
+        this->type = function->returnType();
+      }
     } else {
       std::ostringstream errmsg;
       errmsg  << function->toString() << " requires "
