@@ -547,7 +547,7 @@ void ReturnStatement::verifyReturnType(SemanticDeclarationNode actual_type) {
     std::cout << actual_type->toString();
     std::cout << expected_type->toString();
   }
-};
+}
 
 
 ContinueStatement::ContinueStatement(Pos pos) : JumpStatement(pos) {}
