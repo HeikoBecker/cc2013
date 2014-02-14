@@ -243,8 +243,10 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
 
 
-  semanticTree->addDeclaration(type, decl, pos);
+  auto returnType = semanticTree->addDeclaration(type, decl, pos);
+  semanticTree->setCurrentFunction(returnType);
   auto compStat = compoundStatement(parameter);
+  semanticTree->unsetCurrentFunction();
 
   return make_shared<FunctionDefinition>(type, decl, compStat, 
                                           pos, semanticTree);

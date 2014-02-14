@@ -515,9 +515,39 @@ SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand, P
   this->type = make_shared<IntDeclaration>();
 }
 
-ReturnStatement::ReturnStatement(Pos pos) : JumpStatement(pos) {}
+ReturnStatement::ReturnStatement(Pos pos) : JumpStatement(pos) 
+{
+  // single return without expression -> return type must be void
+  auto actual_type = make_shared<VoidDeclaration>();
+  verifyReturnType(actual_type);
+}
+
 ReturnStatement::ReturnStatement(SubExpression ex, Pos pos) 
-  : JumpStatement(pos), expression(ex) {}
+  : JumpStatement(pos), expression(ex)
+{
+  // Get the type of the expression which we are returning
+  auto actual_type = ex->getType();
+  verifyReturnType(actual_type);
+}
+
+void ReturnStatement::verifyReturnType(SemanticDeclarationNode actual_type) {
+  // Get the type of the function which in which we are
+  auto function_type = SemanticForest::filename2SemanticTree(this->pos().name)->currentFunction();
+  // extract the return type from it
+  auto expected_type = std::dynamic_pointer_cast<FunctionDeclaration>(function_type)->returnType();
+  // TODO: don't use this equality check, but check if the types are equal after
+  // applying the "usual conversions"
+  if (actual_type->toString() != expected_type->toString()) {
+    throw ParsingException(std::string("A ")
+        + actual_type->toString()
+        + " is returned, but a "
+        + expected_type->toString()
+        + " is expected!", pos());
+  } else {
+    std::cout << actual_type->toString();
+    std::cout << expected_type->toString();
+  }
+};
 
 
 ContinueStatement::ContinueStatement(Pos pos) : JumpStatement(pos) {}

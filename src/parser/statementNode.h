@@ -91,6 +91,7 @@ class JUMPSTATEMENT(ReturnStatement) {
   
   private:
     SubExpression expression;
+    void verifyReturnType(SemanticDeclarationNode actual_type);
 };
 
 // iteration statement i.e. while and for

@@ -103,7 +103,7 @@ class SemanticTree {
      */
     void setCurrentFunction(SemanticDeclarationNode);
     void unsetCurrentFunction();
-    SemanticDeclarationNode currentFunction();
+    inline SemanticDeclarationNode currentFunction() {return m_currentFunction;};
     void addGotoLabel(string str);
     bool isInLoop();
     SemanticDeclarationNode createType(TypeNode t, Pos pos);
