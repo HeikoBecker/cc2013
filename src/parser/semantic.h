@@ -49,6 +49,13 @@ class SemanticNode {
       decl[s] = node;
     }
 
+    // TODO: make this private and a friend of StructDeclaration?
+    std::vector<std::pair<std::string, SemanticDeclarationNode>> type() {
+      return std::vector<std::pair<std::string, SemanticDeclarationNode>>(
+            decl.begin(), decl.end()
+          );
+    }
+
     SemanticDeclarationNode getNode(string name) {
       if (decl.find(name) == decl.end()) {
         throw SemanticException(name + " not found");

@@ -1,4 +1,5 @@
 #include "semadecl.h"
+#include "semantic.h"
 #include <string>
 
 using namespace Parsing;
@@ -79,9 +80,18 @@ bool Semantic::compareTypes(SemanticDeclarationNode s1, SemanticDeclarationNode 
       break;
                         }
     case Type::STRUCT: {
-      auto stype1 = std::static_pointer_cast<StructDeclaration>(s1);
-      auto stype2 = std::static_pointer_cast<StructDeclaration>(s2);
-      return false;
+      auto stypes1 = std::static_pointer_cast<StructDeclaration>(s1)->node()->type();
+      auto stypes2 = std::static_pointer_cast<StructDeclaration>(s2)->node()->type();
+      // check if the structs are equal by checking equality of every member
+      // where equality means that both name and type are equal
+      if (stypes1.size() != stypes2.size()) {return false;}
+      for (signed int i = stypes1.size()-1; i >= 0; --i) { // without signed int >= 0 is always true
+        if (stypes1.at(i).first != stypes2.at(i).first) {return false;}
+        if (!compareTypes(stypes1.at(i).second, stypes2.at(i).second)) {
+          return false;
+        }
+      }
+      return true;
       break;
                        }
     default:
