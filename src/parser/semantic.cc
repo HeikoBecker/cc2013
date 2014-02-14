@@ -212,7 +212,7 @@ SemanticDeclarationNode SemanticTree::helpConvert(
      return myDeclaration;
 }
 
-void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
+SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
 
   if (declarator && typeNode) {
     string name = declarator->getIdentifier();
@@ -229,7 +229,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     TypeStack *st;
 
     if (name == "NONAME") {
-      return ;
+      return decl;
     }
 
     if (declarationMap.find(name) == declarationMap.end()) {
@@ -255,8 +255,10 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
       declarationMap[name]->push(make_pair(currentPos, decl ));
       nodes[currentPos]->addDeclaration(name, decl);
     }
+    return decl;
   } else {
     // TODO should this throw an error ?
+    return SemanticDeclarationNode{}; //FIXME: is this  the correct thing to return?
   }
 }
 

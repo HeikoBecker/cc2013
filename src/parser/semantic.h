@@ -92,7 +92,7 @@ class SemanticTree {
     void addChild(Pos pos, string name="@@");
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
-    void addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
+    SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
     void increaseLoopDepth();
     void decreaseLoopDepth();
     void addGotoLabel(string str);
