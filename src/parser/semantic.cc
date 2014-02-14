@@ -321,8 +321,21 @@ bool isArithmeticType(SemanticDeclarationNode s) {
 bool hasArithmeticType(SubExpression s) {
   return isArithmeticType(s->getType());
 }
-bool isIntegerType(SemanticDeclarationNode) {return true;}
-bool hasIntegerType(SubExpression) {return true;}
+bool isIntegerType(SemanticDeclarationNode s) {
+/* Currently this is the same as isArithmeticType.
+ * However, if we ever want to expand the compiler to a larger subset of C,
+ * those methods need to be extended */
+  switch (s->type()) {
+    case Type::INT:
+    case Type::CHAR:
+      return true;
+    default:
+      return false;
+  }
+}
+bool hasIntegerType(SubExpression s) {
+  return isIntegerType(s->getType());
+}
 bool isRealType(SemanticDeclarationNode) {return true;}
 bool hasRealType(SubExpression) {return true;}
 bool isNullPtrConstant(SubExpression s);
