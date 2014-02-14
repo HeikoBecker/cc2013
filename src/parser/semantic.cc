@@ -222,7 +222,7 @@ void SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, P
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
 #ifdef DEBUG
-    cout<<" DECL : "<<decl->toString()<<endl;
+    cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
 #endif
 
     // This is the old code 

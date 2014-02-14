@@ -233,7 +233,10 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
   expect(PunctuatorType::LEFTCURLYBRACE);
 
-  auto parameter = decl->getParameter();
+  auto parameter = decl->getNextParameter();
+
+
+
   semanticTree->addDeclaration(type, decl, pos);
   auto compStat = compoundStatement(parameter);
 
