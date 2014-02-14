@@ -15,6 +15,7 @@ namespace Semantic {
     FUNCTION,
     STRUCT,
   };
+
 }
 
 namespace Parsing {
@@ -110,6 +111,11 @@ namespace Parsing {
       SubSemanticNode m_node;
   };
 
+}
+
+namespace Semantic {
+  // TODO: should this be implemented in terms of operator == ?
+  bool compareTypes(Parsing::SemanticDeclarationNode s1, Parsing::SemanticDeclarationNode s2);
 }
 
 #endif
