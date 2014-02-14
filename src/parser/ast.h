@@ -120,22 +120,29 @@ class ASTNODE(ExternalDeclaration) {
   public:
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
-                        SubCompoundStatement compoundStatement,
-                        Pos pos,
-                        SemanticTreeNode semanticTree
-                        );
-    ExternalDeclaration(TypeNode type,
-                        SubDeclarator declarator,
                         Pos pos,
                         SemanticTreeNode semanticTree
                         );
     ExternalDeclaration(TypeNode type, Pos pos);
     PPRINTABLE
-  private:
+  protected:
     TypeNode type;
     SubDeclarator declarator;
-    SubCompoundStatement compoundStatement;
     SemanticTreeNode semanticTree;
+};
+
+class FunctionDefinition : public ExternalDeclaration {
+  public:
+    FunctionDefinition(TypeNode type,
+        SubDeclarator declarator,
+        SubCompoundStatement compoundStatement,
+        Pos pos,
+        SemanticTreeNode semanticTree
+        );
+  PPRINTABLE
+
+  private:
+    SubCompoundStatement compoundStatement;
 };
 
 typedef std::shared_ptr<ExternalDeclaration> ExternalDeclarationNode;

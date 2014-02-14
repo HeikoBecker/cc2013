@@ -426,14 +426,14 @@ Declaration::Declaration(TypeNode t, Pos pos)
   : AstNode(pos), type(t){}
 
 
-ExternalDeclaration::ExternalDeclaration(TypeNode type,
+FunctionDefinition::FunctionDefinition(TypeNode type,
                         SubDeclarator declarator,
                         SubCompoundStatement compoundStatement,
                         Pos pos,
                         shared_ptr<SemanticTree> semanticTree
                         )
-  : AstNode(pos), type(type), declarator(declarator),
-    compoundStatement(compoundStatement), semanticTree(semanticTree)
+  : ExternalDeclaration(type, declarator, pos, semanticTree),
+    compoundStatement(compoundStatement)
 {
 }
 

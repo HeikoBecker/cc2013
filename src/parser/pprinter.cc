@@ -356,25 +356,27 @@ PRETTY_PRINT(ExternalDeclaration) {
   PPRINT(this->type);
   if (this->declarator) {
     PPRINT(' ');
-    if (compoundStatement) {
-      PPRINT('('); // <- WTF, that's a really coding style
-    }
     PPRINT(this->declarator);
-    if (compoundStatement) {
-      PPRINT(')');
-    }
-    if (this->compoundStatement) {
-      PPRINT(this->compoundStatement);
-      PPRINT('\n');
-      debug(PARSER) << "ExternalDeclaration END";
-      return; // so that we don't print a semicolon
-    }
   }
   // TODO: move semicolon printing to declarations
   PPRINT(';'); // declarations end with an ;
   debug(PARSER) << "ExternalDeclaration END";
   PPRINT('\n');
 }
+
+PRETTY_PRINT(FunctionDefinition) {
+  /*TODO: unfinished */
+  PPRINT(this->type);
+  PPRINT(' ');
+  PPRINT('('); // <- WTF, that's a really coding style
+  PPRINT(this->declarator);
+  PPRINT(')');
+  PPRINT(this->compoundStatement);
+  PPRINT('\n');
+  debug(PARSER) << "ExternalDeclaration END";
+}
+
+
 
 PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/

@@ -246,7 +246,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   semanticTree->addDeclaration(type, decl, pos);
   auto compStat = compoundStatement(parameter);
 
-  return make_shared<ExternalDeclaration>(type, decl, compStat, 
+  return make_shared<FunctionDefinition>(type, decl, compStat, 
                                           pos, semanticTree);
 }
 
