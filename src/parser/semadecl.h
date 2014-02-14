@@ -5,6 +5,18 @@
 #include <memory>
 #include <vector>
 
+namespace Semantic {
+
+  enum class Type {
+    INT,
+    CHAR,
+    VOID,
+    POINTER,
+    FUNCTION,
+    STRUCT,
+  };
+}
+
 namespace Parsing {
 
   class SemanticNode;
@@ -15,12 +27,14 @@ namespace Parsing {
       virtual std::string toString() {
         return "SemanticDeclaration";
       }
+      virtual Semantic::Type type() {throw;};
   };
 
   typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;
 
   class IntDeclaration : public SemanticDeclaration {
     public: 
+      Semantic::Type type() override {return Semantic::Type::INT;}
       virtual std::string toString() {
         return "int";
       }
@@ -28,6 +42,7 @@ namespace Parsing {
 
   class CharDeclaration : public SemanticDeclaration {
     public :
+      Semantic::Type type() override {return Semantic::Type::CHAR;}
       virtual std::string toString() {
         return "char";
       }
@@ -36,6 +51,7 @@ namespace Parsing {
 
   // void is not allowed, but void**
   class VoidDeclaration : public SemanticDeclaration {
+    Semantic::Type type() override {return Semantic::Type::VOID;}
     public: 
       virtual std::string toString() {
         return "void";
@@ -46,6 +62,7 @@ namespace Parsing {
     public:
       // type is int, char, or void
       PointerDeclaration(int pointerCounter, SemanticDeclarationNode type);
+      Semantic::Type type() override {return Semantic::Type::POINTER;}
 
       SemanticDeclarationNode pointee() {return child;};
 
@@ -61,6 +78,7 @@ namespace Parsing {
 
     public:
       FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par); 
+      Semantic::Type type() override {return Semantic::Type::FUNCTION;}
 
       std::vector<SemanticDeclarationNode> parameter() {return m_parameter;};
       SemanticDeclarationNode returnType() {return returnChild;};
@@ -81,6 +99,7 @@ namespace Parsing {
         name = n;
         m_node = s;
       }
+      Semantic::Type type() override {return Semantic::Type::STRUCT;}
 
       std::string toString() {
         return name;

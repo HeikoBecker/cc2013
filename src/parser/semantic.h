@@ -130,6 +130,7 @@ namespace Semantic {
   bool hasRealType(SubExpression);
   bool isNullPtrConstant(SubExpression s);
   SemanticDeclarationNode promoteType(SemanticDeclarationNode s);
+  std::pair<SemanticDeclarationNode, SemanticDeclarationNode> applyUsualConversions(SemanticDeclarationNode,SemanticDeclarationNode);
 }
 
 #endif

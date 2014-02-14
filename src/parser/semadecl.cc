@@ -3,7 +3,6 @@
 
 using namespace Parsing;
 
-
 std::string FunctionDeclaration::toString() {
         std::string str = "function (";
         bool first =true;

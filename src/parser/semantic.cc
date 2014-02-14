@@ -343,4 +343,10 @@ SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {
   }
   return s;
 }
+
+  std::pair<SemanticDeclarationNode, SemanticDeclarationNode> applyUsualConversions(SemanticDeclarationNode s1,SemanticDeclarationNode s2)
+{
+  return make_pair<>(s1,s2);
+}
+
 }
