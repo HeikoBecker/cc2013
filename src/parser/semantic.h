@@ -77,6 +77,7 @@ class SemanticTree {
     SemanticTree();
     vector<shared_ptr<SemanticNode> > nodes;
     int currentPos;
+    SemanticDeclarationNode m_currentFunction;
     int counter;
     map<string, TypeStack *> declarationMap;
     map<string, stack<int> > structMap;
@@ -95,6 +96,14 @@ class SemanticTree {
     SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
     void increaseLoopDepth();
     void decreaseLoopDepth();
+    /*
+     * set and unset the current function type
+     * this is used when entering a function definition to check that the return
+     * type matches
+     */
+    void setCurrentFunction(SemanticDeclarationNode);
+    void unsetCurrentFunction();
+    SemanticDeclarationNode currentFunction();
     void addGotoLabel(string str);
     bool isInLoop();
     SemanticDeclarationNode createType(TypeNode t, Pos pos);

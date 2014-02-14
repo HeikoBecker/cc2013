@@ -91,6 +91,14 @@ void SemanticTree::decreaseLoopDepth() {
   loopDepth--;
 }
 
+void SemanticTree::setCurrentFunction(SemanticDeclarationNode s) {
+  m_currentFunction = s;
+}
+
+void SemanticTree::unsetCurrentFunction() {
+  m_currentFunction.reset();
+}
+
 bool SemanticTree::addLabel(string label) {
   if (labelMap.find(label) == labelMap.end()) {
     labelMap.insert(label);
