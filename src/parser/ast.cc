@@ -537,15 +537,14 @@ void ReturnStatement::verifyReturnType(SemanticDeclarationNode actual_type) {
   auto expected_type = std::dynamic_pointer_cast<FunctionDeclaration>(function_type)->returnType();
   // TODO: don't use this equality check, but check if the types are equal after
   // applying the "usual conversions"
-  if (actual_type->toString() != expected_type->toString()) {
+  auto types_after_conversion = applyUsualConversions(actual_type, expected_type);
+  if (!Semantic::compareTypes(types_after_conversion.first,
+                             types_after_conversion.second)) {
     throw ParsingException(std::string("A ")
         + actual_type->toString()
         + " is returned, but a "
         + expected_type->toString()
         + " is expected!", pos());
-  } else {
-    std::cout << actual_type->toString();
-    std::cout << expected_type->toString();
   }
 }
 
