@@ -61,6 +61,7 @@ namespace Parsing {
       inline void expect(PunctuatorType puncutator);
       inline void expect(KeywordType keyword);
       inline void expect(TokenType tokenType);
+      [[noreturn]] inline void reportError(Pos pos, std::string msg);
       [[noreturn]] inline void reportError(std::string msg);
       [[noreturn]] inline void expectedAnyOf(std::string msg);
 

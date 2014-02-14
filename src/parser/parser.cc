@@ -24,6 +24,12 @@ Parser::Parser(FILE* f, char const *name)
   semanticTree = SemanticForest::filename2SemanticTree(name);
 }
 
+[[noreturn]] inline void Parser::reportError( Pos pos, std::string msg = "Parsing error") {
+  //errorf(m_nextsym->pos(), msg.c_str()); FIXME: decide where to use exceptions
+  // TODO: the full featured parser should continue
+  throw ParsingException(msg, pos);
+}
+
 [[noreturn]] inline void Parser::reportError(std::string msg = "Parsing error") {
   //errorf(m_nextsym->pos(), msg.c_str()); FIXME: decide where to use exceptions
   // TODO: the full featured parser should continue
@@ -1011,7 +1017,7 @@ SubLabeledStatement Parser::labeledStatement() {
     bool unique = semanticTree->addLabel(label);
 
     if(!unique) {
-      reportError("The label " + label + " is already defined");
+      reportError(pos, "The label " + label + " is already defined");
     }
     
     return make_shared<LabeledStatement>(label, st, pos);
