@@ -346,6 +346,30 @@ SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {
 
   std::pair<SemanticDeclarationNode, SemanticDeclarationNode> applyUsualConversions(SemanticDeclarationNode s1,SemanticDeclarationNode s2)
 {
+  //6.3.1.8 Usual arithmetic conversions
+  // many rules which are not relevant, because we have no unsigned and only int
+  // + char
+  if (compareTypes(s1, s2)) {
+    return make_pair<>(s1,s2);
+  }
+  // else
+  // If both operands have the same type, then no further conversion is needed.
+  //Otherwise, if both operands have signed integer types or both have unsigned
+  //integer types, the operand with the type of lesser integer conversion rank is
+  //converted to the type of the operand with greater rank.
+  // ==> in our case: char -> int
+  auto s1_type = s1->type();
+  auto s2_type = s2->type();
+  if (s1_type == Type::INT && s2_type == Type::CHAR) {
+    auto int_type = make_shared<IntDeclaration>();
+    return make_pair<>(s1, int_type);
+  }
+  if (s2_type == Type::INT && s1_type == Type::CHAR) {
+    auto int_type = make_shared<IntDeclaration>();
+    return make_pair<>(int_type, s2);
+  }
+  // the other rules don't apply in our limited subset
+  // TODO: throw an exception in that case?
   return make_pair<>(s1,s2);
 }
 
