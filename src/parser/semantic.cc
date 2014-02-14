@@ -306,15 +306,18 @@ bool hasScalarType(SubExpression s) {
 }
 bool isArithmeticType(SemanticDeclarationNode s) {
   /* As we don't support floading point types,
-   * arithmetic types are limited to integral types
-   * those are limited to char and int in our implementation
+   * arithmetic types are limited to integral types.
+   * Those are limited to char and int in our implementation
    */
-  if (   std::dynamic_pointer_cast<IntDeclaration>(s)
-      || std::dynamic_pointer_cast<CharDeclaration>(s) ) {
-    return true;
+  switch (s->type()) {
+    case Type::INT:
+    case Type::CHAR:
+      return true;
+    default:
+      return false;
   }
-  return false;
 }
+
 bool hasArithmeticType(SubExpression s) {
   return isArithmeticType(s->getType());
 }
