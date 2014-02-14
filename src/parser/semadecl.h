@@ -45,13 +45,7 @@ namespace Parsing {
   class PointerDeclaration : public SemanticDeclaration {
     public:
       // type is int, char, or void
-      PointerDeclaration(int pointerCounter, SemanticDeclarationNode type) {
-        if (pointerCounter == 0) {
-          child = type;
-        } else {
-          child = std::make_shared<PointerDeclaration>(pointerCounter-1, type);
-        }
-      }
+      PointerDeclaration(int pointerCounter, SemanticDeclarationNode type);
 
       SemanticDeclarationNode pointee() {return child;};
 
@@ -66,39 +60,12 @@ namespace Parsing {
   class FunctionDeclaration : public SemanticDeclaration {
 
     public:
-      FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par) :returnChild(ret), m_parameter(par) 
-    {
-      if (m_parameter.size() == 1) {
-        if (std::dynamic_pointer_cast<VoidDeclaration>(m_parameter.front())) {
-          /* 6.7.6.3:
-           * The special case of an unnamed parameter of type void as the only item in the list
-           * specifies that the function has no parameters.
-           */
-          m_parameter.clear();
-        }
-      } 
-    }
+      FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par); 
 
       std::vector<SemanticDeclarationNode> parameter() {return m_parameter;};
       SemanticDeclarationNode returnType() {return returnChild;};
 
-      virtual std::string toString() {
-        std::string str = "function (";
-        bool first =true;
-        for (SemanticDeclarationNode p : m_parameter) {
-          if (!first) {
-            str+= ",";
-          }
-          str += p->toString() ;
-
-          first = false;
-        }
-
-        str +=") returning ";
-        str += returnChild->toString();
-
-        return str;
-      }
+      virtual std::string toString();
 
     private:
       SemanticDeclarationNode returnChild;
