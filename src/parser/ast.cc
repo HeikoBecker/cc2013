@@ -333,6 +333,7 @@ TernaryExpression::TernaryExpression(SubExpression condition,
      : Expression(pos), condition(condition), lhs(lhs), rhs(rhs)
 {
  //TODO: type checking
+ this->type = lhs->getType();
 }
 
 BasicType::BasicType(std::string type, Pos pos) : Type(pos)

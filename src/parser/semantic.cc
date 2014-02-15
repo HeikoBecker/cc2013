@@ -300,7 +300,12 @@ shared_ptr<SemanticTree> SemanticForest::filename2SemanticTree(std::string filen
 namespace Semantic {
 
   
-bool isScalarType(SemanticDeclarationNode) {return true;}
+bool isScalarType(SemanticDeclarationNode s) {
+  // cherry picking relevant parts from C++'s type_traits as described at
+  // http://www.cplusplus.com/reference/type_traits/
+  // (just removing everything not in C4
+  return (isArithmeticType(s) || s->type() == Type::POINTER);
+}
 bool hasScalarType(SubExpression s) {
   return isScalarType(s->getType());
 }
