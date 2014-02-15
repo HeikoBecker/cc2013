@@ -264,7 +264,7 @@ bool Lexer::consumeQuoted() {
         );
       }
       // create Token
-      storeToken(TokenType::CONSTANT);
+      storeConstToken(ConstantType::CHAR);
       return true;
     } else if (!singlequote && tracker.current() == '\"') {
       // end of string literal
@@ -312,11 +312,11 @@ bool Lexer::consumeDecimal() {
         throw LexingException("Decimal constant contains illegal character.", tracker.currentPosition());
       }
       tracker.rewind();
-      storeToken(TokenType::CONSTANT);
+      storeConstToken(ConstantType::INT);
       return true;
     }
   }
-  storeToken(TokenType::CONSTANT);
+  storeConstToken(ConstantType::INT);
   return true;
 }
 
@@ -334,7 +334,7 @@ bool Lexer::consumeIdentOrDecConstant() {
       tracker.rewind();
     }
     appendToToken('0');
-    storeToken(TokenType::CONSTANT);
+    storeConstToken(ConstantType::NULLPOINTER);
     return true;
   } else if(std::isalpha(tracker.current()) || '_' == tracker.current()) {
     appendToToken(tracker.current());
@@ -427,6 +427,11 @@ std::shared_ptr<Token> Lexer::genToken(TokenType type) {
 
 void Lexer::storeToken(TokenType type) {
   curtoken = genToken(type);
+  curword.clear();
+}
+
+void Lexer::storeConstToken(ConstantType ct) {
+  curtoken = std::make_shared<ConstantToken>(tracker.storedPosition(), curword, ct);
   curword.clear();
 }
 

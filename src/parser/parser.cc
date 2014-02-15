@@ -410,7 +410,8 @@ SubExpression Parser::computeAtom() {
     return child;
   } else if ( m_nextsym->type() == TokenType::CONSTANT) {
     // 'normal ' atom, constant
-    auto var = std::make_shared<Constant>(m_nextsym->value(), pos);
+    auto ct = std::static_pointer_cast<ConstantToken>(m_nextsym)->type;
+    auto var = std::make_shared<Constant>(m_nextsym->value(), pos, ct);
     //auto var = std::make_shared<Literal>(m_nextsym->value(), pos);
     scan();
     auto child = SubExpression(var);

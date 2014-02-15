@@ -41,6 +41,13 @@ namespace Parsing {
       }
   };
 
+  // only used to distinguish null pointer value from integer
+  class NullDeclaration : public IntDeclaration {
+      virtual std::string toString() {
+        return "NULL";
+      }
+  };
+
   class CharDeclaration : public SemanticDeclaration {
     public :
       Semantic::Type type() override {return Semantic::Type::CHAR;}

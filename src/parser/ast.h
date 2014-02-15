@@ -71,9 +71,10 @@ class EXPRESSION(Literal)
 class EXPRESSION(Constant)
 {
   public:
-    Constant(std::string name, Pos pos);
+    Constant(std::string name, Pos pos, Lexing::ConstantType ct);
     PPRINTABLE
   private:
+    Lexing::ConstantType ct;
     std::string name;
 };
 

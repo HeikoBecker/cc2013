@@ -75,6 +75,7 @@ namespace Lexing {
       bool consumeIdent();
       inline void appendToToken(unsigned char c) {curword += c;}
       void storeToken(TokenType type);
+      void storeConstToken(ConstantType ct);
       std::shared_ptr<Token> genToken(TokenType type);
   };
   void printToken(const Token token);

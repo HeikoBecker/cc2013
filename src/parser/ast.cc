@@ -271,10 +271,23 @@ Literal::Literal(std::string name, Pos pos)
   this->type = make_shared<PointerDeclaration>(1, make_shared<CharDeclaration>());
 }
 
-Constant::Constant(std::string name, Pos pos)
-  : Expression(pos), name(name) 
+Constant::Constant(std::string name, Pos pos, ConstantType ct)
+  : Expression(pos), ct(ct), name(name) 
 {
-  this->type = make_shared<IntDeclaration>();
+  switch (ct) {
+    case ConstantType::CHAR:
+      this->type = make_shared<CharDeclaration>();
+      break;
+    case ConstantType::NULLPOINTER:
+      // One can't decide which type a nullpointer has without knowing in which
+      // context it is used
+      this->type = make_shared<NullDeclaration>();
+      break;
+    case ConstantType::INT:
+    default:
+      this->type = make_shared<IntDeclaration>();
+      break;
+  }
 }
 
 
