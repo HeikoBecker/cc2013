@@ -195,9 +195,11 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
        * http://stackoverflow.com/questions/6893285/why-do-all-these-crazy-function-pointer-definitions-all-work-what-is-really-goi
        * is useful (though not a replacement for the standard) */
       if (auto optype = dynamic_pointer_cast<PointerDeclaration>(operand->getType()))  {
-        this->type = make_shared<PointerDeclaration>(1, operand->getType());
+        // dereferencing a pointer yields the type of the pointee
+        this->type = optype->pointee();
       } else if (auto optype = dynamic_pointer_cast<FunctionDeclaration>(operand->getType())) {
-        // function  is convertible to pointer to function 
+        // function  is convertible to pointer to function
+        // when dereferenced, we get the function again 
         this->type = optype;
       } else {
         throw ParsingException(std::string("Cannot dereference ") 
