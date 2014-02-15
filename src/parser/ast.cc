@@ -121,6 +121,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
     case PunctuatorType::LESS:
       if (hasRealType(lhs) && hasRealType(rhs)) {
         // TODO: apply usual conversions
+        auto converted = applyUsualConversions(lhs->getType(),rhs->getType());
         this->type = make_shared<IntDeclaration>();
       } else {
         auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs->getType());

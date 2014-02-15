@@ -327,6 +327,15 @@ bool isScalarType(SemanticDeclarationNode s) {
 bool hasScalarType(SubExpression s) {
   return isScalarType(s->getType());
 }
+
+/*******************************************************************************
+ * Integer and floating types are collectively called arithmetic types. 
+ * Each arithmetic type belongs to one type domain: the real type domain
+ * comprises the real types, lthe complex type domain comprises the complex types.
+ * 
+ * Note: We don't have complex types, therefore real type => arithmetic type
+ *******************************************************************************/
+
 bool isArithmeticType(SemanticDeclarationNode s) {
   /* As we don't support floading point types,
    * arithmetic types are limited to integral types.
@@ -359,8 +368,13 @@ bool isIntegerType(SemanticDeclarationNode s) {
 bool hasIntegerType(SubExpression s) {
   return isIntegerType(s->getType());
 }
-bool isRealType(SemanticDeclarationNode) {return true;}
-bool hasRealType(SubExpression) {return true;}
+
+bool isRealType(SemanticDeclarationNode s) {
+  return isArithmeticType(s);
+}
+bool hasRealType(SubExpression s) {
+  return isRealType(s->getType());
+}
 bool isNullPtrConstant(SubExpression s);
 
 bool isNullPtrConstant(SubExpression s) {
