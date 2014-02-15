@@ -207,7 +207,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
     case PunctuatorType::AMPERSAND:
       // TODO: check that operand is lvalue, function designator, or operand of
       // [] or *
-      this->type = make_shared<PointerDeclaration>(1, operand->getType());
+      this->type = make_shared<PointerDeclaration>(0, operand->getType());
       break;
     case PunctuatorType::MINUS:
       if (!hasArithmeticType(operand)) {
