@@ -293,7 +293,7 @@ FunctionCall::FunctionCall(SubExpression funcName,
           // TODO: conversion is not correct atm
           auto promoted_expected = promoteType(expected_parameter.at(i));
           auto promoted_actually = promoteType(arguments.at(i)->getType());
-          if (typeid(promoted_actually).name() == typeid(promoted_expected).name()) {
+          if (Semantic::compareTypes(promoted_actually, promoted_expected)) {
             continue;
           } else {
             std::cout << "promoted: expected "
