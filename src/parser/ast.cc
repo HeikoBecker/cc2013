@@ -157,6 +157,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       break;
     case PunctuatorType::EQUAL:
     case PunctuatorType::NEQUAL:
+      this->type = make_shared<IntDeclaration>();
       if (hasArithmeticType(lhs) && hasArithmeticType(rhs)) {
         // TODO: apply usual conversions
         this->type = make_shared<IntDeclaration>();
@@ -166,8 +167,26 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         /* either both has to be pointers, or one has to be a pointer and the
          * othe one a null pointer constant (6.5.9 2)
          */
-        if (   (lhs_as_ptr && rhs_as_ptr)
-            || (lhs_as_ptr && isNullPtrConstant(rhs))
+        if (lhs_as_ptr && rhs_as_ptr) {
+          auto lpointee = lhs_as_ptr->pointee();
+          auto rpointee = rhs_as_ptr->pointee();
+          // one operand is a pointer to an object type and the other is a 
+          // pointer to a qualified or unqualified version of void
+          if (!(  (isObjectType(lpointee) && rpointee->type() == Semantic::Type::VOID)
+              || (isObjectType(rpointee) && lpointee->type() == Semantic::Type::VOID))) {
+            // both operands are pointers to qualified or unqualified versions 
+            // of compatible types
+            auto types_after_conversion =  applyUsualConversions(lpointee, rpointee);
+            if (!compareTypes(types_after_conversion.first, types_after_conversion.second)) {
+              ostringstream errmsg;
+              errmsg << "Operands of equality operator are not compatible! Types were: "
+                << lhs->getType()->toString() << " and "
+                << rhs->getType()->toString();
+              throw ParsingException(errmsg.str(), pos);
+            }
+          }
+        } else
+        if (   (lhs_as_ptr && isNullPtrConstant(rhs))
             || (rhs_as_ptr && isNullPtrConstant(lhs))) {
           this->type = make_shared<IntDeclaration>();
         } else {
