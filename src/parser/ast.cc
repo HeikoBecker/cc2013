@@ -43,6 +43,10 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       // and (ab)use fall through
       if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
         pointedToType = ltype->pointee();
+        // A postfix expression followed by the -> operator and an identifier designates a member
+        // of a structure or union object. The value is that of the named member of the object to
+        // which the first expression points, and is an lvalue.
+        this->m_can_be_lvalue = true;
       } else {
         throw ParsingException(std::string(  "Can't use operator -> on ")
                                            + (ltype ? ltype->toString() : "INITIALIZE ME!")
@@ -56,6 +60,16 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         // identifier must follow
         if (auto identifier = std::dynamic_pointer_cast<VariableUsage>(rhs)) {
           this->type = identifier->getType(ltype->node());
+          if (!this->m_can_be_lvalue) {
+            // if we actually handle ARROW (instead of MEMBER_ACCESS) we must
+            // not change the value of m_can_be_lvalue; luckily the parent
+            // constructor always sets the value to false, and ARROW always sets
+            // it to true before we reach this point; so if it is false, we know
+            // that we are in the MEMBER_ACCESS case and have to react
+            // accordingly:
+            // 6.5.2.3 $3: and is an lvalue if the first expression is an lvalue
+            this->m_can_be_lvalue = lhs->can_be_lvalue();
+          }
         } else {
           throw ParsingException(std::string(
               "Trying to access struct member, but right operand is not an identifier , but a "
