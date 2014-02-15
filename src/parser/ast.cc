@@ -332,8 +332,63 @@ TernaryExpression::TernaryExpression(SubExpression condition,
                                      Pos pos)
      : Expression(pos), condition(condition), lhs(lhs), rhs(rhs)
 {
- //TODO: type checking
- this->type = lhs->getType();
+  std::ostringstream errmsg;
+  // 6.5.15: conditional operator
+  //The first operand shall have scalar type.
+  if (!hasScalarType(condition)) {
+    errmsg << "The conditional operator requires that the first operand has scalar type, but it has type "
+           << condition->getType()->toString();
+    throw ParsingException(errmsg.str(), condition->pos());
+  }
+  // One of the following shall hold true for the second and third operand
+  // both operands have arithmetic type;
+  auto lhs_type = lhs->getType();
+  auto rhs_type = rhs->getType();
+  auto types_are_equal = Semantic::compareTypes(lhs_type, rhs_type);
+  auto valid = (hasArithmeticType(lhs) && hasArithmeticType(rhs));
+  //both operands have the same structure or union type  // we don't have union
+  if (!valid) {
+    valid = (   lhs_type->type() == Semantic::Type::STRUCT
+             && types_are_equal);
+  }
+  // both operands have void type
+  if (!valid) {
+    // TODO save value of compareTypes for reuse
+    valid = (   lhs_type->type() == Semantic::Type::VOID
+             && types_are_equal);
+  }
+  // both operands are pointers to qualified or unqualified versions of
+  // compatible types
+  auto lhs_is_a_pointer = lhs_type->type() == Semantic::Type::POINTER;
+  auto rhs_is_a_pointer = rhs_type->type() == Semantic::Type::POINTER;
+  if (!valid) {
+    // TODO: I coudn't find this in the standard, but it makes sense that we
+    // apply the usual conversions to the pointee types before comparing
+    if (  lhs_is_a_pointer && rhs_is_a_pointer) {
+      auto lhs_as_ptr = std::static_pointer_cast<PointerDeclaration>(lhs_type);
+      auto rhs_as_ptr = std::static_pointer_cast<PointerDeclaration>(rhs_type);
+      auto promoted = applyUsualConversions(lhs_as_ptr->pointee(), rhs_as_ptr->pointee());
+      valid = compareTypes(promoted.first, promoted.second);
+      if (valid) {
+        lhs_type = promoted.first;
+        rhs_type = promoted.second;
+      }
+    }
+  }
+  // one operand is a pointer and the other is a null pointer constant
+  if (!valid) {
+    if (lhs_is_a_pointer && isNullPtrConstant(rhs)) {
+      valid = true;
+    } else if (rhs_is_a_pointer && isNullPtrConstant(lhs)) {
+      valid = true;
+    }
+  }
+  if (!valid) {
+    errmsg << "Second and third operand of conditional operator have unsuiting types "
+           << lhs_type->toString() << " and " << rhs_type->toString();
+    throw ParsingException(errmsg.str(), pos);
+  }
+  this->type = lhs_type;
 }
 
 BasicType::BasicType(std::string type, Pos pos) : Type(pos)
