@@ -353,6 +353,18 @@ bool isNullPtrConstant(SubExpression s) {
   return false;
 }
 
+bool isFunctionType(SemanticDeclarationNode s) {
+  return s->type() == Type::FUNCTION;
+}
+
+bool isObjectType(SemanticDeclarationNode s) {
+  return !isFunctionType(s);
+}
+
+bool hasObjectType(SubExpression s) {
+  return isObjectType(s->getType());
+}
+
 SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {
   // C defines some promotions
   // the only one we currently care about is from char to int

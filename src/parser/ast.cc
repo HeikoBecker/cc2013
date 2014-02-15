@@ -340,22 +340,35 @@ TernaryExpression::TernaryExpression(SubExpression condition,
            << condition->getType()->toString();
     throw ParsingException(errmsg.str(), condition->pos());
   }
-  // One of the following shall hold true for the second and third operand
-  // both operands have arithmetic type;
   auto lhs_type = lhs->getType();
   auto rhs_type = rhs->getType();
   auto types_are_equal = Semantic::compareTypes(lhs_type, rhs_type);
-  auto valid = (hasArithmeticType(lhs) && hasArithmeticType(rhs));
+  auto valid = false;
+  // One of the following shall hold true for the second and third operand
+  // both operands have arithmetic type;
+  if (hasArithmeticType(lhs) && hasArithmeticType(rhs)) {
+    valid = true;
+    // If both the second and third operands have arithmetic type, the result type that would be
+    // determined by the usual arithmetic conversions, were they applied to those two operands,
+    // is the type of the result.
+    this->type = applyUsualConversions(lhs_type, rhs_type).first;
+  }
   //both operands have the same structure or union type  // we don't have union
   if (!valid) {
-    valid = (   lhs_type->type() == Semantic::Type::STRUCT
-             && types_are_equal);
+    if (   lhs_type->type() == Semantic::Type::STRUCT
+             && types_are_equal) {
+      valid = true;
+      //If both the operands have structure or union type, the result has that type
+      this->type = lhs->getType();
+    }
   }
   // both operands have void type
   if (!valid) {
     // TODO save value of compareTypes for reuse
     valid = (   lhs_type->type() == Semantic::Type::VOID
              && types_are_equal);
+    //If both operands have void type, the result has void type.
+    this->type = lhs_type;
   }
   // both operands are pointers to qualified or unqualified versions of
   // compatible types
@@ -370,8 +383,7 @@ TernaryExpression::TernaryExpression(SubExpression condition,
       auto promoted = applyUsualConversions(lhs_as_ptr->pointee(), rhs_as_ptr->pointee());
       valid = compareTypes(promoted.first, promoted.second);
       if (valid) {
-        lhs_type = promoted.first;
-        rhs_type = promoted.second;
+        this->type = promoted.first;
       }
     }
   }
@@ -379,16 +391,39 @@ TernaryExpression::TernaryExpression(SubExpression condition,
   if (!valid) {
     if (lhs_is_a_pointer && isNullPtrConstant(rhs)) {
       valid = true;
+      this->type = lhs_type;
     } else if (rhs_is_a_pointer && isNullPtrConstant(lhs)) {
       valid = true;
+      this->type = rhs_type;
     }
   }
+  // one operand is a pointer to an object type and the other is a pointer to a 
+  // qualified or unqualified version of void.
+  if (!valid) {
+    if (lhs_is_a_pointer && rhs_is_a_pointer) {
+      auto lhs_as_ptr = std::static_pointer_cast<PointerDeclaration>(lhs_type);
+      auto rhs_as_ptr = std::static_pointer_cast<PointerDeclaration>(rhs_type);
+      auto lhs_pointee = lhs_as_ptr->pointee();
+      auto rhs_pointee = rhs_as_ptr->pointee();
+      // otherwise, one operand is a pointer to void or a qualified version of 
+      // void, in which case the result type is a pointer to an appropriately 
+      // qualified version of void.
+      if (   isObjectType(lhs_pointee) && rhs_pointee->type() == Semantic::Type::VOID) {
+        valid = true;
+        this->type = rhs_type;
+      }
+      if (isObjectType(rhs_pointee) && lhs_pointee->type() == Semantic::Type::VOID) {
+        valid = true;
+        this->type = lhs_type;
+      }
+    }
+  }
+
   if (!valid) {
     errmsg << "Second and third operand of conditional operator have unsuiting types "
            << lhs_type->toString() << " and " << rhs_type->toString();
     throw ParsingException(errmsg.str(), pos);
   }
-  this->type = lhs_type;
 }
 
 BasicType::BasicType(std::string type, Pos pos) : Type(pos)
