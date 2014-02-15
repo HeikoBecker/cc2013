@@ -288,7 +288,6 @@ FunctionCall::FunctionCall(SubExpression funcName,
       // check if argument types match
       // if not, try to convert to desired type
       for (unsigned long i = 0; i < arguments.size(); ++i) {
-          // TODO: typeid is extremly expensive, create a cheaper compare function
         if (!Semantic::compareTypes(expected_parameter.at(i), arguments.at(i)->getType())) {
           // TODO: conversion is not correct atm
           auto promoted_expected = promoteType(expected_parameter.at(i));
