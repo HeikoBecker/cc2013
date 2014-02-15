@@ -645,12 +645,18 @@ ReturnStatement::ReturnStatement(SubExpression ex, Pos pos)
 }
 
 void ReturnStatement::verifyReturnType(SemanticDeclarationNode actual_type) {
+  // TODO: share code with assignment (operator =)
   // Get the type of the function which in which we are
   auto function_type = SemanticForest::filename2SemanticTree(this->pos().name)->currentFunction();
   // extract the return type from it
   auto expected_type = std::dynamic_pointer_cast<FunctionDeclaration>(function_type)->returnType();
-  // TODO: don't use this equality check, but check if the types are equal after
-  // applying the "usual conversions"
+  // check if expected is pointer and actual is null pointer constant
+  // TODO: this should probably move into its own function
+  if (  expected_type->type() == Semantic::Type::POINTER 
+      && dynamic_pointer_cast<NullDeclaration>(actual_type)) {
+    return; // types are compatible
+  }
+
   auto types_after_conversion = applyUsualConversions(actual_type, expected_type);
   if (!Semantic::compareTypes(types_after_conversion.first,
                              types_after_conversion.second)) {
