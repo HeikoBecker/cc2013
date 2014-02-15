@@ -276,7 +276,7 @@ Literal::Literal(std::string name, Pos pos)
    * however, we don't support arrays 
    * and when used it should decay to char* anyway
    */
-  this->type = make_shared<PointerDeclaration>(1, make_shared<CharDeclaration>());
+  this->type = make_shared<PointerDeclaration>(0, make_shared<CharDeclaration>());
 }
 
 Constant::Constant(std::string name, Pos pos, ConstantType ct)
