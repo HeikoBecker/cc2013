@@ -247,9 +247,9 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     SemanticDeclarationNode ret;
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
-//#ifdef DEBUG
+#ifdef DEBUG
     cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
-//#endif
+#endif
 
     // This is the old code 
     TypeStack *st;
