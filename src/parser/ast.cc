@@ -291,7 +291,9 @@ Constant::Constant(std::string name, Pos pos, ConstantType ct)
 {
   switch (ct) {
     case ConstantType::CHAR:
-      this->type = make_shared<CharDeclaration>();
+      // 6.4.4.4 $10
+      // An integer character constant has type int. 
+      this->type = make_shared<IntDeclaration>();
       break;
     case ConstantType::NULLPOINTER:
       // One can't decide which type a nullpointer has without knowing in which
