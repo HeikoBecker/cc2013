@@ -25,6 +25,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       // left operand must have type pointer to object _type_
       if (auto ltype = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
         // right operand must have integer type
+        if (!hasIntegerType(rhs)) {
+        throw ParsingException(std::string(
+              "Right operand of array subscript must have integer type, but is a !"
+              + (rhs->getType() ?  rhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+        }
+        this->type = ltype;
+        this->m_can_be_lvalue = true;
       } else {
         throw ParsingException(std::string(
               "Left operand does not point to an object, but is a !"
