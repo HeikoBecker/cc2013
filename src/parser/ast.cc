@@ -157,7 +157,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       break;
     case PunctuatorType::EQUAL:
     case PunctuatorType::NEQUAL:
-      if (hasRealType(lhs) && hasRealType(rhs)) {
+      if (hasArithmeticType(lhs) && hasArithmeticType(rhs)) {
         // TODO: apply usual conversions
         this->type = make_shared<IntDeclaration>();
       } else {
