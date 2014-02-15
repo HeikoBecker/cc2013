@@ -212,13 +212,19 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
   switch (op) {
     // 6.5.3.2 has some strange stuff in section 3 about & and *'s interplay
     case PunctuatorType::STAR:
-      this->m_can_be_lvalue = true;
       /* to understand this 
        * http://stackoverflow.com/questions/6893285/why-do-all-these-crazy-function-pointer-definitions-all-work-what-is-really-goi
        * is useful (though not a replacement for the standard) */
       if (auto optype = dynamic_pointer_cast<PointerDeclaration>(operand->getType()))  {
         // dereferencing a pointer yields the type of the pointee
         this->type = optype->pointee();
+        if (isObjectType(this->type)) {
+          // 6.5.3.2 $4
+          // If the operand points to a function, the result is a function
+          // designator; if it points to an object, the result is an lvalue
+          // designating the object.
+          this->m_can_be_lvalue = true;
+        }
       } else if (auto optype = dynamic_pointer_cast<FunctionDeclaration>(operand->getType())) {
         // function  is convertible to pointer to function
         // when dereferenced, we get the function again 
