@@ -121,8 +121,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       auto lhs_type = lhs->getType();
       auto rhs_type = rhs->getType();
       if (isArithmeticType(lhs_type) && isArithmeticType(rhs_type)) {
-        // TODO: apply usual conversions
-        this->type = make_shared<IntDeclaration>();
+        this->type = applyUsualConversions(lhs_type, rhs_type).first;
         break;
       }
       auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
