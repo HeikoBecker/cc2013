@@ -173,7 +173,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
        *  more?
        */
       if (!(hasArithmeticType(lhs) && hasArithmeticType(rhs))) {
-        if (typeid(lhs->getType()).name() != typeid(rhs->getType()).name()) { // TODO: is operator== already implemented?
+        if (!compareTypes(lhs->getType(), rhs->getType())) { // TODO: is operator== already implemented?
           throw ParsingException("More work remaining! ", pos);
         }
       }
@@ -219,6 +219,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
                <<  operand->getType()->toString()
                << "\n";
         throw ParsingException(errmsg.str(), operand->pos());
+      } else {
         this->type = promoteType(operand->getType());
       }
       break;
