@@ -570,9 +570,9 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
   if (type->isStruct() && !type->containsDeclaration()) {
      // Todo add here
      //
-     // FIXME: @Patrick: any reason to keep the lines I  commented out belo
-     /*
      string name = "@" + type->toString();
+     // FIXME: @Patrick: any reason to keep the line I  commented out below
+     /*
      cout<<"name : "<< name<<endl;
      */
      semanticTree->addChild(pos, name, true);
