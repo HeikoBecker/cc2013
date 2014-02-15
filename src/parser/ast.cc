@@ -191,6 +191,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
   switch (op) {
     // 6.5.3.2 has some strange stuff in section 3 about & and *'s interplay
     case PunctuatorType::STAR:
+      this->m_can_be_lvalue = true;
       /* to understand this 
        * http://stackoverflow.com/questions/6893285/why-do-all-these-crazy-function-pointer-definitions-all-work-what-is-really-goi
        * is useful (though not a replacement for the standard) */
@@ -245,8 +246,8 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
 VariableUsage::VariableUsage(std::string name, Pos pos, 
                              SemanticTreeNode semanticTree) 
   : Expression(pos), name(name), semanticTree(semanticTree) {
-    
-}
+    this->m_can_be_lvalue = true;
+  }
 
 SemanticDeclarationNode VariableUsage::getType() {
   if (!this->type) {
@@ -277,6 +278,12 @@ Literal::Literal(std::string name, Pos pos)
    * and when used it should decay to char* anyway
    */
   this->type = make_shared<PointerDeclaration>(0, make_shared<CharDeclaration>());
+  /* TODO: For reasons descibed in 
+   * http://stackoverflow.com/questions/10004511/why-are-string-literals-l-value-while-all-other-literals-are-r-value
+   * string literals are lvalues (see 6.5.1 $4). So in theory we need to set
+   * this->m_can_be_lvalue = true
+   * But I currently don't see any reason to do so
+   */
 }
 
 Constant::Constant(std::string name, Pos pos, ConstantType ct)
