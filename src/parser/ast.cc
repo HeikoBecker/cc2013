@@ -211,7 +211,11 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
       break;
     case PunctuatorType::MINUS:
       if (!hasArithmeticType(operand)) {
-        throw ParsingException(std::string("Operator - requires an arithmetic type"), operand->pos());
+        ostringstream errmsg;
+        errmsg << "Operator - requires an arithmetic type, but got "
+               <<  operand->getType()->toString()
+               << "\n";
+        throw ParsingException(errmsg.str(), operand->pos());
         this->type = promoteType(operand->getType());
       }
       break;
