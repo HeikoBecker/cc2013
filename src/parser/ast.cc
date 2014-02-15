@@ -135,6 +135,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       if (lhs_as_ptr && rhs_as_ptr) {
         // in real C this would be ptrdiff_t
         this->type = make_shared<IntDeclaration>();
+        break;
       }
       throw ParsingException(std::string("Incompatible types for -"), lhs->pos());
     }
