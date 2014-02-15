@@ -5,7 +5,6 @@
 #include "parser.h"
 #include "parserException.h"
 #include "../utils/debug.h"
-#include "typeinfo"
 
 using namespace Parsing;
 using namespace Semantic;
@@ -290,7 +289,7 @@ FunctionCall::FunctionCall(SubExpression funcName,
       // if not, try to convert to desired type
       for (unsigned long i = 0; i < arguments.size(); ++i) {
           // TODO: typeid is extremly expensive, create a cheaper compare function
-        if (typeid(expected_parameter.at(i)).name() != typeid(arguments.at(i)->getType()).name()) {
+        if (!Semantic::compareTypes(expected_parameter.at(i), arguments.at(i)->getType())) {
           // TODO: conversion is not correct atm
           auto promoted_expected = promoteType(expected_parameter.at(i));
           auto promoted_actually = promoteType(arguments.at(i)->getType());
