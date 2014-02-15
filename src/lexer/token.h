@@ -18,6 +18,8 @@ namespace Lexing {
     END = 6,
   };
 
+  enum class ConstantType {CHAR,INT,NULLPOINTER};
+
   class Token {
     public:
       Token(TokenType type, Pos posinfo, std::string value); 
@@ -44,6 +46,12 @@ namespace Lexing {
       KeywordType keywordtype() const {return this->m_keywordtype;};
     private:
       KeywordType m_keywordtype;
+  };
+
+  class ConstantToken : public Token {
+    public:
+      ConstantToken(Pos posinfo, std::string value, ConstantType type);
+      const ConstantType type;
   };
 
 /* Converts a PunctuatorType to its string representation */
