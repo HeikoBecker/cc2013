@@ -186,7 +186,16 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       this->type = make_shared<IntDeclaration>();
       break;
     case PunctuatorType::ASSIGN:
-      // TODO: check that lhs is lvalue
+      /* 6.5.16 $2:
+       * An assignment operator shall have a modifiable lvalue as its left operand.
+       * WARNING: We currently don't have non-modifiable lvalues, because string
+       * literals are not lvalues in our implementation and const does not exist;
+       * as soon as this changes, the check below is not sufficiant enough
+       */
+      if (!lhs->can_be_lvalue()) {
+        throw ParsingException("The left operand of an assignment must be a lvalue",
+             lhs->pos());
+      }
       /* TODO: this needs more checks! Check the legality of the following
        *  lhs is pointer, rhs is int
        *  lhs is pointer, rhs is null pointer constant
