@@ -18,7 +18,7 @@ Token::Token(TokenType type, Pos posinfo, std::string value)
 }
 
 ConstantToken::ConstantToken(Pos posinfo, std::string value, ConstantType ct) 
-  : Token(TokenType::CONSTANT, posinfo, value), type(ct) {};
+  : Token(TokenType::CONSTANT, posinfo, value), type(ct) {}
 
 
 PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
