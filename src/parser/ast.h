@@ -121,9 +121,15 @@ class ASTNODE(ExternalDeclaration) {
     ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
                         Pos pos,
-                        SemanticTreeNode semanticTree
+                        SemanticTreeNode semanticTree,
+                        bool assign = true
                         );
-    ExternalDeclaration(TypeNode type, Pos pos);
+    ExternalDeclaration(TypeNode type, Pos pos,
+                        SemanticTreeNode semanticTree);
+
+    virtual bool isFunction() { return false; }
+
+
     PPRINTABLE
   protected:
     TypeNode type;
@@ -140,6 +146,7 @@ class FunctionDefinition : public ExternalDeclaration {
         SemanticTreeNode semanticTree
         );
   PPRINTABLE
+    bool isFunction() { return true;}
 
   private:
     SubCompoundStatement compoundStatement;
@@ -170,6 +177,14 @@ class TYPE(StructType) {
     StructType(std::string name, Pos pos);
     StructType(std::string name, StructContent content, Pos pos);
     bool canBeInFunctionDeclaration() { return !hasDeclaration; };
+
+    bool isStruct() {
+      return true;
+    }
+
+    bool containsDeclaration() {
+      return hasDeclaration;
+    }
     
     // TODO : only calculate once
     virtual string getIdentifier() {

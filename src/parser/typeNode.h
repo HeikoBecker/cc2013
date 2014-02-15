@@ -15,6 +15,8 @@ class ASTNODE(Type)
     virtual bool canBeInFunctionDeclaration() { return true; };
     virtual std::string toString() { return "unknown"; }
     virtual bool isVoid() { return false; }
+    virtual bool isStruct() { return false; }
+    virtual bool containsDeclaration() { return false; }
 };
 
 typedef std::shared_ptr<Type> TypeNode;

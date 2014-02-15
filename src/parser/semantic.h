@@ -87,7 +87,7 @@ class SemanticTree {
     SemanticDeclarationNode m_currentFunction;
     int counter;
     map<string, TypeStack *> declarationMap;
-    map<string, stack<int> > structMap;
+    map<string, stack<pair<int,bool> > > structMap;
     int loopDepth; // depth inside loop for checking break; continue;
 
     // map for goto 
@@ -97,7 +97,7 @@ class SemanticTree {
   public:
     // returns true, if the label could be added
     bool addLabel(string label);
-    void addChild(Pos pos, string name="@@");
+    void addChild(Pos pos, string name="@@", bool forward = false);
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
     SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);

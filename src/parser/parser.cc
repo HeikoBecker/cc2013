@@ -218,7 +218,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     // TODO : make lookuptable for struct
     // or is this not allowed in our grammar
 
-    return make_shared<ExternalDeclaration>(type, pos);
+    return make_shared<ExternalDeclaration>(type, pos, semanticTree);
   }
 
   auto decl = declarator();
@@ -242,9 +242,9 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   auto parameter = decl->getNextParameter();
 
 
-
   auto returnType = semanticTree->addDeclaration(type, decl, pos);
   semanticTree->setCurrentFunction(returnType);
+
   auto compStat = compoundStatement(parameter);
   semanticTree->unsetCurrentFunction();
 

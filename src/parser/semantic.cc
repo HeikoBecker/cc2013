@@ -12,24 +12,23 @@ SemanticTree::SemanticTree() {
   counter++;
 }
 
-void SemanticTree::addChild(Pos pos, string name) {
-  nodes.push_back(make_shared<SemanticNode>(currentPos));
-
+void SemanticTree::addChild(Pos pos, string name, bool forward) {
 
   // save the struct definitions
   if (name != "@@") {
 
     if(structMap.find(name) == structMap.end()) {
-      stack<int> st = stack<int>();
-      st.push(counter);
+      stack<pair<int,bool> > st = stack<pair<int, bool> >();
+      st.push(
+      make_pair(counter, forward)
+      );
       structMap[name] = st;
     } else {
-
       SubSemanticNode helpNode;
 
       // delete not active nodes
       while(!structMap[name].empty()) {
-        int id = structMap[name].top();
+        int id = structMap[name].top().first;
         int parent = nodes[id]->getParentIndex();
         if (nodes[parent]->isActive()) {
           helpNode = nodes[id];
@@ -40,17 +39,36 @@ void SemanticTree::addChild(Pos pos, string name) {
       }
 
       // add it to the Map
-      if (structMap[name].empty() || nodes[structMap[name].top()]->getParentIndex() != currentPos) {
-          structMap[name].push(counter);
-      } else {
-          throw Parsing::ParsingException("no redefinition of " + name, pos);
+      if (structMap[name].empty() || nodes[structMap[name].top().first]->getParentIndex() != currentPos) {
+
+          structMap[name].push(
+            make_pair(counter, forward) 
+          );
+      } else { // it was alredy declared
+          // it is a forward declaration
+          if (forward) {
+            return;
+          } else {
+             bool lastForward = structMap[name].top().second;
+
+             // take the node from the forward declaration
+             if (lastForward) {
+              currentPos = lastForward;
+              return;
+             } else {
+               // it is a redefinition
+                throw Parsing::ParsingException("no redefinition of " + name, pos);
+             }
+          }
       }
     }
   }
 
+  nodes.push_back(make_shared<SemanticNode>(currentPos));
   counter++;
   currentPos = counter - 1;
-}
+
+  }
 
 void SemanticTree::goUp() {
   nodes[currentPos]->disable();
@@ -132,7 +150,7 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        SubSemanticNode helpNode;
 
        while(!structMap[name].empty()) {
-        int id = structMap[name].top();
+        int id = structMap[name].top().first;
        // cout<<"Id : "<<id<<endl;
         int parent = nodes[id]->getParentIndex();
         if (nodes[parent]->isActive()) {
@@ -229,9 +247,9 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     SemanticDeclarationNode ret;
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
-#ifdef DEBUG
+//#ifdef DEBUG
     cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
-#endif
+//#endif
 
     // This is the old code 
     TypeStack *st;

@@ -431,7 +431,7 @@ FunctionDefinition::FunctionDefinition(TypeNode type,
                         Pos pos,
                         shared_ptr<SemanticTree> semanticTree
                         )
-  : ExternalDeclaration(type, declarator, pos, semanticTree),
+  : ExternalDeclaration(type, declarator, pos, semanticTree, false),
     compoundStatement(compoundStatement)
 {
 }
@@ -439,21 +439,33 @@ FunctionDefinition::FunctionDefinition(TypeNode type,
 ExternalDeclaration::ExternalDeclaration(TypeNode type,
                         SubDeclarator declarator,
                         Pos pos,
-                        shared_ptr<SemanticTree> semanticTree
+                        shared_ptr<SemanticTree> semanticTree,
+                        bool assign
                         )
   : AstNode(pos), type(type), declarator(declarator),
     semanticTree(semanticTree)
 {
-  // TODO : I dont think we need that anymore ..
+  if (assign) {
   if (semanticTree) {
     semanticTree->addDeclaration(type, declarator, pos);
+  }
   }
   
 }
 
-ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos)
-  : AstNode(pos), type(type)
+ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
+, shared_ptr<SemanticTree> semanticTree
+)
+  : AstNode(pos), type(type), semanticTree(semanticTree)
 {
+  // forward declaration of struct 
+  if (type->isStruct() && !type->containsDeclaration()) {
+     // Todo add here
+     //
+     string name = "@" + type->toString();
+     cout<<"name : "<< name<<endl;
+     semanticTree->addChild(pos, name, true);
+  }
 }
 
 
