@@ -2,6 +2,8 @@
 // with -Werror enabled
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wall"
+#pragma GCC diagnostic push "-Wno-unknown-pragmmas"
+#pragma clang diagnostic push "-Wno-all"
 #include "llvm/IR/Module.h"                /* Module */
 #include "llvm/IR/Function.h"              /* Function */
 #include "llvm/IR/Constant.h"              /* Constant::getNullValue */
@@ -10,6 +12,8 @@
 #include "llvm/IR/GlobalValue.h"           /* GlobaleVariable, LinkageTypes */
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
+#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 
 #include "cogen.h"
