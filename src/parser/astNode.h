@@ -4,11 +4,10 @@
 #include <memory>
 #include "../lexer/punctuatortype.h"
 #include "../utils/pos.h"
-#include "pprinter.h"
 #include "semantic.h"
 
 /* This macro allows an easy switching of pprint in all methods*/
-#define PPRINTABLE  void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel = 0) override;
+#define PPRINTABLE  void prettyPrint(unsigned int indentLevel = 0) override;
 
 /* This macro is used in intermediate classes */
 #define CONS_INTER(X) protected : X(Pos pos) : AstNode(pos){};
@@ -32,7 +31,7 @@ namespace Parsing {
       AstNode(Pos pos) : m_pos(std::move(pos)) {};
     public:
       virtual ~AstNode() {};
-      virtual void prettyPrint(const PrettyPrinter &, unsigned int) {};
+      virtual void prettyPrint(unsigned int) {};
       Pos inline pos() {return m_pos;}
     private:
       Pos m_pos;

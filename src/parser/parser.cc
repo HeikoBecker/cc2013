@@ -6,6 +6,7 @@
 #include <utility> // for std::move
 #include "parser.h"
 #include "../utils/diagnostic.h"
+#include "../utils/debug.h"
 #include "../lexer/lexer.h"
 #include "../lexer/punctuatortype.h"
 #include "../lexer/keywordtokentype.h"

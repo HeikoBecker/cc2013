@@ -6,7 +6,6 @@
 #include <vector>
 #include "../lexer/punctuatortype.h"
 #include "../utils/pos.h"
-#include "pprinter.h"
 #include "semantic.h"
 #include "astNode.h"
 #include "expressionNode.h"
@@ -14,6 +13,8 @@
 #include "typeNode.h"
 #include "declaratorNode.h"
 #include "expressionNode.h"
+
+#include "../lexer/lexer.h"
 
 namespace Parsing {
 

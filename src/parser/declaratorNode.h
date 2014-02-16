@@ -77,11 +77,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
   class ASTNODE(DirectDeclarator) { 
     CONS_INTER(DirectDeclarator)
     public:
-      virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel) {
-        AstNode::prettyPrint(pp, indentLevel);
-        pp.pprint(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"),
-            indentLevel);
-      };
+      PPRINTABLE
       virtual std::string getIdentifier() {
         return "NONAME";
       }

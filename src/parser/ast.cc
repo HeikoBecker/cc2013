@@ -667,8 +667,6 @@ Parameter::Parameter(TypeNode type, Pos pos)
   
 }
 
-
-
 //DirectDeclaratorHelp::DirectDeclaratorHelp(Pos pos) 
   //: AstNode(pos)
 //{

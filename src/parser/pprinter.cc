@@ -1,16 +1,70 @@
 #include <iostream>
 #include "ast.h"
 #include "pprinter.h"
+#include "../lexer/punctuatortype.h"
+
+namespace Parsing {
+
+void pprint(AstNode node, unsigned int indentLevel) {
+  node.prettyPrint(indentLevel);
+}
+
+void pprint(std::shared_ptr<AstNode> nodeptr, unsigned int indentLevel)
+{
+  if(nodeptr) {
+    nodeptr->prettyPrint(indentLevel);
+  } else {
+    pprint(std::string("\n"), indentLevel);
+    pprint(std::string("******************************************\n"),
+        indentLevel);
+    pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"),
+        indentLevel);
+    pprint(std::string("*Should never happen at this stage!"),
+        indentLevel);
+    pprint(std::string("******************************************\n"),
+        indentLevel);
+    pprint(std::string("\n"),
+        indentLevel);
+  }
+}
+
+void pprint(PunctuatorType op, unsigned int indentLevel)
+{
+  (void) indentLevel;
+  std::cout << Lexing::PunctuatorType2String(op);
+}
+
+void pprint(char c, unsigned int indentLevel)
+{
+  switch (c) {
+    case '\n':
+      std::cout << '\n';
+      for (int i = indentLevel; i > 0; i--) {
+        std::cout << '\t';
+      }
+      break;
+    default:
+      std::cout << c;
+      break;
+  }
+}
+
+void pprint(std::string s, unsigned int indentLevel)
+{
+  (void) indentLevel;
+  // TODO: replace newline in s with newline + indentLevel times tab char
+  std::cout << s;
+}
+
+}
 
 using namespace Parsing;
-
-PrettyPrinter::PrettyPrinter() {}
 
 bool g_skipNewLineBeforeBlockStatement = false; // TODO: FIXME: global variables are BAD!
 bool g_skipNewLineBeforeSelectionStatement = false; // TODO: FIXME: global variables are BAD!
 bool g_adjustParenthesesInDeclarator = false; // TODO: FIXME: global variables are BAD!
 
-#define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
+#define PRETTY_PRINT(X) void X::prettyPrint(unsigned int indentLevel)
 /* Beware of macro magic
  * This prints the name of function calling PPRINT, it's argument and finally
  * any output produced by the function
@@ -18,10 +72,10 @@ bool g_adjustParenthesesInDeclarator = false; // TODO: FIXME: global variables a
 #define PPRINT(X)  do { \
   debug(PRINT_AST) << __PRETTY_FUNCTION__ << "\t: "\
         << std::string(#X) << ":";\
-  pp.pprint((X), indentLevel);\
+  pprint((X), indentLevel);\
 } while(0);
-#define ADDINDENT()  do {indentLevel++;} while(0);
-#define REMOVEINDENT()  do {indentLevel--;} while(0);
+#define ADDINDENT()  do {indentLevel++;} while(0)
+#define REMOVEINDENT()  do {indentLevel--;} while(0)
 #define RESETINDENT() \
   auto reset = indentLevel;\
   indentLevel = 0;
@@ -469,6 +523,11 @@ PRETTY_PRINT(SizeOfExpression)
   }
   PPRINT(')');
 }
+
+PRETTY_PRINT(DirectDeclarator)
+{
+  PPRINT(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"));
+};
 
 #undef PPRINT
 #undef ADDINDENT
