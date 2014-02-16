@@ -64,9 +64,6 @@ namespace Parsing {
       [[noreturn]] inline void expectedAnyOf(std::string msg);
 
 
-      // debug function 
-      void debugOutput();
-
       // parse functions
       std::vector<BlockItem> blockItemList();
       BlockItem blockItem();

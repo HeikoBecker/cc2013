@@ -97,19 +97,6 @@ bool Parser::testTypeSpecifier() {
   );
 }
 
-
-void Parser::debugOutput() {
-  // print current token
-// #ifdef DEBUG
-//  cout<<"SCAN :";
-//  if (getNextType() == TokenType::END) {
-//    cout<<"END OF TOKENS REACHED"<<endl;
-//  } else {
-//     printToken(*getNextSymbol());
-//  }
-// #endif
-}
-
 std::shared_ptr<Token> Parser::getNextSymbol() {
   return m_nextsym;
 }
@@ -175,8 +162,6 @@ bool Parser::testk(KeywordType keyword) {
 }
 
 std::shared_ptr<Token> Parser::scan() {
-  debugOutput();
-
   m_nextsym = std::move(m_lookahead);
   m_lookahead = m_lexer->getNextToken();
   return m_nextsym;
