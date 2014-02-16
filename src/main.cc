@@ -10,6 +10,9 @@
 #include "parser/pprinter.h"
 #include "utils/debug.h"
 #include "utils/exception.h"
+#include "llvm/Support/PrettyStackTrace.h"
+#include "llvm/Support/Signals.h"          /* Nice stacktrace output */
+#include "llvm/Support/SystemUtils.h"
 
 enum class Mode {
   TOKENIZE,
@@ -18,8 +21,11 @@ enum class Mode {
   COMPILE,
 };
 
-int main(int, char** const argv)
+int main(int argc, char** const argv)
 {
+  llvm::sys::PrintStackTraceOnErrorSignal();
+  llvm::PrettyStackTraceProgram X(argc, argv);
+
   try {
     char** i = argv + 1;
 
