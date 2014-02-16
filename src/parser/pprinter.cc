@@ -8,6 +8,7 @@ PrettyPrinter::PrettyPrinter() {}
 
 bool g_skipNewLineBeforeBlockStatement = false; // TODO: FIXME: global variables are BAD!
 bool g_skipNewLineBeforeSelectionStatement = false; // TODO: FIXME: global variables are BAD!
+bool g_adjustParenthesesInDeclarator = false; // TODO: FIXME: global variables are BAD!
 
 #define PRETTY_PRINT(X) void X::prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel)
 /* Beware of macro magic
@@ -317,15 +318,26 @@ PRETTY_PRINT(IdentifierList) {
 PRETTY_PRINT(Declarator)
 {
   // TODO : unfinished, probably also broken
+  auto adjust = g_adjustParenthesesInDeclarator;
   for (auto i = this->pointerCounter; i>0; --i) {
-    PPRINT('(');
+    if (adjust) {
+      adjust = false;
+    } else {
+      PPRINT('(');
+    }
     PPRINT('*');
   }
+  adjust = g_adjustParenthesesInDeclarator;
+  g_adjustParenthesesInDeclarator = false;
   if (directDeclarator) {
     PPRINT(this->directDeclarator);
   }
   for (auto i = this->pointerCounter; i>0; --i) {
-    PPRINT(')');
+    if (adjust) {
+      adjust = false;
+    } else {
+      PPRINT(')');
+    }
   }
 }
 
@@ -369,6 +381,7 @@ PRETTY_PRINT(FunctionDefinition) {
   PPRINT(this->type);
   PPRINT(' ');
   PPRINT('('); // <- WTF, that's a really coding style
+  g_adjustParenthesesInDeclarator = true;
   PPRINT(this->declarator);
   PPRINT(')');
   PPRINT(this->compoundStatement);
