@@ -177,7 +177,7 @@ bool Parser::testk(KeywordType keyword) {
 std::shared_ptr<Token> Parser::scan() {
   debugOutput();
 
-  m_nextsym = m_lookahead;
+  m_nextsym = std::move(m_lookahead);
   m_lookahead = m_lexer->getNextToken();
   return m_nextsym;
 }
