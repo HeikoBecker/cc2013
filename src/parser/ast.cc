@@ -3,8 +3,8 @@
 #include "ast.h"
 #include "pprinter.h"
 #include "parser.h"
-#include "parserException.h"
 #include "../utils/debug.h"
+#include "../utils/exception.h"
 
 using namespace Parsing;
 using namespace Semantic;

@@ -7,7 +7,6 @@
 #include <vector>
 #include <stack>
 #include "../utils/pos.h"
-#include "parserException.h"
 #include "astNode.h"
 #include "typeNode.h"
 #include "declaratorNode.h"

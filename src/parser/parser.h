@@ -7,7 +7,6 @@
 #include <memory>
 #include "ast.h"
 #include "semantic.h"
-#include "parserException.h"
 #include "../lexer/token.h"
 
 namespace Lexing {

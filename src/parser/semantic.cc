@@ -1,6 +1,7 @@
 #include "semantic.h"
 #include "ast.h"
 #include "../utils/debug.h"
+#include "../utils/exception.h"
 
 using namespace Parsing;
 

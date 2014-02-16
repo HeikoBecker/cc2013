@@ -5,19 +5,10 @@
 #include <stdexcept>
 #include <memory>
 #include "../utils/pos.h"
+#include "../utils/exception.h"
 #include "token.h"
 
 namespace Lexing {
-
-  /* TODO: derive from another base exception (e.g. compilerexception) */
-  class LexingException: public std::runtime_error 
-  {
-    public:
-      LexingException(std::string message, Pos where) : std::runtime_error(message), m_where(where) {}
-      Pos where() const {return m_where;}
-    private:
-      Pos m_where;
-  };
 
   /*
    * \brief A thin wrapper around fgetc and ungetc which keeps track of the
