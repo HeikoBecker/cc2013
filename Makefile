@@ -21,7 +21,7 @@ UNAME := $(shell uname)
 BINDIR := $(BUILDDIR)/$(CFG)
 BIN    := $(BINDIR)/$(NAME)
 SUBDIRS := lexer
-SRC    := $(sort $(wildcard $(SRCDIR)/utils/*.cc) $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/lexer/*.cc) $(wildcard $(SRCDIR)/parser/*.cc))
+SRC    := $(sort $(wildcard $(SRCDIR)/utils/*.cc) $(wildcard $(SRCDIR)/*.cc) $(wildcard $(SRCDIR)/lexer/*.cc) $(wildcard $(SRCDIR)/parser/*.cc) $(wildcard $(SRCDIR)/codegen/*.cc))
 OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 

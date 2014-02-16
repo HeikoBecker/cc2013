@@ -8,11 +8,15 @@
 #include <fstream>
 #include <string>
 #include "parser/pprinter.h"
+#include "codegen/cogen.h"
 #include "utils/debug.h"
 #include "utils/exception.h"
 #include "llvm/Support/PrettyStackTrace.h"
 #include "llvm/Support/Signals.h"          /* Nice stacktrace output */
 #include "llvm/Support/SystemUtils.h"
+
+// TODO: use a more portable alternative
+#include <libgen.h>
 
 enum class Mode {
   TOKENIZE,
@@ -97,7 +101,22 @@ int main(int argc, char** const argv)
             break;
           }
           case Mode::COMPILE:
-            PANIC("TODO implement");
+            // we need to build the name of the output file
+            // TODO: use a less-hacky, more general solution
+            // 1024 chars have to be enough for anyone
+            char namecpy[1024] = {0};
+            // insert rant about strcpy, strlcpy and strncpy
+            strncpy(namecpy, name, 1023); //1023 to ensure last char is 0
+            auto len = strlen(namecpy);
+            if (len < 1023) { // else we have no chance anyway
+              namecpy[len-1] = 'l';
+              namecpy[len] = 'l';
+              namecpy[len+1] = '\0';
+            }
+            auto output_filename = basename(namecpy);
+            auto parser = Parsing::Parser{f, name};
+            auto ast = parser.parse();
+            Codegeneration::genLLVMIR(output_filename, ast);
             break;
         }
 
