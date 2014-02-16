@@ -34,7 +34,7 @@ namespace Parsing {
       AstNode(Pos pos) : m_pos(std::move(pos)) {};
     public:
       virtual ~AstNode() {};
-      virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel);
+      virtual void prettyPrint(const PrettyPrinter &, unsigned int) {};
       Pos inline pos() {return m_pos;}
     private:
       Pos m_pos;
