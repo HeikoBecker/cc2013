@@ -13,6 +13,7 @@
 #include "statementNode.h"
 #include "typeNode.h"
 #include "declaratorNode.h"
+#include "expressionNode.h"
 
 namespace Parsing {
 

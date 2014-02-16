@@ -10,6 +10,7 @@
 #include "astNode.h"
 #include "typeNode.h"
 #include "declaratorNode.h"
+#include "expressionNode.h"
 #include "semadecl.h"
 
 using namespace std;

@@ -2,9 +2,14 @@
 #define PARSER_STATEMENT_H
 #pragma once
 
-#include "expressionNode.h"
+#include <memory>
+#include "astNode.h"
 
 namespace Parsing {
+
+class Expression; // forward declare
+typedef std::shared_ptr<Expression> SubExpression;
+
 class ASTNODE(Statement) 
 {
   CONS_INTER(Statement)

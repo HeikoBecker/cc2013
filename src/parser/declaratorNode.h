@@ -3,8 +3,6 @@
 #pragma once
 
 #include "astNode.h"
-#include "expressionNode.h"
-#include "statementNode.h"
 #include "typeNode.h"
 
 using namespace std;

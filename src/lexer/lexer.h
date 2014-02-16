@@ -2,7 +2,6 @@
 #define LEXER_LEXER_H
 
 #include <unordered_set>
-#include <stdexcept>
 #include <memory>
 #include "../utils/pos.h"
 #include "../utils/exception.h"

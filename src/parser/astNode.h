@@ -2,8 +2,6 @@
 #define PARSER_ASTNODE_H
 #pragma once
 #include <memory>
-#include <string>
-#include <vector>
 #include "../lexer/punctuatortype.h"
 #include "../utils/pos.h"
 #include "pprinter.h"
