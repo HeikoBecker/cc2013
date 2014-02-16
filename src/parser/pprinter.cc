@@ -2,8 +2,17 @@
 #include "ast.h"
 #include "pprinter.h"
 #include "../lexer/punctuatortype.h"
+#include "../utils/debug.h"
 
 namespace Parsing {
+
+void pprint(std::string s, unsigned int indentLevel)
+{
+  (void) indentLevel;
+  // TODO: replace newline in s with newline + indentLevel times tab char
+  std::cout << s;
+}
+
 
 void pprint(AstNode node, unsigned int indentLevel) {
   node.prettyPrint(indentLevel);
@@ -47,13 +56,6 @@ void pprint(char c, unsigned int indentLevel)
       std::cout << c;
       break;
   }
-}
-
-void pprint(std::string s, unsigned int indentLevel)
-{
-  (void) indentLevel;
-  // TODO: replace newline in s with newline + indentLevel times tab char
-  std::cout << s;
 }
 
 }
