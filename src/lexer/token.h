@@ -54,67 +54,6 @@ namespace Lexing {
       const ConstantType type;
   };
 
-/* Converts a PunctuatorType to its string representation */
-// the function and in the header because it is used in an inline templated function
-// don't ask
-inline std::string PunctuatorType2String(PunctuatorType pt)
-{
-   switch (pt) {
-    case PunctuatorType::PLUS:
-      return "+";
-    case PunctuatorType::MINUS:
-      return "-";
-    case PunctuatorType::STAR:
-      return "*";
-    case PunctuatorType::ASSIGN:
-      return "=";
-    case PunctuatorType::EQUAL:
-      return "==";
-    case PunctuatorType::NEQUAL:
-      return "!=";
-    case PunctuatorType::QMARK:
-      return "?";
-    case PunctuatorType::COLON:
-      return ":";
-    case PunctuatorType::SEMICOLON:
-      return ";";
-    case PunctuatorType::LAND:
-      return "&&";
-    case PunctuatorType::LOR:
-      return "||";
-    case PunctuatorType::LESS:
-      return "<";
-    case PunctuatorType::GREATER:
-      return ">";
-    case PunctuatorType::ARRAY_ACCESS:
-      return "[]";
-    case PunctuatorType::MEMBER_ACCESS:
-      return ".";
-    case PunctuatorType::ARROW:
-      return "->";
-    case PunctuatorType::SIZEOF:
-      return "sizeof";
-    case PunctuatorType::LEFTSQBRACKET:
-      return "[";
-    case PunctuatorType::RIGHTSQBRACKET:
-      return "]";
-    case PunctuatorType::LEFTCURLYBRACE:
-      return "{";
-    case PunctuatorType::RIGHTCURLYBRACE:
-      return "}";
-    case PunctuatorType::COMMA:
-      return ",";
-    case PunctuatorType::AMPERSAND:
-      return "&";
-    case PunctuatorType::NOT:
-      return "!";
-    case PunctuatorType::ILLEGAL:
-      return "ILLEGAL";
-    default:
-      return "ERROR"; //TODO
-   }
-}
-
 /*
  *  operator== is NOT virtual; cast a Token to the subclass you want before
  *  using it

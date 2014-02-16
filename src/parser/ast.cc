@@ -5,6 +5,7 @@
 #include "parser.h"
 #include "../utils/debug.h"
 #include "../utils/exception.h"
+#include "../lexer/punctuatortype.h"
 
 using namespace Parsing;
 using namespace Semantic;
@@ -229,7 +230,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       this->type = lhs->getType();
       break;
     default:
-      throw ParsingException(std::string() + "Implement this! " + PunctuatorType2String(op), pos);
+      throw ParsingException(std::string() + "Implement this! " + Lexing::PunctuatorType2String(op), pos);
       break;
   }
 }
