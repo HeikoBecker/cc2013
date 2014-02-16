@@ -1,5 +1,6 @@
 #include "token.h"
 #include <iostream>
+#include <map>
 using namespace Lexing;
 
 Token::Token(TokenType type, Pos posinfo, std::string value)
@@ -13,60 +14,38 @@ ConstantToken::ConstantToken(Pos posinfo, std::string value, ConstantType ct)
 
 PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
   : Token(type, posinfo, value) {
-    if (value == "+") {
-      m_puncttype = PunctuatorType::PLUS;
-    } else if (value == "-") {
-      m_puncttype = PunctuatorType::MINUS;
-    } else if (value == "*") {
-      m_puncttype = PunctuatorType::STAR;
-    } else if (value == "=") {
-      m_puncttype = PunctuatorType::ASSIGN;
-    } else if (value == "==") {
-      m_puncttype = PunctuatorType::EQUAL;
-    } else if (value == "!=") {
-      m_puncttype = PunctuatorType::NEQUAL;
-    } else if (value == "!") {
-      m_puncttype = PunctuatorType::NOT;
-    } else if (value == "?") {
-      m_puncttype = PunctuatorType::QMARK;
-    } else if (value == ":") {
-      m_puncttype = PunctuatorType::COLON;
-    } else if (value == "&&") {
-      m_puncttype = PunctuatorType::LAND;
-    } else if (value == "||") {
-      m_puncttype = PunctuatorType::LOR;
-    } else if (value == "(") {
-      m_puncttype = PunctuatorType::LEFTPARENTHESIS;
-    } else if (value == ")" ) {
-      m_puncttype = PunctuatorType::RIGHTPARENTHESIS;
-    } else if (value == "[" || value == "<:") {
-      m_puncttype = PunctuatorType::LEFTSQBRACKET;
-    } else if (value == "]" || value == ":>") {
-      m_puncttype = PunctuatorType::RIGHTSQBRACKET;
-    } else if (value == "{" || value == "<%") {
-      m_puncttype = PunctuatorType::LEFTCURLYBRACE;
-    } else if (value == "}" || value == "%>") {
-      m_puncttype = PunctuatorType::RIGHTCURLYBRACE;
-    } else if (value == "<") {
-      m_puncttype = PunctuatorType::LESS;
-    } else if (value == ">") {
-      m_puncttype = PunctuatorType::GREATER;
-    } else if (value == "->") {
-      m_puncttype = PunctuatorType::ARROW;
-    } else if (value == "&") {
-      m_puncttype = PunctuatorType::AMPERSAND;
-    } else if (value == ";") {
-      m_puncttype = PunctuatorType::SEMICOLON;
-    } else if (value == ",") {
-      m_puncttype = PunctuatorType::COMMA;
-    } else if (value == ".") {
-      m_puncttype = PunctuatorType::MEMBER_ACCESS;
-    } else {
-      /* #, ##, %:, %:%: are missing
-       * however, those aren't legal/relevant at the parsing stage anymore
-       * */
-      m_puncttype = PunctuatorType::ILLEGAL;
-    }
+    static const std::map<std::string, PunctuatorType> lookup
+    {
+      {"+", PunctuatorType::PLUS},
+      {"-", PunctuatorType::MINUS},
+      {"*", PunctuatorType::STAR},
+      {"=", PunctuatorType::ASSIGN},
+      {"==", PunctuatorType::EQUAL},
+      {"!=", PunctuatorType::NEQUAL},
+      {"!", PunctuatorType::NOT},
+      {"?", PunctuatorType::QMARK},
+      {":", PunctuatorType::COLON},
+      {"&&", PunctuatorType::LAND},
+      {"||", PunctuatorType::LOR},
+      {"(", PunctuatorType::LEFTPARENTHESIS},
+      {")", PunctuatorType::RIGHTPARENTHESIS},
+      {"[", PunctuatorType::LEFTSQBRACKET},
+      {"<:", PunctuatorType::LEFTSQBRACKET},
+      {"]", PunctuatorType::RIGHTSQBRACKET},
+      {":>", PunctuatorType::RIGHTSQBRACKET},
+      {"{", PunctuatorType::LEFTCURLYBRACE},
+      {"<%", PunctuatorType::LEFTCURLYBRACE},
+      {"}", PunctuatorType::RIGHTCURLYBRACE},
+      {"%>", PunctuatorType::RIGHTCURLYBRACE},
+      {"<", PunctuatorType::LESS},
+      {">", PunctuatorType::GREATER},
+      {"->", PunctuatorType::ARROW},
+      {"&", PunctuatorType::AMPERSAND},
+      {";", PunctuatorType::SEMICOLON},
+      {",", PunctuatorType::COMMA},
+      {".", PunctuatorType::MEMBER_ACCESS},
+    };
+    m_puncttype = lookup.at(value);
   }
 
 KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)
