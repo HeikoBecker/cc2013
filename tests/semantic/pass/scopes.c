@@ -1,3 +1,5 @@
+void print(int);
+
 int main() {
   // look at diffent scopes
   int a;
