@@ -213,7 +213,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
        */
       if (!lhs->can_be_lvalue()) {
         throw ParsingException("The left operand of an assignment must be a lvalue",
-             lhs->pos());
+             pos);
       }
       /* TODO: this needs more checks! Check the legality of the following
        *  lhs is pointer, rhs is int
