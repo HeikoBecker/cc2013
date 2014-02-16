@@ -242,9 +242,13 @@ bool Lexer::consumeQuoted() {
             break;
           default:
             //report error
+            // current position would be the character after the \, we fail a
+            // unit test with this approach; so lets point to the \ instead
+            auto pos = tracker.currentPosition();
+            pos.column--;
             throw LexingException( std::string("Invalid escape sequence \\") 
                                   + static_cast<char>(tracker.current())
-                , tracker.currentPosition());
+                , pos);
         }
       }
     } else if ('\n' == tracker.current()) {
