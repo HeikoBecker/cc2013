@@ -25,7 +25,7 @@ class PrettyPrinter {
             indentLevel);
         pprint(std::string("*WARNING: SHARED_PTR WAS NOT INITIALIZED!*\n"),
             indentLevel);
-        pprint(std::string("*Should have been ") + typeid(S).name() + "\n",
+        pprint(std::string("*Should never happen at this stage!"),
             indentLevel);
         pprint(std::string("******************************************\n"),
             indentLevel);

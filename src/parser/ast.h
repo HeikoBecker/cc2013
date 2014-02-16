@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <typeinfo>
 #include "../lexer/punctuatortype.h"
 #include "../utils/pos.h"
 #include "pprinter.h"

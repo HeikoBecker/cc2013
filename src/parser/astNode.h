@@ -4,7 +4,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <typeinfo>
 #include "../lexer/punctuatortype.h"
 #include "../utils/pos.h"
 #include "pprinter.h"
@@ -35,11 +34,7 @@ namespace Parsing {
       AstNode(Pos pos) : m_pos(std::move(pos)) {};
     public:
       virtual ~AstNode() {};
-      virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel) {
-        pp.pprint(std::string("\nIMPLEMENTATION MISSING!\n"), indentLevel);
-        pp.pprint(std::string(typeid(*this).name()), indentLevel);
-        pp.pprint('\n', indentLevel);
-      };
+      virtual void prettyPrint(const PrettyPrinter & pp, unsigned int indentLevel);
       Pos inline pos() {return m_pos;}
     private:
       Pos m_pos;
