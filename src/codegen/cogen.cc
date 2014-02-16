@@ -18,6 +18,7 @@ void Codegeneration::genLLVMIR(char* filename, Parsing::AstRoot root) {
   std::string errorStr;
   raw_fd_ostream stream(filename, errorStr);
   Module M(filename, Ctx);
+  verifyModule(M);
   M.print(stream, nullptr); /* M is a llvm::Module */
 }
 
