@@ -18,7 +18,7 @@
 
 namespace Parsing {
 
-typedef shared_ptr<SemanticTree> SemanticTreeNode;
+typedef std::shared_ptr<SemanticTree> SemanticTreeNode;
 
 class EXPRESSION(BinaryExpression)
 {
@@ -192,11 +192,11 @@ class TYPE(StructType) {
     }
     
     // TODO : only calculate once
-    virtual string getIdentifier() {
+    virtual std::string getIdentifier() {
       return "struct_" + name;
     }
 
-    string toString() {
+    std::string toString() {
       return name;
     }
 

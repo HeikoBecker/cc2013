@@ -13,6 +13,7 @@
 
 #define OBTAIN_POS() auto pos = m_nextsym->pos();
 
+using namespace std;
 using namespace Lexing;
 using namespace Parsing;
 

@@ -69,33 +69,33 @@ namespace Parsing {
   class PointerDeclaration : public SemanticDeclaration {
     public:
       // type is int, char, or void
-      PointerDeclaration(int pointerCounter, SemanticDeclarationNode type);
+      PointerDeclaration(int pointerCounter, Parsing::SemanticDeclarationNode type);
       Semantic::Type type() override {return Semantic::Type::POINTER;}
 
-      SemanticDeclarationNode pointee() {return child;};
+      Parsing::SemanticDeclarationNode pointee() {return child;};
 
       virtual std::string toString() {
         return "*" + child->toString();
       }
 
     private:
-      SemanticDeclarationNode child;
+      Parsing::SemanticDeclarationNode child;
   };
 
   class FunctionDeclaration : public SemanticDeclaration {
 
     public:
-      FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par); 
+      FunctionDeclaration(Parsing::SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par); 
       Semantic::Type type() override {return Semantic::Type::FUNCTION;}
 
-      std::vector<SemanticDeclarationNode> parameter() {return m_parameter;};
-      SemanticDeclarationNode returnType() {return returnChild;};
+      std::vector<Parsing::SemanticDeclarationNode> parameter() {return m_parameter;};
+      Parsing::SemanticDeclarationNode returnType() {return returnChild;};
 
       virtual std::string toString();
 
     private:
-      SemanticDeclarationNode returnChild;
-      std::vector<SemanticDeclarationNode> m_parameter;
+      Parsing::SemanticDeclarationNode returnChild;
+      std::vector<Parsing::SemanticDeclarationNode> m_parameter;
 
   };
 

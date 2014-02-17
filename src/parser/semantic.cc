@@ -3,6 +3,7 @@
 #include "../utils/debug.h"
 #include "../utils/exception.h"
 
+using namespace std;
 using namespace Parsing;
 
 SemanticTree::SemanticTree() {

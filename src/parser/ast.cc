@@ -7,6 +7,7 @@
 #include "../utils/exception.h"
 #include "../lexer/punctuatortype.h"
 
+using namespace std;
 using namespace Parsing;
 using namespace Semantic;
 
@@ -294,7 +295,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
      this->type = make_shared<IntDeclaration>();
      break;
     default:
-      throw ParsingException(std::string() + "Implement this! " + PunctuatorType2String(op), pos);
+      throw ParsingException(std::string() + "Implement this! " + Lexing::PunctuatorType2String(op), pos);
       break;
   }
 }
@@ -342,21 +343,21 @@ Literal::Literal(std::string name, Pos pos)
    */
 }
 
-Constant::Constant(std::string name, Pos pos, ConstantType ct)
+Constant::Constant(std::string name, Pos pos, Lexing::ConstantType ct)
   : Expression(pos), ct(ct), name(name) 
 {
   switch (ct) {
-    case ConstantType::CHAR:
+    case Lexing::ConstantType::CHAR:
       // 6.4.4.4 $10
       // An integer character constant has type int. 
       this->type = make_shared<IntDeclaration>();
       break;
-    case ConstantType::NULLPOINTER:
+    case Lexing::ConstantType::NULLPOINTER:
       // One can't decide which type a nullpointer has without knowing in which
       // context it is used
       this->type = make_shared<NullDeclaration>();
       break;
-    case ConstantType::INT:
+    case Lexing::ConstantType::INT:
     default:
       this->type = make_shared<IntDeclaration>();
       break;

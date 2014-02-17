@@ -74,7 +74,7 @@ int main(int argc, char** const argv)
         switch (mode) {
           case Mode::TOKENIZE:
             for(auto token = lexer.getNextToken(); 
-                token->type() != TokenType::END;
+                token->type() != Lexing::TokenType::END;
                 token = lexer.getNextToken()) {
               printToken(*token);
             }

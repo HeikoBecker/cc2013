@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_set>
 #include <memory>
+#include <string>
 #include "ast.h"
 #include "semantic.h"
 #include "../lexer/token.h"
@@ -11,9 +12,6 @@
 namespace Lexing {
   class Lexer;
 }
-
-using namespace std;
-using namespace Lexing;
 
 namespace Parsing {
 
@@ -35,30 +33,30 @@ namespace Parsing {
       AstRoot parse();
 
     private:
-      unique_ptr<Lexer> m_lexer;
-      shared_ptr<Token> m_nextsym;
-      shared_ptr<Token> m_lookahead;
-      shared_ptr<SemanticTree> semanticTree;
+      std::unique_ptr<Lexing::Lexer> m_lexer;
+      std::shared_ptr<Lexing::Token> m_nextsym;
+      std::shared_ptr<Lexing::Token> m_lookahead;
+      std::shared_ptr<SemanticTree> semanticTree;
 
       // function concerning reading
-      shared_ptr<Token> getNextSymbol();
-      TokenType getNextType();
-      string getNextValue();
-      shared_ptr<Token> scan();
-      bool testType(TokenType token);
-      bool testValue(string value);
-      bool test(TokenType token, string value);
-      bool testp(string value); // test punctuator
+      std::shared_ptr<Lexing::Token> getNextSymbol();
+      Lexing::TokenType getNextType();
+      std::string getNextValue();
+      std::shared_ptr<Lexing::Token> scan();
+      bool testType(Lexing::TokenType token);
+      bool testValue(std::string value);
+      bool test(Lexing::TokenType token, std::string value);
+      bool testp(std::string value); // test punctuator
       bool testp(PunctuatorType puncutator); // test punctuator
-      bool testk(string value); // test keyword
+      bool testk(std::string value); // test keyword
       bool testk(KeywordType keyword); // test keyword
       bool testTypeSpecifier();
-      bool testLookAheadP(string val);
+      bool testLookAheadP(std::string val);
       bool testLookAheadType();
       inline void expect(std::string s);
       inline void expect(PunctuatorType puncutator);
       inline void expect(KeywordType keyword);
-      inline void expect(TokenType tokenType);
+      inline void expect(Lexing::TokenType tokenType);
       [[noreturn]] inline void reportError(Pos pos, std::string msg);
       [[noreturn]] inline void reportError(std::string msg);
       [[noreturn]] inline void expectedAnyOf(std::string msg);
@@ -103,7 +101,7 @@ namespace Parsing {
       ExternalDeclarationNode externalDeclaration();
       TUNode translationUnit();
 
-      SubCompoundStatement compoundStatement(vector<ParameterNode> param = vector<ParameterNode>() );
+      SubCompoundStatement compoundStatement(std::vector<ParameterNode> param = std::vector<ParameterNode>() );
       SubExpressionStatement expressionStatement();
   };
 }

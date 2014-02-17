@@ -13,10 +13,6 @@
 #include "expressionNode.h"
 #include "semadecl.h"
 
-using namespace std;
-
-// conflict in C++ dependencies
-
 namespace Parsing {
 
 class SemanticException: public std::runtime_error {
@@ -25,9 +21,9 @@ class SemanticException: public std::runtime_error {
 };
 
 class SemanticNode;
-typedef shared_ptr<SemanticNode> SubSemanticNode;
+typedef std::shared_ptr<SemanticNode> SubSemanticNode;
 
-typedef stack<pair<int, SemanticDeclarationNode> > TypeStack;
+typedef std::stack<std::pair<int, Parsing::SemanticDeclarationNode> > TypeStack;
 
 class SemanticNode {
   public:
@@ -45,18 +41,18 @@ class SemanticNode {
       return active;
     }
 
-    void addDeclaration(string s, SemanticDeclarationNode node) {
+    void addDeclaration(std::string s, Parsing::SemanticDeclarationNode node) {
       decl[s] = node;
     }
 
     // TODO: make this private and a friend of StructDeclaration?
-    std::vector<std::pair<std::string, SemanticDeclarationNode>> type() {
-      return std::vector<std::pair<std::string, SemanticDeclarationNode>>(
+    std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> type() {
+      return std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>>(
             decl.begin(), decl.end()
           );
     }
 
-    SemanticDeclarationNode getNode(string name) {
+    Parsing::SemanticDeclarationNode getNode(std::string name) {
       if (decl.find(name) == decl.end()) {
         throw SemanticException(name + " not found");
       } else {
@@ -67,14 +63,14 @@ class SemanticNode {
   private:
     int parent;
     bool active;
-    map<string, SemanticDeclarationNode> decl;
+    std::map<std::string, Parsing::SemanticDeclarationNode> decl;
 };
 
 class SemanticTree;
 
 class SemanticForest {
   public:
-    static shared_ptr<SemanticTree> filename2SemanticTree(std::string filename);
+    static std::shared_ptr<SemanticTree> filename2SemanticTree(std::string filename);
 };
 
 class SemanticTree {
@@ -82,25 +78,25 @@ class SemanticTree {
 
   private:
     SemanticTree();
-    vector<shared_ptr<SemanticNode> > nodes;
+    std::vector<std::shared_ptr<SemanticNode> > nodes;
     int currentPos;
-    SemanticDeclarationNode m_currentFunction;
+    Parsing::SemanticDeclarationNode m_currentFunction;
     int counter;
-    map<string, TypeStack *> declarationMap;
-    map<string, stack<pair<int,bool> > > structMap;
+    std::map<std::string, TypeStack *> declarationMap;
+    std::map<std::string, std::stack<std::pair<int,bool> > > structMap;
     int loopDepth; // depth inside loop for checking break; continue;
 
     // map for goto 
-    set<string> labelMap;
-    vector<string> gotoLabels;
+    std::set<std::string> labelMap;
+    std::vector<std::string> gotoLabels;
 
   public:
     // returns true, if the label could be added
-    bool addLabel(string label);
-    void addChild(Pos pos, string name="@@", bool forward = false);
+    bool addLabel(std::string label);
+    void addChild(Pos pos, std::string name="@@", bool forward = false);
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
-    SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
+    Parsing::SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
     void increaseLoopDepth();
     void decreaseLoopDepth();
     /*
@@ -108,38 +104,39 @@ class SemanticTree {
      * this is used when entering a function definition to check that the return
      * type matches
      */
-    void setCurrentFunction(SemanticDeclarationNode);
+    void setCurrentFunction(Parsing::SemanticDeclarationNode);
     void unsetCurrentFunction();
-    inline SemanticDeclarationNode currentFunction() {return m_currentFunction;};
-    void addGotoLabel(string str);
+    inline Parsing::SemanticDeclarationNode currentFunction() {return m_currentFunction;};
+    void addGotoLabel(std::string str);
     bool isInLoop();
-    SemanticDeclarationNode createType(TypeNode t, Pos pos);
-    SemanticDeclarationNode helpConvert(
+    Parsing::SemanticDeclarationNode createType(TypeNode t, Pos pos);
+    Parsing::SemanticDeclarationNode helpConvert(
   TypeNode typeNode, 
   SubDeclarator declarator, 
-  SemanticDeclarationNode ret, Pos pos);
+  Parsing::SemanticDeclarationNode ret, Pos pos);
 
-    pair<bool, string> checkGotoLabels();
-    SemanticDeclarationNode lookUpType(string name, Pos pos);
+    std::pair<bool, std::string> checkGotoLabels();
+    Parsing::SemanticDeclarationNode lookUpType(std::string name, Pos pos);
 };
 
 }
 
 namespace Semantic {
-  using namespace Parsing;
-  bool isScalarType(SemanticDeclarationNode);
-  bool hasScalarType(SubExpression);
-  bool isArithmeticType(SemanticDeclarationNode);
-  bool hasArithmeticType(SubExpression);
-  bool isIntegerType(SemanticDeclarationNode);
-  bool hasIntegerType(SubExpression);
-  bool isRealType(SemanticDeclarationNode);
-  bool hasRealType(SubExpression);
-  bool isNullPtrConstant(SubExpression s);
-  bool isObjectType(SemanticDeclarationNode);
-  bool hasObjectType(SubExpression);
-  SemanticDeclarationNode promoteType(SemanticDeclarationNode s);
-  std::pair<SemanticDeclarationNode, SemanticDeclarationNode> applyUsualConversions(SemanticDeclarationNode,SemanticDeclarationNode);
+  bool isScalarType(Parsing::SemanticDeclarationNode);
+  bool hasScalarType(Parsing::SubExpression);
+  bool isArithmeticType(Parsing::SemanticDeclarationNode);
+  bool hasArithmeticType(Parsing::SubExpression);
+  bool isIntegerType(Parsing::SemanticDeclarationNode);
+  bool hasIntegerType(Parsing::SubExpression);
+  bool isRealType(Parsing::SemanticDeclarationNode);
+  bool hasRealType(Parsing::SubExpression);
+  bool isNullPtrConstant(Parsing::SubExpression s);
+  bool isObjectType(Parsing::SemanticDeclarationNode);
+  bool hasObjectType(Parsing::SubExpression);
+  Parsing::SemanticDeclarationNode promoteType(Parsing::SemanticDeclarationNode s);
+  std::pair<Parsing::SemanticDeclarationNode, Parsing::SemanticDeclarationNode> 
+  applyUsualConversions(Parsing::SemanticDeclarationNode,
+                        Parsing::SemanticDeclarationNode);
 }
 
 #endif

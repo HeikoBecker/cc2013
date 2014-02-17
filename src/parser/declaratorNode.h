@@ -4,8 +4,9 @@
 
 #include "astNode.h"
 #include "typeNode.h"
+#include <utility> // for pair
+#include <string>
 
-using namespace std;
 
 namespace Parsing {
 
@@ -96,8 +97,8 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return false;
       }
 
-      virtual pair<int,bool>  getPointers() {
-        return make_pair(0, false);
+      virtual std::pair<int,bool>  getPointers() {
+        return std::make_pair(0, false);
       }
 
       virtual SubDeclarator getSubDeclarator() {
@@ -140,14 +141,14 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return false;
       }
 
-      pair<int,bool> getPointers() {
+      std::pair<int,bool> getPointers() {
         if(directDeclarator) {
           auto p =  directDeclarator->getPointers();
           p.first = p.first + pointerCounter;
           return p;
         }
 
-        return make_pair(pointerCounter, false);
+        return std::make_pair(pointerCounter, false);
       }
 
       SubDeclarator getNextDeclarator() {
@@ -188,9 +189,9 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return identifier;
       }
 
-      pair<int, bool> getPointers() {
+      std::pair<int, bool> getPointers() {
         // we are finished in our goal
-        return make_pair(0, help.size() != 0);
+        return std::make_pair(0, help.size() != 0);
       }
 
 
@@ -255,13 +256,13 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return declarator->getIdentifier();
       }
 
-      pair<int, bool> getPointers() {
+      std::pair<int, bool> getPointers() {
 
         if (help.size() == 0 ) {
           return declarator->getPointers();
         }
 
-        return make_pair(0, true);
+        return std::make_pair(0, true);
       }
 
       virtual bool canBeFunctionDefinition() {

@@ -63,7 +63,7 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   auto name = this->declarator->getIdentifier();
   // lookup the type of the current function
   auto semtree = Parsing::SemanticForest::filename2SemanticTree(this->pos().name);
-  auto function_type_ =  static_pointer_cast<FunctionDeclaration>(semtree->lookUpType(name, this->pos()));
+  auto function_type_ = std::static_pointer_cast<FunctionDeclaration>(semtree->lookUpType(name, this->pos()));
   auto Builder = llvm::IRBuilder<>(M.getContext());
   // lookup the return type and set it correctly
   auto return_type_ = function_type_->returnType();
