@@ -6,6 +6,7 @@
 #include <set>
 #include <vector>
 #include <stack>
+#include <memory>
 #include "../utils/pos.h"
 #include "astNode.h"
 #include "typeNode.h"
@@ -91,6 +92,7 @@ class SemanticTree {
     std::vector<std::string> gotoLabels;
 
   public:
+    ~SemanticTree(); // we hold pointers in the declarationMap which we need to free
     // returns true, if the label could be added
     bool addLabel(std::string label);
     void addChild(Pos pos, std::string name="@@", bool forward = false);

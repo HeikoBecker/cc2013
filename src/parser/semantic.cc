@@ -14,6 +14,13 @@ SemanticTree::SemanticTree() {
   counter++;
 }
 
+SemanticTree::~SemanticTree() {
+  for (auto it : declarationMap) {
+    delete it.second;
+  }
+  declarationMap.clear();
+}
+
 void SemanticTree::addChild(Pos pos, string name, bool forward) {
 
   // save the struct definitions
