@@ -39,8 +39,10 @@ DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
 
 all: $(BIN)
 
-debug: CFLAGS += -DDEBUG -g -Wextra -pedantic-errors -Og
-debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors -Og
+debug: CFLAGS += -DDEBUG -g -Wextra -pedantic-errors -Og -fsanitize=address -fno-omit-frame-pointer
+debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors -Og -fsanitize=address -fno-omit-frame-pointer
+debug: CPPFLAGS += -fsanitize=address
+debug: LDFLAGS += -fsanitize=address
 debug: $(BIN)
 
 quick: CFLAGS += -O0
