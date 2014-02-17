@@ -133,6 +133,7 @@ class ASTNODE(ExternalDeclaration) {
 
 
     PPRINTABLE
+    IR_EMITTING
   protected:
     TypeNode type;
     SubDeclarator declarator;
@@ -162,6 +163,7 @@ class ASTNODE(TranslationUnit) {
     TranslationUnit(std::vector<ExternalDeclarationNode> externalDeclarations, 
         Pos pos);
     PPRINTABLE
+    IR_EMITTING
   private:
     std::vector<ExternalDeclarationNode> externalDeclarations;
 };

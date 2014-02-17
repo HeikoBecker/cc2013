@@ -29,11 +29,11 @@
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
-  (void) root;
   auto &Ctx = llvm::getGlobalContext();
   std::string errorStr;
   llvm::raw_fd_ostream stream(filename, errorStr);
   llvm::Module M(filename, Ctx);
+  root->emitIR(M);
   verifyModule(M);
   M.print(stream, nullptr); /* M is a llvm::Module */
 }
@@ -42,6 +42,21 @@ void Parsing::AstNode::emitIR(llvm::Module & M)
 {
   (void) M;
 }
+
+void Parsing::TranslationUnit::emitIR(llvm::Module & M)
+{
+  // call emitIR on each external declaration of the translation unit
+  for (auto external_declaration: this->externalDeclarations) {
+    external_declaration->emitIR(M);
+  }
+}
+
+void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
+{
+  // TODO: implement this
+  (void) M;
+}
+
 
 void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   // TODO: make name a member of functiondefiniton or declaration
