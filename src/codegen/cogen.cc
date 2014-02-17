@@ -107,4 +107,21 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
    */
   // emit code for the body
   this->compoundStatement->emitIR(M);
+
+  // stol^H^H^H^H borrowed from Johannes' example
+  /* All code was emitted,.. but the last block might be empty.
+   * If the last block does not end with a terminator statement the simple
+   * rules created either dead code or the function is a void function without
+   * a return on each path. Either way we need to add a terminator instruction
+   * to the last block. The idea is to look at the return type of the current
+   * function and emit either a void return or a return with the 'NULL' value
+   * for this type */
+  if (Builder.GetInsertBlock()->getTerminator() == nullptr) {
+    auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
+    if (CurFuncReturnType->isVoidTy()) {
+      Builder.CreateRetVoid();
+    } else {
+      Builder.CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
+    }
+  }
 }
