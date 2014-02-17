@@ -1,7 +1,6 @@
 #ifndef LEXER_LEXER_H
 #define LEXER_LEXER_H
 
-#include <unordered_set>
 #include <memory>
 #include "../utils/pos.h"
 #include "../utils/exception.h"
@@ -50,8 +49,6 @@ namespace Lexing {
       FileTracker tracker;
       std::string curword;
       std::shared_ptr<Token> curtoken;
-      const static std::unordered_set<std::string> punctuators;
-      const static std::unordered_set<std::string> keywords;
       /* returns true iff it could consume a Punctuator */
       bool consumePunctuator();
       /* returns true iff it could consume a comment */

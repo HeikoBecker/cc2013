@@ -6,6 +6,7 @@
 #include "lexer.h"
 #include "token.h"
 #include "../utils/debug.h"
+#include <unordered_set>
 
 #define ABORT do {throw std::exception();} while (false)
 
@@ -18,7 +19,7 @@ namespace {
 
 // GCC 4.8.1 complains when using auto instead of the explicit type
 // this does not make sense :-(
-const std::unordered_set<std::string> Lexer::punctuators = 
+static const std::unordered_set<std::string> punctuators = 
   std::unordered_set<std::string> {{
   "[", "]", "(", ")", "{", "}", ".", "->", "++", "--", "&", "*",
     "+", "-", "~", "!", "/", "%", "<<", ">>", "<", ">", "<=", ">=",
@@ -27,7 +28,7 @@ const std::unordered_set<std::string> Lexer::punctuators =
     ",", "#", "##", "<:", ":>", "<%", "%>", "%:", "%:%:",
 }};
 
-const std::unordered_set<std::string> Lexer::keywords = 
+static const std::unordered_set<std::string> keywords = 
   std::unordered_set<std::string> {{
   "_Alignas", "_Alignof", "_Atomic", "_Bool", "_Complex", "_Generic",
   "_Imaginary", "_Noreturn", "_Static_assert", "_Thread_local", "auto",
