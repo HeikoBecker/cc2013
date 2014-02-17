@@ -5,6 +5,7 @@
 #include "../parser/expressionNode.h"
 #include "../parser/semantic.h"
 #include "../utils/exception.h"
+#include "../utils/util.h"
 
 #include <memory>
 
@@ -45,7 +46,7 @@ void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 void Parsing::AstNode::emitIR(llvm::Module & M)
 {
   std::cout << "TODO\n";
-  (void) M;
+  UNUSED(M);
 }
 
 void Parsing::TranslationUnit::emitIR(llvm::Module & M)
@@ -59,7 +60,7 @@ void Parsing::TranslationUnit::emitIR(llvm::Module & M)
 void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
 {
   // TODO: implement this
-  (void) M;
+  UNUSED(M);
 }
 
 
@@ -73,7 +74,7 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   // lookup the return type and set it correctly
   auto return_type_ = function_type_->returnType();
   /* TODO: set the correct return type */
-  (void) return_type_; // FIXME: marked as unused for now
+  UNUSED(M);
   auto return_type = (llvm::Type *) Builder.getInt32Ty(); //FIXME
   /*************************************/
   /* TODO: set the correct parameter types */
@@ -94,7 +95,7 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
    * byiterating over them and calling setName*/
   // TODO: retrive function argument names
   auto argument_it = function->begin();
-  (void) argument_it;
+  UNUSED(argument_it);
   /********************************************/
   // Create the basic block for the function
   auto function_basic_block = llvm::BasicBlock::Create(
@@ -142,7 +143,7 @@ void Parsing::ExpressionStatement::emitIR(llvm::Module & M) {
 }
 
 void Parsing::Expression::emitIR(llvm::Module & M) {
-  (void) M;
+  UNUSED(M);
   std::cerr << "Don't call emitIR of an expression!\n"
             << "Either call emit_rvalue or emit_lvalue\n";
 }
@@ -150,14 +151,14 @@ void Parsing::Expression::emitIR(llvm::Module & M) {
 llvm::Value* Parsing::Expression::emit_rvalue(llvm::Module & M) {
   // get lvalue of Variable
   auto address = this->emit_lvalue(M);
-  (void) address;
+  UNUSED(address);
   // load from lvalue
   return nullptr; // FIXME
 }
 
 
 llvm::Value* Parsing::Expression::emit_lvalue(llvm::Module & M) {
-  (void) M;
+  UNUSED(M);
   if (this->can_be_lvalue()) {
     throw CompilerException("Not implemeted!", this->pos());
   }
@@ -165,7 +166,7 @@ llvm::Value* Parsing::Expression::emit_lvalue(llvm::Module & M) {
 }
 
 void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
-  (void) M;
+  UNUSED(M);
   switch (this->op) {
     default:
       std::cerr << "TODO";

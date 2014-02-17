@@ -3,12 +3,13 @@
 #include "pprinter.h"
 #include "../lexer/punctuatortype.h"
 #include "../utils/debug.h"
+#include "../utils/util.h"
 
 namespace Parsing {
 
 void pprint(std::string s, unsigned int indentLevel)
 {
-  (void) indentLevel;
+  UNUSED(indentLevel);
   // TODO: replace newline in s with newline + indentLevel times tab char
   std::cout << s;
 }
@@ -39,7 +40,7 @@ void pprint(std::shared_ptr<AstNode> nodeptr, unsigned int indentLevel)
 
 void pprint(PunctuatorType op, unsigned int indentLevel)
 {
-  (void) indentLevel;
+  UNUSED(indentLevel);
   std::cout << Lexing::PunctuatorType2String(op);
 }
 

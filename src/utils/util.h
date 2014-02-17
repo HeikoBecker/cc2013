@@ -25,6 +25,7 @@ template<typename T> inline T* nonNull(T* const p)
 }
 
 #define PANIC(msg) panic(__FILE__, __LINE__, (msg))
+#define UNUSED(X) do {(void) (X);} while (0)
 
 static inline bool strEq(char const* const a, char const* const b)
 {
