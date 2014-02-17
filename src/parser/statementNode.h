@@ -32,6 +32,7 @@ class STATEMENT(ExpressionStatement) {
     ExpressionStatement(Pos pos);
     ExpressionStatement(SubExpression ex, Pos pos);
     PPRINTABLE
+    IR_EMITTING
 
   private:
     SubExpression expression;

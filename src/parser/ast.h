@@ -28,6 +28,7 @@ class EXPRESSION(BinaryExpression)
                      PunctuatorType op,
                      Pos pos);
     PPRINTABLE
+    IR_EMITTING
   private:
     SubExpression lhs;
     SubExpression rhs;

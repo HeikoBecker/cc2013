@@ -1,6 +1,8 @@
 #include "cogen.h"
+#include "../parser/ast.h"
 #include "../parser/astNode.h"
 #include "../parser/statementNode.h"
+#include "../parser/expressionNode.h"
 #include "../parser/semantic.h"
 
 #include <memory>
@@ -131,5 +133,22 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
 void Parsing::CompoundStatement::emitIR(llvm::Module & M) {
   for (auto statement : this->subStatements) {
     statement->emitIR(M);
+  }
+}
+
+void Parsing::ExpressionStatement::emitIR(llvm::Module & M) {
+  this->expression->emitIR(M);
+}
+
+void Parsing::Expression::emitIR(llvm::Module & M) {
+  (void) M;
+  std::cout << "TODO\n";
+}
+
+void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
+  (void) M;
+  switch (this->op) {
+    default:
+      std::cerr << "TODO";
   }
 }
