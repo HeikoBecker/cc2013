@@ -4,6 +4,7 @@
 #include "../parser/statementNode.h"
 #include "../parser/expressionNode.h"
 #include "../parser/semantic.h"
+#include "../utils/exception.h"
 
 #include <memory>
 
@@ -149,8 +150,18 @@ void Parsing::Expression::emitIR(llvm::Module & M) {
 llvm::Value* Parsing::Expression::emit_rvalue(llvm::Module & M) {
   // get lvalue of Variable
   auto address = this->emit_lvalue(M);
+  (void) address;
   // load from lvalue
-  
+  return nullptr; // FIXME
+}
+
+
+llvm::Value* Parsing::Expression::emit_lvalue(llvm::Module & M) {
+  (void) M;
+  if (this->can_be_lvalue()) {
+    throw CompilerException("Not implemeted!", this->pos());
+  }
+  throw CompilerException("Illegal LVALUE!", this->pos());
 }
 
 void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
