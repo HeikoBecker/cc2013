@@ -529,7 +529,7 @@ PRETTY_PRINT(SizeOfExpression)
 PRETTY_PRINT(DirectDeclarator)
 {
   PPRINT(std::string("Called prettyPrint of DirectDeclarator directly. Why?\n"));
-};
+}
 
 #undef PPRINT
 #undef ADDINDENT
