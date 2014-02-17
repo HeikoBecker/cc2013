@@ -1,5 +1,6 @@
 #include "cogen.h"
 #include "../parser/astNode.h"
+#include "../parser/statementNode.h"
 #include "../parser/semantic.h"
 
 #include <memory>
@@ -40,6 +41,7 @@ void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
 void Parsing::AstNode::emitIR(llvm::Module & M)
 {
+  std::cout << "TODO\n";
   (void) M;
 }
 
@@ -123,5 +125,11 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
     } else {
       Builder.CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
     }
+  }
+}
+
+void Parsing::CompoundStatement::emitIR(llvm::Module & M) {
+  for (auto statement : this->subStatements) {
+    statement->emitIR(M);
   }
 }

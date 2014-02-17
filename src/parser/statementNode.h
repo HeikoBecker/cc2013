@@ -22,6 +22,7 @@ class STATEMENT(CompoundStatement) {
     // TODO add inner blocks here
     CompoundStatement(std::vector<BlockItem> subStatements, Pos pos);
     PPRINTABLE
+    IR_EMITTING
   private:
     std::vector<BlockItem> subStatements;
 };
