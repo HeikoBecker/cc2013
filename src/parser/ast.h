@@ -147,7 +147,8 @@ class FunctionDefinition : public ExternalDeclaration {
         Pos pos,
         SemanticTreeNode semanticTree
         );
-  PPRINTABLE
+    PPRINTABLE
+    IR_EMITTING
     bool isFunction() { return true;}
 
   private:

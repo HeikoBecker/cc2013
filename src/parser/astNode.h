@@ -9,6 +9,9 @@
 /* This macro allows an easy switching of pprint in all methods*/
 #define PPRINTABLE  void prettyPrint(unsigned int indentLevel = 0) override;
 
+/* Allows an easy change of emitIR methot */
+#define IR_EMITTING void emitIR(llvm::Module & M) override;
+
 /* This macro is used in intermediate classes */
 #define CONS_INTER(X) protected : X(Pos pos) : AstNode(pos){};
 
@@ -24,6 +27,10 @@
 #define ITERATIONSTATEMENT(X) X: public IterationStatement
 #define DIRECTDECLARATOR(X) X : public DirectDeclarator
 
+namespace llvm {
+  class Module;
+}
+
 namespace Parsing {
   class AstNode
   {
@@ -33,6 +40,7 @@ namespace Parsing {
       virtual ~AstNode() {};
       virtual void prettyPrint(unsigned int) {};
       Pos inline pos() {return m_pos;}
+      virtual void emitIR(llvm::Module &);
     private:
       Pos m_pos;
   };
