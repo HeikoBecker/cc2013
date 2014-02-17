@@ -136,8 +136,8 @@ bool SemanticTree::addLabel(string label) {
 
 // checks whether two types declarations are the same 
 bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
-  // TODO this will not work for structs right now
-  return (a->toString()) == (b->toString());
+  // TODO get rid of this method alltogether 
+  return Semantic::compareTypes(a,b); 
 }
 
 SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
