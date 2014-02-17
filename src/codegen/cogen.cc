@@ -11,7 +11,7 @@
 
 using namespace llvm;
 
-void Codegeneration::genLLVMIR(char* filename, Parsing::AstRoot root) {
+void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
   (void) root;
   LLVMContext &Ctx = getGlobalContext();
