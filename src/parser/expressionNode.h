@@ -5,6 +5,11 @@
 #include "astNode.h"
 #include "semadecl.h"
 
+namespace llvm {
+  class Module;
+  class Value;
+}
+
 namespace Parsing {
 
 class ASTNODE(Expression) 
@@ -17,6 +22,8 @@ class ASTNODE(Expression)
     virtual void checkSemanticConstraints() {};
     virtual SemanticDeclarationNode getType() {return this->type;};
     virtual bool can_be_lvalue() {return m_can_be_lvalue;};
+    virtual llvm::Value* emit_rvalue(llvm::Module &);
+    virtual llvm::Value* emit_lvalue(llvm::Module &);
     IR_EMITTING
 };
 

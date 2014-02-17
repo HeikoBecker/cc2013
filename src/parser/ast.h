@@ -55,6 +55,7 @@ class EXPRESSION(VariableUsage)
     // maps a variable name to its type when it is used in the context of a
     // struct
     SemanticDeclarationNode getType(SubSemanticNode structContext);
+    void emit_rvalue(llvm::Module & M) override;
     PPRINTABLE
   private:
     std::string name;

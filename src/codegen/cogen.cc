@@ -137,12 +137,20 @@ void Parsing::CompoundStatement::emitIR(llvm::Module & M) {
 }
 
 void Parsing::ExpressionStatement::emitIR(llvm::Module & M) {
-  this->expression->emitIR(M);
+  this->expression->emit_rvalue(M);
 }
 
 void Parsing::Expression::emitIR(llvm::Module & M) {
   (void) M;
-  std::cout << "TODO\n";
+  std::cerr << "Don't call emitIR of an expression!\n"
+            << "Either call emit_rvalue or emit_lvalue\n";
+}
+
+llvm::Value* Parsing::Expression::emit_rvalue(llvm::Module & M) {
+  // get lvalue of Variable
+  auto address = this->emit_lvalue(M);
+  // load from lvalue
+  
 }
 
 void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
