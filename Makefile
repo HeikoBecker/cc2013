@@ -43,6 +43,9 @@ debug: CFLAGS += -DDEBUG -g -Wextra -pedantic-errors -O0
 debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors -O0
 debug: $(BIN)
 
+quick: CFLAGS += -O0
+quick: $(BIN)
+
 profile: CFLAGS += -pg
 profile: CXXFLAGS += -pg
 profile: LDFLAGS += -pg
