@@ -106,10 +106,7 @@ namespace Parsing {
 
     public:  
       // name e.g. @S
-      StructDeclaration(std::string n, SubSemanticNode s) {
-        name = n;
-        m_node = s;
-      }
+      StructDeclaration(std::string n, SubSemanticNode s);
       Semantic::Type type() override {return Semantic::Type::STRUCT;}
 
       std::string toString() {
