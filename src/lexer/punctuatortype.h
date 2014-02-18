@@ -41,7 +41,7 @@ enum class PunctuatorType {
 
 namespace Lexing {
 /* Converts a PunctuatorType to its string representation */
-std::string PunctuatorType2String(PunctuatorType pt);
+std::string PunctuatorType2String(const PunctuatorType pt);
 }
 
 

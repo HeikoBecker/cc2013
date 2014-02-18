@@ -2,7 +2,7 @@
 #include <map>
 
 namespace Lexing {
-std::string PunctuatorType2String(PunctuatorType pt) {
+std::string PunctuatorType2String(const PunctuatorType pt) {
   static const std::map<PunctuatorType,std::string> t2s {
     {PunctuatorType::PLUS, "+"},
     {PunctuatorType::MINUS, "-"},
