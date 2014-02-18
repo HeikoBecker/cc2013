@@ -65,7 +65,7 @@ namespace Lexing {
       void storeConstToken(ConstantType ct);
       std::shared_ptr<Token> genToken(TokenType type);
   };
-  void printToken(const Token token);
+  void printToken(const Token & token);
 }
 
 #endif

@@ -499,7 +499,7 @@ void FileTracker::storePosition() {
   m_storedPosition = m_position;
 }
 
-void Lexing::printToken(const Token token) {
+void Lexing::printToken(const Token & token) {
   auto posinfo = token.pos();
   std::string tokentype {};
   switch (token.type()) {
