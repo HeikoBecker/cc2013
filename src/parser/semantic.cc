@@ -15,7 +15,7 @@ SemanticTree::SemanticTree() {
 }
 
 SemanticTree::~SemanticTree() {
-  for (auto it : declarationMap) {
+  for (auto const & it : declarationMap) {
     delete it.second;
   }
   declarationMap.clear();

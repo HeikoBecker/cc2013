@@ -128,8 +128,12 @@ int main(int argc, char** const argv)
     }
     infile.close();
     line += '\n';
-    for (int i = pos.column-1; i > 0; --i) {
-      line += " ";
+    for (unsigned int i = 0; i < pos.column-1; i++) {
+      if (line[i] == '\t') {
+        line += '\t';
+      } else {
+        line += " ";
+      }
     }
     line += "^^^^";
     std::cerr << line << std::endl;

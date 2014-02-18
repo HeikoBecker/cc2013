@@ -80,7 +80,7 @@ bool Lexer::consumePunctuator() {
         }
       }
       notDoneYet = true; // we've read also a part of the next token
-      if (partial.substr(0,1) == "..") {
+      if (partial.substr(0,2) == "..") {
         // partial == ..SOME_CHARACTER, SOME_CHARACTER might be espilon
         partial = partial.substr(1); // partial is now everything after the first dot
         curword = "."; // curword must be . now, else partial wouldn't have been ..

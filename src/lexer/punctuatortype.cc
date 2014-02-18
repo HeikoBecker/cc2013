@@ -29,6 +29,7 @@ std::string PunctuatorType2String(const PunctuatorType pt) {
     {PunctuatorType::COMMA, ","},
     {PunctuatorType::AMPERSAND, "&"},
     {PunctuatorType::NOT, "!"},
+    {PunctuatorType::SIZEOF, "sizeof"},
   };
   return t2s.at(pt);
 }
