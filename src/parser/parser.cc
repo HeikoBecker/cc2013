@@ -609,7 +609,6 @@ std::pair<SubDeclarator,SubExpression> Parser::structDeclarator(TypeNode type) {
     auto decl = declarator();
     
     OBTAIN_POS();
-    string identifier = decl->getIdentifier();
     semanticTree->addDeclaration(type, decl, pos);
 
     if (testp(":")) {
