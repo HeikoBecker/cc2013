@@ -51,7 +51,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         this->m_can_be_lvalue = true;
       } else {
         throw ParsingException(std::string(  "Can't use operator -> on ")
-                                           + (ltype ? ltype->toString() : "INITIALIZE ME!")
+                                           + (lhs->getType()? lhs->getType()->toString() : "INITIALIZE ME!")
                                            + ", pointer type required",
                                lhs->pos());
       }
