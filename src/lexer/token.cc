@@ -45,7 +45,12 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       {",", PunctuatorType::COMMA},
       {".", PunctuatorType::MEMBER_ACCESS},
     };
-    m_puncttype = lookup.at(value);
+    const std::map<std::string, PunctuatorType>::const_iterator result = lookup.find(value);
+    if (result == lookup.cend()) {
+      m_puncttype =  PunctuatorType::ILLEGAL;
+    } else {
+      m_puncttype = result->second;
+    }
   }
 
 KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)

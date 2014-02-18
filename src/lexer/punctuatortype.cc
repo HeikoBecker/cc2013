@@ -30,6 +30,7 @@ std::string PunctuatorType2String(const PunctuatorType pt) {
     {PunctuatorType::AMPERSAND, "&"},
     {PunctuatorType::NOT, "!"},
     {PunctuatorType::SIZEOF, "sizeof"},
+    {PunctuatorType::ILLEGAL, ":-("},
   };
   return t2s.at(pt);
 }
