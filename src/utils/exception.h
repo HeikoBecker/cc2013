@@ -2,6 +2,7 @@
 #define PARSER_EXCEPTION_H
 
 #include <stdexcept>
+#include <string>
 #include "pos.h"
 
 class CompilerException: public std::runtime_error {
