@@ -280,7 +280,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
       deleteNotActiveNodes(st);
 
       // NO redefinitions
-      if (st->size() > 0 && st->top().first == currentPos) {
+      if (!st->empty() && st->top().first == currentPos) {
         if (currentPos !=0 || 
             !(
             hasSameType(st->top().second, decl)
@@ -306,7 +306,7 @@ SemanticDeclarationNode SemanticTree::lookUpType(string name, Pos pos) {
     deleteNotActiveNodes(st);
     // delete not active nodes
 
-    if (st->size() == 0) {
+    if (st->empty()) {
       throw Parsing::ParsingException(name+ " is not declared in this scope", pos);
     } else {
       return st->top().second;
