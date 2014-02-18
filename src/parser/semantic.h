@@ -89,7 +89,7 @@ class SemanticTree {
 
     // map for goto 
     std::set<std::string> labelMap;
-    std::vector<std::string> gotoLabels;
+    std::vector<std::pair<std::string, Pos>> gotoLabels;
 
   public:
     ~SemanticTree(); // we hold pointers in the declarationMap which we need to free
@@ -109,7 +109,7 @@ class SemanticTree {
     void setCurrentFunction(Parsing::SemanticDeclarationNode);
     void unsetCurrentFunction();
     inline Parsing::SemanticDeclarationNode currentFunction() {return m_currentFunction;};
-    void addGotoLabel(std::string str);
+    void addGotoLabel(std::string str, Pos pos);
     bool isInLoop();
     Parsing::SemanticDeclarationNode createType(TypeNode t, Pos pos);
     Parsing::SemanticDeclarationNode helpConvert(
@@ -117,7 +117,7 @@ class SemanticTree {
   SubDeclarator declarator, 
   Parsing::SemanticDeclarationNode ret, Pos pos);
 
-    std::pair<bool, std::string> checkGotoLabels();
+    void checkGotoLabels();
     Parsing::SemanticDeclarationNode lookUpType(std::string name, Pos pos);
 };
 

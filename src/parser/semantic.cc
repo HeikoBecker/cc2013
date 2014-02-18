@@ -84,18 +84,16 @@ void SemanticTree::goUp() {
   currentPos = nodes[currentPos]->getParentIndex();
 }
 
-void SemanticTree::addGotoLabel(string str) {
-  gotoLabels.push_back(str);
+void SemanticTree::addGotoLabel(string str, Pos pos) {
+  gotoLabels.push_back(make_pair(str, pos));
 }
 
-pair<bool, string> SemanticTree::checkGotoLabels() {
-  for (auto str : gotoLabels) {
-    if (labelMap.find(str) == labelMap.end()) {
-      return make_pair(false, str);
+void SemanticTree::checkGotoLabels() {
+  for (auto info : gotoLabels) {
+    if (labelMap.find(info.first) == labelMap.end()) {
+          throw Parsing::ParsingException("label " + info.first +" is not defined", info.second);
     }
   }
-
-  return make_pair(true, "");
 }
 
 void SemanticTree::deleteNotActiveNodes(TypeStack *st) {

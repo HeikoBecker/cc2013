@@ -173,11 +173,7 @@ AstRoot Parser::parse() {
   expect(TokenType::END);
 
   // check for goto-statement label at the end
-  auto res = semanticTree->checkGotoLabels();
-  
-  if (!res.first) {
-    reportError("The label " + res.second + " is not defined");
-  }
+  semanticTree->checkGotoLabels();
 
   return tu;
 }
@@ -1099,7 +1095,7 @@ SubJumpStatement Parser::jumpStatement() {
     scan();
     if(testType(TokenType::IDENTIFIER)) {
 
-      semanticTree->addGotoLabel(m_nextsym->value());
+      semanticTree->addGotoLabel(m_nextsym->value(), pos);
 
       SubJumpStatement gotoStatement = make_shared<GotoStatement>(m_nextsym->value(), pos);
       scan();
