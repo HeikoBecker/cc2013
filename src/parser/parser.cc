@@ -60,7 +60,7 @@ void Parser::expect(std::string s) {
 void Parser::expect(PunctuatorType puncutator) {
   if (!testp(puncutator)) {
     auto msg = std::string("Expected ");
-    msg += "TODO";
+    msg += Lexing::PunctuatorType2String(puncutator);
     msg += std::string(" but got ");
     msg += m_nextsym->value();
         if (m_nextsym->type() == TokenType::END)
