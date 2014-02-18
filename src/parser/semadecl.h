@@ -12,6 +12,7 @@ namespace Semantic {
     CHAR,
     VOID,
     POINTER,
+    ARRAY,
     FUNCTION,
     STRUCT,
   };
@@ -83,6 +84,21 @@ namespace Parsing {
 
     private:
       Parsing::SemanticDeclarationNode child;
+  };
+
+  /*
+   *  an array derives from pointer
+   *  this has the advantage that it can automatically decay into a pointer if
+   *  a pointer_cast is used
+   *
+   *  we need the array to handle sizeof applied to string literals
+   */
+  class ArrayDeclaration : public PointerDeclaration {
+    public:
+      ArrayDeclaration(Parsing::SemanticDeclarationNode type, size_t size);
+      // in type we are currently lying to faciliate the usage
+      Semantic::Type type() override {return Semantic::Type::POINTER;}
+      const size_t size;
   };
 
   class FunctionDeclaration : public SemanticDeclaration {

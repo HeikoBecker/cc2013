@@ -47,6 +47,9 @@ PointerDeclaration::PointerDeclaration(int pointerCounter, SemanticDeclarationNo
   }
 }
 
+ArrayDeclaration::ArrayDeclaration(Parsing::SemanticDeclarationNode type, size_t size)
+  : PointerDeclaration(0, type), size(size) {}
+
 using namespace Semantic;
 
 bool Semantic::compareTypes(SemanticDeclarationNode s1, SemanticDeclarationNode s2) {
