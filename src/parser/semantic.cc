@@ -260,6 +260,10 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
 #endif
 
+    if (decl->isVoid()) {
+        throw Parsing::ParsingException("void " + name + " cannot be declared", pos);
+    }
+
     // This is the old code 
     TypeStack *st;
 

@@ -743,8 +743,6 @@ SubDeclarator Parser::declarator(ThreeValueBool abstract) {
   // TODO: is the if below correct?
   if (testp(PunctuatorType::RIGHTPARENTHESIS)
     || testp(PunctuatorType::COMMA) // in parameterlist
-
-    
     ) {
 
  return make_shared<Declarator>(counter,

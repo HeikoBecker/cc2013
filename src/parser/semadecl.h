@@ -29,6 +29,9 @@ namespace Parsing {
         return "SemanticDeclaration";
       }
       virtual Semantic::Type type() {throw;};
+      bool isVoid() {
+        return type() == Semantic::Type::VOID;
+      }
   };
 
   typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;
