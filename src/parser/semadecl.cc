@@ -74,13 +74,11 @@ bool Semantic::compareTypes(SemanticDeclarationNode s1, SemanticDeclarationNode 
         }
       }
       return true;
-      break;
                          }
     case Type::POINTER: {
       auto ptype1 = std::static_pointer_cast<PointerDeclaration>(s1);
       auto ptype2 = std::static_pointer_cast<PointerDeclaration>(s2);
       return compareTypes(ptype1->pointee(), ptype2->pointee());
-      break;
                         }
     case Type::STRUCT: {
       auto stypes1 = std::static_pointer_cast<StructDeclaration>(s1)->node()->type();
@@ -95,7 +93,6 @@ bool Semantic::compareTypes(SemanticDeclarationNode s1, SemanticDeclarationNode 
         }
       }
       return true;
-      break;
                        }
     default:
       return false;
