@@ -318,7 +318,7 @@ SemanticDeclarationNode VariableUsage::getType(SubSemanticNode s) {
   if (!this->type) {
     try {
       this->type = s->getNode(this->name);
-    } catch (SemanticException e) {
+    } catch (const SemanticException & e) {
         throw ParsingException(std::string("Struct has no member " + name), this->pos());
     }
   }
