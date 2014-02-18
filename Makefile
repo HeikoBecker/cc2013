@@ -53,6 +53,10 @@ profile: CXXFLAGS += -pg
 profile: LDFLAGS += -pg
 profile: $(BIN)
 
+analyze:
+	@echo "===> CLEAN"
+	$(Q)cppcheck  --force --enable=all --std=c++11 --inconclusive -j 4  ./src 2> cpp_report.txt
+
 -include $(CFG).cfg
 -include $(DEP)
 
