@@ -7,6 +7,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <cstdio>
 #include "parser/pprinter.h"
 #include "codegen/cogen.h"
 #include "utils/debug.h"
@@ -24,6 +25,11 @@ enum class Mode {
 
 int main(int argc, char** const argv)
 {
+  // speed up I/O
+  constexpr auto buffersize = 1024*1024*4;
+  static char buffer[buffersize];
+  std::setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
+
   llvm::sys::PrintStackTraceOnErrorSignal();
   llvm::PrettyStackTraceProgram X(argc, argv);
 
