@@ -39,7 +39,6 @@ static const std::unordered_set<std::string> keywords =
 }};
 
 bool Lexer::consumePunctuator() {
-#define MAXOPLENGTH 3
   auto foundPuntcutor = false;
   auto matched = false;
   static std::string partial;
@@ -103,7 +102,6 @@ bool Lexer::consumePunctuator() {
       return false;
     }
   } while (true);
-#undef MAXOPLENGTH 
 }
 
 bool Lexer::consumeComment() {
@@ -391,35 +389,6 @@ std::shared_ptr<Token> Lexer::getNextToken() {
   }
   return genToken(TokenType::END);
 }
-
-#if 0
-std::vector<Token> Lexer::lex() {
-  /* delim is the current token deliminator
-   * it is WHITESPACE, except when a (double) quote has been previously
-   * encountered 
-   */
-
-  std::vector<Token> tokenList = std::vector<Token>();
-  while (true) {
-    Token token = getNextToken();
-
-    if(token.type() == TokenType::END) {
-      tokenList.push_back(token);
-      break;
-    } else if (token.type() == TokenType::ILLEGAL) {
-      // report error
-      std::ostringstream msg;
-      msg << "Got illegal token: " 
-          << static_cast<unsigned char>(tracker.current ()) 
-          << std::endl;
-      throw LexingException(msg.str(), tracker.currentPosition ());
-    } else {
-      tokenList.push_back(tokens[0]);
-    }
-  }
-  return tokenList;
-};
-#endif
 
 std::shared_ptr<Token> Lexer::genToken(TokenType type) {
   if (TokenType::PUNCTUATOR == type) {
