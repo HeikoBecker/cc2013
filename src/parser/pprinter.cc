@@ -5,6 +5,21 @@
 #include "../utils/debug.h"
 #include "../utils/util.h"
 
+/*~~~~~~~~~~~~~~~~~~~~~HIC SUNT DRACONES~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            
+                           _     //` `\
+                       _,-"\%   // /``\`\
+                  ~^~ >__^  |% // /  } `\`\
+                         )  )%// / }  } }`\`\
+                        /  (%/'/.\_/\_/\_/\`/
+                       (    '         `-._`
+                        \   ,     (  \   _`-.__.-;%>
+                       /_`\ \      `\ \." `-..-'`
+                      ``` /_/`"-=-'`/_/
+                 jgs     ```       ```
+     (source: http://www.geocities.com/spunk1111/mythical2.htm)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 namespace Parsing {
 
 void pprint(std::string s, unsigned int indentLevel)
@@ -438,10 +453,8 @@ PRETTY_PRINT(FunctionDefinition) {
   /*TODO: unfinished */
   PPRINT(this->type);
   PPRINT(' ');
-  PPRINT('('); // <- WTF, that's a really coding style
   g_adjustParenthesesInDeclarator = true;
   PPRINT(this->declarator);
-  PPRINT(')');
   PPRINT(this->compoundStatement);
   PPRINT('\n');
   debug(PARSER) << "ExternalDeclaration END";
@@ -451,12 +464,25 @@ PRETTY_PRINT(FunctionDefinition) {
 
 PRETTY_PRINT(IdentifierDirectDeclarator) {
   /*TODO: unfinished*/
-  PPRINT(this->identifier);
   auto numDiDeHelp = help.size();
+  /*
+   *  Reasoning about copy:
+   *  if something follows the identifier direct declarator, it should be a
+   *  function declaration/definition, therefore we put it in parentheses
+   *  FIXME: I have no idea if this is actually correct...
+   */
+  auto copy = numDiDeHelp;
+  if (copy) {
+    PPRINT('(');
+  }
+  PPRINT(this->identifier);
   // TODO: we might need to print helpers which are not the last one in
   // parentheses
   while (numDiDeHelp) {
     PPRINT(help.at(--numDiDeHelp));
+  }
+  if (copy) {
+    PPRINT(')');
   }
 }
 
