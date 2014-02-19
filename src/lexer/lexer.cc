@@ -7,6 +7,7 @@
 #include "token.h"
 #include "../utils/debug.h"
 #include <unordered_set>
+#include <cstdio>
 
 #define ABORT do {throw std::exception();} while (false)
 
@@ -501,7 +502,7 @@ void FileTracker::storePosition() {
 
 void Lexing::printToken(const Token & token) {
   auto posinfo = token.pos();
-  std::string tokentype {};
+  const char *tokentype;
   switch (token.type()) {
     case TokenType::KEYWORD:
       tokentype = "keyword";
@@ -522,7 +523,7 @@ void Lexing::printToken(const Token & token) {
     default:
       ABORT;
   }
-  std::cout << posinfo.name << ":" << posinfo.line << ":" << posinfo.column 
-            << ": " << tokentype << " " << token.value() 
-            << "\n";
+  std::printf("%s:%u:%u: %s %s\n",
+              posinfo.name, posinfo.line, posinfo.column,
+              tokentype, token.value().c_str());
 }
