@@ -185,9 +185,10 @@ PRETTY_PRINT(BasicType)
 
 PRETTY_PRINT(StructType) {
   // TODO: this looks way too complicated
-  PPRINT(std::string("struct "));
+  PPRINT(std::string("struct"));
 
-  if (name.length() > 0) {
+  if (name.length() > 0 && (name[0] != '@')) {
+    PPRINT(' ');
     PPRINT(name);
   }
 
