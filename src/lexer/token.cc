@@ -56,51 +56,36 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
 KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)
   : Token(type, posinfo, value) 
 {
-  if (value == "auto") {
-    m_keywordtype = KeywordType::AUTO;
-  } else if (value == "break") {
-    m_keywordtype = KeywordType::BREAK;
-  } else if (value == "case") {
-    m_keywordtype = KeywordType::CASE;
-  } else if (value == "char") {
-    m_keywordtype = KeywordType::CHAR;
-  } else if (value == "const") {
-    m_keywordtype = KeywordType::CONST;
-  } else if (value == "continue") {
-    m_keywordtype = KeywordType::CONTINUE;
-  } else if (value == "default") {
-    m_keywordtype = KeywordType::DEFAULT;
-  } else if (value == "do") {
-    m_keywordtype = KeywordType::DO;
-  } else if (value == "double") {
-    m_keywordtype = KeywordType::DOUBLE;
-  } else if (value == "else") {
-    m_keywordtype = KeywordType::ELSE;
-  } else if (value == "enum") {
-    m_keywordtype = KeywordType::ENUM;
-  } else if (value == "float") {
-    m_keywordtype = KeywordType::FLOAT;
-  } else if (value == "for") {
-    m_keywordtype = KeywordType::FOR;
-  } else if (value == "goto") {
-    m_keywordtype = KeywordType::GOTO;
-  } else if (value == "if") {
-    m_keywordtype = KeywordType::IF;
-  } else if (value == "int") {
-    m_keywordtype = KeywordType::INT;
-  } else if (value == "return") {
-    m_keywordtype = KeywordType::RETURN;
-  } else if (value == "sizeof") {
-    m_keywordtype = KeywordType::SIZEOF;
-  } else if (value == "struct") {
-    m_keywordtype = KeywordType::STRUCT;
-  } else if (value == "switch") {
-    m_keywordtype = KeywordType::SWITCH;
-  } else if (value == "void") {
-    m_keywordtype = KeywordType::VOID;
-  } else if (value == "while") {
-    m_keywordtype = KeywordType::WHILE;
+  static const std::map<std::string, KeywordType> lookup
+  {
+    {"auto", KeywordType::AUTO},
+    {"break", KeywordType::BREAK},
+    {"case", KeywordType::CASE},
+    {"char", KeywordType::CHAR},
+    {"const", KeywordType::CONST},
+    {"continue", KeywordType::CONTINUE},
+    {"default", KeywordType::DEFAULT},
+    {"do", KeywordType::DO},
+    {"double", KeywordType::DOUBLE},
+    {"else", KeywordType::ELSE},
+    {"enum", KeywordType::ENUM},
+    {"float", KeywordType::FLOAT},
+    {"for", KeywordType::FOR},
+    {"goto", KeywordType::GOTO},
+    {"if", KeywordType::IF},
+    {"int", KeywordType::INT},
+    {"return", KeywordType::RETURN},
+    {"sizeof", KeywordType::SIZEOF},
+    {"struct", KeywordType::STRUCT},
+    {"switch", KeywordType::SWITCH},
+    {"void", KeywordType::VOID},
+    {"while", KeywordType::WHILE},
+  };
+  const std::map<std::string, KeywordType>::const_iterator result = lookup.find(value);
+  if (result == lookup.cend()) {
+    m_keywordtype =  KeywordType::WHO_CARES;
   } else {
-    m_keywordtype = KeywordType::WHO_CARES;
+    m_keywordtype = result->second;
   }
+  
 }
