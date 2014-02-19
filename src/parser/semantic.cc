@@ -389,7 +389,6 @@ bool hasRealType(SubExpression s) {
 bool isNullPtrConstant(SubExpression s);
 
 bool isNullPtrConstant(SubExpression s) {
-  // TODO: this has to check if the constant is actually 0
   if (auto s_as_constant = dynamic_pointer_cast<Constant>(s)) {
     if (dynamic_pointer_cast<NullDeclaration>(s_as_constant->getType())) {
       return true;

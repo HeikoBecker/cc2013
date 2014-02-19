@@ -207,6 +207,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       this->type = make_shared<IntDeclaration>();
       break;
     case PunctuatorType::ASSIGN:
+      {
       /* 6.5.16 $2:
        * An assignment operator shall have a modifiable lvalue as its left operand.
        * WARNING: We currently don't have non-modifiable lvalues, because string
@@ -217,19 +218,47 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         throw ParsingException("The left operand of an assignment must be a lvalue",
              pos);
       }
-      /* TODO: this needs more checks! Check the legality of the following
-       *  lhs is pointer, rhs is int
-       *  lhs is pointer, rhs is null pointer constant
-       *  lhs is int, rhs is pointer
+      /* FIXME: this is probably wrong, allowing too much (can we really apply
+       * the usual conversions here?)!
+       * Check the legality of the following
+       *  lhs is pointer, rhs is int => not allowed
+       *  lhs is pointer, rhs is null pointer constant => done
+       *  lhs is int, rhs is pointer => not allowed
        *  more?
        */
-      if (!(hasArithmeticType(lhs) && hasArithmeticType(rhs))) {
-        if (!compareTypes(lhs->getType(), rhs->getType())) { // TODO: is operator== already implemented?
-          throw ParsingException("More work remaining! ", pos);
+      auto valid = false;
+      if (compareTypes(lhs->getType(), rhs->getType())) {
+        valid = true;
+      } else if ((hasArithmeticType(lhs) && hasArithmeticType(rhs))) {
+        auto types_after_conversion = applyUsualConversions(lhs->getType(), rhs->getType());
+        if (compareTypes(types_after_conversion.first, types_after_conversion.second)) {
+          valid = true;
+        }
+      } else if (auto lhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(lhs)) {
+        if (isNullPtrConstant(rhs)) {
+          valid = true;
+        }
+      } else if (isNullPtrConstant(rhs)) {
+        auto lhs_type = lhs->getType();
+        switch (lhs_type->type()) {
+          case Semantic::Type::INT:
+          case Semantic::Type::CHAR:
+            valid = true;
+            break;
+          default:
+            break;
         }
       }
       this->type = lhs->getType();
+      if (!valid) {
+        std::stringstream errmsg;
+        errmsg << "Assignment invalid, <descriptive error messages here>!\n"
+               << "lhs has type " << lhs->getType()->toString() << '\n'
+               << "rhs has type " << rhs->getType()->toString() << '\n';
+        throw ParsingException(errmsg.str(), pos);
+      }
       break;
+      }
     default:
       throw ParsingException(std::string() + "Implement this! " + Lexing::PunctuatorType2String(op), pos);
       break;
