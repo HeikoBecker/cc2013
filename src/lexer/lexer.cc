@@ -252,9 +252,14 @@ bool Lexer::consumeQuoted() {
         }
       }
     } else if ('\n' == tracker.current()) {
+      tracker.rewind();
+      auto pos = tracker.currentPosition();
+      pos.column++;
+      tracker.advance();
       throw LexingException(
-        "Found newline in string literal. Maybe you forgot to add a \" or \\n.",
-        tracker.currentPosition()
+        "Found newline in string literal. Maybe you forgot to add a \" or "
+        "actually wanted to use \\n.",
+        pos
       );
     } else if (singlequote && tracker.current() == '\'') {
       // end of character constant
