@@ -242,10 +242,10 @@ bool Lexer::consumeQuoted() {
             break;
           default:
             //report error
-            // current position would be the character after the \, we fail a
-            // unit test with this approach; so lets point to the \ instead
+            // small hack to reliably get position of the backslash
+            tracker.rewind();
             auto pos = tracker.currentPosition();
-            pos.column--;
+            tracker.advance();
             throw LexingException( std::string("Invalid escape sequence \\") 
                                   + static_cast<char>(tracker.current())
                 , pos);
@@ -485,6 +485,11 @@ void FileTracker::rewind() {
     m_position.line--;
     m_position.column = m_lastCollumn;
   } else {
+#ifdef DEBUG
+    if (m_position.column == 0) {
+      ABORT;
+    }
+#endif
     m_position.column--;
   }
   auto result =  std::ungetc(m_current, stream);
