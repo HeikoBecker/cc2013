@@ -1,0 +1,82 @@
+ DECL : a : function (char) returning int
+ DECL : c : char
+[1;33mLexer: [0mAdvancing... got i
+[1;33mLexer: [0mAdvancing... got n
+[1;33mLexer: [0mAdvancing... got t
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mAdvancing... got a
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got a
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mAdvancing... got (
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got (
+[1;33mLexer: [0mAdvancing... got c
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got c
+[1;33mLexer: [0mAdvancing... got h
+[1;33mLexer: [0mAdvancing... got a
+[1;33mLexer: [0mAdvancing... got r
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mAdvancing... got c
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got c
+[1;33mLexer: [0mAdvancing... got )
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got )
+[1;33mLexer: [0mAdvancing... got {
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got {
+[1;33mLexer: [0mAdvancing... got 
+
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got 
+
+[1;33mLexer: [0mAdvancing... got !
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got !
+[1;33mLexer: [0mAdvancing... got b
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got b
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mAdvancing... got =
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got =
+[1;33mLexer: [0mAdvancing... got =
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got  
+[1;33mLexer: [0mAdvancing... got f
+[1;33mLexer: [0mrewinding...
+
+[1;33mLexer: [0mAdvancing... got f
+[1;33mLexer: [0mAdvancing... got ;
+[1;33mLexer: [0mrewinding...
+
+expression_test1.c:2:2: error: b is not declared in this scope
+!b == f;
+ ^^^^
+1 error(s)

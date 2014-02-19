@@ -1,0 +1,293 @@
+1c1,11
+< int foo;
+---
+>  DECL : foo : int
+>  DECL : bar : void
+>  DECL : ptr : **char
+>  DECL : i : int
+>  DECL : c : char
+>  DECL : func : function (int,char) returning @s
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+3c13,15
+< void bar;
+---
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got f
+> [1;33mLexer: [0mrewinding...
+5c17,21
+< char (*(*ptr));
+---
+> [1;33mLexer: [0mAdvancing... got f
+> [1;33mLexer: [0mAdvancing... got o
+> [1;33mLexer: [0mAdvancing... got o
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mrewinding...
+7,11c23,24
+< struct s
+< {
+< 	int i;
+< 	char c;
+< } (func(int, char ch));
+---
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mAdvancing... got 
+13c26
+< int int (func2(int (*(*))));
+---
+> [1;33mLexer: [0mrewinding...
+15,19c28,272
+< void struct
+< {
+< 	void v;
+< 	int ((*f)(void));
+< } (func3(char ((*(*))(int, void))));
+---
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mAdvancing... got v
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got v
+> [1;33mLexer: [0mAdvancing... got o
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got d
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got b
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got b
+> [1;33mLexer: [0mAdvancing... got a
+> [1;33mLexer: [0mAdvancing... got r
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got h
+> [1;33mLexer: [0mAdvancing... got a
+> [1;33mLexer: [0mAdvancing... got r
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got (
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got (
+> [1;33mLexer: [0mAdvancing... got *
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got *
+> [1;33mLexer: [0mAdvancing... got *
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got *
+> [1;33mLexer: [0mAdvancing... got p
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got p
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got r
+> [1;33mLexer: [0mAdvancing... got )
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got )
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mAdvancing... got s
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got s
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got r
+> [1;33mLexer: [0mAdvancing... got u
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got s
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got s
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got {
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got {
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got h
+> [1;33mLexer: [0mAdvancing... got a
+> [1;33mLexer: [0mAdvancing... got r
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got }
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got }
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got f
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got f
+> [1;33mLexer: [0mAdvancing... got u
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got (
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got (
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got ,
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got ,
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got h
+> [1;33mLexer: [0mAdvancing... got a
+> [1;33mLexer: [0mAdvancing... got r
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got h
+> [1;33mLexer: [0mAdvancing... got )
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got )
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got ;
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got 
+> 
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got i
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got t
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got  
+> [1;33mLexer: [0mAdvancing... got f
+> [1;33mLexer: [0mrewinding...
+> 
+> [1;33mLexer: [0mAdvancing... got f
+> [1;33mLexer: [0mAdvancing... got u
+> [1;33mLexer: [0mAdvancing... got n
+> [1;33mLexer: [0mAdvancing... got c
+> [1;33mLexer: [0mAdvancing... got 2
+> [1;33mLexer: [0mAdvancing... got (
+> [1;33mLexer: [0mrewinding...
+> 
+> declarations.c:5:5: error: error in direct Declarator
+> Last read symbol was int
+> int int func2(int**);
+>     ^^^^
+> 1 error(s)
