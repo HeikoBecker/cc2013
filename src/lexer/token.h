@@ -23,29 +23,31 @@ namespace Lexing {
   class Token {
     public:
       Token(TokenType type, Pos posinfo, std::string value); 
-      TokenType type() const {return this->m_type;}
-      Pos pos() const {return this->m_posinfo;}
+      const TokenType & type() const {return this->m_type;}
+      const Pos & pos() const {return this->m_posinfo;}
       std::string value() const {return this->m_value;}
     private:
-      TokenType m_type;
-      Pos m_posinfo; 
-      std::string m_value;
+      const TokenType m_type;
+      const Pos m_posinfo; 
+      const std::string m_value;
   };
 
   class PunctuatorToken : public Token {
     public:
       PunctuatorToken(TokenType type, Pos posinfo, std::string value);
-      PunctuatorType punctype() const {return this->m_puncttype;};
+      const PunctuatorType & punctype() const {return this->m_puncttype;};
     private:
-      PunctuatorType m_puncttype;
+      const PunctuatorType m_puncttype;
+      static const PunctuatorType & string2punctuator(std::string value);
   };
 
   class KeywordToken : public Token {
     public:
       KeywordToken(TokenType type, Pos posinfo, std::string value);
-      KeywordType keywordtype() const {return this->m_keywordtype;};
+      const KeywordType & keywordtype() const {return this->m_keywordtype;};
     private:
-      KeywordType m_keywordtype;
+      const KeywordType & m_keywordtype;
+      static const KeywordType & string2keyword(std::string value);
   };
 
   class ConstantToken : public Token {

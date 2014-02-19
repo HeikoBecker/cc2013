@@ -13,8 +13,11 @@ ConstantToken::ConstantToken(Pos posinfo, std::string value, ConstantType ct)
 
 
 PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
-  : Token(type, posinfo, value) {
-    static const std::map<std::string, PunctuatorType> lookup
+  : Token(type, posinfo, value), m_puncttype(string2punctuator(value)) {
+  }
+
+const PunctuatorType & PunctuatorToken::string2punctuator(std::string value) {
+    static const std::map<std::string, const PunctuatorType> lookup
     {
       {"+", PunctuatorType::PLUS},
       {"-", PunctuatorType::MINUS},
@@ -45,18 +48,23 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       {",", PunctuatorType::COMMA},
       {".", PunctuatorType::MEMBER_ACCESS},
     };
-    const std::map<std::string, PunctuatorType>::const_iterator result = lookup.find(value);
+    static const auto illegal = PunctuatorType::ILLEGAL;
+    const std::map<std::string, const PunctuatorType>::const_iterator result = lookup.find(value);
     if (result == lookup.cend()) {
-      m_puncttype =  PunctuatorType::ILLEGAL;
+      return illegal;
     } else {
-      m_puncttype = result->second;
+      return result->second;
     }
-  }
+}
 
 KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)
-  : Token(type, posinfo, value) 
+  : Token(type, posinfo, value), m_keywordtype(string2keyword(value))
 {
-  static const std::map<std::string, KeywordType> lookup
+
+}
+
+const KeywordType & KeywordToken::string2keyword(std::string value) {
+  static const std::map<std::string,const KeywordType> lookup
   {
     {"auto", KeywordType::AUTO},
     {"break", KeywordType::BREAK},
@@ -81,11 +89,11 @@ KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)
     {"void", KeywordType::VOID},
     {"while", KeywordType::WHILE},
   };
-  const std::map<std::string, KeywordType>::const_iterator result = lookup.find(value);
+  static const KeywordType & who_cares = KeywordType::WHO_CARES;
+  const std::map<std::string, const KeywordType>::const_iterator result = lookup.find(value);
   if (result == lookup.cend()) {
-    m_keywordtype =  KeywordType::WHO_CARES;
+    return who_cares;
   } else {
-    m_keywordtype = result->second;
+    return result->second;
   }
-  
 }
