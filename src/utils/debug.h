@@ -5,13 +5,17 @@
 #include <iostream>
 #include <sstream>
 
+
 typedef enum debugFilter {
-  LEXER   = 0x001,
-  PARSER  = 0x002,
-  PRINT_AST     = 0x003,
-  CODEGEN = 0x004,
-  GENERAL = 0x005,
+  SILENT = 0x000,
+  LEXER   = 1 << 0,
+  PARSER  = 1 << 1,
+  PRINT_AST     = 1 << 2,
+  CODEGEN = 1 << 3,
+  GENERAL = 1 << 4,
 } debugFilter;
+
+constexpr debugFilter filter = SILENT;
 
 #ifdef DEBUG
 struct debug {
