@@ -247,11 +247,14 @@ SemanticDeclarationNode SemanticTree::helpConvert(
 
 SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
 
+  SemanticDeclarationNode ret;
   if (declarator && typeNode) {
     string name = declarator->getIdentifier();
+    if (name == "@NAMELESS") {
+      return  ret;
+    }
     string type = typeNode->toString();
 
-    SemanticDeclarationNode ret;
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
 #ifdef DEBUG
