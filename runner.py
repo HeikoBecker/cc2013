@@ -40,11 +40,11 @@ def run(testdir=None):
     msg("Running tests in {}".format(testdir))
     subdirs = next(os.walk(testdir))[1]
     for directory in subdirs:
-        options =  ["--parse"]
-        if directory == "lexer":
-            options = ["--tokenize"]
-        elif directory == "pretty":
-            options = ["--print-ast"]
+        try:
+            with open(os.path.join(testdir, directory, "c4flags.config")) as cf:
+                options = [cf.read().strip()]
+        except IOError:
+            options = ["--parse"]
         counter = 0
         msg("Entering {}".format(directory))
         # all files ending with c in pass should pass
