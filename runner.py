@@ -60,7 +60,7 @@ def run(testdir=None):
                         print("T", end="")
                     else:
                         print("F", end="")
-                        failed_tests_pass.append(test_file)
+                        failed_tests_pass.append((test_file, o[2]))
                 if counter == 80:
                     counter = 0
                     print("\n", end="")
@@ -94,7 +94,7 @@ def run(testdir=None):
     if failed_tests_pass:
         msg("The following tests have failed, but should not:")
         for failed in failed_tests_pass:
-            print("\t" + failed)
+            print("\t" + failed[0], "\noutput was\n" + failed[1].decode("utf-8"))
     if failed_tests_fail:
         msg("The following tests have not failed, but should have:")
         for failed in failed_tests_fail:
