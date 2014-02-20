@@ -13,8 +13,11 @@ ConstantToken::ConstantToken(Pos posinfo, std::string value, ConstantType ct)
 
 
 PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
-  : Token(type, posinfo, value) {
-    static const std::map<std::string, PunctuatorType> lookup
+  : Token(type, posinfo, value), m_puncttype(string2punctuator(value)) {
+  }
+
+const PunctuatorType & PunctuatorToken::string2punctuator(std::string value) {
+    static const std::map<std::string, const PunctuatorType> lookup
     {
       {"+", PunctuatorType::PLUS},
       {"-", PunctuatorType::MINUS},
@@ -45,62 +48,52 @@ PunctuatorToken::PunctuatorToken(TokenType type, Pos posinfo, std::string value)
       {",", PunctuatorType::COMMA},
       {".", PunctuatorType::MEMBER_ACCESS},
     };
-    const std::map<std::string, PunctuatorType>::const_iterator result = lookup.find(value);
+    static const auto illegal = PunctuatorType::ILLEGAL;
+    const std::map<std::string, const PunctuatorType>::const_iterator result = lookup.find(value);
     if (result == lookup.cend()) {
-      m_puncttype =  PunctuatorType::ILLEGAL;
+      return illegal;
     } else {
-      m_puncttype = result->second;
+      return result->second;
     }
-  }
+}
 
 KeywordToken::KeywordToken(TokenType type, Pos posinfo, std::string value)
-  : Token(type, posinfo, value) 
+  : Token(type, posinfo, value), m_keywordtype(string2keyword(value))
 {
-  if (value == "auto") {
-    m_keywordtype = KeywordType::AUTO;
-  } else if (value == "break") {
-    m_keywordtype = KeywordType::BREAK;
-  } else if (value == "case") {
-    m_keywordtype = KeywordType::CASE;
-  } else if (value == "char") {
-    m_keywordtype = KeywordType::CHAR;
-  } else if (value == "const") {
-    m_keywordtype = KeywordType::CONST;
-  } else if (value == "continue") {
-    m_keywordtype = KeywordType::CONTINUE;
-  } else if (value == "default") {
-    m_keywordtype = KeywordType::DEFAULT;
-  } else if (value == "do") {
-    m_keywordtype = KeywordType::DO;
-  } else if (value == "double") {
-    m_keywordtype = KeywordType::DOUBLE;
-  } else if (value == "else") {
-    m_keywordtype = KeywordType::ELSE;
-  } else if (value == "enum") {
-    m_keywordtype = KeywordType::ENUM;
-  } else if (value == "float") {
-    m_keywordtype = KeywordType::FLOAT;
-  } else if (value == "for") {
-    m_keywordtype = KeywordType::FOR;
-  } else if (value == "goto") {
-    m_keywordtype = KeywordType::GOTO;
-  } else if (value == "if") {
-    m_keywordtype = KeywordType::IF;
-  } else if (value == "int") {
-    m_keywordtype = KeywordType::INT;
-  } else if (value == "return") {
-    m_keywordtype = KeywordType::RETURN;
-  } else if (value == "sizeof") {
-    m_keywordtype = KeywordType::SIZEOF;
-  } else if (value == "struct") {
-    m_keywordtype = KeywordType::STRUCT;
-  } else if (value == "switch") {
-    m_keywordtype = KeywordType::SWITCH;
-  } else if (value == "void") {
-    m_keywordtype = KeywordType::VOID;
-  } else if (value == "while") {
-    m_keywordtype = KeywordType::WHILE;
+
+}
+
+const KeywordType & KeywordToken::string2keyword(std::string value) {
+  static const std::map<std::string,const KeywordType> lookup
+  {
+    {"auto", KeywordType::AUTO},
+    {"break", KeywordType::BREAK},
+    {"case", KeywordType::CASE},
+    {"char", KeywordType::CHAR},
+    {"const", KeywordType::CONST},
+    {"continue", KeywordType::CONTINUE},
+    {"default", KeywordType::DEFAULT},
+    {"do", KeywordType::DO},
+    {"double", KeywordType::DOUBLE},
+    {"else", KeywordType::ELSE},
+    {"enum", KeywordType::ENUM},
+    {"float", KeywordType::FLOAT},
+    {"for", KeywordType::FOR},
+    {"goto", KeywordType::GOTO},
+    {"if", KeywordType::IF},
+    {"int", KeywordType::INT},
+    {"return", KeywordType::RETURN},
+    {"sizeof", KeywordType::SIZEOF},
+    {"struct", KeywordType::STRUCT},
+    {"switch", KeywordType::SWITCH},
+    {"void", KeywordType::VOID},
+    {"while", KeywordType::WHILE},
+  };
+  static const KeywordType & who_cares = KeywordType::WHO_CARES;
+  const std::map<std::string, const KeywordType>::const_iterator result = lookup.find(value);
+  if (result == lookup.cend()) {
+    return who_cares;
   } else {
-    m_keywordtype = KeywordType::WHO_CARES;
+    return result->second;
   }
 }

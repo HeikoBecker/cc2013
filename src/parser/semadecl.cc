@@ -84,8 +84,13 @@ bool Semantic::compareTypes(SemanticDeclarationNode s1, SemanticDeclarationNode 
       return compareTypes(ptype1->pointee(), ptype2->pointee());
                         }
     case Type::STRUCT: {
-      auto stypes1 = std::static_pointer_cast<StructDeclaration>(s1)->node()->type();
-      auto stypes2 = std::static_pointer_cast<StructDeclaration>(s2)->node()->type();
+      auto struct1 = std::static_pointer_cast<StructDeclaration>(s1);
+      auto struct2 = std::static_pointer_cast<StructDeclaration>(s2);
+      if (struct1->toString() != struct2->toString()) {
+        return false;
+      }
+      auto stypes1 = struct1->node()->type();
+      auto stypes2 = struct2->node()->type();
       // check if the structs are equal by checking equality of every member
       // where equality means that both name and type are equal
       if (stypes1.size() != stypes2.size()) {return false;}
