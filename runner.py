@@ -46,7 +46,7 @@ def run(testdir=None):
         except IOError:
             options = ["--parse"]
         counter = 0
-        msg("Entering {}".format(directory))
+        msg("Entering {}, using options {}".format(directory, *options))
         # all files ending with c in pass should pass
         pass_folder = os.path.join(testdir, directory, "pass")
         should_pass = os.path.join(pass_folder, "*.c")
