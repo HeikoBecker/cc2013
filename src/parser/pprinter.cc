@@ -503,7 +503,9 @@ PRETTY_PRINT(DeclaratorDirectDeclarator)
   if (numDiDeHelp > 0) {
     PPRINT('(');
   }
-  PPRINT(declarator);
+  if (declarator) {
+    PPRINT(declarator);
+  }
   if (numDiDeHelp > 0) {
     PPRINT(help.at(--numDiDeHelp));
     while (numDiDeHelp) {
