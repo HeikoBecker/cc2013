@@ -32,6 +32,7 @@ def c4(filename, params):
 
 
 def run(testdir=None):
+    test_count = 0
     if testdir is None:
         testdir = os.path.join(os.path.abspath(os.path.curdir), "tests")
     failed_tests_pass = []
@@ -51,6 +52,7 @@ def run(testdir=None):
         should_pass = os.path.join(pass_folder, "*.c")
         if os.path.isdir(pass_folder):
             for test_file in glob.iglob(should_pass):
+                test_count += 1
                 counter += 1
                 o = c4(test_file, options)
                 if (o[0]) == 0:
@@ -69,6 +71,7 @@ def run(testdir=None):
         fail_folder = os.path.join(directory, "fail")
         if os.path.isdir(fail_folder):
             for test_file in glob.iglob(should_pass):
+                test_count += 1
                 counter += 1
                 o = c4(test_file, options)
                 if (o[0]) == 0:
@@ -99,6 +102,10 @@ def run(testdir=None):
         msg("The following tests have not failed, but should have:")
         for failed in failed_tests_fail:
             print("\t" + failed)
+    msg("{} of {} tests passed".format(
+        test_count - len(failed_tests_fail) - len(failed_tests_pass),
+        test_count)
+    )
 
 
 
