@@ -121,7 +121,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
    class ASTNODE(Declarator) {
     public:
       Declarator(int cnt, SubDirectDeclarator ast, Pos pos);
-      std::string getIdentifier() { return directDeclarator->getIdentifier(); }
+      std::string getIdentifier() { return (directDeclarator ? directDeclarator->getIdentifier() : "FIX THIS!"); }
       int getCounter() { return pointerCounter; }
       std::vector<ParameterNode> getParameter() { 
         return directDeclarator->getParameter(); 
