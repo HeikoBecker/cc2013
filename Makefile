@@ -35,7 +35,7 @@ LDFLAGS  += $(LLVM_LDFLAGS)
 
 DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
 
-.PHONY: all clean
+.PHONY: all clean check analyze
 
 all: $(BIN)
 
@@ -53,8 +53,11 @@ profile: CXXFLAGS += -pg
 profile: LDFLAGS += -pg
 profile: $(BIN)
 
+check:	$(BIN)
+	python3 runner.py 
+
 analyze:
-	@echo "===> CLEAN"
+	@echo "===> ANALYZE"
 	$(Q)cppcheck  --force --enable=all --std=c++11 --inconclusive -j 4  ./src 2> cpp_report.txt
 
 -include $(CFG).cfg
