@@ -259,12 +259,8 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         if (lhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
           if (rhs->getType()->type() == Semantic::Type::POINTER) {
             valid = true;
-          } else {
-             std::cerr << "wtf?";
           }
         }
-      } else {
-             std::cerr << "wtf2?";
       }
       this->type = lhs->getType();
       if (!valid) {
