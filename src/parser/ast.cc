@@ -151,7 +151,11 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs->getType());
         // TODO: function pointer conversion must fail
         if (lhs_as_ptr && rhs_as_ptr) {
-          this->type = make_shared<IntDeclaration>();
+          if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
+            this->type = make_shared<IntDeclaration>();
+          } else {
+          throw ParsingException(std::string("TODO: good message!"), this->pos());
+          }
         } else {
           throw ParsingException(std::string("Comparision requires both operands to be either pointer to object or to be of real type."), this->pos());
         }
