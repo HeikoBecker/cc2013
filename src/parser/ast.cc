@@ -234,7 +234,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         if (compareTypes(types_after_conversion.first, types_after_conversion.second)) {
           valid = true;
         }
-      } else if (auto lhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(lhs)) {
+      } else if (lhs->getType()->type() == Semantic::Type::POINTER) {
         if (isNullPtrConstant(rhs)) {
           valid = true;
         }
