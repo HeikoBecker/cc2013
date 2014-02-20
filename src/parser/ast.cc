@@ -114,7 +114,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         t = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
       }
       if (t) {
-        this->type = t->pointee();
+        this->type = t;
         break;
       }
       throw ParsingException(std::string("Incompatible types for +"), lhs->pos());
