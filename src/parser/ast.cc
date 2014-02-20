@@ -152,9 +152,8 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         // TODO: function pointer conversion must fail
         if (lhs_as_ptr && rhs_as_ptr) {
           if (isObjectType(lhs_as_ptr->pointee()) && isObjectType(rhs_as_ptr->pointee())) {
-            throw ParsingException(std::string("TODO: good message!"), this->pos());
           } else {
-          
+            throw ParsingException(std::string("TODO: good message!"), this->pos());
           }
           if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
             this->type = make_shared<IntDeclaration>();
