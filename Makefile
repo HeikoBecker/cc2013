@@ -35,7 +35,7 @@ LDFLAGS  += $(LLVM_LDFLAGS)
 
 DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
 
-.PHONY: all clean check analyze
+.PHONY: all clean check analyze coverage
 
 all: $(BIN)
 
@@ -44,6 +44,14 @@ debug: CXXFLAGS += -DDEBUG -g -Wextra -pedantic-errors -O0 -fsanitize=address -f
 debug: CPPFLAGS += -fsanitize=address
 debug: LDFLAGS += -fsanitize=address
 debug: $(BIN)
+	@echo $(CXXFLAGS)
+
+coverage: CFLAGS += -fprofile-arcs -ftest-coverage
+coverage: CXXFLAGS += -fprofile-arcs -ftest-coverage
+coverage: LDFLAGS += -lgcov
+coverage: debug
+	
+
 
 quick: CFLAGS += -O0
 quick: $(BIN)
