@@ -1,0 +1,6 @@
+1c1,3
+< test_cond_if_error.c:8:7: error: Expected ')' but found ';'
+---
+> test_cond_if_error.c:9:7: error: Expected ) but got ;
+> 	if (a; b){
+> 	     ^^^^

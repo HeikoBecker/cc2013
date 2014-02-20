@@ -1,0 +1,4 @@
+sizeof_fp.c:2:1: error: The left operand of an assignment must be a lvalue
+&x = sizeof(void (*)(int)); // get the size of a pointer to a int->void function
+^^^^
+1 error(s)

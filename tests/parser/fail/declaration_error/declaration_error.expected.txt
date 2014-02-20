@@ -1,0 +1,2 @@
+declaration_error.c:1:6: error: Expected ';' but found 'EOF'
+1 error(s)

@@ -1,0 +1,4 @@
+test_cond_if_error.c:9:7: error: Expected ) but got ;
+	if (a; b){
+	     ^^^^
+1 error(s)

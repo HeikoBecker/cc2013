@@ -1,0 +1,27 @@
+1,21c1,4
+< void (blub())
+< {
+< 	if ((a + b)) {
+< 		;
+< 	} else
+< 		;
+< 	while ((a[9])) {
+< 		;
+< 	}
+< 	if ((((a->b).c) = (7 = (a || b))))
+< 		if ((a ? b : c), (a = (a ? b : 7))) {
+< 		} else {
+< 			while ((7 ? (a = (b ? (a[9]) : (a || b))) : ((z && a) || (b + d)))) {
+< 				goto b;
+< 				continue;
+< 				break;
+< 				return;
+< 			}
+< 		}
+< 	return (a ? b, (a[8]), (a || c), (a && (((a[9]) + (1->b)) - (d.c))) : ((a < b) != (a < b)));
+< }
+---
+> test_if_while.c:25:16: error: Second and third operand of conditional operator have unsuiting types *int and int
+> 		while(7? a = b ? c[9] : a || b : e && a || b + d) {
+> 		             ^^^^
+> 1 error(s)

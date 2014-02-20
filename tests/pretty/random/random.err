@@ -1,0 +1,4 @@
+random.c:15:4: error: Trying to access struct member, but left operand is not a struct, but a **@G
+		c[9]->b->o.p = a = b ? c : d;
+		 ^^^^
+1 error(s)

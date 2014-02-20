@@ -1,0 +1,6 @@
+int (main(int (*x)))
+{
+	((&x) = (sizeof(void((*)(int)))));
+	((&x) = (sizeof(void((*)(int, char)))));
+	((&x) = (sizeof (x + x)));
+}

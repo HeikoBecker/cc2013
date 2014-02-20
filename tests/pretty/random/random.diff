@@ -1,0 +1,37 @@
+1,31c1,4
+< int (main(int x))
+< {
+< 	{
+< 		int a;
+< 		(a = ((((7 * 8) * 9) * 10) + 3));
+< 		(a = 7);
+< 		(a = (((a + b) * 8) * (7 * 9)));
+< 		(((((a[9])->b)->o).p) = (a = (b ? c : d)));
+< 		(sizeof blub);
+< 		{
+< 		}
+< 	}
+< 	{
+< 		{
+< 		}
+< 	}
+< }
+< 
+< int (*(*(*i)));
+< 
+< int ((*(*(*g)))(int (*(*(*(*(*(*(*(*(int (*(*(*(void, char, int)))))))))))))));
+< 
+< int ((*(*(*g)))(int (*(*(*(*(*(*(*(*(int (*(*(*()))))))))))))));
+< 
+< void (*(*b));
+< 
+< int a;
+< 
+< int i;
+< 
+< int int (a(void));
+---
+> random.c:15:4: error: Trying to access struct member, but left operand is not a struct, but a **@G
+> 		c[9]->b->o.p = a = b ? c : d;
+> 		 ^^^^
+> 1 error(s)

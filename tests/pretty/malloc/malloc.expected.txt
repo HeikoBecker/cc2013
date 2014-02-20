@@ -1,0 +1,201 @@
+void (malloc_init(void));
+
+void (*(malloc(int)));
+
+void (*(calloc(int, int)));
+
+void (*(realloc(void (*), int)));
+
+void (free(void (*)));
+
+struct desc
+{
+	int block_size;
+	int blocks_per_arena;
+	struct list free_list;
+	struct lock lock;
+};
+
+struct arena
+{
+	int magic;
+	struct desc (*desc);
+	int free_cnt;
+};
+
+struct block
+{
+	struct list_elem free_elem;
+};
+
+struct desc (*descs);
+
+int desc_cnt;
+
+struct arena (*(block_to_arena(struct block (*))));
+
+struct block (*(arena_to_block(struct arena (*), int idx)));
+
+void (malloc_init(void))
+{
+	int block_size;
+	(block_size = 16);
+	while ((block_size < (PGSIZE * 2))) {
+		struct desc (*d);
+		(d = (&(descs[desc_cnt])));
+		(desc_cnt = (desc_cnt + 1));
+		(ASSERT(((desc_cnt < ((sizeof descs) * (sizeof (*descs)))) || (desc_cnt == ((sizeof descs) * (sizeof (*descs)))))));
+		((d->block_size) = block_size);
+		((d->blocks_per_arena) = ((PGSIZE - (sizeof(struct arena))) * block_size));
+		(list_init((&(d->free_list))));
+		(lock_init((&(d->lock))));
+		(block_size = (block_size * 2));
+	}
+}
+
+void (*(malloc(int size)))
+{
+	struct desc (*d);
+	struct block (*b);
+	struct arena (*a);
+	if ((size == 0))
+		return NULL;
+	(d = descs);
+	while ((d < (descs + desc_cnt))) {
+		if ((!((d->block_size) < size)))
+			break;
+		(d = (d + 1));
+	}
+	if ((d == (descs + desc_cnt))) {
+		int page_cnt;
+		(page_cnt = (DIV_ROUND_UP((size + (sizeof (*a))), PGSIZE)));
+		(a = (palloc_get_multiple(0, page_cnt)));
+		if ((a == NULL))
+			return NULL;
+		((a->magic) = ARENA_MAGIC);
+		((a->desc) = NULL);
+		((a->free_cnt) = page_cnt);
+		return (a + 1);
+	}
+	(lock_acquire((&(d->lock))));
+	if ((list_empty((&(d->free_list))))) {
+		int i;
+		(a = (palloc_get_page(0)));
+		if ((a == NULL)) {
+			(lock_release((&(d->lock))));
+			return NULL;
+		}
+		((a->magic) = ARENA_MAGIC);
+		((a->desc) = d);
+		((a->free_cnt) = (d->blocks_per_arena));
+		(i = 0);
+		while ((i < (d->blocks_per_arena))) {
+			struct block (*b);
+			(b = (arena_to_block(a, i)));
+			(list_push_back((&(d->free_list)), (&(b->free_elem))));
+			(i = (i + 1));
+		}
+	}
+	(b = (list_entry((list_pop_front((&(d->free_list)))), block, free_elem)));
+	(a = (block_to_arena(b)));
+	((a->free_cnt) = ((a->free_cnt) - 1));
+	(lock_release((&(d->lock))));
+	return b;
+}
+
+void (*(calloc(int a, int b)))
+{
+	void (*p);
+	int size;
+	(size = (a * b));
+	if (((size < a) || (size < b)))
+		return NULL;
+	(p = (malloc(size)));
+	if ((p != NULL))
+		(memset(p, 0, size));
+	return p;
+}
+
+int (block_size(void (*block)))
+{
+	struct block (*b);
+	(b = block);
+	struct arena (*a);
+	(a = (block_to_arena(b)));
+	struct desc (*d);
+	(d = (a->desc));
+	return ((d != NULL) ? (d->block_size) : ((PGSIZE * (a->free_cnt)) - (pg_ofs(block))));
+}
+
+void (*(realloc(void (*old_block), int new_size)))
+{
+	if ((new_size == 0)) {
+		(free(old_block));
+		return NULL;
+	} else {
+		void (*new_block);
+		(new_block = (malloc(new_size)));
+		if (((old_block != NULL) && (new_block != NULL))) {
+			int old_size;
+			(old_size = (block_size(old_block)));
+			int min_size;
+			(min_size = ((new_size < old_size) ? new_size : old_size));
+			(memcpy(new_block, old_block, min_size));
+			(free(old_block));
+		}
+		return new_block;
+	}
+}
+
+void (free(void (*p)))
+{
+	if ((p != NULL)) {
+		struct block (*b);
+		(b = p);
+		struct arena (*a);
+		(a = (block_to_arena(b)));
+		struct desc (*d);
+		(d = (a->desc));
+		if ((d != NULL)) {
+			(memset(b, 204, (d->block_size)));
+			(lock_acquire((&(d->lock))));
+			(list_push_front((&(d->free_list)), (&(b->free_elem))));
+			(a = (a + 1));
+			if ((!((a->free_cnt) < (d->blocks_per_arena)))) {
+				int i;
+				(ASSERT(((a->free_cnt) == (d->blocks_per_arena))));
+				(i = 0);
+				while ((i < (d->blocks_per_arena))) {
+					struct block (*b);
+					(b = (arena_to_block(a, i)));
+					(list_remove((&(b->free_elem))));
+					(i = (i + 1));
+				}
+				(palloc_free_page(a));
+			}
+			(lock_release((&(d->lock))));
+		} else {
+			(palloc_free_multiple(a, (a->free_cnt)));
+			return;
+		}
+	}
+}
+
+struct arena (*(block_to_arena(struct block (*b))))
+{
+	struct arena (*a);
+	(a = (pg_round_down(b)));
+	(ASSERT((a != NULL)));
+	(ASSERT(((a->magic) == ARENA_MAGIC)));
+	(ASSERT((((a->desc) == NULL) || ((((pg_ofs(b)) - (sizeof (*a))) + ((a->desc)->block_size)) == 0))));
+	(ASSERT((((a->desc) != NULL) || ((pg_ofs(b)) == (sizeof (*a))))));
+	return a;
+}
+
+struct block (*(arena_to_block(struct arena (*a), int idx)))
+{
+	(ASSERT((a != NULL)));
+	(ASSERT(((a->magic) == ARENA_MAGIC)));
+	(ASSERT((idx < ((a->desc)->blocks_per_arena))));
+	return ((a + (sizeof (*a))) + (idx * ((a->desc)->block_size)));
+}

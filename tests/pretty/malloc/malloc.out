@@ -1,0 +1,4 @@
+malloc.c:38:26: error: the struct @listis not defined
+    struct list free_list;      /* List of free blocks. */
+                         ^^^^
+1 error(s)

@@ -1,0 +1,4 @@
+test_if_while.c:25:16: error: Second and third operand of conditional operator have unsuiting types *int and int
+		while(7? a = b ? c[9] : a || b : e && a || b + d) {
+		             ^^^^
+1 error(s)

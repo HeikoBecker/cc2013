@@ -1,0 +1,9 @@
+void (foo(int bar))
+{
+	int a;
+	int b;
+	int i;
+	int bla;
+	int z;
+	(bar = ((((((i + (1 * 7)) + 8) - bla) + ((a * b) * (a + b))) < z) ? 4 : 8));
+}

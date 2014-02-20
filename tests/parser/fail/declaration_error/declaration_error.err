@@ -1,0 +1,4 @@
+declaration_error.c:1:5: error: FunctionDefinition has to be either (void) or all parameters have to be declared
+int i
+    ^^^^
+1 error(s)

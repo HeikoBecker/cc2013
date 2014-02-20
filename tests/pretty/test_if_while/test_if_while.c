@@ -1,0 +1,31 @@
+struct G {
+	int c;
+};
+
+struct S {
+	struct G b;
+};
+
+void blub (void){
+int a; int b;
+int* c;
+int e;
+struct S* d;
+struct G f;
+
+	if((a + b)){
+		;
+	}else ;
+	while(c[9]){;}
+	if(((d->b.c = (7 == a || b)))) 
+		if(a ? b : e){
+		       	a = a ? b : 7;
+		}
+	else{ 
+		while(7? a = b ? c[9] : a || b : e && a || b + d) {
+			goto b; continue; break; return;
+		}
+	}
+	return;
+}
+
