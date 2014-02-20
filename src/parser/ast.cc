@@ -234,11 +234,17 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         if (compareTypes(types_after_conversion.first, types_after_conversion.second)) {
           valid = true;
         }
-      } else if (lhs->getType()->type() == Semantic::Type::POINTER) {
+      }
+      if (lhs->getType()->type() == Semantic::Type::POINTER) {
         if (isNullPtrConstant(rhs)) {
           valid = true;
+        } else if (auto rhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(rhs->getType())) {
+          if (rhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
+            valid = true;
+          }
         }
-      } else if (isNullPtrConstant(rhs)) {
+      }
+      if (isNullPtrConstant(rhs)) {
         auto lhs_type = lhs->getType();
         switch (lhs_type->type()) {
           case Semantic::Type::INT:
@@ -248,6 +254,17 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
           default:
             break;
         }
+      }
+      if (auto lhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
+        if (lhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
+          if (rhs->getType()->type() == Semantic::Type::POINTER) {
+            valid = true;
+          } else {
+             std::cerr << "wtf?";
+          }
+        }
+      } else {
+             std::cerr << "wtf2?";
       }
       this->type = lhs->getType();
       if (!valid) {
