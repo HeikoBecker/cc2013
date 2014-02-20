@@ -120,7 +120,7 @@ int main(int argc, char** const argv)
       }
     }
   } catch (CompilerException const& e) {
-    errorf(e.where(), e.what());
+    errorf(e.where(), "%s", e.what());
     auto pos = e.where();
     std::ifstream infile(pos.name);
     auto counter = pos.line;
