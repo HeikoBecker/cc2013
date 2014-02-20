@@ -26,7 +26,8 @@ class EXPRESSION(BinaryExpression)
     BinaryExpression(SubExpression lhs,
                      SubExpression rhs,
                      PunctuatorType op,
-                     Pos pos);
+                     Pos pos,
+                     const Pos* const operator_position = nullptr);
     PPRINTABLE
     IR_EMITTING
   private:

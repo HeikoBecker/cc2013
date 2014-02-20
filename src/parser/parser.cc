@@ -456,6 +456,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
   auto expr = computeAtom();
   SubExpression ternaryHelper;
   while (isBinaryOperator(*m_nextsym) && getPrec(*m_nextsym) >= minPrecedence) {
+    auto operator_position = m_nextsym->pos();
     auto punctype = static_pointer_cast<PunctuatorToken>(m_nextsym)->punctype();
     auto isTernary = punctype == PunctuatorType::QMARK;
     int precNext;
@@ -476,7 +477,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     if (isTernary) {
       expr = make_shared<TernaryExpression>(expr, ternaryHelper, rhs, pos);
     } else {
-      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos);
+      expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos, &operator_position);
     }
   }
   return expr;

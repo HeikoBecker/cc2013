@@ -14,7 +14,7 @@ using namespace Semantic;
 BinaryExpression::BinaryExpression(SubExpression lhs,
                                    SubExpression rhs,
                                    PunctuatorType op,
-                                   Pos pos) :
+                                   Pos pos, const Pos* const operator_position) :
   Expression(pos),
   lhs(lhs),
   rhs(rhs),
@@ -216,7 +216,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
        */
       if (!lhs->can_be_lvalue()) {
         throw ParsingException("The left operand of an assignment must be a lvalue",
-             pos);
+             *operator_position);
       }
       /* FIXME: this is probably wrong, allowing too much (can we really apply
        * the usual conversions here?)!
