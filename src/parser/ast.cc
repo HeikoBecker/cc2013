@@ -129,7 +129,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
       if (isIntegerType(rhs_type)) {
         if (rhs_as_ptr) {
-          this->type = rhs_as_ptr->pointee();
+          this->type = rhs_as_ptr;
           break;
         }
       }
