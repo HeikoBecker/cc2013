@@ -253,7 +253,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       DeclaratorDirectDeclarator(SubDeclarator d, Pos pos); 
       PPRINTABLE
       virtual std::string getIdentifier() {
-        return declarator->getIdentifier();
+        return (declarator ? declarator->getIdentifier() : "FIX THIS!");
       }
 
       std::pair<int, bool> getPointers() {
