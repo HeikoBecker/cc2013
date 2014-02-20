@@ -32,7 +32,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               "Right operand of array subscript must have integer type, but is a !"
               + (rhs->getType() ?  rhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
         }
-        this->type = ltype;
+        this->type = ltype->pointee();
         this->m_can_be_lvalue = true;
       } else {
         throw ParsingException(std::string(
