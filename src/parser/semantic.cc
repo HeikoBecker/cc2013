@@ -433,6 +433,7 @@ bool isFunctionType(SemanticDeclarationNode s) {
 }
 
 bool isObjectType(SemanticDeclarationNode s) {
+  // TODO: we also need to check that the type is complete!
   return !isFunctionType(s);
 }
 
