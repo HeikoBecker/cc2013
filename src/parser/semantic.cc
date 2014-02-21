@@ -52,6 +52,7 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
 
   // save the struct definitions
   if (name != "@@") {
+
     if(structMap.find(name) == structMap.end()) {
       stack<pair<int,bool> > st = stack<pair<int, bool> >();
       st.push(
