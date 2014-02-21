@@ -322,10 +322,32 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
       }
       break;
     case PunctuatorType::AMPERSAND:
+      {
       // TODO: check that operand is lvalue, function designator, or operand of
       // [] or *
-      this->type = make_shared<PointerDeclaration>(0, operand->getType());
+      // Multiple possibilities:
+      // 1) lvalue that designates an object that is not a bit-field and is
+      // not declared with the register storage-class specifier
+      auto valid = false;
+      if (operand->can_be_lvalue() && hasObjectType(operand)) {
+        valid = true;
+      } else if (operand->getType()->type() == Semantic::Type::FUNCTION) {
+        //2) a function designator
+        valid = true;
+      } else if (auto operand_as_unary = std::dynamic_pointer_cast<UnaryExpression>(operand) ) {
+        //3) the result of a [] or unary * operator
+        if (   operand_as_unary->op == PunctuatorType::ARRAY_ACCESS
+            || operand_as_unary->op == PunctuatorType::STAR) {
+          valid = true;
+        }
+      }
+      if (valid) {
+        this->type = make_shared<PointerDeclaration>(0, operand->getType());
+      } else {
+        throw ParsingException("Incompatible opreand for &", operand->pos());
+      }
       break;
+      }
     case PunctuatorType::MINUS:
       if (!hasArithmeticType(operand)) {
         ostringstream errmsg;
