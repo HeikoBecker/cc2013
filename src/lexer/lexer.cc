@@ -39,7 +39,7 @@ static const std::unordered_set<std::string> keywords =
 }};
 
 /*
- * Consumes a single punctuator. If it has only read a partial punctuator
+ * \brief Consumes a single punctuator. If it has only read a partial punctuator
  * it tries to read the full one as needed by the maximal munch rule.
  * As a side effect, it stores the token corresponding to the punctuator 
  *
@@ -112,7 +112,7 @@ bool Lexer::consumePunctuator() {
 }
 
 /*
- * Reads in a complete comment and uses the tracker variable to leave positions 
+ * \brief Reads in a complete comment and uses the tracker variable to leave positions 
  * intact for the tokens. It reads both sorts of comments.
  */
 bool Lexer::consumeComment() {

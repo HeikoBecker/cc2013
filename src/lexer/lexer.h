@@ -9,7 +9,7 @@
 namespace Lexing {
 
   /*
-   * A thin wrapper around fgetc and ungetc which keeps track of the
+   * \brief A thin wrapper around fgetc and ungetc which keeps track of the
    * positon in the file.
    * It is used by the lexer class to handle the I/O operations.
    */
@@ -42,7 +42,7 @@ namespace Lexing {
   };
 
  /*
-   * Class implementing the basic lexing functionality
+   * \brief Class implementing the basic lexing functionality
    * If the compiler is invoked with --tokenize it will be used directly by the
    * main function.
    * If any other parameter is given, it will be used as "on-demand" object by
