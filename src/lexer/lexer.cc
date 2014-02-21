@@ -38,6 +38,13 @@ static const std::unordered_set<std::string> keywords =
   "volatile", "while",
 }};
 
+/*
+ * Consumes a single punctuator. If it has only read a partial punctuator
+ * it tries to read the full one as needed by the maximal munch rule.
+ * As a side effect, it stores the token corresponding to the punctuator 
+ *
+ * @returns wether reading was succesfull or not
+ */
 bool Lexer::consumePunctuator() {
   auto foundPuntcutor = false;
   auto matched = false;
@@ -104,6 +111,10 @@ bool Lexer::consumePunctuator() {
   } while (true);
 }
 
+/*
+ * Reads in a complete comment and uses the tracker variable to leave positions 
+ * intact for the tokens. It reads both sorts of comments.
+ */
 bool Lexer::consumeComment() {
   tmpPos = tracker.currentPosition();
   if (tracker.current()== '/') {
