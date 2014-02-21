@@ -398,12 +398,14 @@ SubExpression Parser::computeAtom() {
     //auto var = std::make_shared<Literal>(m_nextsym->value(), pos);
     scan();
     auto child = SubExpression(var);
+    child = postfixExpression(child);
     return child;
   } else if (m_nextsym->type() == TokenType::STRINGLITERAL) {
     // 'normal ' atom, literal
     auto var = std::make_shared<Literal>(m_nextsym->value(), pos);
     scan();
     auto child = SubExpression(var);
+    child = postfixExpression(child);
     return child;
   } else if (testp(   PunctuatorType::STAR) 
                    || testp(PunctuatorType::MINUS) 
