@@ -221,7 +221,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       if (!hasScalarType(lhs)) {
         throw ParsingException(std::string("Logical operator requires operands with scalar type, but left operand is ") + (lhs->getType() ? lhs->getType()->toString() : "INITIALIZE ME!"), lhs->pos());
       }
-      if (!hasScalarType(lhs)) {
+      if (!hasScalarType(rhs)) {
         throw ParsingException(std::string("Logical operator requires operands with scalar type, but right operand is ") + (rhs->getType() ? rhs->getType()->toString() : "INITIALIZE ME!"), lhs->pos());
       }
       this->type = make_shared<IntDeclaration>();
