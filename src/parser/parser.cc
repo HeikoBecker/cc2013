@@ -522,6 +522,7 @@ StructNode Parser::structOrUnionSpecifier() {
   if (testType(TokenType::IDENTIFIER)) {
     auto name = m_nextsym->value();
 
+
     scan();
     if (testp(PunctuatorType::LEFTCURLYBRACE)) {
       semanticTree->addChild(pos, "@"+name);
@@ -533,6 +534,9 @@ StructNode Parser::structOrUnionSpecifier() {
       auto ret =  make_shared<StructType>(name, structDecLst, pos);
       semanticTree->goUp();
       return ret;
+    } else {
+      semanticTree->addChild(pos,"@"+ name, true);
+      semanticTree->goUp();
     }
 
     return make_shared<StructType>(name, pos);
