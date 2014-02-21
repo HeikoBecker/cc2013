@@ -544,15 +544,12 @@ TernaryExpression::TernaryExpression(SubExpression condition,
   auto lhs_is_a_pointer = lhs_type->type() == Semantic::Type::POINTER;
   auto rhs_is_a_pointer = rhs_type->type() == Semantic::Type::POINTER;
   if (!valid) {
-    // TODO: I coudn't find this in the standard, but it makes sense that we
-    // apply the usual conversions to the pointee types before comparing
     if (  lhs_is_a_pointer && rhs_is_a_pointer) {
       auto lhs_as_ptr = std::static_pointer_cast<PointerDeclaration>(lhs_type);
       auto rhs_as_ptr = std::static_pointer_cast<PointerDeclaration>(rhs_type);
-      auto promoted = applyUsualConversions(lhs_as_ptr->pointee(), rhs_as_ptr->pointee());
-      valid = compareTypes(promoted.first, promoted.second);
+      valid = compareTypes(lhs_as_ptr, rhs_as_ptr);
       if (valid) {
-        this->type = promoted.first;
+        this->type = lhs_as_ptr;
       }
     }
   }
