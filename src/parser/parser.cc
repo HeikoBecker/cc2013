@@ -518,6 +518,8 @@ StructNode Parser::structOrUnionSpecifier() {
   expect("struct");
   scan();
 
+  std::cout<<"call"<<std::endl;
+
 
   if (testType(TokenType::IDENTIFIER)) {
     auto name = m_nextsym->value();

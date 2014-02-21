@@ -81,10 +81,7 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
           );
       } else { // it was alredy declared
           // it is a forward declaration
-          if (forward) {
-            return;
-          } else {
-             bool lastForward = structMap[name].top().second;
+                      bool lastForward = structMap[name].top().second;
 
              // take the node from the forward declaration
              if (lastForward) {
@@ -94,7 +91,6 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
                // it is a redefinition
                 throw Parsing::ParsingException("no redefinition of " + name, pos);
              }
-          }
       }
     }
   }
