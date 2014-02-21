@@ -468,11 +468,6 @@ FunctionCall::FunctionCall(SubExpression funcName,
           auto promoted_actually = promoteType(arguments.at(i)->getType());
           if (Semantic::compareTypes(promoted_actually, promoted_expected)) {
             continue;
-          } else {
-            std::cout << "promoted: expected "
-                      << promoted_expected->toString()
-                      << "got "
-                      << promoted_expected->toString();
           }
           std::ostringstream errmsg;
           errmsg << "Expected argument of type "
