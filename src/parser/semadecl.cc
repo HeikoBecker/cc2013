@@ -5,7 +5,7 @@
 using namespace Parsing;
 
 
-StructDeclaration::StructDeclaration(std::string n, SubSemanticNode s) : name(n), m_node(s)  {}
+StructDeclaration::StructDeclaration(std::string n, SubSemanticNode s, bool forward) : name(n), m_node(s), forward(forward) {}
 
 std::string FunctionDeclaration::toString() {
         std::string str = "function (";

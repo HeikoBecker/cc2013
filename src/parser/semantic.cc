@@ -48,6 +48,8 @@ SemanticTree::~SemanticTree() {
 
 void SemanticTree::addChild(Pos pos, string name, bool forward) {
 
+//  std::cout<<" add child : "<<name<<" "<<forward<<endl;
+
   // save the struct definitions
   if (name != "@@") {
 
@@ -180,9 +182,11 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        string name = "@" + type;
         
        SubSemanticNode helpNode;
+       bool forward;
 
        while(!structMap[name].empty()) {
         int id = structMap[name].top().first;
+        forward = structMap[name].top().second;
        // cout<<"Id : "<<id<<endl;
         int parent = nodes[id]->getParentIndex();
         if (nodes[parent]->isActive()) {
@@ -194,7 +198,7 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        }
 
        if (helpNode) {
-        myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode);
+        myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode, forward);
        } else {
           throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
        }
@@ -281,6 +285,19 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     string type = typeNode->toString();
 
     auto decl = helpConvert(typeNode, declarator, ret, pos);
+
+
+    // don't allow struct S a; if S is forward declaration
+    if (decl->type() == Semantic::Type::STRUCT) {
+      auto structDecl = static_pointer_cast<StructDeclaration>(decl);
+      if (structDecl->isForward()) {
+      throw ParsingException("The size of " + name + " cannot be determined", pos);
+      }
+    }
+
+
+
+
     if (!Semantic::isValidType(decl)) {
       throw ParsingException("Invalid type: " + decl->toString(), pos);
     }
