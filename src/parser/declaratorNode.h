@@ -132,7 +132,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return directDeclarator->getNextParameter(); 
       }
 
-      bool canBeFunctionDefinition() { return directDeclarator->canBeFunctionDefinition();}
+      bool canBeFunctionDefinition() { return (directDeclarator ? directDeclarator->canBeFunctionDefinition() : false);}
       bool hasName() {
         if(directDeclarator) {
           return directDeclarator->hasName();
