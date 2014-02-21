@@ -4,6 +4,7 @@ int main(void) {
   int b;
   ip = &a;
   ip = ip  +1;
+  ip = 1 + ip;
   *(ip+1) = 4;
   return 0;
 }
