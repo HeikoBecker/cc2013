@@ -68,14 +68,16 @@ def run(testdir=None):
                     print("\n", end="")
 
         # all files ending with c in fail should fail
-        fail_folder = os.path.join(directory, "fail")
+        fail_folder = os.path.join(testdir, directory, "fail")
+        should_fail = os.path.join(fail_folder, "*.c")
         if os.path.isdir(fail_folder):
-            for test_file in glob.iglob(should_pass):
+            for test_file in glob.iglob(should_fail):
                 test_count += 1
                 counter += 1
                 o = c4(test_file, options)
                 if (o[0]) == 0:
                     print("P", end="")
+                    failed_tests_fail.append(test_file)
                 else:
                     if o[0] == 1:
                         print(".", end="")
