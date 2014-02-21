@@ -6,9 +6,6 @@ struct complexNumbers {
   int imag;
 };
 
-char;
-int;
-
 int main (int a) {
   int c;
   return a;
