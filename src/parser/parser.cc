@@ -573,8 +573,13 @@ std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpressio
 
 std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> Parser::structDeclaration() {
   if(testTypeSpecifier()) {
+    OBTAIN_POS();
+    // TODO: we should be able to reuse parts of declaration here
     auto type = specifierQualifierList();
     if (testp(";")) {
+      if (!(type->containsDeclaration() || type->isStruct())) {
+        throw ParsingException("Declaration doesn't declare anything!", pos);
+      }
       decltype(structDeclaration().second) empty {};
       scan();
       return std::make_pair(type, empty);
