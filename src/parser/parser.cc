@@ -203,10 +203,6 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
     // TODO : make lookuptable for struct
     // or is this not allowed in our grammar
-
-    if (!(type->containsDeclaration() || type->isStruct())) {
-      throw ParsingException("Declaration doesn't declare anything!", pos);
-    }
     return make_shared<ExternalDeclaration>(type, pos, semanticTree);
   }
 
@@ -249,6 +245,9 @@ TypeNode Parser::typeSpecifier() {
   } else {
     auto type = std::make_shared<BasicType>(m_nextsym->value(), pos);
     scan();
+    if (testp(PunctuatorType::SEMICOLON) && !type->containsDeclaration()) {
+      throw ParsingException("Declaration doesn't declare anything!", pos);
+    }
     return type;
   }
 }
@@ -498,9 +497,6 @@ DeclarationNode Parser::declaration() {
 
   if (testp(";")) {
     scan();
-    if (!(type->containsDeclaration() || type->isStruct())) {
-      throw ParsingException("Declaration doesn't declare anything!", pos);
-    }
     return std::make_shared<Declaration>(type, pos);
   } else {
     auto decl = declarator();
@@ -573,13 +569,9 @@ std::vector<std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpressio
 
 std::pair<TypeNode, std::vector<std::pair<SubDeclarator,SubExpression>>> Parser::structDeclaration() {
   if(testTypeSpecifier()) {
-    OBTAIN_POS();
     // TODO: we should be able to reuse parts of declaration here
     auto type = specifierQualifierList();
     if (testp(";")) {
-      if (!(type->containsDeclaration() || type->isStruct())) {
-        throw ParsingException("Declaration doesn't declare anything!", pos);
-      }
       decltype(structDeclaration().second) empty {};
       scan();
       return std::make_pair(type, empty);
