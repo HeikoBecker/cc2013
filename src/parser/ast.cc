@@ -142,7 +142,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       }
       if (lhs_as_ptr && rhs_as_ptr) {
         // in real C this would be ptrdiff_t
-        this->type = make_shared<IntDeclaration>();
+        if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
+          this->type = make_shared<IntDeclaration>();
+        } else {
+          throw ParsingException(lhs_type->toString()
+              + " and " + rhs_type->toString()
+              + " are not pointers to compatible types", pos);
+        }
         break;
       }
       throw ParsingException(std::string("Incompatible types for -"), lhs->pos());
@@ -215,7 +221,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       if (!hasScalarType(lhs)) {
         throw ParsingException(std::string("Logical operator requires operands with scalar type, but left operand is ") + (lhs->getType() ? lhs->getType()->toString() : "INITIALIZE ME!"), lhs->pos());
       }
-      if (!hasScalarType(lhs)) {
+      if (!hasScalarType(rhs)) {
         throw ParsingException(std::string("Logical operator requires operands with scalar type, but right operand is ") + (rhs->getType() ? rhs->getType()->toString() : "INITIALIZE ME!"), lhs->pos());
       }
       this->type = make_shared<IntDeclaration>();
@@ -462,11 +468,6 @@ FunctionCall::FunctionCall(SubExpression funcName,
           auto promoted_actually = promoteType(arguments.at(i)->getType());
           if (Semantic::compareTypes(promoted_actually, promoted_expected)) {
             continue;
-          } else {
-            std::cout << "promoted: expected "
-                      << promoted_expected->toString()
-                      << "got "
-                      << promoted_expected->toString();
           }
           std::ostringstream errmsg;
           errmsg << "Expected argument of type "
