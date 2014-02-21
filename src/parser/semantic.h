@@ -133,6 +133,7 @@ namespace Semantic {
   bool isRealType(Parsing::SemanticDeclarationNode);
   bool hasRealType(Parsing::SubExpression);
   bool isNullPtrConstant(Parsing::SubExpression s);
+  bool isFunctionType(Parsing::SemanticDeclarationNode);
   bool isObjectType(Parsing::SemanticDeclarationNode);
   bool hasObjectType(Parsing::SubExpression);
   Parsing::SemanticDeclarationNode promoteType(Parsing::SemanticDeclarationNode s);

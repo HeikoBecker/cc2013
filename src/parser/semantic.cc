@@ -3,8 +3,33 @@
 #include "../utils/debug.h"
 #include "../utils/exception.h"
 
+//# include <algorithm>
+
 using namespace std;
 using namespace Parsing;
+
+namespace Semantic {
+bool isValidType(SemanticDeclarationNode const s) {
+  switch (s->type()) {
+    case Type::FUNCTION:
+      {
+      auto s_as_function = static_pointer_cast<FunctionDeclaration>(s);
+      // TODO: remove line below, or do we also need to check for this?
+      //auto params = s_as_function->parameter();
+      //if (!std::all_of(params.cbegin(), params.cend(), isValidType)) {
+        //return false;
+      //}
+      auto ret_type = s_as_function->returnType();
+      //  Functions shall not have a return type of type array or function
+      return (ret_type->type() == Type::FUNCTION ? false : isValidType(ret_type));
+      break;
+      }
+    default:
+      return true;
+  }
+  return true;
+}
+}
 
 SemanticTree::SemanticTree() {
   counter = 0;
@@ -256,6 +281,9 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     string type = typeNode->toString();
 
     auto decl = helpConvert(typeNode, declarator, ret, pos);
+    if (!Semantic::isValidType(decl)) {
+      throw ParsingException("Invalid type: " + decl->toString(), pos);
+    }
 
 #ifdef DEBUG
     cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
