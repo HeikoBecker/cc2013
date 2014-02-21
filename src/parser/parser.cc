@@ -189,11 +189,14 @@ TUNode Parser::translationUnit() {
 
 ExternalDeclarationNode Parser::externalDeclaration() {
 
+  /* TODO: avoid code duplication with declaration
+   * the start of declaration is !exactly! the same as the one for external
+   * declaration
+   */
   // functionDefinition or declaration ?
   OBTAIN_POS();
 
   auto type = typeSpecifier();
-
   if (testp(";")) {
     // it was a declaration
     scan();
@@ -495,6 +498,9 @@ DeclarationNode Parser::declaration() {
 
   if (testp(";")) {
     scan();
+    if (!(type->containsDeclaration() || type->isStruct())) {
+      throw ParsingException("Declaration doesn't declare anything!", pos);
+    }
     return std::make_shared<Declaration>(type, pos);
   } else {
     auto decl = declarator();
