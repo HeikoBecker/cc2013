@@ -677,7 +677,7 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
 {
   if (assign) {
   if (semanticTree) {
-    semanticTree->addDeclaration(type, declarator, pos);
+    declNode = semanticTree->addDeclaration(type, declarator, pos);
   }
   }
   
@@ -697,6 +697,9 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
      /*
      cout<<"name : "<< name<<endl;
      */
+
+     //FIXME: @Patrick: addChild should return the same value as addDeclaration!
+     //declNode =
      semanticTree->addChild(pos, name, true);
   }
 }

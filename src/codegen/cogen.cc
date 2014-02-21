@@ -59,6 +59,44 @@ void Parsing::TranslationUnit::emitIR(llvm::Module & M)
 
 void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
 {
+  // we either have to work with a global declaration or a forward declaration
+  // first we take the type of the node
+  switch(this->declNode->type()){
+	case Semantic::Type::INT:{
+		auto int_type = 
+			std::static_pointer_cast<IntDeclaration>(this->declNode);
+		break;
+				   }
+	case Semantic::Type::CHAR:{
+		auto char_type =
+		       std::static_pointer_cast<CharDeclaration>(this->declNode);	
+		break;
+				    }
+	case Semantic::Type::VOID:{
+		auto void_type =
+			std::static_pointer_cast<VoidDeclaration>(this->declNode);
+		break;
+				    }
+	case Semantic::Type::POINTER:{
+		auto pointer_type =
+		       std::static_pointer_cast<PointerDeclaration>(this->declNode);	
+		break;
+				       }
+	case Semantic::Type::ARRAY:{
+		auto array_type =
+			std::static_pointer_cast<ArrayDeclaration>(this->declNode);
+		break;
+				     }
+	case Semantic::Type::FUNCTION:
+		//We have reached a forward declaration which is not needed in 
+		//llvm --> just skip it
+		return;
+	case Semantic::Type::STRUCT:{
+		auto structType =
+			std::static_pointer_cast<StructDeclaration>(this->declNode);
+		break;
+				      }
+  }
   // TODO: implement this
   UNUSED(M);
 }

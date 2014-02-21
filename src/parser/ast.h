@@ -140,6 +140,7 @@ class ASTNODE(ExternalDeclaration) {
     TypeNode type;
     SubDeclarator declarator;
     SemanticTreeNode semanticTree;
+    SemanticDeclarationNode declNode;
 };
 
 class FunctionDefinition : public ExternalDeclaration {
