@@ -31,7 +31,12 @@ def c4(filename, params):
             return (timeout, None, None)
 
 
+def preamble():
+    msg("F(ail)|T(imeout)|S(ignal)|(unexpected )P(ass)")
+
+
 def run(testdir=None):
+    preamble()
     test_count = 0
     if testdir is None:
         testdir = os.path.join(os.path.abspath(os.path.curdir), "tests")
@@ -77,15 +82,15 @@ def run(testdir=None):
                 o = c4(test_file, options)
                 if (o[0]) == 0:
                     print("P", end="")
-                    failed_tests_fail.append(test_file)
+                    failed_tests_fail.append((test_file, None))
                 else:
                     if o[0] == 1:
                         print(".", end="")
                     elif o[0] == timeout:
                         print("T", end="")
                     else:
-                        print("F", end="")
-                        failed_tests_fail.append(test_file)
+                        print("S", end="")
+                        failed_tests_fail.append((test_file, o[2]))
                 if counter == 80:
                     counter = 0
                     print("\n", end="")
@@ -103,7 +108,9 @@ def run(testdir=None):
     if failed_tests_fail:
         msg("The following tests have not failed, but should have:")
         for failed in failed_tests_fail:
-            print("\t" + failed)
+            print("\t" + failed[0])
+            if(failed[1]):
+                print("error log:\n ", failed[1].decode("utf-8"))
     msg("{} of {} tests passed".format(
         test_count - len(failed_tests_fail) - len(failed_tests_pass),
         test_count)
