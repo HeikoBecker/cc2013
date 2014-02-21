@@ -201,6 +201,9 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     // TODO : make lookuptable for struct
     // or is this not allowed in our grammar
 
+    if (!(type->containsDeclaration() || type->isStruct())) {
+      throw ParsingException("Declaration doesn't declare anything!", pos);
+    }
     return make_shared<ExternalDeclaration>(type, pos, semanticTree);
   }
 
