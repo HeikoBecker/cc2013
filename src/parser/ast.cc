@@ -142,7 +142,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       }
       if (lhs_as_ptr && rhs_as_ptr) {
         // in real C this would be ptrdiff_t
-        this->type = make_shared<IntDeclaration>();
+        if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
+          this->type = make_shared<IntDeclaration>();
+        } else {
+          throw ParsingException(lhs_type->toString()
+              + " and " + rhs_type->toString()
+              + " are not pointers to compatible types", pos);
+        }
         break;
       }
       throw ParsingException(std::string("Incompatible types for -"), lhs->pos());
