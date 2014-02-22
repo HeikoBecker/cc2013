@@ -117,6 +117,9 @@ class SemanticTree {
   SubDeclarator declarator, 
   Parsing::SemanticDeclarationNode ret, Pos pos);
 
+    // tells whether a struct has already been declared
+    bool hasStructDeclaration(std::string name);
+
     void checkGotoLabels();
     Parsing::SemanticDeclarationNode lookUpType(std::string name, Pos pos);
 };

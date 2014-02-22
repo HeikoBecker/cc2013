@@ -31,6 +31,27 @@ bool isValidType(SemanticDeclarationNode const s) {
 }
 }
 
+
+bool SemanticTree::hasStructDeclaration(std::string name) {
+  if (structMap.find(name) == structMap.end()) {
+    return false;
+  } else {
+      // check whether it is empty
+
+      // delete not active nodes
+      while(!structMap[name].empty()) {
+        int id = structMap[name].top().first;
+        int parent = nodes[id]->getParentIndex();
+        if (nodes[parent]->isActive()) {
+          break;
+        } 
+      }
+
+      return !structMap[name].empty();
+  }
+}
+
+
 SemanticTree::SemanticTree() {
   counter = 0;
   loopDepth = 0;
@@ -48,7 +69,7 @@ SemanticTree::~SemanticTree() {
 
 void SemanticTree::addChild(Pos pos, string name, bool forward) {
 
-//  std::cout<<" add child : "<<name<<" "<<forward<<endl;
+  //std::cout<<" add child : "<<name<<" "<<forward<<endl;
 
   // save the struct definitions
   if (name != "@@") {
