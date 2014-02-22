@@ -329,6 +329,9 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
           // designator; if it points to an object, the result is an lvalue
           // designating the object.
           this->m_can_be_lvalue = true;
+        } else if (isIncompleteType(optype->pointee())) {
+          throw ParsingException("Cannot dereference pointer to incomplete type "
+                                 + optype->pointee()->toString(), pos);
         }
       } else if (auto optype = dynamic_pointer_cast<FunctionDeclaration>(operand->getType())) {
         // function  is convertible to pointer to function
