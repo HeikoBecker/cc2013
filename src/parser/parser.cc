@@ -45,18 +45,6 @@ Parser::Parser(FILE* f, char const *name)
   reportError(msg);
 }
 
-void Parser::expect(std::string s) {
-  if (m_nextsym->value() != s) {
-    auto msg = std::string("Expected ");
-    msg += s;
-    msg += std::string(" but got ");
-    msg += m_nextsym->value();
-    if (m_nextsym->type() == TokenType::END)
-      msg += "EOF!";
-    reportError(msg);
-  }
-}
-
 void Parser::expect(PunctuatorType puncutator) {
   if (!testp(puncutator)) {
     auto msg = std::string("Expected ");
@@ -72,7 +60,7 @@ void Parser::expect(PunctuatorType puncutator) {
 void Parser::expect(KeywordType keyword) {
   if (!testk(keyword)) {
     auto msg = std::string("Expected ");
-    msg += "TODO";
+    msg += KeywordType2String(keyword);
     msg += std::string(" but got ");
     msg += m_nextsym->value();
         if (m_nextsym->type() == TokenType::END)
@@ -469,10 +457,10 @@ SubExpression Parser::expression(int minPrecedence = 0) {
     int precNext;
     if (isTernary) {
       //auto prec_ternary = getPrec(*m_nextsym);
-      expect("?");
+      expect(PunctuatorType::QMARK);
       scan(); // read the ?
       ternaryHelper = expression(1/*prec_ternary*/); //FIXME: with prec_ternary (== 2) it doesn't work; but this is a hack...
-      expect(":");
+      expect(PunctuatorType::COLON);
       precNext = 2;
     } else {
       precNext = (isRightAssociative(*m_nextsym))
@@ -515,7 +503,7 @@ struct-or-union-specifier -> "struct" identifier "{" struct-declarations-list "}
 */
 StructNode Parser::structOrUnionSpecifier() {
   OBTAIN_POS();
-  expect("struct");
+  expect(KeywordType::STRUCT);
   scan();
 
   if (testType(TokenType::IDENTIFIER)) {
@@ -1047,14 +1035,14 @@ SubIterationStatement Parser::iterationStatement() {
   } else if (testk(KeywordType::DO)) {
     scan();
     SubStatement st = statement();
-    expect("while");
+    expect(KeywordType::WHILE);
     scan();
     expect(PunctuatorType::LEFTPARENTHESIS);
     scan();
     SubExpression ex = expression();
     expect(PunctuatorType::RIGHTPARENTHESIS);
     scan();
-    expect(";");
+    expect(PunctuatorType::SEMICOLON);
     scan();
     semanticTree->decreaseLoopDepth();
     return make_shared<IterationStatement>(ex, st, IterationEnum::DOWHILE, pos);
@@ -1113,7 +1101,7 @@ SubJumpStatement Parser::jumpStatement() {
       SubJumpStatement gotoStatement = make_shared<GotoStatement>(m_nextsym->value(), pos);
       scan();
 
-      expect(";");
+      expect(PunctuatorType::SEMICOLON);
       scan();
 
       return gotoStatement;
@@ -1126,7 +1114,7 @@ SubJumpStatement Parser::jumpStatement() {
     }
 
     scan();
-    expect(";");
+    expect(PunctuatorType::SEMICOLON);
     scan();
 
     return make_shared<ContinueStatement>(pos);
@@ -1135,7 +1123,7 @@ SubJumpStatement Parser::jumpStatement() {
       reportError("break must be inside a loop");
     }
     scan();
-    expect(";");
+    expect(PunctuatorType::SEMICOLON);
     scan();
     return make_shared<BreakStatement>(pos);
   } else if (testk(KeywordType::RETURN)){
@@ -1147,7 +1135,7 @@ SubJumpStatement Parser::jumpStatement() {
       return make_shared<ReturnStatement>(pos);
     } else {
       SubExpression sub = expression();
-      expect(";");
+      expect(PunctuatorType::SEMICOLON);
       scan();
 
       return make_shared<ReturnStatement>(sub, pos);

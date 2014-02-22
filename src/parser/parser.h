@@ -53,7 +53,6 @@ namespace Parsing {
       bool testTypeSpecifier();
       bool testLookAheadP(std::string val);
       bool testLookAheadType();
-      inline void expect(std::string s);
       inline void expect(PunctuatorType puncutator);
       inline void expect(KeywordType keyword);
       inline void expect(Lexing::TokenType tokenType);
