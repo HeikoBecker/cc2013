@@ -323,8 +323,8 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
 #endif
 
-    if (decl->isVoid()) {
-        throw Parsing::ParsingException("void " + name + " cannot be declared", pos);
+    if (Semantic::isIncompleteType(decl)) {
+        throw Parsing::ParsingException(decl->toString() + " has incomplete type", pos);
     }
 
     // This is the old code 
@@ -472,6 +472,9 @@ bool isIncompleteType(SemanticDeclarationNode s) {
       {
         auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
         // if the struct is only forward declared, it is incomplete
+        // TODO: this doesn't work as I hoped it would;
+        // this only return true iff we are forward declaring a type,
+        // not when we use a forward declared type
         return s_as_struct->isForward();
       }
     case Type::VOID:
@@ -483,7 +486,6 @@ bool isIncompleteType(SemanticDeclarationNode s) {
 
 
 bool isObjectType(SemanticDeclarationNode s) {
-  // TODO: we also need to check that the type is complete!
   return !(isFunctionType(s) || isIncompleteType(s));
 }
 
