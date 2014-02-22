@@ -127,6 +127,7 @@ class SemanticTree {
 }
 
 namespace Semantic {
+  bool isValidType(const Parsing::SemanticDeclarationNode & s);
   bool isScalarType(Parsing::SemanticDeclarationNode);
   bool hasScalarType(Parsing::SubExpression);
   bool isArithmeticType(Parsing::SemanticDeclarationNode);

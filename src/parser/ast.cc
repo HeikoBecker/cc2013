@@ -706,9 +706,12 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
     semanticTree(semanticTree)
 {
   if (assign) {
-  if (semanticTree) {
-    declNode = semanticTree->addDeclaration(type, declarator, pos);
-  }
+    if (semanticTree) {
+      declNode = semanticTree->addDeclaration(type, declarator, pos);
+      if (!Semantic::isValidType(declNode)) {
+        throw ParsingException("Illegal type: " + declNode->toString(), pos);
+      }
+    }
   }
   
 }

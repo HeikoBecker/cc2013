@@ -9,7 +9,7 @@ using namespace std;
 using namespace Parsing;
 
 namespace Semantic {
-bool isValidType(SemanticDeclarationNode const s) {
+bool isValidType(const SemanticDeclarationNode & s) {
   switch (s->type()) {
     case Type::FUNCTION:
       {
