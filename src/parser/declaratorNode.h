@@ -302,7 +302,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
 
       SubDeclarator getNextDeclarator() {
         if(help.size() == 0) {
-          return declarator->getSubDeclarator();
+          return declarator->getNextDeclarator();
         } else {
           return declarator;
         }
