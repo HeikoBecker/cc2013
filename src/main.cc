@@ -33,6 +33,7 @@ int main(int argc, char** const argv)
   llvm::sys::PrintStackTraceOnErrorSignal();
   llvm::PrettyStackTraceProgram X(argc, argv);
 
+  debug() << "C4 reporting in!";
   try {
     char** i = argv + 1;
 

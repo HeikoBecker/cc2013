@@ -43,7 +43,7 @@ private:
 };
 #else
 struct debug {
-   debug(debugFilter messageType) {(void) messageType;}
+   debug(debugFilter messageType = GENERAL) {(void) messageType;}
     template<class T>
     debug &operator<<(const T &) {
         return *this;
