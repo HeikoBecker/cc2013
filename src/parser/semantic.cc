@@ -3,7 +3,7 @@
 #include "../utils/debug.h"
 #include "../utils/exception.h"
 
-//# include <algorithm>
+# include <algorithm>
 
 using namespace std;
 using namespace Parsing;
@@ -15,14 +15,22 @@ bool isValidType(SemanticDeclarationNode const s) {
       {
       auto s_as_function = static_pointer_cast<FunctionDeclaration>(s);
       // TODO: remove line below, or do we also need to check for this?
-      //auto params = s_as_function->parameter();
-      //if (!std::all_of(params.cbegin(), params.cend(), isValidType)) {
-        //return false;
-      //}
+      auto params = s_as_function->parameter();
+      if (!std::all_of(params.cbegin(), params.cend(), isValidType)) {
+        return false;
+      }
       auto ret_type = s_as_function->returnType();
       //  Functions shall not have a return type of type array or function
       return (ret_type->type() == Type::FUNCTION ? false : isValidType(ret_type));
       break;
+      }
+    case Type::POINTER:
+      return isValidType(std::static_pointer_cast<PointerDeclaration>(s)->pointee());
+    case Type::STRUCT:
+      {
+      auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
+      auto members = s_as_struct->node();
+      (void) members; // FIXME: argh, can't get a vector of all members!<F6>
       }
     default:
       return true;
