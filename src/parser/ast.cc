@@ -128,10 +128,10 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         this->type = applyUsualConversions(lhs_type, rhs_type).first;
         break;
       }
-      auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
+      auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
       if (isIntegerType(rhs_type)) {
-        if (rhs_as_ptr) {
-          if (!isObjectType(rhs_as_ptr->pointee())) {
+        if (lhs_as_ptr) {
+          if (!isObjectType(lhs_as_ptr->pointee())) {
             throw ParsingException(
                 std::string("- requires pointer to have complete object type"),
                 lhs->pos()
@@ -139,11 +139,11 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
           }
           // 2) the left operand is a pointer to a complete object type and the
           // right operand has integer type.
-          this->type = rhs_as_ptr;
+          this->type = lhs_as_ptr;
           break;
         }
       }
-      auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
+      auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
       if (lhs_as_ptr && rhs_as_ptr) {
         if (!isObjectType(lhs_as_ptr->pointee())) {
           throw ParsingException(std::string("- requires pointer to have complete object type"), lhs->pos());
