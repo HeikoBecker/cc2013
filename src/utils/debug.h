@@ -17,8 +17,19 @@ typedef enum debugFilter : size_t {
 } debugFilter;
 
 #ifdef DEBUG
+/*
+ * \brief: A simple class for printing debug messages
+ * Note that this class does nothing DEBUG is not defined
+ * When running the executable, you have to enable options in the followin way:
+ * LEXER=1 SEMANTIC=1 ./build/default/c4 --parse example.c
+ * This will enable debug messages tagged with LEXER and SEMANTIC, but won't
+ * print anything for the other tags (PARSER, GENERAL, CODEGEN, ...)
+ * Usage: Just create an instance of the class
+ * and use it like a normal outstream
+ * Example: debug(LEXER) << "Lexing is fun!"
+ */
 struct debug {
-    debug(debugFilter messageType);
+    debug(debugFilter messageType = GENERAL);
     ~debug();
 
     template<class T>
