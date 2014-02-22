@@ -327,9 +327,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
       throw ParsingException("Invalid type: " + decl->toString(), pos);
     }
 
-#ifdef DEBUG
-    cout<<" DECL : "<<name<<" : " <<decl->toString()<<endl;
-#endif
+    debug(SEMANTIC) <<" DECL : "<<name<<" : " <<decl->toString();
 
     if (Semantic::isIncompleteType(decl)) {
         throw Parsing::ParsingException(decl->toString() + " has incomplete type", pos);
