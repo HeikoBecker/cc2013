@@ -466,9 +466,25 @@ bool isFunctionType(SemanticDeclarationNode s) {
   return s->type() == Type::FUNCTION;
 }
 
+bool isIncompleteType(SemanticDeclarationNode s) {
+  switch (s->type()) {
+    case Type::STRUCT:
+      {
+        auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
+        // if the struct is only forward declared, it is incomplete
+        return s_as_struct->isForward();
+      }
+    case Type::VOID:
+      return true;
+    default:
+      return false;
+  }
+}
+
+
 bool isObjectType(SemanticDeclarationNode s) {
   // TODO: we also need to check that the type is complete!
-  return !isFunctionType(s);
+  return !(isFunctionType(s) || isIncompleteType(s));
 }
 
 bool hasObjectType(SubExpression s) {
