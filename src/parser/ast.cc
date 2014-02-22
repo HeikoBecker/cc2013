@@ -414,6 +414,11 @@ SemanticDeclarationNode VariableUsage::getType() {
 
 }
 
+void VariableUsage::checkSemanticConstraints() {
+  // check if the variable is declared
+  this->getType();
+}
+
 SemanticDeclarationNode VariableUsage::getType(SubSemanticNode s) {
   if (!this->type) {
     try {
@@ -672,6 +677,7 @@ SelectionStatement::SelectionStatement(SubExpression ex,
     Pos pos) : Statement(pos)
 {
   expression = ex;
+  ex->checkSemanticConstraints();
   ifStatement = ifStat;
 }
 
@@ -682,6 +688,7 @@ SelectionStatement::SelectionStatement(
   Pos pos) : Statement(pos)
 {
   expression = ex;
+  ex->checkSemanticConstraints();
   ifStatement = ifStat;
   elseStatement = elseStat;
 }
