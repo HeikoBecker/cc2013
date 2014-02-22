@@ -262,6 +262,10 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
           if (rhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
             valid = true;
           }
+        } else if (rhs->getType()->type() == Semantic::Type::FUNCTION) {
+          auto rhs_type2fptr = make_shared<PointerDeclaration>(0,
+              std::static_pointer_cast<FunctionDeclaration>(rhs->getType()));
+          valid = compareTypes(lhs->getType(), rhs_type2fptr);
         }
       }
       if (isNullPtrConstant(rhs)) {
