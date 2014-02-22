@@ -129,22 +129,29 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         break;
       }
       auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
-      if (!isObjectType(rhs_as_ptr->pointee())) {
-        throw ParsingException(std::string("- requires pointer to have complete object type"), lhs->pos());
-      }
       if (isIntegerType(rhs_type)) {
         if (rhs_as_ptr) {
+          if (!isObjectType(rhs_as_ptr->pointee())) {
+            throw ParsingException(
+                std::string("- requires pointer to have complete object type"),
+                lhs->pos()
+            );
+          }
+          // 2) the left operand is a pointer to a complete object type and the
+          // right operand has integer type.
           this->type = rhs_as_ptr;
           break;
         }
       }
       auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
-      if (!isObjectType(lhs_as_ptr->pointee())) {
-        throw ParsingException(std::string("- requires pointer to have complete object type"), lhs->pos());
-      }
       if (lhs_as_ptr && rhs_as_ptr) {
+        if (!isObjectType(lhs_as_ptr->pointee())) {
+          throw ParsingException(std::string("- requires pointer to have complete object type"), lhs->pos());
+        }
         // in real C this would be ptrdiff_t
         if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
+          // 3) both operands are pointers to qualified or unqualified versions
+          // of compatible complete object types
           this->type = make_shared<IntDeclaration>();
         } else {
           throw ParsingException(lhs_type->toString()
