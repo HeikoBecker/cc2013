@@ -6,16 +6,15 @@
 #include <sstream>
 
 
-typedef enum debugFilter {
-  SILENT = 0x000,
-  LEXER   = 1 << 0,
-  PARSER  = 1 << 1,
-  PRINT_AST     = 1 << 2,
-  CODEGEN = 1 << 3,
-  GENERAL = 1 << 4,
+typedef enum debugFilter : size_t {
+  SILENT    = 0x000,
+  LEXER     = 1 << 0,
+  PARSER    = 1 << 1,
+  PRINT_AST = 1 << 2,
+  SEMANTIC  = 1 << 3,
+  CODEGEN   = 1 << 4,
+  GENERAL   = 1 << 5,
 } debugFilter;
-
-constexpr debugFilter filter = SILENT;
 
 #ifdef DEBUG
 struct debug {

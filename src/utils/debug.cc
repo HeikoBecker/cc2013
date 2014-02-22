@@ -1,8 +1,16 @@
 #include "debug.h"
-
 #ifdef DEBUG
+#include <cstdlib>
+
 debug::debug(debugFilter messageType) : m_messageType(messageType)  {
 }
+
+static size_t filter =   (std::getenv("LEXER")     ? LEXER     : SILENT)
+                       | (std::getenv("PARSER")    ? PARSER    : SILENT)
+                       | (std::getenv("PRINT_AST") ? PRINT_AST : SILENT)
+                       | (std::getenv("SEMANTIC")  ? SEMANTIC  : SILENT)
+                       | (std::getenv("CODEGEN")   ? CODEGEN   : SILENT)
+                       | (std::getenv("GENERAL")   ? GENERAL   : SILENT);
 
 debug::~debug() {
   if (m_messageType & filter) {
@@ -18,6 +26,10 @@ debug::~debug() {
       case PARSER:
         std::cerr << "\033[1;32m";
         std::cerr << "Parser: ";
+        break;
+      case SEMANTIC:
+        std::cerr << "\033[1;35m";
+        std::cerr << "SEMANTIC: ";
         break;
       case CODEGEN:
         std::cerr << "\033[1;31m";
