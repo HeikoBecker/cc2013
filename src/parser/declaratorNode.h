@@ -82,6 +82,7 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       virtual std::string getIdentifier() {
         return "NONAME";
       }
+      virtual bool hasMoreThanOneParameterList() { return false;}
       virtual std::vector<ParameterNode> getParameter() { return std::vector<ParameterNode>(); }
 
 
@@ -125,6 +126,15 @@ typedef std::shared_ptr<Parameter> ParameterNode;
       int getCounter() { return pointerCounter; }
       std::vector<ParameterNode> getParameter() { 
         return directDeclarator->getParameter(); 
+      }
+
+      // test whether declartor has something like a()()
+      bool hasMoreThanOneParameterList() {
+        if(directDeclarator) {
+          return directDeclarator->hasMoreThanOneParameterList();
+        }
+
+        return false;
       }
 
 
@@ -230,11 +240,18 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return s;
       }
 
-
-
-
       bool isFunction() {
         return help.size() !=0;
+      }
+
+      bool hasMoreThanOneParameterList() {
+        if (help.size() >1 ) {
+          return true;
+        } else if (s){
+          return s->hasMoreThanOneParameterList();
+        } else {
+          return false;
+        }
       }
 
       PPRINTABLE
@@ -305,6 +322,16 @@ typedef std::shared_ptr<Parameter> ParameterNode;
           return declarator->getNextDeclarator();
         } else {
           return declarator;
+        }
+      }
+
+      bool hasMoreThanOneParameterList() {
+        if (help.size() >1 ) {
+          return true;
+        } else if (declarator){
+          return declarator->hasMoreThanOneParameterList();
+        } else {
+          return false;
         }
       }
 

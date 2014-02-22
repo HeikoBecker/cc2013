@@ -320,7 +320,9 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
       }
     }
 
-
+    if (declarator->hasMoreThanOneParameterList()) {
+      throw ParsingException("The declaration of  " + name + " has more than one parameter list", pos);
+    }
 
 
     if (!Semantic::isValidType(decl)) {
