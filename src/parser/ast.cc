@@ -122,11 +122,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
     case PunctuatorType::MINUS: {
       auto lhs_type = lhs->getType();
       auto rhs_type = rhs->getType();
+      // For subtraction, one of the following shall hold:
       if (isArithmeticType(lhs_type) && isArithmeticType(rhs_type)) {
+        // 1) both operands have arithmetic type
         this->type = applyUsualConversions(lhs_type, rhs_type).first;
         break;
       }
-      auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
+      auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
       if (!isObjectType(rhs_as_ptr->pointee())) {
         throw ParsingException(std::string("- requires pointer to have complete object type"), lhs->pos());
       }
