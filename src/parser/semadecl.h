@@ -6,7 +6,6 @@
 #include <vector>
 
 namespace Semantic {
-
   enum class Type {
     INT,
     CHAR,
@@ -16,7 +15,6 @@ namespace Semantic {
     FUNCTION,
     STRUCT,
   };
-
 }
 
 namespace Parsing {
@@ -60,7 +58,6 @@ namespace Parsing {
       }
   };
 
-
   // void is not allowed, but void**
   class VoidDeclaration : public SemanticDeclaration {
     Semantic::Type type() override {return Semantic::Type::VOID;}
@@ -75,7 +72,6 @@ namespace Parsing {
       // type is int, char, or void
       PointerDeclaration(int pointerCounter, Parsing::SemanticDeclarationNode type);
       Semantic::Type type() override {return Semantic::Type::POINTER;}
-
       Parsing::SemanticDeclarationNode pointee() {return child;};
 
       virtual std::string toString() {
@@ -122,7 +118,7 @@ namespace Parsing {
 
     public:  
       // name e.g. @S
-      StructDeclaration(std::string n, SubSemanticNode s, bool forward);
+      StructDeclaration(std::string n, SubSemanticNode s, bool forward, bool selfReferencing);
       Semantic::Type type() override {return Semantic::Type::STRUCT;}
 
       std::string toString() {
@@ -132,11 +128,16 @@ namespace Parsing {
       bool isForward() {
         return forward;
       }
+
+      bool isSelfReferencing() {
+        return selfReferencing;
+      }
       SubSemanticNode node() {return m_node;}
     private:
       std::string name;
       SubSemanticNode m_node;
       bool forward;
+      bool selfReferencing;
   };
 
 }

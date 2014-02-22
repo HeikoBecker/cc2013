@@ -208,9 +208,10 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
         
        SubSemanticNode helpNode;
        bool forward;
-
+        
+       int id;
        while(!structMap[name].empty()) {
-        int id = structMap[name].top().first;
+        id = structMap[name].top().first;
         forward = structMap[name].top().second;
        // cout<<"Id : "<<id<<endl;
         int parent = nodes[id]->getParentIndex();
@@ -223,7 +224,7 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        }
 
        if (helpNode) {
-        myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode, forward);
+        myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode, forward, nodes[id]->isActive());
        } else {
           throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
        }
@@ -242,9 +243,17 @@ SemanticDeclarationNode SemanticTree::helpConvert(
    SemanticDeclarationNode myDeclaration;
 
 
-  if (!declarator) {
-    return createType(typeNode, pos);
-  }
+   if (!declarator) {
+     auto s =  createType(typeNode, pos);
+     if(s->type() == Semantic::Type::STRUCT) {
+       auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
+       if(s_as_struct->isSelfReferencing()) {
+         throw Parsing::ParsingException("the struct is referencing itself", pos);
+       }
+     }
+
+     return s;
+   }
 
 
    TypeNode t = typeNode;
@@ -267,7 +276,16 @@ SemanticDeclarationNode SemanticTree::helpConvert(
 
     if (pointerCounter != 0) {
       myDeclaration =  make_shared<PointerDeclaration>(pointerCounter-1, myDeclaration);
-    } 
+    }  else {
+
+      auto s =  myDeclaration;
+     if(s->type() == Semantic::Type::STRUCT) {
+       auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
+       if(s_as_struct->isSelfReferencing()) {
+         throw Parsing::ParsingException("the struct is referencing itself", pos);
+       }
+     }
+   }
    }
 
    if (res.second) {
