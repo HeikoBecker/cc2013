@@ -337,7 +337,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
   
     // don't allow functions inside a struct 
     if (nodes[currentPos]->isInsideStruct()) {
-      std::cout<<"current pos " <<currentPos<<std::endl;
+      debug(SEMANTIC)  <<"current pos " <<currentPos;
       if(!Semantic::isObjectType(decl)) {
       throw ParsingException("A function definition is not allowed inside a struct ", pos);
       }
