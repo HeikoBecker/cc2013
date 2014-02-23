@@ -548,12 +548,19 @@ bool isIncompleteType(SemanticDeclarationNode s) {
   }
 }
 
-
 bool isObjectType(SemanticDeclarationNode s) {
-  return !(isFunctionType(s) || isIncompleteType(s));
+  return !isFunctionType(s);
 }
 
 bool hasObjectType(SubExpression s) {
+  return isObjectType(s->getType());
+}
+
+bool isCompleteObjectType(SemanticDeclarationNode s) {
+  return !(isFunctionType(s) || isIncompleteType(s));
+}
+
+bool hasCompleteObjectType(SubExpression s) {
   return isObjectType(s->getType());
 }
 

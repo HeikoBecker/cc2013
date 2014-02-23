@@ -147,6 +147,8 @@ namespace Semantic {
   bool isFunctionType(Parsing::SemanticDeclarationNode);
   bool isObjectType(Parsing::SemanticDeclarationNode);
   bool hasObjectType(Parsing::SubExpression);
+  bool isCompleteObjectType(Parsing::SemanticDeclarationNode);
+  bool hasCompleteObjectType(Parsing::SubExpression);
   Parsing::SemanticDeclarationNode promoteType(Parsing::SemanticDeclarationNode s);
   std::pair<Parsing::SemanticDeclarationNode, Parsing::SemanticDeclarationNode> 
   applyUsualConversions(Parsing::SemanticDeclarationNode,

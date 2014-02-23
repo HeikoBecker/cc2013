@@ -131,9 +131,9 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       auto lhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(lhs_type);
       if (isIntegerType(rhs_type)) {
         if (lhs_as_ptr) {
-          if (!isObjectType(lhs_as_ptr->pointee())) {
+          if (!isCompleteObjectType(lhs_as_ptr->pointee())) {
             throw ParsingException(
-                std::string("- requires pointer to have complete object type"),
+                std::string("- requires pointer to point to complete object type"),
                 lhs->pos()
             );
           }
@@ -145,8 +145,8 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
       }
       auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs_type);
       if (lhs_as_ptr && rhs_as_ptr) {
-        if (!isObjectType(lhs_as_ptr->pointee())) {
-          throw ParsingException(std::string("- requires pointer to have complete object type"), lhs->pos());
+        if (!isCompleteObjectType(lhs_as_ptr->pointee())) {
+          throw ParsingException(std::string("- requires pointer to point to complete object type"), lhs->pos());
         }
         // in real C this would be ptrdiff_t
         if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
@@ -172,8 +172,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         auto rhs_as_ptr = dynamic_pointer_cast<PointerDeclaration>(rhs->getType());
         // TODO: function pointer conversion must fail
         if (lhs_as_ptr && rhs_as_ptr) {
-          if (isObjectType(lhs_as_ptr->pointee()) && isObjectType(rhs_as_ptr->pointee())) {
-          } else {
+          if (!(isObjectType(lhs_as_ptr->pointee()) && isObjectType(rhs_as_ptr->pointee()))) {
             throw ParsingException(std::string("TODO: good message!"), this->pos());
           }
           if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
