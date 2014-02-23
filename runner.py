@@ -42,6 +42,7 @@ def run(testdir=None):
         testdir = os.path.join(os.path.abspath(os.path.curdir), "tests")
     failed_tests_pass = []
     failed_tests_fail = []
+    timed_out_test = []
     msg("Running tests in {}".format(testdir))
     subdirs = next(os.walk(testdir))[1]
     for directory in subdirs:
@@ -65,6 +66,7 @@ def run(testdir=None):
                 else:
                     if o[0] == timeout:
                         print("T", end="")
+                        timed_out_test.append((test_file, None))
                     else:
                         print("F", end="")
                         failed_tests_pass.append((test_file, o[2]))
@@ -88,6 +90,7 @@ def run(testdir=None):
                         print(".", end="")
                     elif o[0] == timeout:
                         print("T", end="")
+                        timed_out_test.append((test_file, None))
                     else:
                         print("S", end="")
                         failed_tests_fail.append((test_file, o[2]))
@@ -111,8 +114,12 @@ def run(testdir=None):
             print("\t" + failed[0])
             if(failed[1]):
                 print("error log:\n ", failed[1].decode("utf-8"))
+    if timed_out_test:
+        msg("The following tests were kiled due to a timeout")
+        for timed_out in timed_out_test:
+            print("\t" + timed_out[0])
     msg("{} of {} tests passed".format(
-        test_count - len(failed_tests_fail) - len(failed_tests_pass),
+        test_count - len(failed_tests_fail) - len(failed_tests_pass) - len(timed_out_test),
         test_count)
     )
 
