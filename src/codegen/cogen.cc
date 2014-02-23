@@ -8,6 +8,7 @@
 #include "../utils/util.h"
 
 #include <memory>
+#include <algorithm>
 
 #include "llvm/IR/Module.h"                /* Module */
 #include "llvm/IR/Function.h"              /* Function */
@@ -101,6 +102,15 @@ void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
   UNUSED(M);
 }
 
+/*
+ * Converst one of our types to a suiting LLVM type
+ */
+static llvm::Type* sem_type2llvm_type(llvm::IRBuilder<> & Builder, const Semantic::Type t) {
+  //TODO
+  UNUSED(t);
+  return Builder.getInt32Ty();
+}
+
 
 void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   // TODO: make name a member of functiondefiniton or declaration
@@ -118,6 +128,13 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   /* TODO: set the correct parameter types */
   auto parameter_types = std::vector<llvm::Type *>(function_type_->parameter().size());
   // iterate over parameter_types and push corresponding LLVM type into vector
+  std::transform(
+      function_type_->parameter().cbegin(),
+      function_type_->parameter().cend(),
+      begin(parameter_types),
+      [&](SemanticDeclarationNode s) {
+        return sem_type2llvm_type(Builder, s->type());
+  });
   /*************************************/
   llvm::FunctionType* function_type = llvm::FunctionType::get(
       return_type,
