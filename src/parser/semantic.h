@@ -90,6 +90,7 @@ class SemanticTree {
     int counter;
     std::map<std::string, TypeStack *> declarationMap;
     std::map<std::string, std::stack<std::pair<int,bool> > > structMap;
+    std::map<std::string, std::pair<SemanticDeclarationNode, bool> > functionMap;
     int loopDepth; // depth inside loop for checking break; continue;
 
     // map for goto 
@@ -103,7 +104,7 @@ class SemanticTree {
     void addChild(Pos pos, std::string name="@@", bool forward = false);
     void goUp();
     void deleteNotActiveNodes(TypeStack *st);
-    Parsing::SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos);
+    Parsing::SemanticDeclarationNode addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos, bool forwardFunction = true);
     void increaseLoopDepth();
     void decreaseLoopDepth();
     /*

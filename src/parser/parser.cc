@@ -215,7 +215,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
   auto parameter = decl->getNextParameter();
 
 
-  auto returnType = semanticTree->addDeclaration(type, decl, pos);
+  auto returnType = semanticTree->addDeclaration(type, decl, pos, false);
   semanticTree->setCurrentFunction(returnType);
 
   auto compStat = compoundStatement(parameter);

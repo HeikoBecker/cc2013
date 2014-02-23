@@ -320,7 +320,7 @@ SemanticDeclarationNode SemanticTree::helpConvert(
      return myDeclaration;
 }
 
-SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos) {
+SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDeclarator declarator, Pos pos, bool isForwardFunction) {
 
   SemanticDeclarationNode ret;
   if (declarator && typeNode) {
@@ -363,6 +363,28 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
 
     if (Semantic::isIncompleteType(decl)) {
         throw Parsing::ParsingException(decl->toString() + " has incomplete type", pos);
+    }
+
+    // add function to map
+    if (decl->type() == Semantic::Type::FUNCTION) {
+      if (functionMap.find(name) == functionMap.end()){
+          functionMap[name] = make_pair(decl, isForwardFunction);
+      } else {
+        bool wasForward = functionMap[name].second;
+        auto lastDecl = functionMap[name].first; 
+        if (!hasSameType(lastDecl, decl)) {
+          throw Parsing::ParsingException("the functions do not have the same type ", pos);
+        }
+
+        if (wasForward) {
+          functionMap[name] = make_pair(decl, isForwardFunction);
+        } else {
+          if (!isForwardFunction) {
+            throw Parsing::ParsingException("No redefinition of  " + name, pos);
+          }
+        }
+      }
+
     }
 
     // This is the old code 
