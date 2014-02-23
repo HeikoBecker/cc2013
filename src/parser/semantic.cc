@@ -229,7 +229,8 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        }
 
        if (helpNode) {
-        myDeclaration = make_shared<StructDeclaration>("@" + type, helpNode, forward, nodes[id]->isActive());
+         auto ptr = (size_t) helpNode.operator->(); // TODO FIXME WARNING HACK !!!!!
+        myDeclaration = make_shared<StructDeclaration>("@" + type + std::to_string(ptr), helpNode, forward, nodes[id]->isActive());
        } else {
           throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
        }
