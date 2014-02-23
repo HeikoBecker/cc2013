@@ -322,7 +322,7 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
       if (auto optype = dynamic_pointer_cast<PointerDeclaration>(operand->getType()))  {
         // dereferencing a pointer yields the type of the pointee
         this->type = optype->pointee();
-        if (isObjectType(this->type)) {
+        if (isCompleteObjectType(this->type)) {
           // 6.5.3.2 $4
           // If the operand points to a function, the result is a function
           // designator; if it points to an object, the result is an lvalue
