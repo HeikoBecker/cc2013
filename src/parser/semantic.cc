@@ -52,7 +52,9 @@ bool SemanticTree::hasStructDeclaration(std::string name) {
         int parent = nodes[id]->getParentIndex();
         if (nodes[parent]->isActive()) {
           break;
-        } 
+        }else {
+          structMap[name].pop();
+        }
       }
 
       return !structMap[name].empty();
