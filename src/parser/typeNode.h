@@ -12,7 +12,6 @@ class ASTNODE(Type)
   CONS_INTER(Type)
 
   public:
-    virtual bool canBeInFunctionDeclaration() { return true; };
     virtual std::string toString() { return "unknown"; }
     virtual bool isVoid() { return false; }
     virtual bool isStruct() { return false; }

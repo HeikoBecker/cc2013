@@ -185,7 +185,6 @@ class TYPE(StructType) {
     StructType(Pos pos);
     StructType(std::string name, Pos pos);
     StructType(std::string name, StructContent content, Pos pos);
-    bool canBeInFunctionDeclaration() { return !hasDeclaration; };
 
     bool isStruct() {
       return true;

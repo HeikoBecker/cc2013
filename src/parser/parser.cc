@@ -201,11 +201,8 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     // it was a declaration()
     return make_shared<ExternalDeclaration>(type, decl, pos, semanticTree);
   }
-  // it is a functionDefition!
-  if (!type->canBeInFunctionDeclaration()) {
-    reportError("struct { is an error");
-  }
 
+  // it is a functionDefition!
   if (!decl->canBeFunctionDefinition()) {
     reportError(decl->pos(), "FunctionDefinition has to be either (void) or all parameters have to be declared");
   }
