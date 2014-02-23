@@ -406,10 +406,14 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
 
       // NO redefinitions
       if (!st->empty() && st->top().first == currentPos) {
-        if (currentPos !=0 || 
-            !(
-            hasSameType(st->top().second, decl)
-            )) {
+
+        auto prevDecl = st->top().second;
+
+        if (!hasSameType(prevDecl, decl)) {
+          throw Parsing::ParsingException("the declaration of  " + name + " has not the same type", pos);
+        }
+
+        if (decl->type() !=  Semantic::Type::FUNCTION && currentPos != 0) {
           throw Parsing::ParsingException("no redefinition of " + name, pos);
         }
       } 
