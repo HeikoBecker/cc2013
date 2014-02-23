@@ -678,18 +678,22 @@ SelectionStatement::SelectionStatement(SubExpression ex,
 {
   expression = ex;
   ex->checkSemanticConstraints();
+  if (!hasScalarType(ex)) {
+    throw ParsingException(
+        "Controlling expression of selection statement must have scalar type",
+        pos
+        );
+  };
   ifStatement = ifStat;
 }
 
+// use delegating constructor
 SelectionStatement::SelectionStatement(
   SubExpression ex, 
   SubStatement ifStat, 
   SubStatement elseStat,
-  Pos pos) : Statement(pos)
+  Pos pos) : SelectionStatement(ex, ifStat, pos) 
 {
-  expression = ex;
-  ex->checkSemanticConstraints();
-  ifStatement = ifStat;
   elseStatement = elseStat;
 }
 
