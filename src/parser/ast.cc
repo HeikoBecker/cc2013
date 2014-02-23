@@ -740,20 +740,6 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
 )
   : AstNode(pos), type(type), semanticTree(semanticTree)
 {
-  // forward declaration of struct 
-  if (type->isStruct() && !type->containsDeclaration()) {
-     // Todo add here
-     //
-     string name = "@" + type->toString();
-     // FIXME: @Patrick: any reason to keep the line I  commented out below
-     /*
-     cout<<"name : "<< name<<endl;
-     */
-
-     //FIXME: @Patrick: addChild should return the same value as addDeclaration!
-     //declNode =
-     semanticTree->addChild(pos, name, true);
-  }
 }
 
 

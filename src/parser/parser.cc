@@ -509,6 +509,7 @@ StructNode Parser::structOrUnionSpecifier() {
   if (testType(TokenType::IDENTIFIER)) {
     auto name = m_nextsym->value();
 
+
     scan();
     if (testp(PunctuatorType::LEFTCURLYBRACE)) {
       semanticTree->addChild(pos, "@"+name);

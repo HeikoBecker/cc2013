@@ -64,7 +64,7 @@ SemanticTree::SemanticTree() {
   counter = 0;
   loopDepth = 0;
   currentPos = 0;
-  nodes.push_back(make_shared<SemanticNode>(-1));
+  nodes.push_back(make_shared<SemanticNode>(-1, false));
   counter++;
 }
 
@@ -77,10 +77,12 @@ SemanticTree::~SemanticTree() {
 
 void SemanticTree::addChild(Pos pos, string name, bool forward) {
 
-  //std::cout<<" add child : "<<name<<" "<<forward<<endl;
+   debug(SEMANTIC) << name<<" "<<forward;
 
+  bool insideStruct = nodes[currentPos]->isInsideStruct();
   // save the struct definitions
   if (name != "@@") {
+    insideStruct = true;
 
     if(structMap.find(name) == structMap.end()) {
       stack<pair<int,bool> > st = stack<pair<int, bool> >();
@@ -125,13 +127,14 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
     }
   }
 
-  nodes.push_back(make_shared<SemanticNode>(currentPos));
+  nodes.push_back(make_shared<SemanticNode>(currentPos, insideStruct));
   counter++;
   currentPos = counter - 1;
 
   }
 
 void SemanticTree::goUp() {
+  debug(SEMANTIC)<<"go up";
   nodes[currentPos]->disable();
   currentPos = nodes[currentPos]->getParentIndex();
 }
@@ -329,6 +332,16 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
 
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
+    debug(SEMANTIC) <<" DECL : "<<name<<" : " <<decl->toString();
+    //std::cout<<" DECL : "<<name<<" : " <<decl->toString(); 
+  
+    // don't allow functions inside a struct 
+    if (nodes[currentPos]->isInsideStruct()) {
+      std::cout<<"current pos " <<currentPos<<std::endl;
+      if(!Semantic::isObjectType(decl)) {
+      throw ParsingException("A function definition is not allowed inside a struct ", pos);
+      }
+    }
 
     // don't allow struct S a; if S is forward declaration
     if (decl->type() == Semantic::Type::STRUCT) {
@@ -347,7 +360,6 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
       throw ParsingException("Invalid type: " + decl->toString(), pos);
     }
 
-    debug(SEMANTIC) <<" DECL : "<<name<<" : " <<decl->toString();
 
     if (Semantic::isIncompleteType(decl)) {
         throw Parsing::ParsingException(decl->toString() + " has incomplete type", pos);

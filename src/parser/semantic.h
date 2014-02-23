@@ -28,7 +28,7 @@ typedef std::stack<std::pair<int, Parsing::SemanticDeclarationNode> > TypeStack;
 
 class SemanticNode {
   public:
-    SemanticNode(int parent) : parent(parent), active(true) { };
+    SemanticNode(int parent, bool insideStruct) : parent(parent), active(true), insideStruct(insideStruct) { };
 
     void disable() {
       active = false;
@@ -53,6 +53,10 @@ class SemanticNode {
           );
     }
 
+    bool isInsideStruct() {
+      return insideStruct;
+    }
+
     Parsing::SemanticDeclarationNode getNode(std::string name) {
       if (decl.find(name) == decl.end()) {
         throw SemanticException(name + " not found");
@@ -64,6 +68,7 @@ class SemanticNode {
   private:
     int parent;
     bool active;
+    bool insideStruct;
     std::map<std::string, Parsing::SemanticDeclarationNode> decl;
 };
 
