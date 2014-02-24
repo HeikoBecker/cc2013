@@ -465,7 +465,11 @@ bool isScalarType(SemanticDeclarationNode s) {
   // cherry picking relevant parts from C++'s type_traits as described at
   // http://www.cplusplus.com/reference/type_traits/
   // (just removing everything not in C4
-  return (isArithmeticType(s) || s->type() == Type::POINTER);
+  return (  isArithmeticType(s)
+          || s->type() == Type::POINTER
+          // function can be converted to function pointer
+          || s->type() == Type::FUNCTION
+          );
 }
 bool hasScalarType(SubExpression s) {
   return isScalarType(s->getType());
