@@ -476,7 +476,17 @@ FunctionCall::FunctionCall(SubExpression funcName,
                            std::vector<SubExpression> arguments, Pos pos)
         : Expression(pos), funcName(funcName), arguments(arguments) 
 {
-  if (auto function = std::dynamic_pointer_cast<FunctionDeclaration>(funcName->getType())) {
+  auto type = funcName->getType();
+  if (type->type() == Semantic::Type::POINTER) {
+    type = std::static_pointer_cast<PointerDeclaration>(type)->pointee();
+  }
+  if (type->type() == Semantic::Type::FUNCTION) {
+    auto function = std::dynamic_pointer_cast<FunctionDeclaration>(funcName->getType());
+    if (!function) {
+      debug(GENERAL) << "This is buggy!!";
+      // the function pointer declaration needs to set up the function object!
+      goto somone_must_fix_function_pointer; // TODO: FIXME: WORKAROUND
+    }
     auto expected_parameter = function->parameter(); 
     if (expected_parameter.size() == arguments.size()) {
       // check if argument types match
@@ -513,6 +523,7 @@ FunctionCall::FunctionCall(SubExpression funcName,
         + (funcName->getType() ? funcName->getType()->toString() : "INITIALIZE ME!")
         + " which is not a function", pos);
   }
+  somone_must_fix_function_pointer:;
 }
 
 TernaryExpression::TernaryExpression(SubExpression condition, 
