@@ -80,7 +80,6 @@ using namespace Parsing;
 
 bool g_skipNewLineBeforeBlockStatement = false; // TODO: FIXME: global variables are BAD!
 bool g_skipNewLineBeforeSelectionStatement = false; // TODO: FIXME: global variables are BAD!
-bool g_adjustParenthesesInDeclarator = false; // TODO: FIXME: global variables are BAD!
 
 #define PRETTY_PRINT(X) void X::prettyPrint(unsigned int indentLevel)
 /* Beware of macro magic
@@ -391,26 +390,15 @@ PRETTY_PRINT(IdentifierList) {
 PRETTY_PRINT(Declarator)
 {
   // TODO : unfinished, probably also broken
-  auto adjust = g_adjustParenthesesInDeclarator;
   for (auto i = this->pointerCounter; i>0; --i) {
-    if (adjust) {
-      adjust = false;
-    } else {
-      PPRINT('(');
-    }
+    PPRINT('(');
     PPRINT('*');
   }
-  adjust = g_adjustParenthesesInDeclarator;
-  g_adjustParenthesesInDeclarator = false;
   if (directDeclarator) {
     PPRINT(this->directDeclarator);
   }
   for (auto i = this->pointerCounter; i>0; --i) {
-    if (adjust) {
-      adjust = false;
-    } else {
-      PPRINT(')');
-    }
+    PPRINT(')');
   }
 }
 
@@ -453,7 +441,6 @@ PRETTY_PRINT(FunctionDefinition) {
   /*TODO: unfinished */
   PPRINT(this->type);
   PPRINT(' ');
-  g_adjustParenthesesInDeclarator = true;
   PPRINT(this->declarator);
   PPRINT(this->compoundStatement);
   PPRINT('\n');
