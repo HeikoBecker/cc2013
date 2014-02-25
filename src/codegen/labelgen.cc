@@ -3,9 +3,10 @@
 
 using namespace std;
 
+namespace Codegeneration {
 LabelGen::LabelGen() :
        		whileCounter( 0), thenCounter(0), elseCounter(0),
-		garbageCounter(0){}
+		garbageCounter(0){};
 
 LabelGen::~LabelGen(){};
 
@@ -31,4 +32,5 @@ string LabelGen::makeOtherLabel(){
 	string res = "CC2013MakesCoolCompilers";
 	res += (garbageCounter++);
 	return res;
+}
 }

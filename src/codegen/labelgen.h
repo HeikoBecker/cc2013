@@ -2,6 +2,7 @@
 #define LABELGEN_H
 #include <string>
 
+namespace Codegeneration {
 class LabelGen {
 
 	private:
@@ -14,5 +15,6 @@ class LabelGen {
 		std::string makeElseLabel();
 		std::string makeOtherLabel();
 };
+}
 
 #endif
