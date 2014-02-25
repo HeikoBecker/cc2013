@@ -603,9 +603,10 @@ std::pair<SubDeclarator,SubExpression> Parser::structDeclarator(TypeNode type) {
     // SubDeclarator will be an empty shared_ptr
     return std::make_pair(SubDeclarator(), constantExpression());
   } else {
+
+    OBTAIN_POS();
     auto decl = declarator();
     
-    OBTAIN_POS();
     semanticTree->addDeclaration(type, decl, pos);
 
     if (testp(":")) {
