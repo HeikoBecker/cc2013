@@ -175,10 +175,15 @@ void SemanticTree::decreaseLoopDepth() {
 
 void SemanticTree::setCurrentFunction(SemanticDeclarationNode s) {
   m_currentFunction = s;
+  // delete label variables
+  labelMap.clear();
+  gotoLabels.clear();
 }
 
 void SemanticTree::unsetCurrentFunction() {
   m_currentFunction.reset();
+  // check goto label here
+  checkGotoLabels();
 }
 
 bool SemanticTree::addLabel(string label) {
