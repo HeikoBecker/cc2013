@@ -160,9 +160,6 @@ AstRoot Parser::parse() {
   auto tu = translationUnit();
   expect(TokenType::END);
 
-  // check for goto-statement label at the end
-  semanticTree->checkGotoLabels();
-
   return tu;
 }
 
