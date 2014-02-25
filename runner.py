@@ -7,6 +7,7 @@ import os.path
 import glob
 import subprocess
 from subprocess import PIPE
+import argparse
 
 path2c4 = os.path.join("build", "default", "c4")
 timeout = -127
@@ -127,4 +128,9 @@ def run(testdir=None):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run cc2013's tests.")
+    parser.add_argument('--executable', dest='c4')
+    args = parser.parse_args()
+    if (args.c4):
+        path2c4 = os.path.abspath(args.c4)
     run()
