@@ -6,6 +6,7 @@
 #include "../parser/semantic.h"
 #include "../utils/exception.h"
 #include "../utils/util.h"
+#include "labelgen.h"
 
 #include <memory>
 #include <algorithm>
@@ -30,8 +31,6 @@
                  TheFunction->getEntryBlock().begin());
   return TmpB.CreateAlloca(type, 0, VarName.c_str());
 }
-
-
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
