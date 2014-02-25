@@ -6,9 +6,9 @@ using namespace std;
 namespace Codegeneration {
 LabelGen::LabelGen() :
        		whileCounter( 0), thenCounter(0), elseCounter(0),
-		garbageCounter(0){};
+		garbageCounter(0){}
 
-LabelGen::~LabelGen(){};
+LabelGen::~LabelGen(){}
 
 string LabelGen::makeWhileLabel(){
 	string res = "WhileBlock";
