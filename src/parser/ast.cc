@@ -30,14 +30,22 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         if (!hasIntegerType(rhs)) {
         throw ParsingException(std::string(
               "Right operand of array subscript must have integer type, but is a !"
-              + (rhs->getType() ?  rhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+              + (rhs->getType() ?  rhs->getType()->toString() : "INITIALIZE ME!")), rhs->pos());
         }
         this->type = ltype->pointee();
         this->m_can_be_lvalue = true;
-      } else {
+      } else if (auto rtype = std::dynamic_pointer_cast<PointerDeclaration>(rhs->getType())) {
+        if (!hasIntegerType(lhs)) {
         throw ParsingException(std::string(
-              "Left operand does not point to an object, but is a !"
+              "Left operand of array subscript must have integer type, but is a !"
               + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), lhs->pos());
+        }
+        this->type = rtype->pointee();
+        this->m_can_be_lvalue = true;
+      }  else {
+        throw ParsingException(std::string(
+              "Neither left nor right operand is a pointer! Left type is "
+              + (lhs->getType() ?  lhs->getType()->toString() : "INITIALIZE ME!")), pos);
       }
       break;
     case PunctuatorType::ARROW: 
