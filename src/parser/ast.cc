@@ -181,15 +181,27 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         // TODO: function pointer conversion must fail
         if (lhs_as_ptr && rhs_as_ptr) {
           if (!(isObjectType(lhs_as_ptr->pointee()) && isObjectType(rhs_as_ptr->pointee()))) {
-            throw ParsingException(std::string("TODO: good message!"), this->pos());
+            throw ParsingException(std::string(
+                  "Pointers must both point to object types, but lhs was "
+                  + lhs_as_ptr->toString() + " and rhs was "
+                  + rhs_as_ptr->toString()
+                   ), this->pos());
           }
           if (compareTypes(lhs_as_ptr->pointee(), rhs_as_ptr->pointee())) {
             this->type = make_shared<IntDeclaration>();
           } else {
-            throw ParsingException(std::string("TODO: good message!"), this->pos());
+            throw ParsingException(
+                std::string("Pointer point to different types: ")
+                + lhs_as_ptr->pointee()->toString() + " and "
+                + rhs_as_ptr->pointee()->toString(),
+                this->pos());
           }
         } else {
-          throw ParsingException(std::string("Comparision requires both operands to be either pointer to object or to be of real type."), this->pos());
+          throw ParsingException(std::string(
+                "Comparision requires both operands to be either pointer to object or to be of real type, but they were of type")
+              + lhs->getType()->toString() + " and "
+              + rhs->getType()->toString()
+              , this->pos());
         }
       }
       break;
