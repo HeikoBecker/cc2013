@@ -877,7 +877,15 @@ IterationStatement::IterationStatement(SubExpression ex,
     SubStatement st,
     IterationEnum k,
     Pos pos)
-  : Statement(pos), expression(ex), statement(st), kind(k) {}
+  : Statement(pos), expression(ex), statement(st), kind(k) 
+{
+  if (!hasScalarType(expression))   {
+    throw ParsingException(
+        "Controlling expression of an iteration statement must have scalar type",
+        pos
+        );
+  }
+}
 
 
 LabeledStatement::LabeledStatement(std::string str, SubStatement st, Pos pos)
