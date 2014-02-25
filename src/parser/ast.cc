@@ -226,8 +226,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               || (isObjectType(rpointee) && lpointee->type() == Semantic::Type::VOID))) {
             // both operands are pointers to qualified or unqualified versions 
             // of compatible types
-            auto types_after_conversion =  applyUsualConversions(lpointee, rpointee);
-            if (!compareTypes(types_after_conversion.first, types_after_conversion.second)) {
+            if (!compareTypes(lpointee, rpointee)) {
               ostringstream errmsg;
               errmsg << "Operands of equality operator are not compatible! Types were: "
                 << lhs->getType()->toString() << " and "
