@@ -129,11 +129,13 @@ bool Parser::testLookAheadP(string val) {
 
 
 bool Parser::testLookAheadType() {
-  return (m_lookahead->value() == "int"     || 
-          m_lookahead->value() == "char"    || 
-          m_lookahead->value() == "void"    || 
-          m_lookahead->value() == "struct") && 
-         m_lookahead->type() == TokenType::KEYWORD;
+  return (   m_lookahead->type() == TokenType::KEYWORD
+          && (   m_lookahead->value() == "int"
+              || m_lookahead->value() == "char"
+              || m_lookahead->value() == "void"
+              || m_lookahead->value() == "struct"
+             )
+         );
 }
 
 bool Parser::testp(PunctuatorType puncutator) {
