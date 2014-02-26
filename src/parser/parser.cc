@@ -59,7 +59,20 @@ void Parser::expect(KeywordType keyword) {
 
 void Parser::expect(TokenType tokenType) {
   if (getNextType() != tokenType) {
-    expected("TODO");
+    switch(tokenType) {
+      case TokenType::IDENTIFIER:
+        expected("an identifier");
+        break;
+      case TokenType::CONSTANT:
+        expected("a constant");
+        break;
+      case TokenType::STRINGLITERAL:
+        expected("a stringliteral");
+        break;
+      default:
+        expected("that this is handled by the other expect functions!");
+        break;
+    }
   }
 }
 
