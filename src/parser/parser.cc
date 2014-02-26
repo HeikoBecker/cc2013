@@ -211,7 +211,7 @@ ExternalDeclarationNode Parser::externalDeclaration() {
 
   // it is a functionDefition!
   if (!decl->canBeFunctionDefinition()) {
-    reportError(decl->pos(), "FunctionDefinition has to be either (void) or all parameters have to be declared");
+    reportError(pos, "FunctionDefinition has to be either (void) or all parameters have to be declared");
   }
 
   expect(PunctuatorType::LEFTCURLYBRACE);
