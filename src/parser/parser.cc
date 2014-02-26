@@ -282,7 +282,7 @@ static inline int getPrec(Token t, bool isUnary = false) {
     return 13;
   } else if (   t.value() == "->"
              || t.value() == "."
-             /*TODO: handle () and [] here*/) {
+            ) {
     return 14;
   } else if ( t.value() == ":") {
     return 15;
@@ -293,7 +293,6 @@ static inline int getPrec(Token t, bool isUnary = false) {
 }
 
 static inline bool isBinaryOperator(Token t) {
-  //TODO: remove this nonsense
   if (   t.value() == "||"
       || t.value() == "=="
       || t.value() == "!="
@@ -347,7 +346,7 @@ SubExpression Parser::postfixExpression(SubExpression child) {
         expect(PunctuatorType::RIGHTPARENTHESIS);
         scan(); // now we've read the closing ")"
         child = make_shared<FunctionCall>(child, arguments, pos);
-      } else if (testp(PunctuatorType::LEFTSQBRACKET)) { //array access(?). TODO: Are expressions supported in []?
+      } else if (testp(PunctuatorType::LEFTSQBRACKET)) {
         scan();
         auto index = expression(0);
         expect(PunctuatorType::RIGHTSQBRACKET);
