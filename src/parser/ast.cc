@@ -231,7 +231,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
               errmsg << "Operands of equality operator are not compatible! Types were: "
                 << lhs->getType()->toString() << " and "
                 << rhs->getType()->toString();
-              throw ParsingException(errmsg.str(), pos);
+              throw ParsingException(errmsg.str(), *operator_position);
             }
           }
         } else
