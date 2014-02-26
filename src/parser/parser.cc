@@ -47,36 +47,31 @@ Parser::Parser(FILE* f, char const *name)
 
 void Parser::expect(PunctuatorType puncutator) {
   if (!testp(puncutator)) {
-    auto msg = std::string("Expected ");
-    msg += Lexing::PunctuatorType2String(puncutator);
-    msg += std::string(" but got ");
-    msg += m_nextsym->value();
-        if (m_nextsym->type() == TokenType::END)
-      msg += "EOF!";
-    reportError(msg);
+    expected(Lexing::PunctuatorType2String(puncutator));
   }
 }
 
 void Parser::expect(KeywordType keyword) {
   if (!testk(keyword)) {
-    auto msg = std::string("Expected ");
-    msg += KeywordType2String(keyword);
-    msg += std::string(" but got ");
-    msg += m_nextsym->value();
-        if (m_nextsym->type() == TokenType::END)
-      msg += "EOF!";
-    reportError(msg);
+    expected(KeywordType2String(keyword));
   }
 }
 
 void Parser::expect(TokenType tokenType) {
   if (getNextType() != tokenType) {
+    expected("TODO");
+  }
+}
+
+void Parser::expected(std::string expected) {
     auto msg = std::string("Expected ");
-    msg += "TODO";
+    msg += expected;
     msg += std::string(" but got ");
     msg += m_nextsym->value();
+    if (m_nextsym->type() == TokenType::END) {
+      msg += "EOF!";
+    }
     reportError(msg);
-  }
 }
 
 bool Parser::testTypeSpecifier() {
