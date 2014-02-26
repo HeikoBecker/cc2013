@@ -440,7 +440,6 @@ SubExpression Parser::computeAtom() {
 
 SubExpression Parser::sizeOfType() {
   OBTAIN_POS();
-  // TODO: actually construct AST class
   scan(); // read starting parenthesis
   // read type
   auto type = typeName();
@@ -829,51 +828,45 @@ direct-declarator_help -> "(" parameter-list ")" direct-declarator_help
 void Parser::directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs ,ThreeValueBool abstract) {
   OBTAIN_POS();
 
+  expect(PunctuatorType::LEFTPARENTHESIS);
+  scan();
 
-  if (testp(PunctuatorType::LEFTPARENTHESIS)) { // TODO: use expect instead of testp
+  // 1. option
+  if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
     scan();
 
-
-    // 1. option
-    if(testp(PunctuatorType::RIGHTPARENTHESIS)) {
-      scan();
-
-      if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        directDeclaratorHelp(hs, abstract);
-        hs.emplace_back(make_shared<DirectDeclaratorHelp>(pos));
-      } else {
-        hs.emplace_back(make_shared<DirectDeclaratorHelp>(pos));
-      }
-
-    } else if (testTypeSpecifier()) { // parameter-list
-      
-      auto params = parameterList();
-      expect(PunctuatorType::RIGHTPARENTHESIS);
-      scan();
-
-      if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        directDeclaratorHelp(hs, abstract);
-        hs.emplace_back(make_shared<DirectDeclaratorHelp>(params, pos));
-      } else {
-        hs.emplace_back(make_shared<DirectDeclaratorHelp>(params, pos));
-      }
-    } else if((abstract == ThreeValueBool::NOTABSTRACT || abstract == ThreeValueBool::DONTCARE) && testType(TokenType::IDENTIFIER)) {
-      auto ids = identifierList();
-      expect(PunctuatorType::RIGHTPARENTHESIS);
-      scan();
-
-      if(testp(PunctuatorType::LEFTPARENTHESIS)) {
-        directDeclaratorHelp(hs, ThreeValueBool::NOTABSTRACT);
-        hs.emplace_back(make_shared<DirectDeclaratorHelp>(ids, pos));
-      } else {
-        hs.emplace_back(make_shared<DirectDeclaratorHelp>(ids, pos));
-      }
+    if(testp(PunctuatorType::LEFTPARENTHESIS)) {
+      directDeclaratorHelp(hs, abstract);
+      hs.emplace_back(make_shared<DirectDeclaratorHelp>(pos));
     } else {
-      expectedAnyOf();
+      hs.emplace_back(make_shared<DirectDeclaratorHelp>(pos));
     }
 
+  } else if (testTypeSpecifier()) { // parameter-list
+
+    auto params = parameterList();
+    expect(PunctuatorType::RIGHTPARENTHESIS);
+    scan();
+
+    if(testp(PunctuatorType::LEFTPARENTHESIS)) {
+      directDeclaratorHelp(hs, abstract);
+      hs.emplace_back(make_shared<DirectDeclaratorHelp>(params, pos));
+    } else {
+      hs.emplace_back(make_shared<DirectDeclaratorHelp>(params, pos));
+    }
+  } else if((abstract == ThreeValueBool::NOTABSTRACT || abstract == ThreeValueBool::DONTCARE) && testType(TokenType::IDENTIFIER)) {
+    auto ids = identifierList();
+    expect(PunctuatorType::RIGHTPARENTHESIS);
+    scan();
+
+    if(testp(PunctuatorType::LEFTPARENTHESIS)) {
+      directDeclaratorHelp(hs, ThreeValueBool::NOTABSTRACT);
+      hs.emplace_back(make_shared<DirectDeclaratorHelp>(ids, pos));
+    } else {
+      hs.emplace_back(make_shared<DirectDeclaratorHelp>(ids, pos));
+    }
   } else {
-    expectedAnyOf(std::string("direct-declatror_help : '(' expected"));
+    expectedAnyOf();
   }
 
 }
