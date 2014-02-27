@@ -16,6 +16,10 @@
 
 #include "../lexer/lexer.h"
 
+#define EMIT_RVALUE llvm::Value* emit_rvalue(llvm::Module &) override;
+#define EMIT_LVALUE llvm::Value* emit_lvalue(llvm::Module &) override;
+
+
 namespace Parsing {
 
 typedef std::shared_ptr<SemanticTree> SemanticTreeNode;
@@ -30,6 +34,7 @@ class EXPRESSION(BinaryExpression)
                      const Pos* const operator_position = nullptr);
     PPRINTABLE
     IR_EMITTING
+    EMIT_RVALUE
   private:
     SubExpression lhs;
     SubExpression rhs;
@@ -42,7 +47,10 @@ class EXPRESSION(UnaryExpression)
    UnaryExpression(PunctuatorType op,
        SubExpression operand,
        Pos pos);
-   PPRINTABLE
+  PPRINTABLE
+  EMIT_LVALUE
+  EMIT_RVALUE
+
   private:
    SubExpression operand;
    PunctuatorType op;
@@ -57,7 +65,10 @@ class EXPRESSION(VariableUsage)
     // maps a variable name to its type when it is used in the context of a
     // struct
     SemanticDeclarationNode getType(SubSemanticNode structContext);
-    PPRINTABLE
+   PPRINTABLE
+   EMIT_LVALUE
+   EMIT_RVALUE
+
   private:
     std::string name;
     SemanticTreeNode semanticTree;
@@ -68,6 +79,9 @@ class EXPRESSION(Literal)
   public:
     Literal(std::string name, Pos pos);
     PPRINTABLE
+    EMIT_LVALUE
+    EMIT_RVALUE
+
   private:
     std::string name;
 };
@@ -77,6 +91,8 @@ class EXPRESSION(Constant)
   public:
     Constant(std::string name, Pos pos, Lexing::ConstantType ct);
     PPRINTABLE
+    EMIT_RVALUE
+
   private:
     Lexing::ConstantType ct;
     std::string name;
@@ -89,6 +105,9 @@ class EXPRESSION(FunctionCall)
                  std::vector<SubExpression> arguments,
                  Pos pos);
     PPRINTABLE
+    EMIT_LVALUE
+    EMIT_RVALUE
+
   private:
     SubExpression funcName;
     std::vector<SubExpression> arguments;
@@ -102,6 +121,9 @@ class EXPRESSION(TernaryExpression)
                       SubExpression rhs,
                       Pos);
     PPRINTABLE
+    EMIT_LVALUE
+    EMIT_RVALUE
+    
   private:
     SubExpression condition;
     SubExpression lhs;
@@ -219,6 +241,7 @@ class EXPRESSION(SizeOfExpression)
   public:
     SizeOfExpression(std::pair<TypeNode, SubDeclarator>, Pos pos);
     PPRINTABLE
+    EMIT_RVALUE
   private:
     std::pair<TypeNode, SubDeclarator> operand;
 };

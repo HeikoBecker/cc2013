@@ -219,10 +219,133 @@ llvm::Value* Parsing::Expression::emit_lvalue(llvm::Module & M) {
   throw CompilerException("Illegal LVALUE!", this->pos());
 }
 
+/*
+ * Emits the complete value calculation for the expression. As statements of the
+ * form e; where e is an expression are valid C, we just explicitely call the 
+ * RVALUE generating function here and ignore the result value
+ */
 void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
-  UNUSED(M);
-  switch (this->op) {
-    default:
-      std::cerr << "TODO";
-  }
+  this->emit_rvalue(M);
+}
+
+/*
+ * Creates the RVALUE of the BinaryExpression object and returns it for further
+ * usage. First compute left and right values, then emit the instruction based 
+ * on the operand
+ */
+llvm::Value* Parsing::BinaryExpression::emit_rvalue(llvm::Module & M){
+  UNUSED(M);//FIXME
+  return nullptr;
+}
+
+/*
+ * A unary operator can be a valid lvalue, so we need to allow this for code 
+ * generation. //TODO: Determine correct operators or not?
+ * First compute the lvalue of the operand and then apply the operator.
+ * Corresponding value is returned.
+ */
+llvm::Value* Parsing::UnaryExpression::emit_lvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * Produces the corresponding rvalue. First the rvalue of the operand is 
+ * computed, then the operator is applied.
+ */
+llvm::Value* Parsing::UnaryExpression::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/* 
+ * Produces the rvalue of a variable by returning the variable name that llvm 
+ * gave it so that we can do computations with it
+ */
+llvm::Value* Parsing::VariableUsage::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * Computes a variables lvalue by returnning the vartiable, that llvm has 
+ * produced when it has been declared.
+ */
+llvm::Value* Parsing::VariableUsage::emit_lvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * Produces the rvalue of a literal by returning its variable.
+ */
+llvm::Value* Parsing::Literal::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * Produces the lvalue of a literal, as string literals are arrays and therefore
+ * they have an address where they are stored.
+ */
+llvm::Value* Parsing::Literal::emit_lvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * Produces the constants value. It has been validated befory by the semantics
+ * so we can advise llvm to create a new constant if it does not exist and 
+ * return the value
+ */
+llvm::Value* Parsing::Constant::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * A function call can produce a valid value. So we need to evaluate all 
+ * parameters and then create the corresponding function call.
+ */
+llvm::Value* Parsing::FunctionCall::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * A function can return the address of some valid space so it can also produce
+ * a valid rvalue. this has been validated by the semantics. We only need
+ * to compute the value and then return it.
+ */
+llvm::Value* Parsing::FunctionCall::emit_lvalue(llvm::Module & M){
+ UNUSED(M); //FIXME
+ return nullptr;
+}
+
+/*
+ * A ternary operator can produce a valid rvalue. First evaluate the condition.
+ * Then return the value based on the condition.
+ * TODO: Use the phi trick that was shown in the slides!
+ */
+llvm::Value* Parsing::TernaryExpression::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
+}
+
+/*
+ * Produce the ternary expressions value. Remember that both expressions need to
+ * be evaluated as one could contain side effects.
+ * TODO: Use the phi trick that was shown in the slides!
+ */
+llvm::Value* Parsing::TernaryExpression::emit_lvalue(llvm::Module & M){
+ UNUSED(M); //FIXME
+ return nullptr;
+}
+
+/*
+ * Produces the rvalue of the sizeof expression. TODO!
+ */
+llvm::Value* Parsing::SizeOfExpression::emit_rvalue(llvm::Module & M){
+  UNUSED(M); //FIXME
+  return nullptr;
 }
