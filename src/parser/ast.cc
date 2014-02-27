@@ -723,7 +723,7 @@ SelectionStatement::SelectionStatement(
 
 Declaration::Declaration(TypeNode t, SubDeclarator declarator, Pos pos, shared_ptr<SemanticTree> semanticTree)
   : AstNode(pos), type(t),declarator(declarator), semanticTree(semanticTree) {
-    semanticTree->addDeclaration(type, declarator, pos);
+    declNode = semanticTree->addDeclaration(type, declarator, pos);
 }
 
 
