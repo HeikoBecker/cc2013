@@ -949,13 +949,17 @@ bool DirectDeclaratorHelp::canBeFunction() {
         if (paramList[0]->isVoid()) {
           return true;
         } 
+       
+        if (!paramList[0]->hasName()) {
+          throw ParsingException("parameter name omitted ", paramList[0]->pos());
+        }
 
         return paramList[0]->hasName();
       } else {
         // all declarators have to have a name
         for (int n=0; n<len; n++) {
           if(!paramList[n]->hasName()) {
-            return false;
+            throw ParsingException("parameter name omitted ", paramList[n]->pos());
           }
         }
         return true;
