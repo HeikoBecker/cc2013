@@ -115,11 +115,19 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
           );
       } else { // it was alredy declared
           // it is a forward declaration
-                      bool lastForward = structMap[name].top().second;
+             bool lastForward = structMap[name].top().second;
 
              // take the node from the forward declaration
              if (lastForward) {
-              currentPos = lastForward;
+
+              if (!forward) {
+                // it is not a forward declaration anymore
+                auto helpPos = structMap[name].top().first;
+                // std::cout<<"go to pos : "<<helpPos<<endl;
+                nodes[helpPos]->setNotForward();
+              }
+
+              currentPos = structMap[name].top().first;
               return;
              } else {
                // it is a redefinition
@@ -128,15 +136,13 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
       }
     }
   }
-
-  nodes.push_back(make_shared<SemanticNode>(currentPos, insideStruct));
+  nodes.push_back(make_shared<SemanticNode>(currentPos, insideStruct, forward));
   counter++;
   currentPos = counter - 1;
-
   }
 
 void SemanticTree::goUp() {
-  debug(SEMANTIC)<<"go up";
+  //debug(SEMANTIC)<<"go up";
   nodes[currentPos]->disable();
   currentPos = nodes[currentPos]->getParentIndex();
 }
@@ -341,7 +347,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
     debug(SEMANTIC) <<" DECL : "<<name<<" : " <<decl->toString();
-    //std::cout<<" DECL : "<<name<<" : " <<decl->toString(); 
+    // std::cout<<" DECL : "<<name<<" : " <<decl->toString()<<std::endl;
   
     // don't allow functions inside a struct 
     if (nodes[currentPos]->isInsideStruct()) {
@@ -547,11 +553,7 @@ bool isIncompleteType(SemanticDeclarationNode s) {
     case Type::STRUCT:
       {
         auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
-        // if the struct is only forward declared, it is incomplete
-        // TODO: this doesn't work as I hoped it would;
-        // this only return true iff we are forward declaring a type,
-        // not when we use a forward declared type
-        return s_as_struct->isForward();
+        return s_as_struct->node()->isForward();
       }
     case Type::VOID:
       return true;
