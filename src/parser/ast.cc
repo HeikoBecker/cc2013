@@ -758,7 +758,15 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type,
         throw ParsingException("Illegal type: " + declNode->toString(), pos);
       }
     }
+  }else {
+    auto name = declarator->getIdentifier();
+    declNode = semanticTree-> lookUpType(name, pos);
   }
+
+//  std::cout<<"NAME: "<<declarator->getIdentifier()<<std::endl;
+//  std::cout<<"Node: "<<declNode->toString()<<std::endl;
+
+  // add the type
   
 }
 
@@ -767,6 +775,7 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
 )
   : AstNode(pos), type(type), semanticTree(semanticTree)
 {
+  // std::cout<<"NAME: "<<declarator->getIdentifier()<<std::endl;
 }
 
 

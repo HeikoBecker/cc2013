@@ -156,6 +156,8 @@ class ASTNODE(ExternalDeclaration) {
 
     virtual bool isFunction() { return false; }
 
+    SemanticDeclarationNode getSemanticNode() { return declNode; }
+
 
     PPRINTABLE
     IR_EMITTING
