@@ -14,18 +14,20 @@
 
 
 namespace Codegeneration {
-  llvm::AllocaInst* CreateEntryBlockAlloca(llvm::Function* TheFunction
-		  			  , llvm::Type* type
-					  , const std::string &VarName);
-  llvm::Value* CreateAddInstr (llvm::Value* lhs, llvm::Value* rhs);
   void genLLVMIR(const char* filename, Parsing::AstRoot root);
 
   class IRCreator {
   
 	public:
+		IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder, 
+				llvm::IRBuilder<>* AllocaBuilder);
+		~IRCreator();
 		llvm::Value* createAdd(llvm::Value* lhs, llvm::Value* rhs);
 	private:
-		llvm::IRBuilder<>* Builder, AllocaBuilder;
+		llvm::Module* M;
+		llvm::IRBuilder<>* Builder, * AllocaBuilder;
+
+		llvm::Type* sem_type2llvm_type(const Semantic::Type t);
   };
 
 }

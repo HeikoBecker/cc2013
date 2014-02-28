@@ -20,30 +20,20 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 
-//##############################################################################
-//#                        Helper functions                                    #
-//##############################################################################
-
-/*Code below is from LLVM's Kaleiscope tutorial*/
-/// CreateEntryBlockAlloca - Create an alloca instruction in the entry block of
-/// the function.  This is used for mutable variables etc.
-llvm::AllocaInst *Codegeneration::CreateEntryBlockAlloca(llvm::Function *TheFunction,
-                                                llvm::Type *type,
-                                                const std::string &VarName)
-{
-  llvm::IRBuilder<> TmpB(&TheFunction->getEntryBlock(),
-                 TheFunction->getEntryBlock().begin());
-  return TmpB.CreateAlloca(type, 0, VarName.c_str());
-}
-
 /*
  * Converts one of our types to a suiting LLVM type
  */
-static llvm::Type* sem_type2llvm_type(llvm::IRBuilder<> & Builder, const Semantic::Type t) {
+llvm::Type* Codegeneration::IRCreator::sem_type2llvm_type(const Semantic::Type t) {
   //TODO
   UNUSED(t);
-  return Builder.getInt32Ty();
+  return Builder->getInt32Ty();
 }
+
+Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
+					llvm::IRBuilder<>* AllocaBuilder):
+M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {}	
+
+Codegeneration::IRCreator::~IRCreator(){}
 
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
@@ -51,11 +41,13 @@ void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
   auto &Ctx = llvm::getGlobalContext();
   std::string errorStr;
   llvm::raw_fd_ostream stream(filename, errorStr);
-  llvm::Module M(filename, Ctx);
-  llvm::IRBuilder<> Builder(Ctx);
-  root->emitIR(M);
-  verifyModule(M);
-  M.print(stream, nullptr); /* M is a llvm::Module */
+  llvm::Module* M = new llvm::Module(filename, Ctx);
+  llvm::IRBuilder<>* Builder = new llvm::IRBuilder<>(Ctx);
+  llvm::IRBuilder<>* AllocaBuilder = new llvm::IRBuilder<>(Ctx);
+  Codegeneration::IRCreator Creator (M, Builder, AllocaBuilder);
+  root->emitIR(*M);
+  verifyModule(*M);
+  (*M).print(stream, nullptr); /* M is a llvm::Module */
 }
 
 void Parsing::AstNode::emitIR(llvm::Module & M)
