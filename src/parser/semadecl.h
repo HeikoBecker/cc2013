@@ -128,6 +128,11 @@ namespace Parsing {
       bool isSelfReferencing() {
         return selfReferencing;
       }
+
+      /* return members as a vector of name type pairs */
+      std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>>
+      members();
+
       SubSemanticNode node() {return m_node;}
     private:
       std::string name;
