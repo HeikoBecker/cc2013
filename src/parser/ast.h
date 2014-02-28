@@ -20,6 +20,9 @@
 #define EMIT_RVALUE llvm::Value* emit_rvalue(Codegeneration::IRCreator *) override;
 #define EMIT_LVALUE llvm::Value* emit_lvalue(Codegeneration::IRCreator *) override;
 
+namespace Codegeneration {
+  class IRCreator;
+}
 
 namespace Parsing {
 

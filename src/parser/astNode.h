@@ -32,6 +32,10 @@ namespace llvm {
   class Module;
 }
 
+namespace Codegeneration {
+  class IRCreator;
+}
+
 namespace Parsing {
   class AstNode
   {
@@ -41,7 +45,7 @@ namespace Parsing {
       virtual ~AstNode() {};
       virtual void prettyPrint(unsigned int) {};
       Pos inline pos() {return m_pos;}
-      virtual void emitIR(llvm::Module &);
+      virtual void emitIR(Codegeneration::IRCreator *);
     private:
       Pos m_pos;
   };

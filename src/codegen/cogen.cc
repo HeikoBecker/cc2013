@@ -83,7 +83,7 @@ void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
   llvm::IRBuilder<>* Builder = new llvm::IRBuilder<>(Ctx);
   llvm::IRBuilder<>* AllocaBuilder = new llvm::IRBuilder<>(Ctx);
   Codegeneration::IRCreator Creator (M, Builder, AllocaBuilder);
-  root->emitIR(*M);
+  root->emitIR(&Creator);
   verifyModule(*M);
   (*M).print(stream, nullptr); /* M is a llvm::Module */
 }
@@ -113,7 +113,7 @@ void Parsing::ExternalDeclaration::emitIR(Codegeneration::IRCreator * M)
   llvm::Type * external_declaration_type = nullptr; // FIXME: use IRCreator
   
   GlobalVariable *GlobVar = new GlobalVariable(
-          M                                       /* Module & */,
+          *M->M                                       /* Module & */,
           external_declaration_type                              /* Type * */,
           false                                   /* bool isConstant */,
           GlobalValue::CommonLinkage              /* LinkageType */,
@@ -134,12 +134,11 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
   // lookup the type of the current function
   auto semtree = Parsing::SemanticForest::filename2SemanticTree(this->pos().name);
   auto function_type_ = std::static_pointer_cast<FunctionDeclaration>(semtree->lookUpType(name, this->pos()));
-  auto Builder = llvm::IRBuilder<>(M.getContext());
   // lookup the return type and set it correctly
   auto return_type_ = function_type_->returnType();
   /* TODO: set the correct return type */
   UNUSED(M);
-  auto return_type = (llvm::Type *) Builder.getInt32Ty(); //FIXME
+  auto return_type = nullptr; //FIXME
   /*************************************/
   /* TODO: set the correct parameter types */
   auto parameter_types = std::vector<llvm::Type *>(function_type_->parameter().size());
@@ -162,7 +161,7 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
       function_type,
       llvm::GlobalValue::ExternalLinkage,
       name,
-      &M
+      nullptr // FIXME
       );
   /* TODO: set the names of the function arguments
    * byiterating over them and calling setName*/
@@ -172,12 +171,13 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
   /********************************************/
   // Create the basic block for the function
   auto function_basic_block = llvm::BasicBlock::Create(
-      M.getContext(),
+      M->M->getContext(), // FIXME: M
       name + "entry",
       function,
       0 //InsertBefore: inserts at end of surrounding function?
       );
-  Builder.SetInsertPoint(function_basic_block);
+  //Builder.SetInsertPoint(function_basic_block); // FIXME: IRCreator now needs
+  //function for this
   /* TODO: store each argument on the stack
    * 1. Allocate a stack slot
    */
@@ -195,14 +195,15 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
    * to the last block. The idea is to look at the return type of the current
    * function and emit either a void return or a return with the 'NULL' value
    * for this type */
-  if (Builder.GetInsertBlock()->getTerminator() == nullptr) {
-    auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
-    if (CurFuncReturnType->isVoidTy()) {
-      Builder.CreateRetVoid();
-    } else {
-      Builder.CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
-    }
-  }
+  UNUSED(function_basic_block); // reenable code  below
+  //if (Builder.GetInsertBlock()->getTerminator() == nullptr) {
+    //auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
+    //if (CurFuncReturnType->isVoidTy()) {
+      //Builder.CreateRetVoid();
+    //} else {
+      //Builder.CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
+    //}
+  //}
 }
 
 void Parsing::CompoundStatement::emitIR(Codegeneration::IRCreator * M) {

@@ -7,8 +7,11 @@
 #include "../codegen/cogen.h"
 
 namespace llvm {
-  class Module;
   class Value;
+}
+
+namespace Codegeneration {
+  class IRCreator;
 }
 
 namespace Parsing {
