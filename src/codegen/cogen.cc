@@ -21,17 +21,78 @@
 #include "llvm/Support/raw_ostream.h"
 
 //convenience macros to save some typing time
+//create is marked for being inlined!
 #define EMIT_IR(X) void X::emitIR(Codegeneration::IRCreator* creator)
 #define EMIT_LV(X) llvm::Value* X::emit_lvalue(Codegeneration::IRCreator* creator) 
 #define EMIT_RV(X) llvm::Value* X::emit_rvalue(Codegeneration::IRCreator* creator) 
-
+#define CREATE(X)  inline llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
 
 Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
 					llvm::IRBuilder<>* AllocaBuilder):
-M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {}	
+M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {
+}	
 
-Codegeneration::IRCreator::~IRCreator(){}
+Codegeneration::IRCreator::~IRCreator(){
+UNUSED(AllocaBuilder); //FIXME
+}
 
+/*
+ * Self explanatory binary expression functions. Special cases are annotated.
+ */
+CREATE(createAdd) {
+	return Builder->CreateAdd(lhs,rhs);
+}
+
+CREATE(createMinus) {
+	return Builder->CreateSub(lhs, rhs);
+}
+
+/*
+ * We use signed less than for the less than operator as usual arithmetic conver
+ * sions imply an implicit threatment of all values as i32 integer which are
+ * signed in our C subset
+ */
+CREATE(createLess) {
+	return Builder->CreateICmpSLT(lhs,rhs);
+}
+
+CREATE(createMult) {
+	return Builder->CreateMul(lhs, rhs);
+}
+
+CREATE(createUnequal){
+	return Builder->CreateICmpNE(lhs,rhs);
+}
+
+CREATE(createEqual){
+	return Builder->CreateICmpEQ(lhs,rhs);
+}
+
+CREATE(createLogAnd){
+	return Builder->CreateAnd(lhs, rhs);
+}
+
+CREATE(createLogOr){
+	return Builder->CreateOr(lhs,rhs);
+}
+
+CREATE(createPointerAccess) { //FIXME
+	UNUSED(lhs);
+	UNUSED(rhs);
+	return nullptr;
+}
+
+CREATE(createAccess) { //FIXME
+	UNUSED(lhs);
+	UNUSED(rhs);
+	return nullptr;
+}
+
+CREATE(createAssign) { //FIXME
+	UNUSED(lhs);
+	UNUSED(rhs);
+	return nullptr;
+}
 
 /*
  *  Converts one of our type classes to the corresponding LLVM Type
@@ -237,10 +298,8 @@ EMIT_IR(Parsing::ExpressionStatement)
  * So we need! emitIR to produce the rvalue.
  * The lvalue function will be overwritten by the corresponding class so we can
  * just call it here
- * FIXME: Mark this function for inlining as it is just a forwarding/wrapper of
- * a call to emit_rvalue
  */
-EMIT_IR(Parsing::Expression)
+inline EMIT_IR(Parsing::Expression)
 {
 	this->emit_lvalue(creator);
 }
@@ -249,13 +308,12 @@ EMIT_IR(Parsing::Expression)
  * Methods for abstract expression object. They should never be called. If this
  * happens, we forgot to override the method at a specific place, that will be
  * printed by the exception.
- * FIXME: Mark for inlining
  */
-EMIT_RV(Parsing::Expression) {
+inline EMIT_RV(Parsing::Expression) {
   UNUSED(creator);
   throw CompilerException("You did not override the method emit_rvalue", this->pos());
 }
-EMIT_LV(Parsing::Expression) {
+inline EMIT_LV(Parsing::Expression) {
   UNUSED(creator);
   throw CompilerException("You did not override the method emit_lvalue", this->pos());
 }
@@ -270,38 +328,35 @@ EMIT_RV(Parsing::BinaryExpression) {
   llvm::Value* lhs = this->lhs->emit_rvalue(creator);
   llvm::Value* rhs = this->rhs->emit_rvalue(creator);
 
-  UNUSED(lhs);
-  UNUSED(rhs);
-
   //then compute the corresponding value based on the operand
+  //the creator will to the llvm magic. We just want to find the
+  //correct method to call
   switch(this->op){
 	case PunctuatorType::PLUS:
-		break;
+		return creator->createAdd(lhs, rhs);
 	case PunctuatorType::MINUS:
-		break;
+		return creator->createMinus(lhs, rhs);
 	case PunctuatorType::LESS:
-		break;
+		return creator->createLess(lhs, rhs);
 	case PunctuatorType::STAR:
-		break;
+		return creator->createMult(lhs, rhs);
 	case PunctuatorType::NEQUAL:
-		break;
+		return creator->createUnequal(lhs, rhs);
 	case PunctuatorType::EQUAL:
-		break;
+		return creator->createEqual(lhs, rhs);
 	case PunctuatorType::LAND:
-		break;
+		return creator->createLogAnd(lhs,rhs);
 	case PunctuatorType::LOR:
-		break;
+		return creator->createLogOr(lhs, rhs);
 	case PunctuatorType::ARROW:
-		break;
+		return creator->createPointerAccess(lhs, rhs);
 	case PunctuatorType::MEMBER_ACCESS:
-		break;
+		return creator->createAccess(lhs, rhs);
 	case PunctuatorType::ASSIGN:
-		break;
+		return creator->createAssign(lhs,rhs);
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
-}
-  
-  return nullptr;
+	}
 }
 
 /*
@@ -309,7 +364,20 @@ EMIT_RV(Parsing::BinaryExpression) {
  * computed, then the operator is applied.
  */
 EMIT_RV(Parsing::UnaryExpression) {
-  UNUSED(creator); //FIXME
+  llvm::Value* vl = this->operand->emit_rvalue(creator);
+  UNUSED(vl); //FIXME
+  switch(this->op){
+	case PunctuatorType::NOT:
+		break;
+	case PunctuatorType::MINUS:
+		break;
+	case PunctuatorType::STAR:
+		break;
+	case PunctuatorType::AMPERSAND:
+		break;
+	default:
+		throw CompilerException("INTERNAL ERROR", this->pos());
+  }
   return nullptr;
 }
 

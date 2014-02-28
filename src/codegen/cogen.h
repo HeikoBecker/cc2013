@@ -11,6 +11,9 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 
+//convenience macros
+#define EXPCREATE(X) llvm::Value* X(llvm::Value* lhs, llvm::Value* rhs);
+
 namespace Parsing {
   class AstNode;
   class SemanticDeclaration;
@@ -29,7 +32,17 @@ namespace Codegeneration {
 		IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder, 
 				llvm::IRBuilder<>* AllocaBuilder);
 		~IRCreator();
-		llvm::Value* createAdd(llvm::Value* lhs, llvm::Value* rhs);
+		EXPCREATE(createAdd)
+		EXPCREATE(createMinus)
+		EXPCREATE(createLess)
+		EXPCREATE(createMult)
+		EXPCREATE(createUnequal)
+		EXPCREATE(createEqual)
+		EXPCREATE(createLogAnd)
+		EXPCREATE(createLogOr)
+		EXPCREATE(createPointerAccess)
+		EXPCREATE(createAccess)
+		EXPCREATE(createAssign)
 		llvm::Module* M;
 	private:
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
