@@ -477,6 +477,7 @@ SubExpression Parser::expression(int minPrecedence = 0) {
       expr = make_shared<BinaryExpression>(expr, rhs, punctype, pos, &operator_position);
     }
   }
+  expr->checkSemanticConstraints();
   return expr;
 }
 
