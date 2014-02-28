@@ -48,10 +48,15 @@ namespace Codegeneration {
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
                 //void allocateAndStoreParameter(llvm::Type* type);
+                /* Allocates a basic block for a functions,
+                 * and sets the Builder to it
+                 */
                 void startFunction(
                     llvm::FunctionType* function_type,
                     std::string name
                     );
+                /* Ensures that the last block of the function has a terminator
+                 */
                 void finishFunction();
 	private:
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
