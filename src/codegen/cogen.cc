@@ -308,18 +308,14 @@ EMIT_IR(Parsing::FunctionDefinition)
   // TODO: retrive function argument names
   /********************************************/
   auto function = creator->startFunction(function_type, name);
-  /* TODO: store each argument on the stack
-   * 1. Allocate a stack slot
-   */
   std::for_each(function->arg_begin(), function->arg_end(),
       [&](decltype(function->arg_begin()) argument){
+      // 1. Allocate a stack slot
       auto ptr = creator->allocateInCurrentFunction(argument->getType());
+      // 2. Store the argument value
       creator->store(argument, ptr);
   });
   
-  /*
-   * 2. Store the argument value
-   */
   // emit code for the body
   this->compoundStatement->emitIR(creator);
   creator->finishFunction();
