@@ -52,7 +52,8 @@ namespace Codegeneration {
                 /* Allocates a basic block for a functions,
                  * and sets the Builder to it
                  */
-                void startFunction(
+                void store(llvm::Value* value, llvm::Value *ptr);
+                llvm::Function *startFunction(
                     llvm::FunctionType* function_type,
                     std::string name
                     );

@@ -46,7 +46,12 @@ llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* ty
   return AllocaBuilder->CreateAlloca(type);
 }
 
-void Codegeneration::IRCreator::startFunction(
+
+void Codegeneration::IRCreator::store(llvm::Value* value, llvm::Value *ptr) {
+  Builder->CreateStore(value,ptr);
+}
+
+llvm::Function* Codegeneration::IRCreator::startFunction(
     llvm::FunctionType* function_type,
     std::string name
 )
@@ -65,6 +70,7 @@ void Codegeneration::IRCreator::startFunction(
       );
   Builder->SetInsertPoint(function_basic_block);
   AllocaBuilder->SetInsertPoint(function_basic_block);
+  return function;
 }
 
 void Codegeneration::IRCreator::finishFunction()
@@ -295,10 +301,16 @@ EMIT_IR(Parsing::FunctionDefinition)
    * byiterating over them and calling setName*/
   // TODO: retrive function argument names
   /********************************************/
-  creator->startFunction(function_type, name);
+  auto function = creator->startFunction(function_type, name);
   /* TODO: store each argument on the stack
    * 1. Allocate a stack slot
    */
+  std::for_each(function->arg_begin(), function->arg_end(),
+      [&](decltype(function->arg_begin()) argument){
+      auto ptr = creator->allocateInCurrentFunction(argument->getType());
+      creator->store(argument, ptr);
+  });
+  
   /*
    * 2. Store the argument value
    */
