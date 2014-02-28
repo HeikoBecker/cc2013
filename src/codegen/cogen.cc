@@ -46,6 +46,7 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       llvm_type = Builder->getVoidTy();
       break;
                               
+    case Semantic::Type::ARRAY:
     case Semantic::Type::POINTER:
       {
         auto pointer_type =
@@ -56,17 +57,16 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       break;
       }
                                  
-    case Semantic::Type::ARRAY:
-      // TODO
-                               
-    case Semantic::Type::FUNCTION:
-      // Should we handle functions here?
     case Semantic::Type::STRUCT:
       {
         auto structType =
           std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
         UNUSED(structType);
+        llvm_type = llvm::StructType::create(this->Builder->getContext());
+        /* TODO: add members */
       }
+    case Semantic::Type::FUNCTION:
+      // Should we handle functions here?
     default:
       llvm_type = Builder->getInt32Ty();
   }
