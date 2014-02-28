@@ -130,7 +130,12 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
           std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
         UNUSED(structType);
         llvm_type = llvm::StructType::create(this->Builder->getContext());
-        /* TODO: add members */
+        /* TODO: handle non primitive types*/
+        std::vector<llvm::Type *> member_types;
+        // TODO: use transform
+        for (auto member: structType->members()) {
+          member_types.push_back(semantic_type2llvm_type(member.second));
+        }
       }
     case Semantic::Type::FUNCTION:
       // Should we handle functions here?
@@ -170,29 +175,33 @@ EMIT_IR(Parsing::TranslationUnit)
 
 EMIT_IR(Parsing::ExternalDeclaration)
 {
-  UNUSED(creator); //FIXME
   //FIXME: use IRcreator
   // TODO: type mapping needs to go into a different method!
   using namespace llvm;
   // we either have to work with a global declaration or a forward declaration
+  // function definitions are handled in FunctionDefinition
   // first we take the type of the node
 
-//  llvm::Type * external_declaration_type = nullptr; // FIXME: use IRCreator
+  llvm::Type * external_declaration_type = creator->semantic_type2llvm_type(
+      this->getSemanticNode()
+  );
   
-//  GlobalVariable *GlobVar = new GlobalVariable(
-//          *M->M                                       /* Module & */,
-//          external_declaration_type                              /* Type * */,
-//          false                                   /* bool isConstant */,
-//          GlobalValue::CommonLinkage              /* LinkageType */,
-//          llvm::Constant::getNullValue(external_declaration_type)      /* Constant * Initializer */,
-//          "TODO"                                /* const Twine &Name = "" */,
-  /* --------- We do not need this part (=> use defaults) ---------- */
-//          0                                       /* GlobalVariable *InsertBefore = 0 */,
-//          GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
-//          0                                       /* unsigned AddressSpace = 0 */,
-//          false                                   /* bool isExternallyInitialized = false */);
-  // TODO: what should we do with the global variable now?
-//  GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
+  // TODO: move global variable creato into creator method?
+  GlobalVariable *GlobVar = new GlobalVariable(
+          *creator->M                                      /* Module & */,
+          external_declaration_type                              /* Type * */,
+          false                                   /* bool isConstant */,
+          GlobalValue::CommonLinkage              /* LinkageType */,
+          llvm::Constant::getNullValue(external_declaration_type)      /* Constant * Initializer */,
+          "TODO"                                /* const Twine &Name = "" */,
+          /*--------- We do not need this part (=> use defaults) ----------*/
+          0                                       /* GlobalVariable *InsertBefore = 0 */,
+          GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
+          0                                       /* unsigned AddressSpace = 0 */,
+          false                                   /* bool isExternallyInitialized = false */);
+   //TODO: what should we do with the global variable now?
+  std::cout << this->declarator->getIdentifier();
+  GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
 }
 
 EMIT_IR(Parsing::FunctionDefinition)

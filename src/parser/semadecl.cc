@@ -7,6 +7,11 @@ using namespace Parsing;
 
 StructDeclaration::StructDeclaration(std::string n, SubSemanticNode s, bool selfReferencing) : name(n), m_node(s), selfReferencing(selfReferencing) {}
 
+std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> StructDeclaration::members()
+{
+  return this->m_node->type();
+}
+
 std::string FunctionDeclaration::toString() {
         std::string str = "function (";
         bool first =true;

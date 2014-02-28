@@ -44,11 +44,11 @@ namespace Codegeneration {
 		EXPCREATE(createAccess)
 		EXPCREATE(createAssign)
 		llvm::Module* M;
+                llvm::Type* semantic_type2llvm_type(
+                    const Parsing::SemanticDeclarationNode semantic_type);
 	private:
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
 
-		llvm::Type* semantic_type2llvm_type(
-                    const Parsing::SemanticDeclarationNode semantic_type);
   };
 
 }
