@@ -69,7 +69,12 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
           std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
         UNUSED(structType);
         llvm_type = llvm::StructType::create(this->Builder->getContext());
-        /* TODO: add members */
+        /* TODO: handle non primitive types*/
+        std::vector<llvm::Type *> member_types;
+        // TODO: use transform
+        for (auto member: structType->members()) {
+          member_types.push_back(semantic_type2llvm_type(member.second));
+        }
       }
     case Semantic::Type::FUNCTION:
       // Should we handle functions here?
