@@ -115,11 +115,19 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
           );
       } else { // it was alredy declared
           // it is a forward declaration
-                      bool lastForward = structMap[name].top().second;
+             bool lastForward = structMap[name].top().second;
 
              // take the node from the forward declaration
              if (lastForward) {
-              currentPos = lastForward;
+
+              if (!forward) {
+                // it is not a forward declaration anymore
+                auto helpPos = structMap[name].top().first;
+                // std::cout<<"go to pos : "<<helpPos<<endl;
+                nodes[helpPos]->setNotForward();
+              }
+
+              currentPos = structMap[name].top().first;
               return;
              } else {
                // it is a redefinition
@@ -128,15 +136,13 @@ void SemanticTree::addChild(Pos pos, string name, bool forward) {
       }
     }
   }
-
-  nodes.push_back(make_shared<SemanticNode>(currentPos, insideStruct));
+  nodes.push_back(make_shared<SemanticNode>(currentPos, insideStruct, forward));
   counter++;
   currentPos = counter - 1;
-
   }
 
 void SemanticTree::goUp() {
-  debug(SEMANTIC)<<"go up";
+  //debug(SEMANTIC)<<"go up";
   nodes[currentPos]->disable();
   currentPos = nodes[currentPos]->getParentIndex();
 }
@@ -217,13 +223,9 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        string name = "@" + type;
         
        SubSemanticNode helpNode;
-       bool forward;
-        
        int id;
        while(!structMap[name].empty()) {
         id = structMap[name].top().first;
-        forward = structMap[name].top().second;
-       // cout<<"Id : "<<id<<endl;
         int parent = nodes[id]->getParentIndex();
         if (nodes[parent]->isActive()) {
           helpNode = nodes[id];
@@ -235,7 +237,7 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
 
        if (helpNode) {
          auto ptr = (size_t) helpNode.operator->(); // TODO FIXME WARNING HACK !!!!!
-        myDeclaration = make_shared<StructDeclaration>("@" + type + std::to_string(ptr), helpNode, forward, nodes[id]->isActive());
+        myDeclaration = make_shared<StructDeclaration>("@" + type + std::to_string(ptr), helpNode, nodes[id]->isActive());
        } else {
           throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
        }
@@ -341,7 +343,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     auto decl = helpConvert(typeNode, declarator, ret, pos);
 
     debug(SEMANTIC) <<" DECL : "<<name<<" : " <<decl->toString();
-    //std::cout<<" DECL : "<<name<<" : " <<decl->toString(); 
+    // std::cout<<" DECL : "<<name<<" : " <<decl->toString()<<std::endl;
   
     // don't allow functions inside a struct 
     if (nodes[currentPos]->isInsideStruct()) {
@@ -354,7 +356,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
     // don't allow struct S a; if S is forward declaration
     if (decl->type() == Semantic::Type::STRUCT) {
       auto structDecl = static_pointer_cast<StructDeclaration>(decl);
-      if (structDecl->isForward()) {
+      if (structDecl->node()->isForward()) {
       throw ParsingException("The size of " + name + " cannot be determined", pos);
       }
     }
@@ -547,11 +549,7 @@ bool isIncompleteType(SemanticDeclarationNode s) {
     case Type::STRUCT:
       {
         auto s_as_struct = std::static_pointer_cast<StructDeclaration>(s);
-        // if the struct is only forward declared, it is incomplete
-        // TODO: this doesn't work as I hoped it would;
-        // this only return true iff we are forward declaring a type,
-        // not when we use a forward declared type
-        return s_as_struct->isForward();
+        return s_as_struct->node()->isForward();
       }
     case Type::VOID:
       return true;

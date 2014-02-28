@@ -118,15 +118,11 @@ namespace Parsing {
 
     public:  
       // name e.g. @S
-      StructDeclaration(std::string n, SubSemanticNode s, bool forward, bool selfReferencing);
+      StructDeclaration(std::string n, SubSemanticNode s, bool selfReferencing);
       Semantic::Type type() override {return Semantic::Type::STRUCT;}
 
       std::string toString() {
         return name;
-      }
-
-      bool isForward() {
-        return forward;
       }
 
       bool isSelfReferencing() {
@@ -136,7 +132,6 @@ namespace Parsing {
     private:
       std::string name;
       SubSemanticNode m_node;
-      bool forward;
       bool selfReferencing;
   };
 

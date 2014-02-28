@@ -134,11 +134,15 @@ class ASTNODE(Declaration) {
     Declaration(TypeNode t, SubDeclarator declarator, 
                 Pos pos, SemanticTreeNode semanticTree);
     Declaration(TypeNode t, Pos pos);
+    SemanticDeclarationNode getSemanticNode() { return declNode; }
+
     PPRINTABLE
   private:
     TypeNode type;
+
     SubDeclarator declarator;
     SemanticTreeNode semanticTree;
+    SemanticDeclarationNode declNode;
 };
 
 typedef std::shared_ptr<Declaration> DeclarationNode;
@@ -154,6 +158,8 @@ class ASTNODE(ExternalDeclaration) {
                         SemanticTreeNode semanticTree);
 
     virtual bool isFunction() { return false; }
+
+    SemanticDeclarationNode getSemanticNode() { return declNode; }
 
 
     PPRINTABLE

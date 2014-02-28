@@ -28,7 +28,7 @@ typedef std::stack<std::pair<int, Parsing::SemanticDeclarationNode> > TypeStack;
 
 class SemanticNode {
   public:
-    SemanticNode(int parent, bool insideStruct) : parent(parent), active(true), insideStruct(insideStruct) { };
+    SemanticNode(int parent, bool insideStruct, bool forward = false) : parent(parent), active(true), insideStruct(insideStruct), forward(forward) { };
 
     void disable() {
       active = false;
@@ -40,6 +40,14 @@ class SemanticNode {
 
     bool isActive() {
       return active;
+    }
+
+    bool isForward() {
+      return forward;
+    }
+
+    void setNotForward() {
+      forward = false;
     }
 
     void addDeclaration(std::string s, Parsing::SemanticDeclarationNode node) {
@@ -69,6 +77,7 @@ class SemanticNode {
     int parent;
     bool active;
     bool insideStruct;
+    bool forward;
     std::map<std::string, Parsing::SemanticDeclarationNode> decl;
 };
 
