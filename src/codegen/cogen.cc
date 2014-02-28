@@ -20,6 +20,12 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 
+//convenience macros to save some typing time
+#define EMIT_IR(X) void X::emitIR(Codegeneration::IRCreator* creator)
+#define EMIT_LV(X) llvm::Value* X::emit_lvalue(Codegeneration::IRCreator* creator) 
+#define EMIT_RV(X) llvm::Value* X::emit_rvalue(Codegeneration::IRCreator* creator) 
+
+
 Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
 					llvm::IRBuilder<>* AllocaBuilder):
 M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {}	
@@ -88,47 +94,48 @@ void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
   (*M).print(stream, nullptr); /* M is a llvm::Module */
 }
 
-void Parsing::AstNode::emitIR(Codegeneration::IRCreator * M)
+EMIT_IR(Parsing::AstNode)
 {
-  std::cout << "TODO\n";
-  UNUSED(M);
+  UNUSED(creator); //FIXME
 }
 
-void Parsing::TranslationUnit::emitIR(Codegeneration::IRCreator * M)
+EMIT_IR(Parsing::TranslationUnit)
 {
   // call emitIR on each external declaration of the translation unit
   for (auto external_declaration: this->externalDeclarations) {
-    external_declaration->emitIR(M);
+    external_declaration->emitIR(creator);
   }
 }
 
-
-void Parsing::ExternalDeclaration::emitIR(Codegeneration::IRCreator * M)
+EMIT_IR(Parsing::ExternalDeclaration)
 {
+  UNUSED(creator); //FIXME
+  //FIXME: use IRcreator
   // TODO: type mapping needs to go into a different method!
   using namespace llvm;
   // we either have to work with a global declaration or a forward declaration
   // first we take the type of the node
 
-  llvm::Type * external_declaration_type = nullptr; // FIXME: use IRCreator
+//  llvm::Type * external_declaration_type = nullptr; // FIXME: use IRCreator
   
-  GlobalVariable *GlobVar = new GlobalVariable(
-          *M->M                                       /* Module & */,
-          external_declaration_type                              /* Type * */,
-          false                                   /* bool isConstant */,
-          GlobalValue::CommonLinkage              /* LinkageType */,
-          llvm::Constant::getNullValue(external_declaration_type)      /* Constant * Initializer */,
-          "TODO"                                /* const Twine &Name = "" */,
+//  GlobalVariable *GlobVar = new GlobalVariable(
+//          *M->M                                       /* Module & */,
+//          external_declaration_type                              /* Type * */,
+//          false                                   /* bool isConstant */,
+//          GlobalValue::CommonLinkage              /* LinkageType */,
+//          llvm::Constant::getNullValue(external_declaration_type)      /* Constant * Initializer */,
+//          "TODO"                                /* const Twine &Name = "" */,
   /* --------- We do not need this part (=> use defaults) ---------- */
-          0                                       /* GlobalVariable *InsertBefore = 0 */,
-          GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
-          0                                       /* unsigned AddressSpace = 0 */,
-          false                                   /* bool isExternallyInitialized = false */);
+//          0                                       /* GlobalVariable *InsertBefore = 0 */,
+//          GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
+//          0                                       /* unsigned AddressSpace = 0 */,
+//          false                                   /* bool isExternallyInitialized = false */);
   // TODO: what should we do with the global variable now?
-  GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
+//  GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
 }
 
-void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
+EMIT_IR(Parsing::FunctionDefinition)
+{
   // TODO: make name a member of functiondefiniton or declaration
   auto name = this->declarator->getIdentifier();
   // lookup the type of the current function
@@ -137,7 +144,6 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
   // lookup the return type and set it correctly
   auto return_type_ = function_type_->returnType();
   /* TODO: set the correct return type */
-  UNUSED(M);
   auto return_type = nullptr; //FIXME
   /*************************************/
   /* TODO: set the correct parameter types */
@@ -171,7 +177,7 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
   /********************************************/
   // Create the basic block for the function
   auto function_basic_block = llvm::BasicBlock::Create(
-      M->M->getContext(), // FIXME: M
+      creator->M->getContext(), // FIXME: M
       name + "entry",
       function,
       0 //InsertBefore: inserts at end of surrounding function?
@@ -185,7 +191,7 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
    * 2. Store the argument value
    */
   // emit code for the body
-  this->compoundStatement->emitIR(M);
+  this->compoundStatement->emitIR(creator);
 
   // stol^H^H^H^H borrowed from Johannes' example
   /* All code was emitted,.. but the last block might be empty.
@@ -206,9 +212,10 @@ void Parsing::FunctionDefinition::emitIR(Codegeneration::IRCreator * M) {
   //}
 }
 
-void Parsing::CompoundStatement::emitIR(Codegeneration::IRCreator * M) {
+EMIT_IR(Parsing::CompoundStatement)
+{
   for (auto statement : this->subStatements) {
-    statement->emitIR(M);
+    statement->emitIR(creator);
   }
 }
 
@@ -220,8 +227,9 @@ void Parsing::CompoundStatement::emitIR(Codegeneration::IRCreator * M) {
  * Every expression has the emitIR function that redirects the call to 
  * emit_rvalue.
  */
-void Parsing::ExpressionStatement::emitIR(Codegeneration::IRCreator * M) {
-  this->expression->emitIR(M);
+EMIT_IR(Parsing::ExpressionStatement)
+{
+  this->expression->emitIR(creator);
 }
 
 /*
@@ -232,8 +240,9 @@ void Parsing::ExpressionStatement::emitIR(Codegeneration::IRCreator * M) {
  * FIXME: Mark this function for inlining as it is just a forwarding/wrapper of
  * a call to emit_rvalue
  */
-void Parsing::Expression::emitIR(Codegeneration::IRCreator * M) {
-	this->emit_lvalue(M);
+EMIT_IR(Parsing::Expression)
+{
+	this->emit_lvalue(creator);
 }
 
 /*
@@ -242,12 +251,12 @@ void Parsing::Expression::emitIR(Codegeneration::IRCreator * M) {
  * printed by the exception.
  * FIXME: Mark for inlining
  */
-llvm::Value* Parsing::Expression::emit_rvalue(Codegeneration::IRCreator * M) {
-  UNUSED(M);
+EMIT_RV(Parsing::Expression) {
+  UNUSED(creator);
   throw CompilerException("You did not override the method emit_rvalue", this->pos());
 }
-llvm::Value* Parsing::Expression::emit_lvalue(Codegeneration::IRCreator * M) {
-  UNUSED(M);
+EMIT_LV(Parsing::Expression) {
+  UNUSED(creator);
   throw CompilerException("You did not override the method emit_lvalue", this->pos());
 }
 
@@ -256,10 +265,10 @@ llvm::Value* Parsing::Expression::emit_lvalue(Codegeneration::IRCreator * M) {
  * usage. First compute left and right values, then emit the instruction based 
  * on the operand
  */
-llvm::Value* Parsing::BinaryExpression::emit_rvalue(Codegeneration::IRCreator * M){
+EMIT_RV(Parsing::BinaryExpression) {
   //First compute the values for the subexpressions
-  llvm::Value* lhs = this->lhs->emit_rvalue(M);
-  llvm::Value* rhs = this->rhs->emit_rvalue(M);
+  llvm::Value* lhs = this->lhs->emit_rvalue(creator);
+  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
 
   UNUSED(lhs);
   UNUSED(rhs);
@@ -296,22 +305,22 @@ llvm::Value* Parsing::BinaryExpression::emit_rvalue(Codegeneration::IRCreator * 
 }
 
 /*
+ * Produces the corresponding rvalue. First the rvalue of the operand is 
+ * computed, then the operator is applied.
+ */
+EMIT_RV(Parsing::UnaryExpression) {
+  UNUSED(creator); //FIXME
+  return nullptr;
+}
+
+/*
  * A unary operator can be a valid lvalue, so we need to allow this for code 
  * generation. //TODO: Determine correct operators or not?
  * First compute the lvalue of the operand and then apply the operator.
  * Corresponding value is returned.
  */
-llvm::Value* Parsing::UnaryExpression::emit_lvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
-  return nullptr;
-}
-
-/*
- * Produces the corresponding rvalue. First the rvalue of the operand is 
- * computed, then the operator is applied.
- */
-llvm::Value* Parsing::UnaryExpression::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_LV(Parsing::UnaryExpression) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
@@ -319,25 +328,25 @@ llvm::Value* Parsing::UnaryExpression::emit_rvalue(Codegeneration::IRCreator * M
  * Produces the rvalue of a variable by returning the variable name that llvm 
  * gave it so that we can do computations with it
  */
-llvm::Value* Parsing::VariableUsage::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_RV(Parsing::VariableUsage) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
 /*
- * Computes a variables lvalue by returnning the vartiable, that llvm has 
+ * Computes a variables lvalue by returning the variable, that llvm has 
  * produced when it has been declared.
  */
-llvm::Value* Parsing::VariableUsage::emit_lvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_LV(Parsing::VariableUsage) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
 /*
  * Produces the rvalue of a literal by returning its variable.
  */
-llvm::Value* Parsing::Literal::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_RV(Parsing::Literal) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
@@ -345,8 +354,8 @@ llvm::Value* Parsing::Literal::emit_rvalue(Codegeneration::IRCreator * M){
  * Produces the lvalue of a literal, as string literals are arrays and therefore
  * they have an address where they are stored.
  */
-llvm::Value* Parsing::Literal::emit_lvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_LV(Parsing::Literal) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
@@ -355,8 +364,8 @@ llvm::Value* Parsing::Literal::emit_lvalue(Codegeneration::IRCreator * M){
  * so we can advise llvm to create a new constant if it does not exist and 
  * return the value
  */
-llvm::Value* Parsing::Constant::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_RV(Parsing::Constant) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
@@ -364,8 +373,8 @@ llvm::Value* Parsing::Constant::emit_rvalue(Codegeneration::IRCreator * M){
  * A function call can produce a valid value. So we need to evaluate all 
  * parameters and then create the corresponding function call.
  */
-llvm::Value* Parsing::FunctionCall::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_RV(Parsing::FunctionCall) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
@@ -374,8 +383,8 @@ llvm::Value* Parsing::FunctionCall::emit_rvalue(Codegeneration::IRCreator * M){
  * a valid rvalue. this has been validated by the semantics. We only need
  * to compute the value and then return it.
  */
-llvm::Value* Parsing::FunctionCall::emit_lvalue(Codegeneration::IRCreator * M){
- UNUSED(M); //FIXME
+EMIT_LV(Parsing::FunctionCall) {
+ UNUSED(creator); //FIXME
  return nullptr;
 }
 
@@ -384,8 +393,8 @@ llvm::Value* Parsing::FunctionCall::emit_lvalue(Codegeneration::IRCreator * M){
  * Then return the value based on the condition.
  * TODO: Use the phi trick that was shown in the slides!
  */
-llvm::Value* Parsing::TernaryExpression::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_RV(Parsing::TernaryExpression) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
 
@@ -394,15 +403,15 @@ llvm::Value* Parsing::TernaryExpression::emit_rvalue(Codegeneration::IRCreator *
  * be evaluated as one could contain side effects.
  * TODO: Use the phi trick that was shown in the slides!
  */
-llvm::Value* Parsing::TernaryExpression::emit_lvalue(Codegeneration::IRCreator * M){
- UNUSED(M); //FIXME
+EMIT_LV(Parsing::TernaryExpression) {
+ UNUSED(creator); //FIXME
  return nullptr;
 }
 
 /*
  * Produces the rvalue of the sizeof expression. TODO!
  */
-llvm::Value* Parsing::SizeOfExpression::emit_rvalue(Codegeneration::IRCreator * M){
-  UNUSED(M); //FIXME
+EMIT_RV(Parsing::SizeOfExpression) {
+  UNUSED(creator); //FIXME
   return nullptr;
 }
