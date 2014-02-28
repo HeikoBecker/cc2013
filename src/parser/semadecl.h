@@ -5,6 +5,10 @@
 #include <memory>
 #include <vector>
 
+namespace llvm {
+  class Value;
+}
+
 namespace Semantic {
   enum class Type {
     INT,
@@ -31,6 +35,7 @@ namespace Parsing {
       bool isVoid() {
         return type() == Semantic::Type::VOID;
       }
+      llvm::Value* associatedValue;
   };
 
   typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;

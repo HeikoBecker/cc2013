@@ -53,6 +53,7 @@ namespace Codegeneration {
                  * and sets the Builder to it
                  */
                 void store(llvm::Value* value, llvm::Value *ptr);
+                llvm::Value* createLoad(llvm::Value* val);
                 llvm::Function *startFunction(
                     llvm::FunctionType* function_type,
                     std::string name

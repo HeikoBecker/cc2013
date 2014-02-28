@@ -46,6 +46,10 @@ llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* ty
   return AllocaBuilder->CreateAlloca(type);
 }
 
+llvm::Value* Codegeneration::IRCreator::createLoad(llvm::Value* val) {
+  return Builder->CreateLoad(val);
+}
+
 
 void Codegeneration::IRCreator::store(llvm::Value* value, llvm::Value *ptr) {
   Builder->CreateStore(value,ptr);
@@ -231,6 +235,7 @@ EMIT_IR(Parsing::Declaration)
 {
   llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
   auto var = creator->allocateInCurrentFunction(variable);
+  declNode->associatedValue = var;
   if (this->declarator->hasName()) {
     var->setName(this->declarator->getIdentifier());
   }
@@ -444,7 +449,7 @@ EMIT_LV(Parsing::UnaryExpression) {
  */
 EMIT_RV(Parsing::VariableUsage) {
   UNUSED(creator); //FIXME
-  return nullptr;
+  return this->getType()->associatedValue;
 }
 
 /*
@@ -452,8 +457,9 @@ EMIT_RV(Parsing::VariableUsage) {
  * produced when it has been declared.
  */
 EMIT_LV(Parsing::VariableUsage) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  /* TODO: why don't we just put this generic case, loading from rvalue in the
+   * parent? */
+  return creator->createLoad(this->emit_rvalue(creator));
 }
 
 /*
