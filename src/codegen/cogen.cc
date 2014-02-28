@@ -38,13 +38,19 @@ M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {
   //AllocaBuilder->CreateAlloca(type);
 //}
 void Codegeneration::IRCreator::startFunction(
-    llvm::Function* function,
+    llvm::FunctionType* function_type,
     std::string name
 )
 {
+  auto function = llvm::Function::Create(
+      function_type,
+      llvm::GlobalValue::ExternalLinkage,
+      name,
+      M
+      );
   auto function_basic_block = llvm::BasicBlock::Create(
       M->getContext(), // FIXME: M
-      name,
+      name+"_begin",
       function,
       0 //InsertBefore: inserts at end of surrounding function?
       );
@@ -239,7 +245,6 @@ EMIT_IR(Parsing::ExternalDeclaration)
           0                                       /* unsigned AddressSpace = 0 */,
           false                                   /* bool isExternallyInitialized = false */);
    //TODO: what should we do with the global variable now?
-  std::cout << this->declarator->getIdentifier();
   GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
 }
 
@@ -266,19 +271,11 @@ EMIT_IR(Parsing::FunctionDefinition)
       return_type,
       parameter_types,
       /*isVarArg=*/false); 
-  auto function = llvm::Function::Create(
-      function_type,
-      llvm::GlobalValue::ExternalLinkage,
-      name,
-      nullptr // FIXME
-      );
   /* TODO: set the names of the function arguments
    * byiterating over them and calling setName*/
   // TODO: retrive function argument names
-  auto argument_it = function->begin();
-  UNUSED(argument_it);
   /********************************************/
-  creator->startFunction(function, name+"entry");
+  creator->startFunction(function_type, name);
   /* TODO: store each argument on the stack
    * 1. Allocate a stack slot
    */

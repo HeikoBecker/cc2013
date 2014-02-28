@@ -49,7 +49,7 @@ namespace Codegeneration {
                     const Parsing::SemanticDeclarationNode semantic_type);
                 //void allocateAndStoreParameter(llvm::Type* type);
                 void startFunction(
-                    llvm::Function* function,
+                    llvm::FunctionType* function_type,
                     std::string name
                     );
                 void finishFunction();
