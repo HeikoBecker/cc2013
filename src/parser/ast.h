@@ -15,9 +15,10 @@
 #include "expressionNode.h"
 
 #include "../lexer/lexer.h"
+#include "../codegen/cogen.h"
 
-#define EMIT_RVALUE llvm::Value* emit_rvalue(llvm::Module &) override;
-#define EMIT_LVALUE llvm::Value* emit_lvalue(llvm::Module &) override;
+#define EMIT_RVALUE llvm::Value* emit_rvalue(Codegeneration::IRCreator *) override;
+#define EMIT_LVALUE llvm::Value* emit_lvalue(Codegeneration::IRCreator *) override;
 
 
 namespace Parsing {

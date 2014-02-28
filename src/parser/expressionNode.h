@@ -4,6 +4,7 @@
 
 #include "astNode.h"
 #include "semadecl.h"
+#include "../codegen/cogen.h"
 
 namespace llvm {
   class Module;
@@ -22,8 +23,8 @@ class ASTNODE(Expression)
     virtual void checkSemanticConstraints() {};
     virtual SemanticDeclarationNode getType() {return this->type;};
     virtual bool can_be_lvalue() {return m_can_be_lvalue;};
-    virtual llvm::Value* emit_rvalue(llvm::Module &);
-    virtual llvm::Value* emit_lvalue(llvm::Module &);
+    virtual llvm::Value* emit_rvalue(Codegeneration::IRCreator*);
+    virtual llvm::Value* emit_lvalue(Codegeneration::IRCreator *);
     IR_EMITTING
 };
 

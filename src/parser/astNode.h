@@ -5,12 +5,13 @@
 #include "../lexer/punctuatortype.h"
 #include "../utils/pos.h"
 #include "semantic.h"
+#include "../codegen/cogen.h"
 
 /* This macro allows an easy switching of pprint in all methods*/
 #define PPRINTABLE  void prettyPrint(unsigned int indentLevel = 0) override;
 
-/* Allows an easy change of emitIR methot */
-#define IR_EMITTING void emitIR(llvm::Module & M) override;
+/* Allows an easy change of emitIR method */
+#define IR_EMITTING void emitIR(Codegeneration::IRCreator *) override;
 
 /* This macro is used in intermediate classes */
 #define CONS_INTER(X) protected : X(Pos pos) : AstNode(pos){};
