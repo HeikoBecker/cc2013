@@ -31,11 +31,11 @@ namespace Codegeneration {
 		~IRCreator();
 		llvm::Value* createAdd(llvm::Value* lhs, llvm::Value* rhs);
 		llvm::Module* M;
+                llvm::Type* semantic_type2llvm_type(
+                    const Parsing::SemanticDeclarationNode semantic_type);
 	private:
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
 
-		llvm::Type* semantic_type2llvm_type(
-                    const Parsing::SemanticDeclarationNode semantic_type);
   };
 
 }
