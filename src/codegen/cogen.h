@@ -47,6 +47,7 @@ namespace Codegeneration {
 		llvm::Module* M;
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
+                llvm::Value* allocateInCurrentFunction(llvm::Type* type);
                 //void allocateAndStoreParameter(llvm::Type* type);
                 /* Allocates a basic block for a functions,
                  * and sets the Builder to it

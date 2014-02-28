@@ -11,6 +11,7 @@
 #include <memory>
 #include <algorithm>
 #include <iterator>
+#include <typeinfo> // only for debugging purpose
 
 #include "llvm/IR/Module.h"                /* Module */
 #include "llvm/IR/Function.h"              /* Function */
@@ -33,10 +34,18 @@ Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder
 M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {
 }	
 
-//llvm::Value* Codegeneration::IRCreator::allocate(llvm::Type* type)
-//{
-  //AllocaBuilder->CreateAlloca(type);
-//}
+llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* type)
+{
+    /* Reset the alloca builder each time before using it
+   *
+   *   It should not insert any instruction behind the terminator of the entry
+   *   block, the easiest way to ensure this is to set it to the begining of
+   *   the entry block each time we insert an alloca. */
+  AllocaBuilder->SetInsertPoint(AllocaBuilder->GetInsertBlock(),
+                               AllocaBuilder->GetInsertBlock()->begin());
+  return AllocaBuilder->CreateAlloca(type);
+}
+
 void Codegeneration::IRCreator::startFunction(
     llvm::FunctionType* function_type,
     std::string name
@@ -55,6 +64,7 @@ void Codegeneration::IRCreator::startFunction(
       0 //InsertBefore: inserts at end of surrounding function?
       );
   Builder->SetInsertPoint(function_basic_block);
+  AllocaBuilder->SetInsertPoint(function_basic_block);
 }
 
 void Codegeneration::IRCreator::finishFunction()
@@ -207,7 +217,17 @@ void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
 EMIT_IR(Parsing::AstNode)
 {
+  throw CompilerException(std::string(typeid(*this).name()) + " is not implemented yet!", this->pos());
   UNUSED(creator); //FIXME
+}
+
+EMIT_IR(Parsing::Declaration)
+{
+  llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
+  auto var = creator->allocateInCurrentFunction(variable);
+  if (this->declarator->hasName()) {
+    var->setName(this->declarator->getIdentifier());
+  }
 }
 
 EMIT_IR(Parsing::TranslationUnit)

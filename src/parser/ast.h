@@ -140,6 +140,7 @@ class ASTNODE(Declaration) {
     Declaration(TypeNode t, Pos pos);
     SemanticDeclarationNode getSemanticNode() { return declNode; }
 
+    IR_EMITTING
     PPRINTABLE
   private:
     TypeNode type;
