@@ -33,7 +33,6 @@ class EXPRESSION(BinaryExpression)
                      Pos pos,
                      const Pos* const operator_position = nullptr);
     PPRINTABLE
-    IR_EMITTING
     EMIT_RVALUE
   private:
     SubExpression lhs;

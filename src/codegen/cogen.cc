@@ -20,10 +20,14 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 
+//##############################################################################
+//#                        Helper functions                                    #
+//##############################################################################
+
 /*Code below is from LLVM's Kaleiscope tutorial*/
 /// CreateEntryBlockAlloca - Create an alloca instruction in the entry block of
 /// the function.  This is used for mutable variables etc.
-/*static*/ llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction,
+llvm::AllocaInst *Codegeneration::CreateEntryBlockAlloca(llvm::Function *TheFunction,
                                                 llvm::Type *type,
                                                 const std::string &VarName)
 {
@@ -32,12 +36,23 @@
   return TmpB.CreateAlloca(type, 0, VarName.c_str());
 }
 
+/*
+ * Converts one of our types to a suiting LLVM type
+ */
+static llvm::Type* sem_type2llvm_type(llvm::IRBuilder<> & Builder, const Semantic::Type t) {
+  //TODO
+  UNUSED(t);
+  return Builder.getInt32Ty();
+}
+
+
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
   auto &Ctx = llvm::getGlobalContext();
   std::string errorStr;
   llvm::raw_fd_ostream stream(filename, errorStr);
   llvm::Module M(filename, Ctx);
+  llvm::IRBuilder<> Builder(Ctx);
   root->emitIR(M);
   verifyModule(M);
   M.print(stream, nullptr); /* M is a llvm::Module */
@@ -100,16 +115,6 @@ void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
   // TODO: implement this
   UNUSED(M);
 }
-
-/*
- * Converst one of our types to a suiting LLVM type
- */
-static llvm::Type* sem_type2llvm_type(llvm::IRBuilder<> & Builder, const Semantic::Type t) {
-  //TODO
-  UNUSED(t);
-  return Builder.getInt32Ty();
-}
-
 
 void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   // TODO: make name a member of functiondefiniton or declaration
@@ -192,40 +197,43 @@ void Parsing::CompoundStatement::emitIR(llvm::Module & M) {
   }
 }
 
+//##############################################################################
+//#                    Expression Code Generation                              #
+//##############################################################################
+
+/*
+ * Every expression has the emitIR function that redirects the call to 
+ * emit_rvalue.
+ */
 void Parsing::ExpressionStatement::emitIR(llvm::Module & M) {
-  this->expression->emit_rvalue(M);
-}
-
-void Parsing::Expression::emitIR(llvm::Module & M) {
-  UNUSED(M);
-  std::cerr << "Don't call emitIR of an expression!\n"
-            << "Either call emit_rvalue or emit_lvalue\n";
-}
-
-llvm::Value* Parsing::Expression::emit_rvalue(llvm::Module & M) {
-  // get lvalue of Variable
-  auto address = this->emit_lvalue(M);
-  UNUSED(address);
-  // load from lvalue
-  return nullptr; // FIXME
-}
-
-
-llvm::Value* Parsing::Expression::emit_lvalue(llvm::Module & M) {
-  UNUSED(M);
-  if (this->can_be_lvalue()) {
-    throw CompilerException("Not implemeted!", this->pos());
-  }
-  throw CompilerException("Illegal LVALUE!", this->pos());
+  this->expression->emitIR(M);
 }
 
 /*
- * Emits the complete value calculation for the expression. As statements of the
- * form e; where e is an expression are valid C, we just explicitely call the 
- * RVALUE generating function here and ignore the result value
+ * An expression can be part of a statement with e; where e is a statement.
+ * So we need! emitIR to produce the rvalue.
+ * The lvalue function will be overwritten by the corresponding class so we can
+ * just call it here
+ * FIXME: Mark this function for inlining as it is just a forwarding/wrapper of
+ * a call to emit_rvalue
  */
-void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
-  this->emit_rvalue(M);
+void Parsing::Expression::emitIR(llvm::Module & M) {
+	this->emit_lvalue(M);
+}
+
+/*
+ * Methods for abstract expression object. They should never be called. If this
+ * happens, we forgot to override the method at a specific place, that will be
+ * printed by the exception.
+ * FIXME: Mark for inlining
+ */
+llvm::Value* Parsing::Expression::emit_rvalue(llvm::Module & M) {
+  UNUSED(M);
+  throw CompilerException("You did not override the method emit_rvalue", this->pos());
+}
+llvm::Value* Parsing::Expression::emit_lvalue(llvm::Module & M) {
+  UNUSED(M);
+  throw CompilerException("You did not override the method emit_lvalue", this->pos());
 }
 
 /*
@@ -234,7 +242,41 @@ void Parsing::BinaryExpression::emitIR(llvm::Module & M) {
  * on the operand
  */
 llvm::Value* Parsing::BinaryExpression::emit_rvalue(llvm::Module & M){
-  UNUSED(M);//FIXME
+  //First compute the values for the subexpressions
+  llvm::Value* lhs = this->lhs->emit_rvalue(M);
+  llvm::Value* rhs = this->rhs->emit_rvalue(M);
+
+  UNUSED(lhs);
+  UNUSED(rhs);
+
+  //then compute the corresponding value based on the operand
+  switch(this->op){
+	case PunctuatorType::PLUS:
+		break;
+	case PunctuatorType::MINUS:
+		break;
+	case PunctuatorType::LESS:
+		break;
+	case PunctuatorType::STAR:
+		break;
+	case PunctuatorType::NEQUAL:
+		break;
+	case PunctuatorType::EQUAL:
+		break;
+	case PunctuatorType::LAND:
+		break;
+	case PunctuatorType::LOR:
+		break;
+	case PunctuatorType::ARROW:
+		break;
+	case PunctuatorType::MEMBER_ACCESS:
+		break;
+	case PunctuatorType::ASSIGN:
+		break;
+	default:
+	  throw CompilerException("INTERNAL ERROR", this->pos());
+}
+  
   return nullptr;
 }
 
