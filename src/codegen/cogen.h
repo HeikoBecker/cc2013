@@ -1,6 +1,7 @@
 #ifndef COGEN_H
 #define COGEN_H
 #include <memory>
+#include <string>
 
 #include "llvm/IR/Module.h"                /* Module */
 #include "llvm/IR/Function.h"              /* Function */
@@ -46,6 +47,12 @@ namespace Codegeneration {
 		llvm::Module* M;
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
+                //void allocateAndStoreParameter(llvm::Type* type);
+                void startFunction(
+                    llvm::Function* function,
+                    std::string name
+                    );
+                void finishFunction();
 	private:
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
 

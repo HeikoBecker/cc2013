@@ -33,6 +33,44 @@ Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder
 M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {
 }	
 
+//llvm::Value* Codegeneration::IRCreator::allocate(llvm::Type* type)
+//{
+  //AllocaBuilder->CreateAlloca(type);
+//}
+void Codegeneration::IRCreator::startFunction(
+    llvm::Function* function,
+    std::string name
+)
+{
+  auto function_basic_block = llvm::BasicBlock::Create(
+      M->getContext(), // FIXME: M
+      name,
+      function,
+      0 //InsertBefore: inserts at end of surrounding function?
+      );
+  Builder->SetInsertPoint(function_basic_block);
+}
+
+void Codegeneration::IRCreator::finishFunction()
+{
+  // stol^H^H^H^H borrowed from Johannes' example
+  /* All code was emitted,.. but the last block might be empty.
+   * If the last block does not end with a terminator statement the simple
+   * rules created either dead code or the function is a void function without
+   * a return on each path. Either way we need to add a terminator instruction
+   * to the last block. The idea is to look at the return type of the current
+   * function and emit either a void return or a return with the 'NULL' value
+   * for this type */
+  if (Builder->GetInsertBlock()->getTerminator() == nullptr) {
+    auto CurFuncReturnType = Builder->getCurrentFunctionReturnType();
+    if (CurFuncReturnType->isVoidTy()) {
+      Builder->CreateRetVoid();
+    } else {
+      Builder->CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
+    }
+  }
+}
+
 Codegeneration::IRCreator::~IRCreator(){
 UNUSED(AllocaBuilder); //FIXME
 }
@@ -240,15 +278,7 @@ EMIT_IR(Parsing::FunctionDefinition)
   auto argument_it = function->begin();
   UNUSED(argument_it);
   /********************************************/
-  // Create the basic block for the function
-  auto function_basic_block = llvm::BasicBlock::Create(
-      creator->M->getContext(), // FIXME: M
-      name + "entry",
-      function,
-      0 //InsertBefore: inserts at end of surrounding function?
-      );
-  //Builder.SetInsertPoint(function_basic_block); // FIXME: IRCreator now needs
-  //function for this
+  creator->startFunction(function, name+"entry");
   /* TODO: store each argument on the stack
    * 1. Allocate a stack slot
    */
@@ -257,24 +287,7 @@ EMIT_IR(Parsing::FunctionDefinition)
    */
   // emit code for the body
   this->compoundStatement->emitIR(creator);
-
-  // stol^H^H^H^H borrowed from Johannes' example
-  /* All code was emitted,.. but the last block might be empty.
-   * If the last block does not end with a terminator statement the simple
-   * rules created either dead code or the function is a void function without
-   * a return on each path. Either way we need to add a terminator instruction
-   * to the last block. The idea is to look at the return type of the current
-   * function and emit either a void return or a return with the 'NULL' value
-   * for this type */
-  UNUSED(function_basic_block); // reenable code  below
-  //if (Builder.GetInsertBlock()->getTerminator() == nullptr) {
-    //auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
-    //if (CurFuncReturnType->isVoidTy()) {
-      //Builder.CreateRetVoid();
-    //} else {
-      //Builder.CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
-    //}
-  //}
+  creator->finishFunction();
 }
 
 EMIT_IR(Parsing::CompoundStatement)
