@@ -27,7 +27,8 @@ namespace Codegeneration {
 		llvm::Module* M;
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
 
-		llvm::Type* sem_type2llvm_type(const Semantic::Type t);
+		llvm::Type* semantic_type2llvm_type(
+                    const Parsing::SemanticDeclarationNode semantic_type);
   };
 
 }

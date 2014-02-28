@@ -20,20 +20,58 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 
-/*
- * Converts one of our types to a suiting LLVM type
- */
-llvm::Type* Codegeneration::IRCreator::sem_type2llvm_type(const Semantic::Type t) {
-  //TODO
-  UNUSED(t);
-  return Builder->getInt32Ty();
-}
-
 Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
 					llvm::IRBuilder<>* AllocaBuilder):
 M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {}	
 
 Codegeneration::IRCreator::~IRCreator(){}
+
+
+/*
+ *  Converts one of our type classes to the corresponding LLVM Type
+ */
+llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
+    const Parsing::SemanticDeclarationNode semantic_type) {
+  llvm::Type *llvm_type = nullptr;
+  switch(semantic_type->type()){
+    case Semantic::Type::INT:
+      llvm_type = Builder->getInt32Ty();
+      break;
+
+    case Semantic::Type::CHAR:
+      llvm_type = Builder->getInt8Ty();
+      break;
+                              
+    case Semantic::Type::VOID:
+      llvm_type = Builder->getVoidTy();
+      break;
+                              
+    case Semantic::Type::POINTER:
+      {
+        auto pointer_type =
+          std::static_pointer_cast<Parsing::PointerDeclaration>(semantic_type);	
+        llvm_type = llvm::PointerType::getUnqual(
+            semantic_type2llvm_type(pointer_type->pointee())
+            );
+      break;
+      }
+                                 
+    case Semantic::Type::ARRAY:
+      // TODO
+                               
+    case Semantic::Type::FUNCTION:
+      // Should we handle functions here?
+    case Semantic::Type::STRUCT:
+      {
+        auto structType =
+          std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
+        UNUSED(structType);
+      }
+    default:
+      llvm_type = Builder->getInt32Ty();
+  }
+  return llvm_type;
+}
 
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
@@ -65,74 +103,15 @@ void Parsing::TranslationUnit::emitIR(llvm::Module & M)
 }
 
 
-
-/*
- *  Converts one of our type classes to the corresponding llvm Type
- */
-llvm::Type* semantic_type2llvm_type(
-    llvm::IRBuilder<> Builder,
-    Parsing::SemanticDeclarationNode const semantic_type) {
-  llvm::Type *llvm_type = nullptr;
-  switch(semantic_type->type()){
-    case Semantic::Type::INT:
-      llvm_type = Builder.getInt32Ty();
-      break;
-
-    case Semantic::Type::CHAR:
-      llvm_type = Builder.getInt8Ty();
-      break;
-                              
-    case Semantic::Type::VOID:
-      llvm_type = Builder.getVoidTy();
-      break;
-                              
-    case Semantic::Type::POINTER:
-      {
-        auto pointer_type =
-          std::static_pointer_cast<Parsing::PointerDeclaration>(semantic_type);	
-        llvm_type = llvm::PointerType::getUnqual(
-            semantic_type2llvm_type(Builder, pointer_type->pointee())
-            );
-      break;
-      }
-                                 
-    case Semantic::Type::ARRAY:
-      // TODO
-      break;
-                               
-    case Semantic::Type::FUNCTION:
-      // Should we handle functions here?
-      break;
-    case Semantic::Type::STRUCT:
-      {
-        auto structType =
-          std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
-        UNUSED(structType);
-        break;
-      }
-  }
-  return llvm_type;
-}
-
 void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
 {
   // TODO: type mapping needs to go into a different method!
   using namespace llvm;
   // we either have to work with a global declaration or a forward declaration
   // first we take the type of the node
-  auto Builder = llvm::IRBuilder<>(M.getContext());
 
-  llvm::Type * external_declaration_type;
-  switch(this->declNode->type()){
-    case Semantic::Type::FUNCTION:
-      //We have reached a forward declaration which is not needed in 
-      //llvm --> just skip it
-      // TODO: this is probably not true
-      return;
-    default:
-      external_declaration_type = semantic_type2llvm_type(Builder, this->declNode);
-    
-  }
+  llvm::Type * external_declaration_type = nullptr; // FIXME: use IRCreator
+  
   GlobalVariable *GlobVar = new GlobalVariable(
           M                                       /* Module & */,
           external_declaration_type                              /* Type * */,
@@ -170,7 +149,9 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
       function_type_->parameter().cend(),
       begin(parameter_types),
       [&](SemanticDeclarationNode s) {
-        return semantic_type2llvm_type(Builder, s);
+        //return semantic_type2llvm_type(Builder, s); // FIXME: use IRCreator
+        UNUSED(s);
+        return nullptr;
   });
   /*************************************/
   llvm::FunctionType* function_type = llvm::FunctionType::get(
