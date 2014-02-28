@@ -139,7 +139,7 @@ void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
           0                                       /* unsigned AddressSpace = 0 */,
           false                                   /* bool isExternallyInitialized = false */);
   // TODO: what should we do with the global variable now?
-  UNUSED(GlobVar);
+  GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
 }
 
 void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
