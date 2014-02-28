@@ -57,59 +57,90 @@ void Parsing::TranslationUnit::emitIR(llvm::Module & M)
   }
 }
 
-void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
-{
-  // we either have to work with a global declaration or a forward declaration
-  // first we take the type of the node
-  switch(this->declNode->type()){
-	case Semantic::Type::INT:{
-		auto int_type = 
-			std::static_pointer_cast<IntDeclaration>(this->declNode);
-		break;
-				   }
-	case Semantic::Type::CHAR:{
-		auto char_type =
-		       std::static_pointer_cast<CharDeclaration>(this->declNode);	
-		break;
-				    }
-	case Semantic::Type::VOID:{
-		auto void_type =
-			std::static_pointer_cast<VoidDeclaration>(this->declNode);
-		break;
-				    }
-	case Semantic::Type::POINTER:{
-		auto pointer_type =
-		       std::static_pointer_cast<PointerDeclaration>(this->declNode);	
-		break;
-				       }
-	case Semantic::Type::ARRAY:{
-		auto array_type =
-			std::static_pointer_cast<ArrayDeclaration>(this->declNode);
-		break;
-				     }
-	case Semantic::Type::FUNCTION:
-		//We have reached a forward declaration which is not needed in 
-		//llvm --> just skip it
-		return;
-	case Semantic::Type::STRUCT:{
-		auto structType =
-			std::static_pointer_cast<StructDeclaration>(this->declNode);
-		break;
-				      }
-  }
-  // TODO: implement this
-  UNUSED(M);
-}
+
 
 /*
- * Converst one of our types to a suiting LLVM type
+ *  Converts one of our type classes to the corresponding llvm Type
  */
-static llvm::Type* sem_type2llvm_type(llvm::IRBuilder<> & Builder, const Semantic::Type t) {
-  //TODO
-  UNUSED(t);
-  return Builder.getInt32Ty();
+llvm::Type* semantic_type2llvm_type(
+    llvm::IRBuilder<> Builder,
+    Parsing::SemanticDeclarationNode const semantic_type) {
+  llvm::Type *llvm_type = nullptr;
+  switch(semantic_type->type()){
+    case Semantic::Type::INT:
+      llvm_type = Builder.getInt32Ty();
+      break;
+
+    case Semantic::Type::CHAR:
+      llvm_type = Builder.getInt8Ty();
+      break;
+                              
+    case Semantic::Type::VOID:
+      llvm_type = Builder.getVoidTy();
+      break;
+                              
+    case Semantic::Type::POINTER:
+      {
+        auto pointer_type =
+          std::static_pointer_cast<Parsing::PointerDeclaration>(semantic_type);	
+        llvm_type = llvm::PointerType::getUnqual(
+            semantic_type2llvm_type(Builder, pointer_type->pointee())
+            );
+      break;
+      }
+                                 
+    case Semantic::Type::ARRAY:
+      // TODO
+      break;
+                               
+    case Semantic::Type::FUNCTION:
+      // Should we handle functions here?
+      break;
+    case Semantic::Type::STRUCT:
+      {
+        auto structType =
+          std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
+        UNUSED(structType);
+        break;
+      }
+  }
+  return llvm_type;
 }
 
+void Parsing::ExternalDeclaration::emitIR(llvm::Module & M)
+{
+  // TODO: type mapping needs to go into a different method!
+  using namespace llvm;
+  // we either have to work with a global declaration or a forward declaration
+  // first we take the type of the node
+  auto Builder = llvm::IRBuilder<>(M.getContext());
+
+  llvm::Type * external_declaration_type;
+  switch(this->declNode->type()){
+    case Semantic::Type::FUNCTION:
+      //We have reached a forward declaration which is not needed in 
+      //llvm --> just skip it
+      // TODO: this is probably not true
+      return;
+    default:
+      external_declaration_type = semantic_type2llvm_type(Builder, this->declNode);
+    
+  }
+  GlobalVariable *GlobVar = new GlobalVariable(
+          M                                       /* Module & */,
+          external_declaration_type                              /* Type * */,
+          false                                   /* bool isConstant */,
+          GlobalValue::CommonLinkage              /* LinkageType */,
+          llvm::Constant::getNullValue(external_declaration_type)      /* Constant * Initializer */,
+          "TODO"                                /* const Twine &Name = "" */,
+  /* --------- We do not need this part (=> use defaults) ---------- */
+          0                                       /* GlobalVariable *InsertBefore = 0 */,
+          GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
+          0                                       /* unsigned AddressSpace = 0 */,
+          false                                   /* bool isExternallyInitialized = false */);
+  // TODO: what should we do with the global variable now?
+  UNUSED(GlobVar);
+}
 
 void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
   // TODO: make name a member of functiondefiniton or declaration
@@ -132,7 +163,7 @@ void Parsing::FunctionDefinition::emitIR(llvm::Module & M) {
       function_type_->parameter().cend(),
       begin(parameter_types),
       [&](SemanticDeclarationNode s) {
-        return sem_type2llvm_type(Builder, s->type());
+        return semantic_type2llvm_type(Builder, s);
   });
   /*************************************/
   llvm::FunctionType* function_type = llvm::FunctionType::get(
