@@ -277,6 +277,7 @@ EMIT_IR(Parsing::ExternalDeclaration)
           false                                   /* bool isExternallyInitialized = false */);
    //TODO: what should we do with the global variable now?
   GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
+  this->getSemanticNode()->associatedValue = GlobVar;
 }
 
 EMIT_IR(Parsing::FunctionDefinition)
