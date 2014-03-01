@@ -71,7 +71,7 @@ EMIT_IR(Parsing::ExternalDeclaration)
   );
   auto name = this->declarator->getIdentifier();
   if (this->getSemanticNode()->type() == Semantic::Type::FUNCTION) {
-    creator->startFunction(
+    this->getSemanticNode()->associatedValue = creator->startFunction(
         static_cast<FunctionType*>(external_declaration_type),
         name,
         false);
