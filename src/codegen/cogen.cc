@@ -113,6 +113,7 @@ EMIT_IR(Parsing::FunctionDefinition)
   // emit code for the body
   this->compoundStatement->emitIR(creator);
   creator->finishFunction();
+  llvm::verifyFunction(*function);
 }
 
 EMIT_IR(Parsing::CompoundStatement)
@@ -348,9 +349,9 @@ EMIT_RV(Parsing::Constant) {
  */
 EMIT_RV(Parsing::FunctionCall) {
  llvm::Value* func = this->funcName->emit_lvalue(creator);
-  std::vector<llvm::Value*>* values = new std::vector<llvm::Value*> ();
+  std::vector<llvm::Value*> values = std::vector<llvm::Value*> ();
   for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
-        values->push_back((*it)->emit_rvalue(creator));
+        values.push_back((*it)->emit_rvalue(creator));
   }
   return creator->createFCall(func, values);
 }
@@ -362,9 +363,9 @@ EMIT_RV(Parsing::FunctionCall) {
  */
 EMIT_LV(Parsing::FunctionCall) {
   llvm::Value* func = this->funcName->emit_lvalue(creator);
-  std::vector<llvm::Value*>* values = new std::vector<llvm::Value*> ();
+  std::vector<llvm::Value*> values = std::vector<llvm::Value*> ();
   for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
-        values->push_back((*it)->emit_rvalue(creator));
+        values.push_back((*it)->emit_rvalue(creator));
   }
   return creator->createFCall(func, values);
 }

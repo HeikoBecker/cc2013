@@ -59,7 +59,7 @@ namespace Codegeneration {
                 ALLOC(allocInt)
                 ALLOC(allocNullptr)
                 llvm::Value* createFCall(llvm::Value* func, 
-                                std::vector<llvm::Value*>* params);
+                                std::vector<llvm::Value*> params);
                 // controlflow
                 llvm::Value* makeSelect(llvm::Value* cond, llvm::Value* lhs,
                                         llvm::Value* rhs);

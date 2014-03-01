@@ -276,31 +276,27 @@ llvm::Value* Codegeneration::IRCreator::lookupVariable(
         return nullptr;
 }
 
-ALLOCF(allocLiteral) { //FIXME
+ALLOCF(allocLiteral) {
         UNUSED(name);
         return nullptr;
 }
 
-ALLOCF(allocChar) {//FIXME
-        UNUSED(name);
-        return nullptr;
+ALLOCF(allocChar) {
+  return Builder->getInt32(std::stoi(name));
 }
 
-ALLOCF(allocInt) { //FIXME
-        UNUSED(name);
-        return nullptr;
+ALLOCF(allocInt) {
+  return Builder->getInt8(std::stoi(name));
 }
 
 ALLOCF(allocNullptr) {//FIXME
-        UNUSED(name);
-        return nullptr;
+  UNUSED(name);
+  return Builder->getInt32(0); //FIXME
 }
 
 llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
-                std::vector<llvm::Value*>* params) { //FIXME
-        UNUSED(func);
-        UNUSED(params);
-        return nullptr;
+                std::vector<llvm::Value*> params) { //FIXME
+  return Builder->CreateCall(func, params);
 }
 
 llvm::Value* Codegeneration::IRCreator::makeSelect(llvm::Value* cond, 
