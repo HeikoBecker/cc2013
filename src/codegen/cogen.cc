@@ -154,9 +154,8 @@ CREATE(createAccess) { //FIXME
 }
 
 CREATE(createAssign) { //FIXME
-	UNUSED(lhs);
-	UNUSED(rhs);
-	return nullptr;
+  store(lhs,rhs);
+  return lhs;
 }
 
 /*
@@ -344,12 +343,12 @@ EMIT_IR(Parsing::ExpressionStatement)
 /*
  * An expression can be part of a statement with e; where e is a statement.
  * So we need! emitIR to produce the rvalue.
- * The lvalue function will be overwritten by the corresponding class so we can
+ * The rvalue function will be overwritten by the corresponding class so we can
  * just call it here
  */
-inline EMIT_IR(Parsing::Expression)
+EMIT_IR(Parsing::Expression)
 {
-	this->emit_lvalue(creator);
+	this->emit_rvalue(creator);
 }
 
 /*
@@ -363,7 +362,9 @@ inline EMIT_RV(Parsing::Expression) {
 }
 inline EMIT_LV(Parsing::Expression) {
   UNUSED(creator);
-  throw CompilerException("You did not override the method emit_lvalue", this->pos());
+  throw CompilerException(std::string("You did not override the method emit_lvalue for")
+      + typeid(*this).name()
+      , this->pos());
 }
 
 /*
@@ -373,8 +374,10 @@ inline EMIT_LV(Parsing::Expression) {
  */
 EMIT_RV(Parsing::BinaryExpression) {
   //First compute the values for the subexpressions
-  llvm::Value* lhs = this->lhs->emit_rvalue(creator);
-  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
+  // FIXME: not every operator requires lvalues! And the emit methods have side
+  // effects, so they mustn't be called when the value is not required
+  llvm::Value* lhs = nullptr;//this->lhs->emit_rvalue(creator);
+  llvm::Value* rhs = nullptr;//this->rhs->emit_rvalue(creator);
 
   //then compute the corresponding value based on the operand
   //the creator will to the llvm magic. We just want to find the
@@ -401,6 +404,8 @@ EMIT_RV(Parsing::BinaryExpression) {
 	case PunctuatorType::MEMBER_ACCESS:
 		return creator->createAccess(lhs, rhs);
 	case PunctuatorType::ASSIGN:
+                lhs = this->lhs->emit_lvalue(creator);
+                rhs = this->rhs->emit_rvalue(creator);
 		return creator->createAssign(lhs,rhs);
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
