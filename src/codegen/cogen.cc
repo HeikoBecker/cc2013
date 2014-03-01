@@ -208,9 +208,18 @@ EMIT_RV(Parsing::BinaryExpression) {
 		return creator->createLogAnd(lhs,rhs);
 	case PunctuatorType::LOR:
 		return creator->createLogOr(lhs, rhs);
-	case PunctuatorType::ARROW:
+	case PunctuatorType::ARROW: {
+                Parsing::SemanticDeclarationNode type = this->lhs->getType();
+                auto  structtype = std::static_pointer_cast<StructDeclaration> (type);
+                auto it = structtype->members()->begin();
+                int i = 0;
+                while (*it != this->rhs->getType()){
+                        ++it;
+                        ++i;
+                }
 		return creator->createPointerAccess(lhs, rhs, 
                                 this->rhs->getType());
+                                    }
 	case PunctuatorType::MEMBER_ACCESS:
 		return creator->createAccess(lhs, rhs, this->rhs->getType());
 	case PunctuatorType::ASSIGN:
