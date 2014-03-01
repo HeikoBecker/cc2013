@@ -108,6 +108,7 @@ EMIT_IR(Parsing::FunctionDefinition)
       param->associatedValue = ptr;
       ++parameter_index;
   });
+  function_type_->associatedValue = function;
   
   // emit code for the body
   this->compoundStatement->emitIR(creator);
@@ -126,7 +127,7 @@ EMIT_IR(Parsing::ReturnStatement)
   if (this->expression) {
     auto value = expression->emit_rvalue(creator);
     if (!value) {
-      throw;
+      throw ParsingException("rvalue is null, this is a bug", pos());
     }
     creator->makeReturn(value);
   } else {
