@@ -93,7 +93,12 @@ void Codegeneration::IRCreator::finishFunction()
 
 void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
   /* Create the return */
-  Builder->CreateRet(value);
+  if (value) {
+    Builder->CreateRet(value);
+  } else {
+    // if we passed a null pointer to makeReturn, we're in a void function
+    Builder->CreateRetVoid();
+  }
 
   /* Always create a new block after a return statement
    *

@@ -115,7 +115,12 @@ EMIT_IR(Parsing::CompoundStatement)
 
 EMIT_IR(Parsing::ReturnStatement)
 {
-  UNUSED(creator);
+  if (this->expression) {
+    auto value = expression->emit_lvalue(creator);
+    creator->makeReturn(value);
+  } else {
+    creator->makeReturn(nullptr);
+  }
 }
 
 //##############################################################################

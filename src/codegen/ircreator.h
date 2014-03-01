@@ -89,6 +89,7 @@ namespace Codegeneration {
 	private:
 		llvm::Module* M;
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
+                llvm::Function* currentFunction;
 
   };
 }
