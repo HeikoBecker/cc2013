@@ -210,7 +210,7 @@ BINCREATEL(createAccess) { //FIXME
 
 BINCREATEL(createAssign) { //FIXME
   UNUSED(rhstype);
-  store(lhs,rhs);
+  store(rhs,lhs);
   return lhs;
 }
 
@@ -282,11 +282,11 @@ ALLOCF(allocLiteral) {
 }
 
 ALLOCF(allocChar) {
-  return Builder->getInt32(std::stoi(name));
+  return Builder->getInt8(std::stoi(name));
 }
 
 ALLOCF(allocInt) {
-  return Builder->getInt8(std::stoi(name));
+  return Builder->getInt32(std::stoi(name));
 }
 
 ALLOCF(allocNullptr) {//FIXME
