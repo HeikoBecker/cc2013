@@ -165,11 +165,11 @@ EMIT_IR(Parsing::Expression)
  * happens, we forgot to override the method at a specific place, that will be
  * printed by the exception.
  */
-inline EMIT_RV(Parsing::Expression) {
+EMIT_RV(Parsing::Expression) {
   UNUSED(creator);
   throw CompilerException("You did not override the method emit_rvalue", this->pos());
 }
-inline EMIT_LV(Parsing::Expression) {
+EMIT_LV(Parsing::Expression) {
   UNUSED(creator);
   throw CompilerException(std::string("You did not override the method emit_lvalue for")
       + typeid(*this).name()
