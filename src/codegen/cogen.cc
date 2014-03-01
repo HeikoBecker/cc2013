@@ -91,14 +91,22 @@ EMIT_IR(Parsing::FunctionDefinition)
   auto name = this->declarator->getIdentifier();
   // lookup the type of the current function
   auto semtree = Parsing::SemanticForest::filename2SemanticTree(this->pos().name);
-  auto function_type = static_cast<llvm::FunctionType*>(creator->semantic_type2llvm_type(semtree->lookUpType(name, this->pos())));
+  auto function_type_ = std::static_pointer_cast<FunctionDeclaration>(
+      semtree->lookUpType(name, this->pos())
+  );
+  auto function_type = static_cast<llvm::FunctionType*>(creator->semantic_type2llvm_type(function_type_));
   auto function = creator->startFunction(function_type, name);
+  auto parameter_index = 0;
   std::for_each(function->arg_begin(), function->arg_end(),
       [&](decltype(function->arg_begin()) argument){
+      auto param = function_type_->parameter()[parameter_index];
       // 1. Allocate a stack slot
       auto ptr = creator->allocateInCurrentFunction(argument->getType());
       // 2. Store the argument value
       creator->store(argument, ptr);
+      // 3. associate type with value
+      param->associatedValue = argument;
+      ++parameter_index;
   });
   
   // emit code for the body
@@ -116,7 +124,10 @@ EMIT_IR(Parsing::CompoundStatement)
 EMIT_IR(Parsing::ReturnStatement)
 {
   if (this->expression) {
-    auto value = expression->emit_lvalue(creator);
+    auto value = expression->emit_rvalue(creator);
+    if (!value) {
+      throw;
+    }
     creator->makeReturn(value);
   } else {
     creator->makeReturn(nullptr);
@@ -278,8 +289,9 @@ EMIT_LV(Parsing::UnaryExpression) {
  * Produces the rvalue of a variable by returning the variable name that llvm 
  * gave it so that we can do computations with it
  */
-EMIT_RV(Parsing::VariableUsage) { //FIXME use the field Fabian is adding in branch cogen_experimental
-  return creator->loadVariable(this->getType(), this->name);
+EMIT_RV(Parsing::VariableUsage) {
+  auto address = this->emit_lvalue(creator);
+  return creator->loadVariable(address);
 }
 
 /*
@@ -289,7 +301,12 @@ EMIT_RV(Parsing::VariableUsage) { //FIXME use the field Fabian is adding in bran
 EMIT_LV(Parsing::VariableUsage) {
   /* TODO: why don't we just put this generic case, loading from rvalue in the
    * parent? */
-  return creator->createLoad(this->emit_rvalue(creator));
+  UNUSED(creator);
+  auto a = this->getType()->associatedValue;
+  if (!a) {
+    throw;
+  }
+  return a;
 }
 
 /*

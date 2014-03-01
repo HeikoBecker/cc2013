@@ -264,11 +264,8 @@ UNCREATE(getAddress) { //FIXME
 }
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
-                Parsing::SemanticDeclarationNode type, 
-                std::string name) { //FIXME
-        UNUSED(type);
-        UNUSED(name);
-        return nullptr;
+                llvm::Value *val) { //FIXME
+  return Builder->CreateLoad(val);
 }
 
 llvm::Value* Codegeneration::IRCreator::lookupVariable(

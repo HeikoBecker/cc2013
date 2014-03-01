@@ -51,8 +51,7 @@ namespace Codegeneration {
                 UNEXPCREATE(getDeref)
                 UNEXPCREATE(getAddress)
                 // are the functions below needed FIXME
-                llvm::Value* loadVariable(Parsing::SemanticDeclarationNode type,
-                                std::string name);
+                llvm::Value* loadVariable(llvm::Value *val);
                 llvm::Value* lookupVariable(Parsing::SemanticDeclarationNode type,
                                 std::string name);
                 ALLOC(allocLiteral)
