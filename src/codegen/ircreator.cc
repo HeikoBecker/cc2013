@@ -11,10 +11,10 @@
 
 //convenience macros to save some typing time
 //create is marked for being inlined!
-#define BINCREATE(X) inline llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
-#define BINCREATEL(X) inline llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs, Parsing::SemanticDeclarationNode rhstype)
-#define UNCREATE(X) inline llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
-#define ALLOCF(X) inline llvm::Value* Codegeneration::IRCreator::X(std::string name)
+#define BINCREATE(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
+#define BINCREATEL(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs, Parsing::SemanticDeclarationNode rhstype)
+#define UNCREATE(X) llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
+#define ALLOCF(X) llvm::Value* Codegeneration::IRCreator::X(std::string name)
 
 Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
 					llvm::IRBuilder<>* AllocaBuilder):
