@@ -79,18 +79,7 @@ EMIT_IR(Parsing::ExternalDeclaration)
   }
   
   // TODO: move global variable creato into creator method?
-  GlobalVariable *GlobVar = new GlobalVariable(
-          *creator->M                                      /* Module & */,
-          external_declaration_type                              /* Type * */,
-          false                                   /* bool isConstant */,
-          GlobalValue::CommonLinkage              /* LinkageType */,
-          llvm::Constant::getNullValue(external_declaration_type)      /* Constant * Initializer */,
-          "TODO"                                /* const Twine &Name = "" */,
-          /*--------- We do not need this part (=> use defaults) ----------*/
-          0                                       /* GlobalVariable *InsertBefore = 0 */,
-          GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
-          0                                       /* unsigned AddressSpace = 0 */,
-          false                                   /* bool isExternallyInitialized = false */);
+  GlobalVariable *GlobVar = creator->makeGlobVar(external_declaration_type);
    //TODO: what should we do with the global variable now?
   GlobVar->setName(name); // FIXME: we probably want a get name method
   this->getSemanticNode()->associatedValue = GlobVar;
@@ -122,6 +111,11 @@ EMIT_IR(Parsing::CompoundStatement)
   for (auto statement : this->subStatements) {
     statement->emitIR(creator);
   }
+}
+
+EMIT_IR(Parsing::ReturnStatement)
+{
+  UNUSED(creator);
 }
 
 //##############################################################################

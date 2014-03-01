@@ -29,6 +29,7 @@ namespace Codegeneration {
 		IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder, 
 				llvm::IRBuilder<>* AllocaBuilder);
 		~IRCreator();
+                // expressions
 		BINEXPCREATE(createAdd)
 		BINEXPCREATE(createMinus)
 		BINEXPCREATE(createLess)
@@ -49,6 +50,7 @@ namespace Codegeneration {
                 UNEXPCREATE(createAddress)
                 UNEXPCREATE(getDeref)
                 UNEXPCREATE(getAddress)
+                // are the functions below needed FIXME
                 llvm::Value* loadVariable(Parsing::SemanticDeclarationNode type,
                                 std::string name);
                 llvm::Value* lookupVariable(Parsing::SemanticDeclarationNode type,
@@ -59,18 +61,19 @@ namespace Codegeneration {
                 ALLOC(allocNullptr)
                 llvm::Value* createFCall(llvm::Value* func, 
                                 std::vector<llvm::Value*>* params);
+                // controlflow
                 llvm::Value* makeSelect(llvm::Value* cond, llvm::Value* lhs,
                                         llvm::Value* rhs);
-		llvm::Module* M;
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
                 llvm::Value* allocateInCurrentFunction(llvm::Type* type);
                 //void allocateAndStoreParameter(llvm::Type* type);
+                void store(llvm::Value* value, llvm::Value *ptr);
+                llvm::Value* createLoad(llvm::Value* val);
+                // functions
                 /* Allocates a basic block for a functions,
                  * and sets the Builder to it
                  */
-                void store(llvm::Value* value, llvm::Value *ptr);
-                llvm::Value* createLoad(llvm::Value* val);
                 llvm::Function *startFunction(
                     llvm::FunctionType* function_type,
                     std::string name,
@@ -79,7 +82,11 @@ namespace Codegeneration {
                 /* Ensures that the last block of the function has a terminator
                  */
                 void finishFunction();
+                // declarations
+                llvm::GlobalVariable *makeGlobVar(llvm::Type *type);
+
 	private:
+		llvm::Module* M;
 		llvm::IRBuilder<>* Builder, * AllocaBuilder;
 
   };

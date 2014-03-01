@@ -93,6 +93,7 @@ class JUMPSTATEMENT(BreakStatement) {
 class JUMPSTATEMENT(ReturnStatement) {
   public:
     PPRINTABLE
+    IR_EMITTING
     ReturnStatement(Pos pos);
     ReturnStatement(SubExpression ex, Pos pos);
   

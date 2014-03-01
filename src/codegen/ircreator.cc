@@ -88,6 +88,24 @@ void Codegeneration::IRCreator::finishFunction()
   }
 }
 
+
+llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
+{
+  return  new llvm::GlobalVariable(
+          *this->M                                      /* Module & */,
+          type                              /* Type * */,
+          false                                   /* bool isConstant */,
+          llvm::GlobalValue::CommonLinkage              /* LinkageType */,
+          llvm::Constant::getNullValue(type)      /* Constant * Initializer */,
+          "TODO"                                /* const Twine &Name = "" */,
+          /*--------- We do not need this part (=> use defaults) ----------*/
+          0                                       /* GlobalVariable *InsertBefore = 0 */,
+          llvm::GlobalVariable::NotThreadLocal          /* ThreadLocalMode TLMode = NotThreadLocal */,
+          0                                       /* unsigned AddressSpace = 0 */,
+          false                                   /* bool isExternallyInitialized = false */);
+   
+}
+
 Codegeneration::IRCreator::~IRCreator(){
 }
 
