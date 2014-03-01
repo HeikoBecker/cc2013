@@ -48,6 +48,10 @@ llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* ty
   return AllocaBuilder->CreateAlloca(type);
 }
 
+llvm::Value* Codegeneration::IRCreator::createLoad(llvm::Value* val) {
+  return Builder->CreateLoad(val);
+}
+
 
 void Codegeneration::IRCreator::store(llvm::Value* value, llvm::Value *ptr) {
   Builder->CreateStore(value,ptr);
@@ -152,9 +156,8 @@ BINCREATE(createAccess) { //FIXME
 }
 
 BINCREATE(createAssign) { //FIXME
-	UNUSED(lhs);
-	UNUSED(rhs);
-	return nullptr;
+  store(lhs,rhs);
+  return lhs;
 }
 
 BINCREATE(getAddressfromPointer){ //FIXME
@@ -332,6 +335,7 @@ EMIT_IR(Parsing::Declaration)
 {
   llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
   auto var = creator->allocateInCurrentFunction(variable);
+  declNode->associatedValue = var;
   if (this->declarator->hasName()) {
     var->setName(this->declarator->getIdentifier());
   }
@@ -373,6 +377,7 @@ EMIT_IR(Parsing::ExternalDeclaration)
           false                                   /* bool isExternallyInitialized = false */);
    //TODO: what should we do with the global variable now?
   GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
+  this->getSemanticNode()->associatedValue = GlobVar;
 }
 
 EMIT_IR(Parsing::FunctionDefinition)
@@ -403,18 +408,14 @@ EMIT_IR(Parsing::FunctionDefinition)
   // TODO: retrive function argument names
   /********************************************/
   auto function = creator->startFunction(function_type, name);
-  /* TODO: store each argument on the stack
-   * 1. Allocate a stack slot
-   */
   std::for_each(function->arg_begin(), function->arg_end(),
       [&](decltype(function->arg_begin()) argument){
+      // 1. Allocate a stack slot
       auto ptr = creator->allocateInCurrentFunction(argument->getType());
+      // 2. Store the argument value
       creator->store(argument, ptr);
   });
   
-  /*
-   * 2. Store the argument value
-   */
   // emit code for the body
   this->compoundStatement->emitIR(creator);
   creator->finishFunction();
@@ -443,12 +444,12 @@ EMIT_IR(Parsing::ExpressionStatement)
 /*
  * An expression can be part of a statement with e; where e is a statement.
  * So we need! emitIR to produce the rvalue.
- * The lvalue function will be overwritten by the corresponding class so we can
+ * The rvalue function will be overwritten by the corresponding class so we can
  * just call it here
  */
-inline EMIT_IR(Parsing::Expression)
+EMIT_IR(Parsing::Expression)
 {
-	this->emit_lvalue(creator);
+	this->emit_rvalue(creator);
 }
 
 /*
@@ -462,7 +463,9 @@ inline EMIT_RV(Parsing::Expression) {
 }
 inline EMIT_LV(Parsing::Expression) {
   UNUSED(creator);
-  throw CompilerException("You did not override the method emit_lvalue", this->pos());
+  throw CompilerException(std::string("You did not override the method emit_lvalue for")
+      + typeid(*this).name()
+      , this->pos());
 }
 
 /*
@@ -472,8 +475,10 @@ inline EMIT_LV(Parsing::Expression) {
  */
 EMIT_RV(Parsing::BinaryExpression) {
   //First compute the values for the subexpressions
-  llvm::Value* lhs = this->lhs->emit_rvalue(creator);
-  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
+  // FIXME: not every operator requires lvalues! And the emit methods have side
+  // effects, so they mustn't be called when the value is not required
+  llvm::Value* lhs = nullptr;//this->lhs->emit_rvalue(creator);
+  llvm::Value* rhs = nullptr;//this->rhs->emit_rvalue(creator);
 
   //then compute the corresponding value based on the operand
   //the creator will to the llvm magic. We just want to find the
@@ -500,6 +505,8 @@ EMIT_RV(Parsing::BinaryExpression) {
 	case PunctuatorType::MEMBER_ACCESS:
 		return creator->createAccess(lhs, rhs);
 	case PunctuatorType::ASSIGN:
+                lhs = this->lhs->emit_lvalue(creator);
+                rhs = this->rhs->emit_rvalue(creator);
 		return creator->createAssign(lhs,rhs);
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
@@ -566,7 +573,8 @@ EMIT_LV(Parsing::UnaryExpression) {
  * gave it so that we can do computations with it
  */
 EMIT_RV(Parsing::VariableUsage) {
-  return creator->loadVariable(this->getType(), this->name);
+  UNUSED(creator); //FIXME
+  return this->getType()->associatedValue;
 }
 
 /*
@@ -574,7 +582,9 @@ EMIT_RV(Parsing::VariableUsage) {
  * produced when it has been declared.
  */
 EMIT_LV(Parsing::VariableUsage) {
-  return creator->lookupVariable(this->getType(), this->name);
+  /* TODO: why don't we just put this generic case, loading from rvalue in the
+   * parent? */
+  return creator->createLoad(this->emit_rvalue(creator));
 }
 
 /*
