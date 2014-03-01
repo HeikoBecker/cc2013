@@ -17,6 +17,11 @@
 #define EMIT_IR(X) void X::emitIR(Codegeneration::IRCreator* creator)
 #define EMIT_LV(X) llvm::Value* X::emit_lvalue(Codegeneration::IRCreator* creator) 
 #define EMIT_RV(X) llvm::Value* X::emit_rvalue(Codegeneration::IRCreator* creator) 
+#define EMIT_CONDITION(X) void X::emit_condition(\
+    Codegeneration::IRCreator* creator,\
+    llvm::BasicBlock* trueSuccessor,\
+    llvm::BasicBlock* falseSuccessor\
+    )
 
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
@@ -139,6 +144,14 @@ EMIT_IR(Parsing::ReturnStatement)
 //##############################################################################
 //#                    Expression Code Generation                              #
 //##############################################################################
+
+EMIT_CONDITION(Parsing::Expression)
+{
+  UNUSED(creator);
+  UNUSED(trueSuccessor);
+  UNUSED(falseSuccessor);
+  throw;
+}
 
 /*
  * Every expression has the emitIR function that redirects the call to 

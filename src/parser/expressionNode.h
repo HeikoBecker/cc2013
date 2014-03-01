@@ -8,6 +8,7 @@
 
 namespace llvm {
   class Value;
+  class BasicBlock;
 }
 
 namespace Codegeneration {
@@ -28,6 +29,11 @@ class ASTNODE(Expression)
     virtual bool can_be_lvalue() {return m_can_be_lvalue;};
     virtual llvm::Value* emit_rvalue(Codegeneration::IRCreator*);
     virtual llvm::Value* emit_lvalue(Codegeneration::IRCreator *);
+    void emit_condition(
+        Codegeneration::IRCreator* creator,
+        llvm::BasicBlock* trueSuccessor,
+        llvm::BasicBlock* falseSuccessor
+    );
     IR_EMITTING
 };
 
