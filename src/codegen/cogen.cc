@@ -1,4 +1,5 @@
 #include "cogen.h"
+#include "ircreator.h"
 #include "../parser/ast.h"
 #include "../parser/astNode.h"
 #include "../parser/statementNode.h"
@@ -13,302 +14,9 @@
 #include <iterator>
 #include <typeinfo> // only for debugging purpose
 
-#include "llvm/IR/Module.h"                /* Module */
-#include "llvm/IR/Function.h"              /* Function */
-#include "llvm/IR/Constant.h"              /* Constant::getNullValue */
-#include "llvm/IR/IRBuilder.h"             /* IRBuilder */
-#include "llvm/IR/LLVMContext.h"           /* LLVMContext */
-#include "llvm/IR/GlobalValue.h"           /* GlobaleVariable, LinkageTypes */
-#include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
-#include "llvm/Support/raw_ostream.h"
-
-//convenience macros to save some typing time
-//create is marked for being inlined!
 #define EMIT_IR(X) void X::emitIR(Codegeneration::IRCreator* creator)
 #define EMIT_LV(X) llvm::Value* X::emit_lvalue(Codegeneration::IRCreator* creator) 
 #define EMIT_RV(X) llvm::Value* X::emit_rvalue(Codegeneration::IRCreator* creator) 
-#define BINCREATE(X) inline llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
-#define UNCREATE(X) inline llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
-#define ALLOCF(X) inline llvm::Value* Codegeneration::IRCreator::X(std::string name)
-
-Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
-					llvm::IRBuilder<>* AllocaBuilder):
-M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {
-}	
-
-llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* type)
-{
-    /* Reset the alloca builder each time before using it
-   *
-   *   It should not insert any instruction behind the terminator of the entry
-   *   block, the easiest way to ensure this is to set it to the begining of
-   *   the entry block each time we insert an alloca. */
-  AllocaBuilder->SetInsertPoint(AllocaBuilder->GetInsertBlock(),
-                               AllocaBuilder->GetInsertBlock()->begin());
-  return AllocaBuilder->CreateAlloca(type);
-}
-
-llvm::Value* Codegeneration::IRCreator::createLoad(llvm::Value* val) {
-  return Builder->CreateLoad(val);
-}
-
-
-void Codegeneration::IRCreator::store(llvm::Value* value, llvm::Value *ptr) {
-  Builder->CreateStore(value,ptr);
-}
-
-llvm::Function* Codegeneration::IRCreator::startFunction(
-    llvm::FunctionType* function_type,
-    std::string name
-)
-{
-  auto function = llvm::Function::Create(
-      function_type,
-      llvm::GlobalValue::ExternalLinkage,
-      name,
-      M
-      );
-  auto function_basic_block = llvm::BasicBlock::Create(
-      M->getContext(), // FIXME: M
-      name+"_begin",
-      function,
-      0 //InsertBefore: inserts at end of surrounding function?
-      );
-  Builder->SetInsertPoint(function_basic_block);
-  AllocaBuilder->SetInsertPoint(function_basic_block);
-  return function;
-}
-
-void Codegeneration::IRCreator::finishFunction()
-{
-  // stol^H^H^H^H borrowed from Johannes' example
-  /* All code was emitted,.. but the last block might be empty.
-   * If the last block does not end with a terminator statement the simple
-   * rules created either dead code or the function is a void function without
-   * a return on each path. Either way we need to add a terminator instruction
-   * to the last block. The idea is to look at the return type of the current
-   * function and emit either a void return or a return with the 'NULL' value
-   * for this type */
-  if (Builder->GetInsertBlock()->getTerminator() == nullptr) {
-    auto CurFuncReturnType = Builder->getCurrentFunctionReturnType();
-    if (CurFuncReturnType->isVoidTy()) {
-      Builder->CreateRetVoid();
-    } else {
-      Builder->CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
-    }
-  }
-}
-
-Codegeneration::IRCreator::~IRCreator(){
-UNUSED(AllocaBuilder); //FIXME
-}
-
-/*
- * Self explanatory binary expression functions. Special cases are annotated.
- */
-BINCREATE(createAdd) {
-	return Builder->CreateAdd(lhs,rhs);
-}
-
-BINCREATE(createMinus) {
-	return Builder->CreateSub(lhs, rhs);
-}
-
-/*
- * We use signed less than for the less than operator as usual arithmetic conver
- * sions imply an implicit threatment of all values as i32 integer which are
- * signed in our C subset
- */
-BINCREATE(createLess) {
-	return Builder->CreateICmpSLT(lhs,rhs);
-}
-
-BINCREATE(createMult) {
-	return Builder->CreateMul(lhs, rhs);
-}
-
-BINCREATE(createUnequal){
-	return Builder->CreateICmpNE(lhs,rhs);
-}
-
-BINCREATE(createEqual){
-	return Builder->CreateICmpEQ(lhs,rhs);
-}
-
-BINCREATE(createLogAnd){
-	return Builder->CreateAnd(lhs, rhs);
-}
-
-BINCREATE(createLogOr){
-	return Builder->CreateOr(lhs,rhs);
-}
-
-BINCREATE(createPointerAccess) { //FIXME
-	UNUSED(lhs);
-	UNUSED(rhs);
-	return nullptr;
-}
-
-BINCREATE(createAccess) { //FIXME
-	UNUSED(lhs);
-	UNUSED(rhs);
-	return nullptr;
-}
-
-BINCREATE(createAssign) { //FIXME
-  store(lhs,rhs);
-  return lhs;
-}
-
-BINCREATE(getAddressfromPointer){ //FIXME
-        UNUSED(lhs);
-        UNUSED(rhs);
-        return nullptr;
-}
-
-BINCREATE(getMemberAddress){ //FIXME
-        UNUSED(lhs);
-        UNUSED(rhs);
-        return nullptr;
-}
-
-BINCREATE(getArrayPosition) { //FIXME
-        UNUSED(lhs);
-        UNUSED(rhs);
-        return nullptr;
-}
-
-UNCREATE(createLogNeg) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
-
-UNCREATE(createNeg) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
-
-UNCREATE(createDeref) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
-
-UNCREATE(createAddress) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
-
-UNCREATE(getDeref) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
-
-UNCREATE(getAddress) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
-
-llvm::Value* Codegeneration::IRCreator::loadVariable(
-                Parsing::SemanticDeclarationNode type, 
-                std::string name) { //FIXME
-        UNUSED(type);
-        UNUSED(name);
-        return nullptr;
-}
-
-llvm::Value* Codegeneration::IRCreator::lookupVariable(
-                Parsing::SemanticDeclarationNode type,
-                std::string name) { //FIXME
-        UNUSED(type);
-        UNUSED(name);
-        return nullptr;
-}
-
-ALLOCF(allocLiteral) { //FIXME
-        UNUSED(name);
-        return nullptr;
-}
-
-ALLOCF(allocChar) {//FIXME
-        UNUSED(name);
-        return nullptr;
-}
-
-ALLOCF(allocInt) { //FIXME
-        UNUSED(name);
-        return nullptr;
-}
-
-ALLOCF(allocNullptr) {//FIXME
-        UNUSED(name);
-        return nullptr;
-}
-
-llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
-                std::vector<llvm::Value*>* params) { //FIXME
-        UNUSED(func);
-        UNUSED(params);
-        return nullptr;
-}
-
-llvm::Value* Codegeneration::IRCreator::makeSelect(llvm::Value* cond, 
-                llvm::Value* lhs, llvm::Value* rhs) { //FIXME
-        UNUSED(cond);
-        UNUSED(lhs);
-        UNUSED(rhs);
-        return nullptr;
-}
-
-/*
- *  Converts one of our type classes to the corresponding LLVM Type
- */
-llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
-    const Parsing::SemanticDeclarationNode semantic_type) {
-  llvm::Type *llvm_type = nullptr;
-  switch(semantic_type->type()){
-    case Semantic::Type::INT:
-      llvm_type = Builder->getInt32Ty();
-      break;
-
-    case Semantic::Type::CHAR:
-      llvm_type = Builder->getInt8Ty();
-      break;
-                              
-    case Semantic::Type::VOID:
-      llvm_type = Builder->getVoidTy();
-      break;
-                              
-    case Semantic::Type::ARRAY:
-    case Semantic::Type::POINTER:
-      {
-        auto pointer_type =
-          std::static_pointer_cast<Parsing::PointerDeclaration>(semantic_type);	
-        llvm_type = llvm::PointerType::getUnqual(
-            semantic_type2llvm_type(pointer_type->pointee())
-            );
-      break;
-      }
-                                 
-    case Semantic::Type::STRUCT:
-      {
-        auto structType =
-          std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
-        UNUSED(structType);
-        llvm_type = llvm::StructType::create(this->Builder->getContext());
-        /* TODO: handle non primitive types*/
-        std::vector<llvm::Type *> member_types;
-        // TODO: use transform
-        for (auto member: structType->members()) {
-          member_types.push_back(semantic_type2llvm_type(member.second));
-        }
-      }
-    case Semantic::Type::FUNCTION:
-      // Should we handle functions here?
-    default:
-      llvm_type = Builder->getInt32Ty();
-  }
-  return llvm_type;
-}
 
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
@@ -501,13 +209,14 @@ EMIT_RV(Parsing::BinaryExpression) {
 	case PunctuatorType::LOR:
 		return creator->createLogOr(lhs, rhs);
 	case PunctuatorType::ARROW:
-		return creator->createPointerAccess(lhs, rhs);
+		return creator->createPointerAccess(lhs, rhs, 
+                                this->rhs->getType());
 	case PunctuatorType::MEMBER_ACCESS:
-		return creator->createAccess(lhs, rhs);
+		return creator->createAccess(lhs, rhs, this->rhs->getType());
 	case PunctuatorType::ASSIGN:
                 lhs = this->lhs->emit_lvalue(creator);
                 rhs = this->rhs->emit_rvalue(creator);
-		return creator->createAssign(lhs,rhs);
+		return creator->createAssign(lhs,rhs, this->rhs->getType());
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
 	}
@@ -519,11 +228,12 @@ EMIT_LV(Parsing::BinaryExpression){
 
         switch (this->op){
         case PunctuatorType::ARROW:
-               return creator->getAddressfromPointer(lhs,rhs);
+               return creator->getAddressfromPointer(lhs,rhs, 
+                               this->rhs->getType());
         case PunctuatorType::MEMBER_ACCESS:
-               return creator->getMemberAddress(lhs,rhs); 
+               return creator->getMemberAddress(lhs,rhs, this->rhs->getType()); 
         case PunctuatorType::ARRAY_ACCESS:
-               return creator->getArrayPosition(lhs,rhs);
+               return creator->getArrayPosition(lhs,rhs, this->rhs->getType());
         default:
                throw CompilerException("INTERNAL ERROR", this->pos());
         }
@@ -572,9 +282,8 @@ EMIT_LV(Parsing::UnaryExpression) {
  * Produces the rvalue of a variable by returning the variable name that llvm 
  * gave it so that we can do computations with it
  */
-EMIT_RV(Parsing::VariableUsage) {
-  UNUSED(creator); //FIXME
-  return this->getType()->associatedValue;
+EMIT_RV(Parsing::VariableUsage) { //FIXME use the field Fabian is adding in branch cogen_experimental
+  return creator->loadVariable(this->getType(), this->name);
 }
 
 /*
