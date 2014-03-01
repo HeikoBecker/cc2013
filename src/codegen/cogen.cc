@@ -94,27 +94,7 @@ EMIT_IR(Parsing::FunctionDefinition)
   auto name = this->declarator->getIdentifier();
   // lookup the type of the current function
   auto semtree = Parsing::SemanticForest::filename2SemanticTree(this->pos().name);
-  auto function_type_ = std::static_pointer_cast<FunctionDeclaration>(semtree->lookUpType(name, this->pos()));
-  // lookup the return type and set it correctly
-  auto return_type_ = function_type_->returnType();
-  auto return_type = creator->semantic_type2llvm_type(return_type_); 
-  /*************************************/
-  /* TODO: set the correct parameter types */
-  auto parameter_types = std::vector<llvm::Type *>();
-  parameter_types.reserve(function_type_->parameter().size());
-  // iterate over parameter_types and push corresponding LLVM type into vector
-  for (auto p: function_type_->parameter()) {
-    parameter_types.push_back(creator->semantic_type2llvm_type(p));
-  }
-  /*************************************/
-  llvm::FunctionType* function_type = llvm::FunctionType::get(
-      return_type,
-      parameter_types,
-      /*isVarArg=*/false); 
-  /* TODO: set the names of the function arguments
-   * byiterating over them and calling setName*/
-  // TODO: retrive function argument names
-  /********************************************/
+  auto function_type = static_cast<llvm::FunctionType*>(creator->semantic_type2llvm_type(semtree->lookUpType(name, this->pos())));
   auto function = creator->startFunction(function_type, name);
   std::for_each(function->arg_begin(), function->arg_end(),
       [&](decltype(function->arg_begin()) argument){

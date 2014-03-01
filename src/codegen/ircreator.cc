@@ -320,7 +320,31 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       }
       break;
     case Semantic::Type::FUNCTION:
-      // Should we handle functions here?
+      {
+      auto function_type_ = std::static_pointer_cast<Parsing::FunctionDeclaration>(semantic_type);
+      // lookup the return type and set it correctly
+      auto return_type_ = function_type_->returnType();
+      auto return_type = this->semantic_type2llvm_type(return_type_); 
+      /*************************************/
+      /* TODO: set the correct parameter types */
+      auto parameter_types = std::vector<llvm::Type *>();
+      parameter_types.reserve(function_type_->parameter().size());
+      // iterate over parameter_types and push corresponding LLVM type into vector
+      for (auto p: function_type_->parameter()) {
+        parameter_types.push_back(this->semantic_type2llvm_type(p));
+      }
+      /*************************************/
+      llvm::FunctionType* function_type = llvm::FunctionType::get(
+          return_type,
+          parameter_types,
+          /*isVarArg=*/false); 
+      /* TODO: set the names of the function arguments
+       * byiterating over them and calling setName*/
+      // TODO: retrive function argument names
+      /********************************************/
+      llvm_type = function_type;
+      break;
+      }
     default:
       llvm_type = Builder->getInt32Ty();
   }
