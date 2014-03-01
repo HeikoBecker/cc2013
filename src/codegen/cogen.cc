@@ -211,9 +211,9 @@ EMIT_RV(Parsing::BinaryExpression) {
 	case PunctuatorType::ARROW: {
                 Parsing::SemanticDeclarationNode type = this->lhs->getType();
                 auto  structtype = std::static_pointer_cast<StructDeclaration> (type);
-                auto it = structtype->members()->begin();
+                auto it = structtype->members().begin();
                 int i = 0;
-                while (*it != this->rhs->getType()){
+                while (it->second != this->rhs->getType()){
                         ++it;
                         ++i;
                 }
