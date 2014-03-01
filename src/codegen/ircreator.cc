@@ -44,7 +44,8 @@ void Codegeneration::IRCreator::store(llvm::Value* value, llvm::Value *ptr) {
 
 llvm::Function* Codegeneration::IRCreator::startFunction(
     llvm::FunctionType* function_type,
-    std::string name
+    std::string name,
+    bool definition
 )
 {
   auto function = llvm::Function::Create(
@@ -53,6 +54,9 @@ llvm::Function* Codegeneration::IRCreator::startFunction(
       name,
       M
       );
+  if (!definition) {
+    return function;
+  }
   auto function_basic_block = llvm::BasicBlock::Create(
       M->getContext(), // FIXME: M
       name+"_begin",

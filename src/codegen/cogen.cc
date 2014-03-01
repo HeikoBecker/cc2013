@@ -69,6 +69,14 @@ EMIT_IR(Parsing::ExternalDeclaration)
   llvm::Type * external_declaration_type = creator->semantic_type2llvm_type(
       this->getSemanticNode()
   );
+  auto name = this->declarator->getIdentifier();
+  if (this->getSemanticNode()->type() == Semantic::Type::FUNCTION) {
+    creator->startFunction(
+        static_cast<FunctionType*>(external_declaration_type),
+        name,
+        false);
+    return;
+  }
   
   // TODO: move global variable creato into creator method?
   GlobalVariable *GlobVar = new GlobalVariable(
@@ -84,7 +92,7 @@ EMIT_IR(Parsing::ExternalDeclaration)
           0                                       /* unsigned AddressSpace = 0 */,
           false                                   /* bool isExternallyInitialized = false */);
    //TODO: what should we do with the global variable now?
-  GlobVar->setName(this->declarator->getIdentifier()); // FIXME: we probably want a get name method
+  GlobVar->setName(name); // FIXME: we probably want a get name method
   this->getSemanticNode()->associatedValue = GlobVar;
 }
 

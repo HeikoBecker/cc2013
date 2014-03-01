@@ -73,7 +73,8 @@ namespace Codegeneration {
                 llvm::Value* createLoad(llvm::Value* val);
                 llvm::Function *startFunction(
                     llvm::FunctionType* function_type,
-                    std::string name
+                    std::string name,
+                    bool definition=true
                     );
                 /* Ensures that the last block of the function has a terminator
                  */
