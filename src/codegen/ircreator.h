@@ -64,10 +64,11 @@ namespace Codegeneration {
                 // controlflow
                 llvm::Value* makeSelect(llvm::Value* cond, llvm::Value* lhs,
                                         llvm::Value* rhs);
+                void makeReturn(llvm::Value *value);
+                // utilities
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
                 llvm::Value* allocateInCurrentFunction(llvm::Type* type);
-                //void allocateAndStoreParameter(llvm::Type* type);
                 void store(llvm::Value* value, llvm::Value *ptr);
                 llvm::Value* createLoad(llvm::Value* val);
                 // functions

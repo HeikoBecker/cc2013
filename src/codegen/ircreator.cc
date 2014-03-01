@@ -18,7 +18,7 @@
 
 Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
 					llvm::IRBuilder<>* AllocaBuilder):
-M(M), Builder(Builder), AllocaBuilder(AllocaBuilder) {
+M(M), Builder(Builder), AllocaBuilder(AllocaBuilder), currentFunction(nullptr) {
 }	
 
 llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* type)
@@ -63,6 +63,7 @@ llvm::Function* Codegeneration::IRCreator::startFunction(
       function,
       0 //InsertBefore: inserts at end of surrounding function?
       );
+  currentFunction = function;
   Builder->SetInsertPoint(function_basic_block);
   AllocaBuilder->SetInsertPoint(function_basic_block);
   return function;
@@ -86,6 +87,27 @@ void Codegeneration::IRCreator::finishFunction()
       Builder->CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
     }
   }
+  currentFunction = nullptr;
+}
+
+
+void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
+  /* Create the return */
+  Builder->CreateRet(value);
+
+  /* Always create a new block after a return statement
+   *
+   *  This will prevent you from inserting code after a block terminator (here
+   *  the return instruction), but it will create a dead basic block instead.
+   */
+  llvm::BasicBlock *ReturnDeadBlock = llvm::BasicBlock::Create(
+          Builder->getContext()                   /* LLVMContext &Context */,
+          "DEAD_BLOCK"                            /* const Twine &Name="" */,
+          currentFunction                         /* Function *Parent=0 */,
+          0                                       /* BasicBlock *InsertBefore=0 */);
+
+  /* Insert code following the return in this new 'dead' block */
+  Builder->SetInsertPoint(ReturnDeadBlock);
 }
 
 
