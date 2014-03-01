@@ -184,28 +184,36 @@ EMIT_RV(Parsing::BinaryExpression) {
   // FIXME: not every operator requires lvalues! And the emit methods have side
   // effects, so they mustn't be called when the value is not required
   llvm::Value* lhs = nullptr;//this->lhs->emit_rvalue(creator);
-  llvm::Value* rhs = nullptr;//this->rhs->emit_rvalue(creator);
+  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
 
   //then compute the corresponding value based on the operand
   //the creator will to the llvm magic. We just want to find the
   //correct method to call
   switch(this->op){
 	case PunctuatorType::PLUS:
-		return creator->createAdd(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createAdd(lhs, rhs);
 	case PunctuatorType::MINUS:
-		return creator->createMinus(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createMinus(lhs, rhs);
 	case PunctuatorType::LESS:
-		return creator->createLess(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createLess(lhs, rhs);
 	case PunctuatorType::STAR:
-		return creator->createMult(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createMult(lhs, rhs);
 	case PunctuatorType::NEQUAL:
-		return creator->createUnequal(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createUnequal(lhs, rhs);
 	case PunctuatorType::EQUAL:
-		return creator->createEqual(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createEqual(lhs, rhs);
 	case PunctuatorType::LAND:
-		return creator->createLogAnd(lhs,rhs);
-	case PunctuatorType::LOR:
-		return creator->createLogOr(lhs, rhs);
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createLogAnd(lhs,rhs);
+        case PunctuatorType::LOR:
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createLogOr(lhs, rhs);
 	case PunctuatorType::ARROW: {
                 Parsing::SemanticDeclarationNode type = this->lhs->getType();
                 auto  structtype = std::static_pointer_cast<StructDeclaration> (type);
@@ -215,15 +223,15 @@ EMIT_RV(Parsing::BinaryExpression) {
                         ++it;
                         ++i;
                 }
-		return creator->createPointerAccess(lhs, rhs, 
+                return creator->createPointerAccess(lhs, rhs, 
                                 this->rhs->getType());
                                     }
 	case PunctuatorType::MEMBER_ACCESS:
-		return creator->createAccess(lhs, rhs, this->rhs->getType());
+          lhs = this->lhs->emit_rvalue(creator);
+          return creator->createAccess(lhs, rhs, this->rhs->getType());
 	case PunctuatorType::ASSIGN:
-                lhs = this->lhs->emit_lvalue(creator);
-                rhs = this->rhs->emit_rvalue(creator);
-		return creator->createAssign(lhs,rhs, this->rhs->getType());
+          lhs = this->lhs->emit_lvalue(creator);
+          return creator->createAssign(lhs,rhs, this->rhs->getType());
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
 	}
