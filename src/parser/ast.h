@@ -38,6 +38,7 @@ class EXPRESSION(BinaryExpression)
                      const Pos* const operator_position = nullptr);
     PPRINTABLE
     EMIT_RVALUE
+    EMIT_LVALUE
   private:
     SubExpression lhs;
     SubExpression rhs;
@@ -82,7 +83,6 @@ class EXPRESSION(Literal)
   public:
     Literal(std::string name, Pos pos);
     PPRINTABLE
-    EMIT_LVALUE
     EMIT_RVALUE
 
   private:

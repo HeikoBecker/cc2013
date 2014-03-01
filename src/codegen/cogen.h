@@ -13,7 +13,9 @@
 #include "llvm/Support/raw_ostream.h"
 
 //convenience macros
-#define EXPCREATE(X) llvm::Value* X(llvm::Value* lhs, llvm::Value* rhs);
+#define BINEXPCREATE(X) llvm::Value* X(llvm::Value* lhs, llvm::Value* rhs);
+#define UNEXPCREATE(X) llvm::Value* X(llvm::Value* vl);
+#define ALLOC(X) llvm::Value* X(std::string name);
 
 namespace Parsing {
   class AstNode;
@@ -33,17 +35,38 @@ namespace Codegeneration {
 		IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder, 
 				llvm::IRBuilder<>* AllocaBuilder);
 		~IRCreator();
-		EXPCREATE(createAdd)
-		EXPCREATE(createMinus)
-		EXPCREATE(createLess)
-		EXPCREATE(createMult)
-		EXPCREATE(createUnequal)
-		EXPCREATE(createEqual)
-		EXPCREATE(createLogAnd)
-		EXPCREATE(createLogOr)
-		EXPCREATE(createPointerAccess)
-		EXPCREATE(createAccess)
-		EXPCREATE(createAssign)
+		BINEXPCREATE(createAdd)
+		BINEXPCREATE(createMinus)
+		BINEXPCREATE(createLess)
+		BINEXPCREATE(createMult)
+		BINEXPCREATE(createUnequal)
+		BINEXPCREATE(createEqual)
+		BINEXPCREATE(createLogAnd)
+		BINEXPCREATE(createLogOr)
+		BINEXPCREATE(createPointerAccess)
+		BINEXPCREATE(createAccess)
+		BINEXPCREATE(createAssign)
+                BINEXPCREATE(getAddressfromPointer)
+                BINEXPCREATE(getMemberAddress)
+                BINEXPCREATE(getArrayPosition)
+                UNEXPCREATE(createLogNeg)
+                UNEXPCREATE(createNeg)
+                UNEXPCREATE(createDeref)
+                UNEXPCREATE(createAddress)
+                UNEXPCREATE(getDeref)
+                UNEXPCREATE(getAddress)
+                llvm::Value* loadVariable(Parsing::SemanticDeclarationNode type,
+                                std::string name);
+                llvm::Value* lookupVariable(Parsing::SemanticDeclarationNode type,
+                                std::string name);
+                ALLOC(allocLiteral)
+                ALLOC(allocChar)
+                ALLOC(allocInt)
+                ALLOC(allocNullptr)
+                llvm::Value* createFCall(llvm::Value* func, 
+                                std::vector<llvm::Value*>* params);
+                llvm::Value* makeSelect(llvm::Value* cond, llvm::Value* lhs,
+                                        llvm::Value* rhs);
 		llvm::Module* M;
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);

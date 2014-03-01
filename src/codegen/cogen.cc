@@ -27,7 +27,9 @@
 #define EMIT_IR(X) void X::emitIR(Codegeneration::IRCreator* creator)
 #define EMIT_LV(X) llvm::Value* X::emit_lvalue(Codegeneration::IRCreator* creator) 
 #define EMIT_RV(X) llvm::Value* X::emit_rvalue(Codegeneration::IRCreator* creator) 
-#define CREATE(X)  inline llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
+#define BINCREATE(X) inline llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
+#define UNCREATE(X) inline llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
+#define ALLOCF(X) inline llvm::Value* Codegeneration::IRCreator::X(std::string name)
 
 Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
 					llvm::IRBuilder<>* AllocaBuilder):
@@ -100,11 +102,11 @@ UNUSED(AllocaBuilder); //FIXME
 /*
  * Self explanatory binary expression functions. Special cases are annotated.
  */
-CREATE(createAdd) {
+BINCREATE(createAdd) {
 	return Builder->CreateAdd(lhs,rhs);
 }
 
-CREATE(createMinus) {
+BINCREATE(createMinus) {
 	return Builder->CreateSub(lhs, rhs);
 }
 
@@ -113,46 +115,145 @@ CREATE(createMinus) {
  * sions imply an implicit threatment of all values as i32 integer which are
  * signed in our C subset
  */
-CREATE(createLess) {
+BINCREATE(createLess) {
 	return Builder->CreateICmpSLT(lhs,rhs);
 }
 
-CREATE(createMult) {
+BINCREATE(createMult) {
 	return Builder->CreateMul(lhs, rhs);
 }
 
-CREATE(createUnequal){
+BINCREATE(createUnequal){
 	return Builder->CreateICmpNE(lhs,rhs);
 }
 
-CREATE(createEqual){
+BINCREATE(createEqual){
 	return Builder->CreateICmpEQ(lhs,rhs);
 }
 
-CREATE(createLogAnd){
+BINCREATE(createLogAnd){
 	return Builder->CreateAnd(lhs, rhs);
 }
 
-CREATE(createLogOr){
+BINCREATE(createLogOr){
 	return Builder->CreateOr(lhs,rhs);
 }
 
-CREATE(createPointerAccess) { //FIXME
+BINCREATE(createPointerAccess) { //FIXME
 	UNUSED(lhs);
 	UNUSED(rhs);
 	return nullptr;
 }
 
-CREATE(createAccess) { //FIXME
+BINCREATE(createAccess) { //FIXME
 	UNUSED(lhs);
 	UNUSED(rhs);
 	return nullptr;
 }
 
-CREATE(createAssign) { //FIXME
+BINCREATE(createAssign) { //FIXME
 	UNUSED(lhs);
 	UNUSED(rhs);
 	return nullptr;
+}
+
+BINCREATE(getAddressfromPointer){ //FIXME
+        UNUSED(lhs);
+        UNUSED(rhs);
+        return nullptr;
+}
+
+BINCREATE(getMemberAddress){ //FIXME
+        UNUSED(lhs);
+        UNUSED(rhs);
+        return nullptr;
+}
+
+BINCREATE(getArrayPosition) { //FIXME
+        UNUSED(lhs);
+        UNUSED(rhs);
+        return nullptr;
+}
+
+UNCREATE(createLogNeg) { //FIXME
+        UNUSED(val);
+        return nullptr;
+}
+
+UNCREATE(createNeg) { //FIXME
+        UNUSED(val);
+        return nullptr;
+}
+
+UNCREATE(createDeref) { //FIXME
+        UNUSED(val);
+        return nullptr;
+}
+
+UNCREATE(createAddress) { //FIXME
+        UNUSED(val);
+        return nullptr;
+}
+
+UNCREATE(getDeref) { //FIXME
+        UNUSED(val);
+        return nullptr;
+}
+
+UNCREATE(getAddress) { //FIXME
+        UNUSED(val);
+        return nullptr;
+}
+
+llvm::Value* Codegeneration::IRCreator::loadVariable(
+                Parsing::SemanticDeclarationNode type, 
+                std::string name) { //FIXME
+        UNUSED(type);
+        UNUSED(name);
+        return nullptr;
+}
+
+llvm::Value* Codegeneration::IRCreator::lookupVariable(
+                Parsing::SemanticDeclarationNode type,
+                std::string name) { //FIXME
+        UNUSED(type);
+        UNUSED(name);
+        return nullptr;
+}
+
+ALLOCF(allocLiteral) { //FIXME
+        UNUSED(name);
+        return nullptr;
+}
+
+ALLOCF(allocChar) {//FIXME
+        UNUSED(name);
+        return nullptr;
+}
+
+ALLOCF(allocInt) { //FIXME
+        UNUSED(name);
+        return nullptr;
+}
+
+ALLOCF(allocNullptr) {//FIXME
+        UNUSED(name);
+        return nullptr;
+}
+
+llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
+                std::vector<llvm::Value*>* params) { //FIXME
+        UNUSED(func);
+        UNUSED(params);
+        return nullptr;
+}
+
+llvm::Value* Codegeneration::IRCreator::makeSelect(llvm::Value* cond, 
+                llvm::Value* lhs, llvm::Value* rhs) { //FIXME
+        UNUSED(cond);
+        UNUSED(lhs);
+        UNUSED(rhs);
+        return nullptr;
 }
 
 /*
@@ -405,22 +506,36 @@ EMIT_RV(Parsing::BinaryExpression) {
 	}
 }
 
+EMIT_LV(Parsing::BinaryExpression){
+        llvm::Value* lhs = this->lhs->emit_lvalue(creator);
+        llvm::Value* rhs = this->rhs->emit_lvalue(creator);
+
+        switch (this->op){
+        case PunctuatorType::ARROW:
+               return creator->getAddressfromPointer(lhs,rhs);
+        case PunctuatorType::MEMBER_ACCESS:
+               return creator->getMemberAddress(lhs,rhs); 
+        case PunctuatorType::ARRAY_ACCESS:
+               return creator->getArrayPosition(lhs,rhs);
+        default:
+               throw CompilerException("INTERNAL ERROR", this->pos());
+        }
+}
 /*
  * Produces the corresponding rvalue. First the rvalue of the operand is 
  * computed, then the operator is applied.
  */
 EMIT_RV(Parsing::UnaryExpression) {
   llvm::Value* vl = this->operand->emit_rvalue(creator);
-  UNUSED(vl); //FIXME
   switch(this->op){
 	case PunctuatorType::NOT:
-		break;
+	        creator->createLogNeg(vl);
 	case PunctuatorType::MINUS:
-		break;
+		creator->createNeg(vl);
 	case PunctuatorType::STAR:
-		break;
+		creator->createDeref(vl);
 	case PunctuatorType::AMPERSAND:
-		break;
+		creator->createAddress(vl);
 	default:
 		throw CompilerException("INTERNAL ERROR", this->pos());
   }
@@ -429,12 +544,20 @@ EMIT_RV(Parsing::UnaryExpression) {
 
 /*
  * A unary operator can be a valid lvalue, so we need to allow this for code 
- * generation. //TODO: Determine correct operators or not?
- * First compute the lvalue of the operand and then apply the operator.
- * Corresponding value is returned.
+ * generation. First compute the lvalue of the operand and then apply the 
+ * operator. Corresponding value is returned.
  */
 EMIT_LV(Parsing::UnaryExpression) {
-  UNUSED(creator); //FIXME
+  llvm::Value* vl  = this->operand->emit_lvalue(creator);
+
+  switch(this->op){
+        case PunctuatorType::STAR:
+                  return creator->getDeref(vl);
+        case PunctuatorType::AMPERSAND:
+                  return creator->getAddress(vl);
+        default:
+                  throw CompilerException("INTERNAL ERROR", this->pos());
+  }
   return nullptr;
 }
 
@@ -443,8 +566,7 @@ EMIT_LV(Parsing::UnaryExpression) {
  * gave it so that we can do computations with it
  */
 EMIT_RV(Parsing::VariableUsage) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  return creator->loadVariable(this->getType(), this->name);
 }
 
 /*
@@ -452,25 +574,14 @@ EMIT_RV(Parsing::VariableUsage) {
  * produced when it has been declared.
  */
 EMIT_LV(Parsing::VariableUsage) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  return creator->lookupVariable(this->getType(), this->name);
 }
 
 /*
  * Produces the rvalue of a literal by returning its variable.
  */
 EMIT_RV(Parsing::Literal) {
-  UNUSED(creator); //FIXME
-  return nullptr;
-}
-
-/*
- * Produces the lvalue of a literal, as string literals are arrays and therefore
- * they have an address where they are stored.
- */
-EMIT_LV(Parsing::Literal) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  return creator->allocLiteral(this->name);
 }
 
 /*
@@ -479,8 +590,14 @@ EMIT_LV(Parsing::Literal) {
  * return the value
  */
 EMIT_RV(Parsing::Constant) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  switch(this->ct){
+          case Lexing::ConstantType::CHAR:
+                  return creator->allocChar(this->name);
+          case Lexing::ConstantType::INT:
+                  return creator->allocInt(this->name);
+          case Lexing::ConstantType::NULLPOINTER:
+                  return creator->allocNullptr(this->name);
+  }
 }
 
 /*
@@ -488,8 +605,12 @@ EMIT_RV(Parsing::Constant) {
  * parameters and then create the corresponding function call.
  */
 EMIT_RV(Parsing::FunctionCall) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+ llvm::Value* func = this->funcName->emit_lvalue(creator);
+  std::vector<llvm::Value*>* values = new std::vector<llvm::Value*> ();
+  for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
+        values->push_back((*it)->emit_rvalue(creator));
+  }
+  return creator->createFCall(func, values);
 }
 
 /*
@@ -498,8 +619,12 @@ EMIT_RV(Parsing::FunctionCall) {
  * to compute the value and then return it.
  */
 EMIT_LV(Parsing::FunctionCall) {
- UNUSED(creator); //FIXME
- return nullptr;
+  llvm::Value* func = this->funcName->emit_lvalue(creator);
+  std::vector<llvm::Value*>* values = new std::vector<llvm::Value*> ();
+  for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
+        values->push_back((*it)->emit_rvalue(creator));
+  }
+  return creator->createFCall(func, values);
 }
 
 /*
@@ -508,8 +633,10 @@ EMIT_LV(Parsing::FunctionCall) {
  * TODO: Use the phi trick that was shown in the slides!
  */
 EMIT_RV(Parsing::TernaryExpression) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  llvm::Value* cond = this->condition->emit_rvalue(creator);
+  llvm::Value* lhs = this->lhs->emit_rvalue(creator);
+  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
+  return creator->makeSelect(cond,lhs,rhs);
 }
 
 /*
@@ -518,8 +645,10 @@ EMIT_RV(Parsing::TernaryExpression) {
  * TODO: Use the phi trick that was shown in the slides!
  */
 EMIT_LV(Parsing::TernaryExpression) {
- UNUSED(creator); //FIXME
- return nullptr;
+  llvm::Value* cond = this->condition->emit_rvalue(creator);
+  llvm::Value* lhs = this->lhs->emit_lvalue(creator);
+  llvm::Value* rhs = this->rhs->emit_lvalue(creator);
+  return creator->makeSelect(cond,lhs,rhs);
 }
 
 /*
