@@ -43,6 +43,16 @@ FunctionDeclaration::FunctionDeclaration(SemanticDeclarationNode ret, std::vecto
   } 
 }
 
+void FunctionDeclaration::rebindParameters(std::vector<Parsing::SemanticDeclarationNode> parameters)
+{
+  if (!(parameters.size() == 1 && parameters[0]->type() == Semantic::Type::VOID)) {
+    m_parameter.clear();
+    for (auto p: parameters) {
+      m_parameter.push_back(p);
+    }
+  }
+}
+
 
 PointerDeclaration::PointerDeclaration(int pointerCounter, SemanticDeclarationNode type) {
   if (pointerCounter == 0) {

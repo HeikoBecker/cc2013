@@ -105,7 +105,7 @@ EMIT_IR(Parsing::FunctionDefinition)
       // 2. Store the argument value
       creator->store(argument, ptr);
       // 3. associate type with value
-      param->associatedValue = argument;
+      param->associatedValue = ptr;
       ++parameter_index;
   });
   
@@ -302,9 +302,10 @@ EMIT_LV(Parsing::VariableUsage) {
   /* TODO: why don't we just put this generic case, loading from rvalue in the
    * parent? */
   UNUSED(creator);
-  auto a = this->getType()->associatedValue;
+  auto type = this->getType();
+  auto a = type->associatedValue;
   if (!a) {
-    throw;
+    throw CompilerException(type->toString(), this->pos());
   }
   return a;
 }

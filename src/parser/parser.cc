@@ -884,8 +884,16 @@ SubCompoundStatement Parser::compoundStatement(vector<ParameterNode> paramList )
   semanticTree->addChild(pos);
 
   // add variables for the function
-  for (auto par : paramList) {
-    semanticTree->addDeclaration(par->getType(), par->getDeclarator(), pos);
+  if (!paramList.empty()) {
+    auto fu = static_pointer_cast<FunctionDeclaration>(semanticTree->currentFunction());
+    std::vector<Parsing::SemanticDeclarationNode> params;
+    for (auto par : paramList) {
+      auto pa = semanticTree->addDeclaration(par->getType(), par->getDeclarator(), pos);
+      if (pa) {
+        params.push_back(pa);
+      }
+    }
+    fu->rebindParameters(params);
   }
 
   expect(PunctuatorType::LEFTCURLYBRACE);

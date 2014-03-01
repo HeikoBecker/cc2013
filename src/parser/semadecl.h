@@ -110,6 +110,10 @@ namespace Parsing {
       Semantic::Type type() override {return Semantic::Type::FUNCTION;}
 
       std::vector<Parsing::SemanticDeclarationNode> parameter() {return m_parameter;};
+      // Throws the parameter away and uses the provided vector for them
+      // necessary to get the correct associatedValue
+      // TODO: hacky. Why don't we use them directly?
+      void rebindParameters(std::vector<Parsing::SemanticDeclarationNode>);
       Parsing::SemanticDeclarationNode returnType() {return returnChild;};
 
       virtual std::string toString();
