@@ -7,6 +7,7 @@
 
 namespace llvm {
   class Value;
+  class Type;
 }
 
 namespace Semantic {
@@ -139,6 +140,9 @@ namespace Parsing {
       members();
 
       SubSemanticNode node() {return m_node;}
+
+      // required to handle self-referencing structs in cogen
+      llvm::Type* llvm_type;
     private:
       std::string name;
       SubSemanticNode m_node;

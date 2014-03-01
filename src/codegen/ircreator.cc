@@ -289,8 +289,9 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       {
         auto pointer_type =
           std::static_pointer_cast<Parsing::PointerDeclaration>(semantic_type);	
+        auto pointee = pointer_type->pointee();
         llvm_type = llvm::PointerType::getUnqual(
-            semantic_type2llvm_type(pointer_type->pointee())
+            semantic_type2llvm_type(pointee)
             );
       break;
       }
@@ -299,15 +300,25 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       {
         auto structType =
           std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
-        UNUSED(structType);
-        llvm_type = llvm::StructType::create(this->Builder->getContext());
+        if (structType->llvm_type) {
+          llvm_type = structType->llvm_type;
+          break;
+        }
+        auto struct_type = llvm::StructType::create(
+            this->Builder->getContext(),
+            structType->toString()
+            );
+        structType->llvm_type = struct_type;
         /* TODO: handle non primitive types*/
         std::vector<llvm::Type *> member_types;
         // TODO: use transform
         for (auto member: structType->members()) {
           member_types.push_back(semantic_type2llvm_type(member.second));
         }
+        struct_type->setBody(member_types);
+        llvm_type = struct_type;
       }
+      break;
     case Semantic::Type::FUNCTION:
       // Should we handle functions here?
     default:
