@@ -832,6 +832,8 @@ SizeOfExpression::SizeOfExpression(std::pair<TypeNode, SubDeclarator> operand, P
   // TODO: do we need any further checks here? Or is the operand guarantueed to be
   // valid when the constructor is called
   this->type = make_shared<IntDeclaration>();
+  this->sem_type = SemanticForest::filename2SemanticTree(pos.name)->helpConvert(
+      operand.first, operand.second, SemanticDeclarationNode{}, pos);
 }
 
 ReturnStatement::ReturnStatement(Pos pos) : JumpStatement(pos) 

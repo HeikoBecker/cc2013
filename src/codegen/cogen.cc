@@ -562,6 +562,5 @@ EMIT_LV(Parsing::TernaryExpression) {
  * Produces the rvalue of the sizeof expression. TODO!
  */
 EMIT_RV(Parsing::SizeOfExpression) {
-  UNUSED(creator); //FIXME
-  return nullptr;
+  return creator->createSizeof(creator->semantic_type2llvm_type(this->sem_type));
 }

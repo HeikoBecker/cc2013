@@ -257,6 +257,7 @@ class EXPRESSION(SizeOfExpression)
     SizeOfExpression(std::pair<TypeNode, SubDeclarator>, Pos pos);
     PPRINTABLE
     EMIT_RVALUE
+    SemanticDeclarationNode sem_type;
   private:
     std::pair<TypeNode, SubDeclarator> operand;
 };
