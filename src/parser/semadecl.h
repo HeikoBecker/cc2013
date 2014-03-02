@@ -36,7 +36,7 @@ namespace Parsing {
       bool isVoid() {
         return type() == Semantic::Type::VOID;
       }
-      llvm::Value* associatedValue;
+      llvm::Value* associatedValue = nullptr;
   };
 
   typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;

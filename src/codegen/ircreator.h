@@ -55,8 +55,8 @@ namespace Codegeneration {
                 // are the functions below needed FIXME
                 llvm::Value* loadVariable(llvm::Value *val);
                 ALLOC(allocLiteral)
-                ALLOC(allocChar)
-                ALLOC(allocInt)
+                llvm::Value* allocChar(char val);
+                llvm::Value* allocInt ( int val);
                 ALLOC(allocNullptr)
                 llvm::Value* createFCall(llvm::Value* func, 
                                 std::vector<llvm::Value*> params);
