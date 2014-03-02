@@ -62,6 +62,8 @@ namespace Codegeneration {
                 llvm::Value* createFCall(llvm::Value* func, 
                                 std::vector<llvm::Value*> params);
                 // controlflow
+                llvm::BasicBlock* getControlFlowBlock();
+                void setCurrentBasicBlock(llvm::BasicBlock*);
                 llvm::Value* makeSelect(llvm::Value* cond, llvm::Value* lhs,
                                         llvm::Value* rhs);
                 void makeReturn(llvm::Value *value);
