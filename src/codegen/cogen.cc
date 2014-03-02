@@ -155,10 +155,9 @@ EMIT_IR(Parsing::LabeledStatement) {
 
 EMIT_IR(Parsing::BreakStatement) {
 
-  // auto parent = creator->getCurrentBlock();
-  // creator->makeBlock("breakBlock");
+   auto dead = creator->makeBlock("deadBreakBlock", false);
   creator->makeBreak();
-  // creator->setCurrentBasicBlock(parent);
+  creator->setCurrentBasicBlock(dead);
 }
 
 EMIT_IR(Parsing::IterationStatement) {
