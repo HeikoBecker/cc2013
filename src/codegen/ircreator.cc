@@ -16,10 +16,22 @@
 #define UNCREATE(X) llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
 #define ALLOCF(X) llvm::Value* Codegeneration::IRCreator::X(std::string name)
 
-Codegeneration::IRCreator::IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder,
-					llvm::IRBuilder<>* AllocaBuilder):
-M(M), Builder(Builder), AllocaBuilder(AllocaBuilder), currentFunction(nullptr) {
+Codegeneration::IRCreator::IRCreator(const char* filename):
+  M(filename, llvm::getGlobalContext()),
+  Builder(M.getContext()), AllocaBuilder(M.getContext()),
+  currentFunction(nullptr)
+{
 }	
+
+Codegeneration::IRCreator::~IRCreator()
+{
+  verifyModule(M);
+}
+
+void Codegeneration::IRCreator::print(llvm::raw_fd_ostream & out)
+{
+  M.print(out, nullptr); /* M is a llvm::Module */
+}
 
 llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* type)
 {
@@ -28,18 +40,18 @@ llvm::Value *Codegeneration::IRCreator::allocateInCurrentFunction(llvm::Type* ty
    *   It should not insert any instruction behind the terminator of the entry
    *   block, the easiest way to ensure this is to set it to the begining of
    *   the entry block each time we insert an alloca. */
-  AllocaBuilder->SetInsertPoint(AllocaBuilder->GetInsertBlock(),
-                               AllocaBuilder->GetInsertBlock()->begin());
-  return AllocaBuilder->CreateAlloca(type);
+  AllocaBuilder.SetInsertPoint(AllocaBuilder.GetInsertBlock(),
+                               AllocaBuilder.GetInsertBlock()->begin());
+  return AllocaBuilder.CreateAlloca(type);
 }
 
 llvm::Value* Codegeneration::IRCreator::createLoad(llvm::Value* val) {
-  return Builder->CreateLoad(val);
+  return Builder.CreateLoad(val);
 }
 
 
 void Codegeneration::IRCreator::store(llvm::Value* value, llvm::Value *ptr) {
-  Builder->CreateStore(value,ptr);
+  Builder.CreateStore(value,ptr);
 }
 
 llvm::Function* Codegeneration::IRCreator::startFunction(
@@ -52,20 +64,20 @@ llvm::Function* Codegeneration::IRCreator::startFunction(
       function_type,
       llvm::GlobalValue::ExternalLinkage,
       name,
-      M
+      &M
       );
   if (!definition) {
     return function;
   }
   auto function_basic_block = llvm::BasicBlock::Create(
-      M->getContext(), // FIXME: M
+      M.getContext(), // FIXME: M
       name+"_begin",
       function,
       0 //InsertBefore: inserts at end of surrounding function?
       );
   currentFunction = function;
-  Builder->SetInsertPoint(function_basic_block);
-  AllocaBuilder->SetInsertPoint(function_basic_block);
+  Builder.SetInsertPoint(function_basic_block);
+  AllocaBuilder.SetInsertPoint(function_basic_block);
   return function;
 }
 
@@ -79,12 +91,12 @@ void Codegeneration::IRCreator::finishFunction()
    * to the last block. The idea is to look at the return type of the current
    * function and emit either a void return or a return with the 'NULL' value
    * for this type */
-  if (Builder->GetInsertBlock()->getTerminator() == nullptr) {
-    auto CurFuncReturnType = Builder->getCurrentFunctionReturnType();
+  if (Builder.GetInsertBlock()->getTerminator() == nullptr) {
+    auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
     if (CurFuncReturnType->isVoidTy()) {
-      Builder->CreateRetVoid();
+      Builder.CreateRetVoid();
     } else {
-      Builder->CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
+      Builder.CreateRet(llvm::Constant::getNullValue(CurFuncReturnType));
     }
   }
   currentFunction = nullptr;
@@ -94,10 +106,10 @@ void Codegeneration::IRCreator::finishFunction()
 void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
   /* Create the return */
   if (value) {
-    Builder->CreateRet(value);
+    Builder.CreateRet(value);
   } else {
     // if we passed a null pointer to makeReturn, we're in a void function
-    Builder->CreateRetVoid();
+    Builder.CreateRetVoid();
   }
 
   /* Always create a new block after a return statement
@@ -106,20 +118,20 @@ void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
    *  the return instruction), but it will create a dead basic block instead.
    */
   llvm::BasicBlock *ReturnDeadBlock = llvm::BasicBlock::Create(
-          Builder->getContext()                   /* LLVMContext &Context */,
+          Builder.getContext()                   /* LLVMContext &Context */,
           "DEAD_BLOCK"                            /* const Twine &Name="" */,
           currentFunction                         /* Function *Parent=0 */,
           0                                       /* BasicBlock *InsertBefore=0 */);
 
   /* Insert code following the return in this new 'dead' block */
-  Builder->SetInsertPoint(ReturnDeadBlock);
+  Builder.SetInsertPoint(ReturnDeadBlock);
 }
 
 
 llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
 {
   return  new llvm::GlobalVariable(
-          *this->M                                      /* Module & */,
+          M                                      /* Module & */,
           type                              /* Type * */,
           false                                   /* bool isConstant */,
           llvm::GlobalValue::CommonLinkage              /* LinkageType */,
@@ -133,18 +145,15 @@ llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
    
 }
 
-Codegeneration::IRCreator::~IRCreator(){
-}
-
 /*
  * Self explanatory binary expression functions. Special cases are annotated.
  */
 BINCREATE(createAdd) {
-	return Builder->CreateAdd(lhs,rhs);
+	return Builder.CreateAdd(lhs,rhs);
 }
 
 BINCREATE(createMinus) {
-	return Builder->CreateSub(lhs, rhs);
+	return Builder.CreateSub(lhs, rhs);
 }
 
 /*
@@ -153,42 +162,42 @@ BINCREATE(createMinus) {
  * signed in our C subset
  */
 BINCREATE(createLess) {
-	return Builder->CreateICmpSLT(lhs,rhs);
+	return Builder.CreateICmpSLT(lhs,rhs);
 }
 
 BINCREATE(createMult) {
-	return Builder->CreateMul(lhs, rhs);
+	return Builder.CreateMul(lhs, rhs);
 }
 
 BINCREATE(createUnequal){
-	return Builder->CreateICmpNE(lhs,rhs);
+	return Builder.CreateICmpNE(lhs,rhs);
 }
 
 BINCREATE(createEqual){
-	return Builder->CreateICmpEQ(lhs,rhs);
+	return Builder.CreateICmpEQ(lhs,rhs);
 }
 
 BINCREATE(createLogAnd){
-	return Builder->CreateAnd(lhs, rhs);
+	return Builder.CreateAnd(lhs, rhs);
 }
 
 BINCREATE(createLogOr){
-	return Builder->CreateOr(lhs,rhs);
+	return Builder.CreateOr(lhs,rhs);
 }
 
 BINCREATEL(createPointerAccess) { //FIXME
-        llvm::LoadInst* loadStruct = Builder->CreateLoad(lhs);
+        llvm::LoadInst* loadStruct = Builder.CreateLoad(lhs);
         UNUSED(loadStruct);
         std::vector<llvm::Value *> indexes;
-        indexes.push_back(Builder->getInt32(0));
+        indexes.push_back(Builder.getInt32(0));
         switch(rhstype->type()){
                 case Semantic::Type::INT:
                 case Semantic::Type::VOID:
                 case Semantic::Type::POINTER:
-                        indexes.push_back(Builder->getInt32(0));
+                        indexes.push_back(Builder.getInt32(0));
                         break;
                 case Semantic::Type::CHAR:
-                        indexes.push_back(Builder->getInt8(0));
+                        indexes.push_back(Builder.getInt8(0));
                         break;
                 case Semantic::Type::ARRAY:
                 case Semantic::Type::STRUCT:
@@ -236,11 +245,11 @@ BINCREATEL(getArrayPosition) { //FIXME
 }
 
 UNCREATE(createLogNeg) {
-        return Builder->CreateNot(val);
+        return Builder.CreateNot(val);
 }
 
 UNCREATE(createNeg) { 
-        return Builder->CreateNeg(val);
+        return Builder.CreateNeg(val);
 }
 
 UNCREATE(createDeref) { //FIXME
@@ -265,7 +274,7 @@ UNCREATE(getAddress) { //FIXME
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
                 llvm::Value *val) { //FIXME
-  return Builder->CreateLoad(val);
+  return Builder.CreateLoad(val);
 }
 
 llvm::Value* Codegeneration::IRCreator::lookupVariable(
@@ -282,21 +291,21 @@ ALLOCF(allocLiteral) {
 }
 
 ALLOCF(allocChar) {
-  return Builder->getInt8(std::stoi(name));
+  return Builder.getInt8(std::stoi(name));
 }
 
 ALLOCF(allocInt) {
-  return Builder->getInt32(std::stoi(name));
+  return Builder.getInt32(std::stoi(name));
 }
 
 ALLOCF(allocNullptr) {//FIXME
   UNUSED(name);
-  return Builder->getInt32(0); //FIXME
+  return Builder.getInt32(0); //FIXME
 }
 
 llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
                 std::vector<llvm::Value*> params) { //FIXME
-  return Builder->CreateCall(func, params);
+  return Builder.CreateCall(func, params);
 }
 
 llvm::Value* Codegeneration::IRCreator::makeSelect(llvm::Value* cond, 
@@ -315,15 +324,15 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
   llvm::Type *llvm_type = nullptr;
   switch(semantic_type->type()){
     case Semantic::Type::INT:
-      llvm_type = Builder->getInt32Ty();
+      llvm_type = Builder.getInt32Ty();
       break;
 
     case Semantic::Type::CHAR:
-      llvm_type = Builder->getInt8Ty();
+      llvm_type = Builder.getInt8Ty();
       break;
                               
     case Semantic::Type::VOID:
-      llvm_type = Builder->getVoidTy();
+      llvm_type = Builder.getVoidTy();
       break;
                               
     case Semantic::Type::ARRAY:
@@ -347,7 +356,7 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
           break;
         }
         auto struct_type = llvm::StructType::create(
-            this->Builder->getContext(),
+            this->Builder.getContext(),
             structType->toString()
             );
         structType->llvm_type = struct_type;
@@ -388,7 +397,7 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       break;
       }
     default:
-      llvm_type = Builder->getInt32Ty();
+      llvm_type = Builder.getInt32Ty();
   }
   return llvm_type;
 }

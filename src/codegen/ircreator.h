@@ -26,9 +26,9 @@ namespace Codegeneration {
         class IRCreator {
         
                 public:
-		IRCreator(llvm::Module* M, llvm::IRBuilder<>* Builder, 
-				llvm::IRBuilder<>* AllocaBuilder);
+		IRCreator(const char* filename);
 		~IRCreator();
+                void print(llvm::raw_fd_ostream & out);
                 // expressions
 		BINEXPCREATE(createAdd)
 		BINEXPCREATE(createMinus)
@@ -86,8 +86,8 @@ namespace Codegeneration {
                 llvm::GlobalVariable *makeGlobVar(llvm::Type *type);
 
 	private:
-		llvm::Module* M;
-		llvm::IRBuilder<>* Builder, * AllocaBuilder;
+		llvm::Module M;
+		llvm::IRBuilder<> Builder, AllocaBuilder;
                 llvm::Function* currentFunction;
 
   };

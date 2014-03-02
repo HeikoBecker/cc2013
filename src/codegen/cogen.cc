@@ -26,16 +26,11 @@
 
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
-  auto &Ctx = llvm::getGlobalContext();
   std::string errorStr;
   llvm::raw_fd_ostream stream(filename, errorStr);
-  llvm::Module* M = new llvm::Module(filename, Ctx);
-  llvm::IRBuilder<>* Builder = new llvm::IRBuilder<>(Ctx);
-  llvm::IRBuilder<>* AllocaBuilder = new llvm::IRBuilder<>(Ctx);
-  Codegeneration::IRCreator Creator (M, Builder, AllocaBuilder);
+  Codegeneration::IRCreator Creator (filename);
   root->emitIR(&Creator);
-  verifyModule(*M);
-  (*M).print(stream, nullptr); /* M is a llvm::Module */
+  Creator.print(stream); /* M is a llvm::Module */
 }
 
 EMIT_IR(Parsing::AstNode)
