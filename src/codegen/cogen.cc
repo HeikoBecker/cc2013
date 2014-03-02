@@ -412,10 +412,14 @@ EMIT_RV(Parsing::Literal) {
  */
 EMIT_RV(Parsing::Constant) {
   switch(this->ct){
-          case Lexing::ConstantType::CHAR:
-                  return creator->allocChar(this->name);
-          case Lexing::ConstantType::INT:
-                  return creator->allocInt(this->name);
+          case Lexing::ConstantType::CHAR:{
+                  char val = static_cast<char>(this->name.at(0));
+                  return creator->allocChar(val);
+                                          }
+          case Lexing::ConstantType::INT:{
+                  int val = std::stoi(this->name);
+                  return creator->allocInt(val);
+                                         }
           case Lexing::ConstantType::NULLPOINTER:
                   return creator->allocNullptr(this->name);
           default:

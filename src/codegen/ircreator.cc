@@ -350,12 +350,12 @@ ALLOCF(allocLiteral) {
         return Builder.CreateGlobalString(llvm::StringRef(name));
 }
 
-ALLOCF(allocChar) {
-  return Builder.getInt8(std::stoi(name));
+llvm::Value* Codegeneration::IRCreator::allocChar (char val) {
+  return Builder.getInt8(val);
 }
 
-ALLOCF(allocInt) {
-  return Builder.getInt32(std::stoi(name));
+llvm::Value* Codegeneration::IRCreator::allocInt(int val){
+  return Builder.getInt32(val);
 }
 
 ALLOCF(allocNullptr) {
