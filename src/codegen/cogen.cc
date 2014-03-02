@@ -160,7 +160,7 @@ EMIT_IR(Parsing::SelectionStatement)
 
 EMIT_CONDITION(Parsing::Expression) //FIXME: Why does an expression need EMIT_CONDITION???
 {
-  auto condition = this->emit_lvalue(creator);
+  auto condition = this->emit_rvalue(creator);
   creator->makeConditonalBranch(condition, trueSuccessor, falseSuccessor);
 }
 
