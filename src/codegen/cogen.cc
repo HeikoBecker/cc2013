@@ -353,6 +353,8 @@ EMIT_RV(Parsing::Constant) {
                   return creator->allocInt(this->name);
           case Lexing::ConstantType::NULLPOINTER:
                   return creator->allocNullptr(this->name);
+          default:
+                  throw ParsingException("Other constants are handled in different classes!", pos());
   }
 }
 
