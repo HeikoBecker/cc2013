@@ -79,6 +79,11 @@ namespace Codegeneration {
                 llvm::BasicBlock* getIfEndBlock();
                 // adds an unconditional jump from "from" to "to"
                 void connect(llvm::BasicBlock *from, llvm::BasicBlock *to);
+                void makeConditonalBranch(
+                    llvm::Value* branchCondition,
+                    llvm::BasicBlock* consequenceBlock,
+                    llvm::BasicBlock* alternativeBlock
+                );
                 // utilities
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);

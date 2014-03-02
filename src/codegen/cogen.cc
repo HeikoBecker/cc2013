@@ -160,10 +160,8 @@ EMIT_IR(Parsing::SelectionStatement)
 
 EMIT_CONDITION(Parsing::Expression) //FIXME: Why does an expression need EMIT_CONDITION???
 {
-  UNUSED(creator);
-  UNUSED(trueSuccessor);
-  UNUSED(falseSuccessor);
-  throw;
+  auto condition = this->emit_lvalue(creator);
+  creator->makeConditonalBranch(condition, trueSuccessor, falseSuccessor);
 }
 
 EMIT_CONDITION(Parsing::BinaryExpression)

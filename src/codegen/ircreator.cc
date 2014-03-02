@@ -156,6 +156,16 @@ llvm::BasicBlock* Codegeneration::IRCreator::getIfConsequenceBlock()
   );
 }
 
+
+void Codegeneration::IRCreator::makeConditonalBranch(
+    llvm::Value* branchCondition,
+    llvm::BasicBlock* consequenceBlock,
+    llvm::BasicBlock* alternativeBlock)
+{
+  Builder.CreateCondBr(branchCondition, consequenceBlock, alternativeBlock);
+}
+
+
 void Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
 {
   llvm::BranchInst::Create(to, from);
