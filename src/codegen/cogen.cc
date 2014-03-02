@@ -152,20 +152,37 @@ EMIT_IR(Parsing::LabeledStatement) {
 }
 
 EMIT_IR(Parsing::IterationStatement) {
-  auto headerBlock = creator->makeBlock("while_header");
 
-  auto contentBlock = creator->makeBlock("while_content", false);
-  auto endBlock = creator->makeBlock("while_end", false);
-  expression->emit_condition(creator, contentBlock, endBlock);
+  if (kind == WHILE) {
+    auto headerBlock = creator->makeBlock("while_header");
 
-  creator->setCurrentBasicBlock(contentBlock);
+    auto contentBlock = creator->makeBlock("while_content", false);
+    auto endBlock = creator->makeBlock("while_end", false);
+    expression->emit_condition(creator, contentBlock, endBlock);
 
-  if (statement) { // TODO should always exist? 
-    statement->emitIR(creator);
+    creator->setCurrentBasicBlock(contentBlock);
+
+    if (statement) { // TODO should always exist? 
+      statement->emitIR(creator);
+    }
+
+    creator->connect(headerBlock);
+    creator->setCurrentBasicBlock(endBlock);
+  } else { // do while
+
+    auto contentBlock = creator->makeBlock("do_content");
+
+    if (statement) { // TODO should always exist? 
+      statement->emitIR(creator);
+    }
+
+    auto testBlock = creator->makeBlock("do_test");
+    auto endBlock = creator->makeBlock("do_end", false);
+    creator->setCurrentBasicBlock(testBlock);
+    expression->emit_condition(creator, contentBlock, endBlock);
+    
+    creator->setCurrentBasicBlock(endBlock);
   }
-
-  creator->connect(headerBlock);
-  creator->setCurrentBasicBlock(endBlock);
 }
 
 EMIT_IR(Parsing::SelectionStatement)
