@@ -66,8 +66,13 @@ EMIT_IR(Parsing::ExternalDeclaration)
   // function definitions are handled in FunctionDefinition
   // first we take the type of the node
 
+  auto type = this->getSemanticNode();
+  if (type->associatedValue) {
+    // we already computed the value
+    return;
+  }
   llvm::Type * external_declaration_type = creator->semantic_type2llvm_type(
-      this->getSemanticNode()
+     type 
   );
   auto name = this->declarator->getIdentifier();
   if (this->getSemanticNode()->type() == Semantic::Type::FUNCTION) {
@@ -94,8 +99,13 @@ EMIT_IR(Parsing::FunctionDefinition)
   auto function_type_ = std::static_pointer_cast<FunctionDeclaration>(
       semtree->lookUpType(name, this->pos())
   );
-  auto function_type = static_cast<llvm::FunctionType*>(creator->semantic_type2llvm_type(function_type_));
-  auto function = creator->startFunction(function_type, name);
+  llvm::Function* function;
+  if (!function_type_->associatedValue) {
+    auto function_type = static_cast<llvm::FunctionType*>(creator->semantic_type2llvm_type(function_type_));
+    function = creator->startFunction(function_type, name);
+  } else {
+     function = static_cast<llvm::Function*>(function_type_->associatedValue);
+  }
   auto parameter_index = 0;
   std::for_each(function->arg_begin(), function->arg_end(),
       [&](decltype(function->arg_begin()) argument){
@@ -107,7 +117,7 @@ EMIT_IR(Parsing::FunctionDefinition)
       // 3. associate type with value
       param->associatedValue = ptr;
       ++parameter_index;
-  });
+      });
   function_type_->associatedValue = function;
   
   // emit code for the body
