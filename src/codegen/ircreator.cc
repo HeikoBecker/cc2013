@@ -151,10 +151,14 @@ llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
  * Self explanatory binary expression functions. Special cases are annotated.
  */
 BINCREATE(createAdd) {
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
 	return Builder.CreateAdd(lhs,rhs);
 }
 
 BINCREATE(createMinus) {
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
 	return Builder.CreateSub(lhs, rhs);
 }
 
@@ -164,30 +168,54 @@ BINCREATE(createMinus) {
  * signed in our C subset
  */
 BINCREATE(createLess) {
-	return Builder.CreateICmpSLT(lhs,rhs);
+	lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        return Builder.CreateICmpSLT(lhs,rhs);
 }
 
 BINCREATE(createMult) {
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
 	return Builder.CreateMul(lhs, rhs);
 }
 
 BINCREATE(createUnequal){
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
 	return Builder.CreateICmpNE(lhs,rhs);
 }
 
 BINCREATE(createEqual){
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
 	return Builder.CreateICmpEQ(lhs,rhs);
 }
 
 BINCREATE(createLogAnd){
-	return Builder.CreateAnd(lhs, rhs);
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        return Builder.CreateAnd(lhs, rhs);
 }
 
 BINCREATE(createLogOr){
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
 	return Builder.CreateOr(lhs,rhs);
 }
 
-BINCREATEL(createPointerAccess) { //FIXME
+BINCREATEL(createPointerAccess) {
+        UNUSED(rhs);
+        //Loading was done before when computing the rvalue of lhs.
+       std::vector<llvm::Value*> indexes;
+       indexes.push_back(Builder.getInt32(0));
+       indexes.push_back(Builder.getInt32(index));
+       //Compute the GEP
+       llvm::Value *GEP = Builder.CreateInBoundsGEP(lhs, indexes);
+       llvm::LoadInst *var = Builder.CreateLoad(GEP);
+       return var;
+}
+
+BINCREATEL(createAccess) {
         UNUSED(rhs);
         std::vector<llvm::Value *> indexes;
         indexes.push_back(Builder.getInt32(0));
@@ -196,16 +224,15 @@ BINCREATEL(createPointerAccess) { //FIXME
         llvm::Value *GEP = Builder.CreateInBoundsGEP(lhs, indexes);
         llvm::LoadInst *var = Builder.CreateLoad(GEP);
         return var;
-}
 
-BINCREATEL(createAccess) { //FIXME
 	UNUSED(lhs);
 	UNUSED(rhs);
         UNUSED(index);
 	return nullptr;
 }
 
-BINCREATE(createAssign) { //FIXME
+BINCREATE(createAssign) { //FIXME: We need to cast the value back to its type...
+  rhs = Builder.CreateSExt(rhs, lhs->getType());
   store(rhs,lhs);
   return lhs;
 }
