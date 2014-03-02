@@ -50,6 +50,7 @@ class ASTNODE(Pointer) {
 class STATEMENT(SelectionStatement) {
   public:
     PPRINTABLE
+    IR_EMITTING
     SelectionStatement(SubExpression ex, SubStatement ifStatement, Pos pos);
     SelectionStatement(
       SubExpression ex, 

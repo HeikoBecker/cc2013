@@ -136,6 +136,24 @@ EMIT_IR(Parsing::ReturnStatement)
   }
 }
 
+EMIT_IR(Parsing::SelectionStatement)
+{
+  creator->makeIfHeader();
+  auto consequenceBlock = creator->getIfConsequenceBlock();
+  auto alternativeBlock = creator->getIfAlternativeBlock();
+  auto endBlock = creator->getIfEndBlock();
+  this->expression->emit_condition(creator, consequenceBlock, alternativeBlock);
+  creator->setCurrentBasicBlock(consequenceBlock);
+  this->ifStatement->emitIR(creator);
+  if (this->elseStatement) {
+    creator->setCurrentBasicBlock(alternativeBlock);
+    this->elseStatement->emitIR(creator);
+  }
+  creator->connect(consequenceBlock, endBlock);
+  creator->connect(alternativeBlock, endBlock);
+  creator->setCurrentBasicBlock(endBlock);
+}
+
 //##############################################################################
 //#                    Expression Code Generation                              #
 //##############################################################################

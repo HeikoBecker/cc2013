@@ -156,6 +156,10 @@ llvm::BasicBlock* Codegeneration::IRCreator::getIfConsequenceBlock()
   );
 }
 
+void Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
+{
+  llvm::BranchInst::Create(to, from);
+}
 
 llvm::BasicBlock* Codegeneration::IRCreator::getIfAlternativeBlock()
 {
