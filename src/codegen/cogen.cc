@@ -136,6 +136,11 @@ EMIT_IR(Parsing::ReturnStatement)
   }
 }
 
+EMIT_IR(Parsing::LabeledStatement) {
+  creator->getLabeledBlock(name);
+  statement->emitIR(creator);
+}
+
 EMIT_IR(Parsing::SelectionStatement)
 {
   creator->makeIfHeader();
