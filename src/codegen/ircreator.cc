@@ -177,15 +177,6 @@ llvm::BasicBlock* Codegeneration::IRCreator::getIfEndBlock()
   );
 }
 
-llvm::BasicBlock* Codegeneration::IRCreator::getIfConsequenceBlock()
-{
-  return llvm::BasicBlock::Create(
-      Builder.getContext()                    /* LLVMContext &Context */,
-      "if-consequence"                        /* const Twine &Name="" */,
-      currentFunction                         /* Function *Parent=0 */,
-      0                                       /* BasicBlock *InsertBefore=0 */
-  );
-}
 llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
 {
   return  new llvm::GlobalVariable(
