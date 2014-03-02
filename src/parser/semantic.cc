@@ -426,6 +426,7 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
         if (decl->type() !=  Semantic::Type::FUNCTION && currentPos != 0) {
           throw Parsing::ParsingException("no redefinition of " + name, pos);
         }
+        decl = prevDecl;
       } 
 
       declarationMap[name]->push(make_pair(currentPos, decl ));

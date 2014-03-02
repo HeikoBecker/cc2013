@@ -107,6 +107,7 @@ EMIT_IR(Parsing::FunctionDefinition)
     function = creator->startFunction(function_type, name);
   } else {
      function = static_cast<llvm::Function*>(function_type_->associatedValue);
+     creator->startAlreadyDefinedFunction(function, name);
   }
   auto parameter_index = 0;
   std::for_each(function->arg_begin(), function->arg_end(),
