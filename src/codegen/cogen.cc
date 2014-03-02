@@ -142,7 +142,20 @@ EMIT_IR(Parsing::LabeledStatement) {
 }
 
 EMIT_IR(Parsing::IterationStatement) {
-  creator->makeBlock("while_header");
+  auto headerBlock = creator->makeBlock("while_header");
+
+  auto contentBlock = creator->makeBlock("while_content", false);
+  auto endBlock = creator->makeBlock("while_end", false);
+  expression->emit_condition(creator, contentBlock, endBlock);
+
+  creator->setCurrentBasicBlock(contentBlock);
+
+  if (statement) { // TODO should always exist? 
+    statement->emitIR(creator);
+  }
+
+  creator->connect(headerBlock);
+  creator->setCurrentBasicBlock(endBlock);
 }
 
 EMIT_IR(Parsing::SelectionStatement)

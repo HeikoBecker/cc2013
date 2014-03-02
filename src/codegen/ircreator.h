@@ -82,6 +82,7 @@ namespace Codegeneration {
 
                 // adds an unconditional jump from "from" to "to"
                 void connect(llvm::BasicBlock *from, llvm::BasicBlock *to);
+                void connect(llvm::BasicBlock *to);
                 void makeConditonalBranch(
                     llvm::Value* branchCondition,
                     llvm::BasicBlock* consequenceBlock,
