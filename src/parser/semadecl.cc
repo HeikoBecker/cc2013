@@ -5,7 +5,7 @@
 using namespace Parsing;
 
 
-StructDeclaration::StructDeclaration(std::string n, SubSemanticNode s, bool selfReferencing) : llvm_type(nullptr), name(n), m_node(s), selfReferencing(selfReferencing) {}
+StructDeclaration::StructDeclaration(std::string n, SubSemanticNode s, bool selfReferencing) : llvm_type(nullptr), selfReferencing(selfReferencing), name(n), m_node(s) {}
 
 std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> StructDeclaration::members()
 {

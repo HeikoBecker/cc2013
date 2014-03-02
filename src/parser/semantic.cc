@@ -207,6 +207,7 @@ bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
 }
 
 SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
+  static std::map<std::string,SemanticDeclarationNode> structname2struct {};
    SemanticDeclarationNode myDeclaration;
 
     string type = typeNode->toString();
@@ -237,7 +238,16 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
 
        if (helpNode) {
          auto ptr = (size_t) helpNode.operator->(); // TODO FIXME WARNING HACK !!!!!
-        myDeclaration = make_shared<StructDeclaration>("@" + type + std::to_string(ptr), helpNode, nodes[id]->isActive());
+         auto name = "@" + type + std::to_string(ptr);
+         if (structname2struct.find(name) == structname2struct.end()) {
+           debug(SEMANTIC) << "New";
+           myDeclaration = make_shared<StructDeclaration>(name, helpNode, nodes[id]->isActive());
+           structname2struct[name] = myDeclaration;
+         } else {
+           debug(SEMANTIC) << "Old";
+           myDeclaration = structname2struct[name];
+           std::static_pointer_cast<StructDeclaration>(myDeclaration)->selfReferencing =  nodes[id]->isActive();
+         }
        } else {
           throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
        }
