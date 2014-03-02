@@ -140,7 +140,7 @@ EMIT_IR(Parsing::ReturnStatement)
 //#                    Expression Code Generation                              #
 //##############################################################################
 
-EMIT_CONDITION(Parsing::Expression)
+EMIT_CONDITION(Parsing::Expression) //FIXME: Why does an expression need EMIT_CONDITION???
 {
   UNUSED(creator);
   UNUSED(trueSuccessor);
@@ -149,23 +149,27 @@ EMIT_CONDITION(Parsing::Expression)
 }
 
 /*
- * Every expression has the emitIR function that redirects the call to 
- * emit_rvalue.
- */
-EMIT_IR(Parsing::ExpressionStatement)
-{
-  this->expression->emitIR(creator);
-}
-
-/*
  * An expression can be part of a statement with e; where e is a statement.
- * So we need! emitIR to produce the rvalue.
+ * So we need! emit_rvalue to produce the rvalue.
  * The rvalue function will be overwritten by the corresponding class so we can
  * just call it here
  */
+
+EMIT_IR(Parsing::ExpressionStatement)
+{
+  this->expression->emit_rvalue(creator);
+}
+
+/*
+ * emitIR should not be called directly! Every time we need a value of it, we 
+ * need to know wether we want the lvalue or the rvalue. 
+ * --> throw exception here
+ */
 EMIT_IR(Parsing::Expression)
 {
-	this->emit_rvalue(creator);
+        UNUSED(creator);
+        throw ParsingException("Illegal Method call for emitIR on an expression",
+                        this->pos());
 }
 
 /*
@@ -175,7 +179,8 @@ EMIT_IR(Parsing::Expression)
  */
 EMIT_RV(Parsing::Expression) {
   UNUSED(creator);
-  throw CompilerException("You did not override the method emit_rvalue", this->pos());
+  throw CompilerException(std::string("You did not override the method emit_rvalue for")
+        + typeid(*this).name(), this->pos());
 }
 EMIT_LV(Parsing::Expression) {
   UNUSED(creator);
@@ -191,13 +196,15 @@ EMIT_LV(Parsing::Expression) {
  */
 EMIT_RV(Parsing::BinaryExpression) {
   //First compute the values for the subexpressions
-  // FIXME: not every operator requires lvalues! And the emit methods have side
+  // Not every operator requires lvalues! And the emit methods have side
   // effects, so they mustn't be called when the value is not required
-  llvm::Value* lhs = nullptr;//this->lhs->emit_rvalue(creator);
+  // We always need the rvalue of the right side. Precompute it and initialize
+  // left side to nullptr
+  llvm::Value* lhs = nullptr;
   llvm::Value* rhs = this->rhs->emit_rvalue(creator);
 
   //then compute the corresponding value based on the operand
-  //the creator will to the llvm magic. We just want to find the
+  //the creator will do the llvm magic. We just want to find the
   //correct method to call
   switch(this->op){
 	case PunctuatorType::PLUS:
@@ -224,24 +231,21 @@ EMIT_RV(Parsing::BinaryExpression) {
         case PunctuatorType::LOR:
           lhs = this->lhs->emit_rvalue(creator);
           return creator->createLogOr(lhs, rhs);
+        case PunctuatorType::MEMBER_ACCESS:
 	case PunctuatorType::ARROW: {
-                Parsing::SemanticDeclarationNode type = this->lhs->getType();
-                auto  structtype = std::static_pointer_cast<StructDeclaration> (type);
-                auto it = structtype->members().begin();
-                int i = 0;
-                while (it->second != this->rhs->getType()){
-                        ++it;
-                        ++i;
-                }
-                return creator->createPointerAccess(lhs, rhs, 
-                                this->rhs->getType());
-                                    }
-	case PunctuatorType::MEMBER_ACCESS:
           lhs = this->lhs->emit_rvalue(creator);
-          return creator->createAccess(lhs, rhs, this->rhs->getType());
+          //We need to find the correct index inside the struct
+          //First get the struct type
+          int index = creator->computeIndex(this->lhs, this->rhs);
+         if(this->op == PunctuatorType::ARROW)
+            //create the acces with the  correct index
+            return creator->createPointerAccess(lhs, rhs, index);
+          else
+            return creator->createAccess(lhs, rhs, index);
+                                    }
 	case PunctuatorType::ASSIGN:
           lhs = this->lhs->emit_lvalue(creator);
-          return creator->createAssign(lhs,rhs, this->rhs->getType());
+          return creator->createAssign(lhs,rhs);
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
 	}
@@ -253,12 +257,11 @@ EMIT_LV(Parsing::BinaryExpression){
 
         switch (this->op){
         case PunctuatorType::ARROW:
-               return creator->getAddressfromPointer(lhs,rhs, 
-                               this->rhs->getType());
+               return creator->getAddressfromPointer(lhs,rhs,0);//FIXME
         case PunctuatorType::MEMBER_ACCESS:
-               return creator->getMemberAddress(lhs,rhs, this->rhs->getType()); 
+               return creator->getMemberAddress(lhs,rhs, 0); //FIXME
         case PunctuatorType::ARRAY_ACCESS:
-               return creator->getArrayPosition(lhs,rhs, this->rhs->getType());
+               return creator->getArrayPosition(lhs,rhs, 0);//FIXME
         default:
                throw CompilerException("INTERNAL ERROR", this->pos());
         }

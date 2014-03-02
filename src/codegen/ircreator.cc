@@ -11,8 +11,10 @@
 
 //convenience macros to save some typing time
 //create is marked for being inlined!
-#define BINCREATE(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs)
-#define BINCREATEL(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs, llvm::Value* rhs, Parsing::SemanticDeclarationNode rhstype)
+#define BINCREATE(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs,\
+                llvm::Value* rhs)
+#define BINCREATEL(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs,\
+                llvm::Value* rhs, int index)
 #define UNCREATE(X) llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
 #define ALLOCF(X) llvm::Value* Codegeneration::IRCreator::X(std::string name)
 
@@ -186,39 +188,24 @@ BINCREATE(createLogOr){
 }
 
 BINCREATEL(createPointerAccess) { //FIXME
-        llvm::LoadInst* loadStruct = Builder.CreateLoad(lhs);
-        UNUSED(loadStruct);
+        UNUSED(rhs);
         std::vector<llvm::Value *> indexes;
         indexes.push_back(Builder.getInt32(0));
-        switch(rhstype->type()){
-                case Semantic::Type::INT:
-                case Semantic::Type::VOID:
-                case Semantic::Type::POINTER:
-                        indexes.push_back(Builder.getInt32(0));
-                        break;
-                case Semantic::Type::CHAR:
-                        indexes.push_back(Builder.getInt8(0));
-                        break;
-                case Semantic::Type::ARRAY:
-                case Semantic::Type::STRUCT:
-
-                case Semantic::Type::FUNCTION:
-                        break;
-        }
-	UNUSED(lhs);
-	UNUSED(rhs);
-	return nullptr;
+        indexes.push_back(Builder.getInt32(index));
+        //Compute the GEP
+        llvm::Value *GEP = Builder.CreateInBoundsGEP(lhs, indexes);
+        llvm::LoadInst *var = Builder.CreateLoad(GEP);
+        return var;
 }
 
 BINCREATEL(createAccess) { //FIXME
 	UNUSED(lhs);
 	UNUSED(rhs);
-        UNUSED(rhstype);
+        UNUSED(index);
 	return nullptr;
 }
 
-BINCREATEL(createAssign) { //FIXME
-  UNUSED(rhstype);
+BINCREATE(createAssign) { //FIXME
   store(rhs,lhs);
   return lhs;
 }
@@ -226,21 +213,21 @@ BINCREATEL(createAssign) { //FIXME
 BINCREATEL(getAddressfromPointer){ //FIXME
         UNUSED(lhs);
         UNUSED(rhs);
-        UNUSED(rhstype);
+        UNUSED(index);
         return nullptr;
 }
 
 BINCREATEL(getMemberAddress){ //FIXME
         UNUSED(lhs);
         UNUSED(rhs);
-        UNUSED(rhstype);
+        UNUSED(index);
         return nullptr;
 }
 
 BINCREATEL(getArrayPosition) { //FIXME
         UNUSED(lhs);
         UNUSED(rhs);
-        UNUSED(rhstype);
+        UNUSED(index);
         return nullptr;
 }
 
@@ -400,4 +387,18 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       llvm_type = Builder.getInt32Ty();
   }
   return llvm_type;
+}
+
+int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs, Parsing::SubExpression rhs){
+  Parsing::SemanticDeclarationNode type = lhs->getType();
+  auto  structtype = std::static_pointer_cast<Parsing::StructDeclaration> (type);
+  auto it = structtype->members().begin();
+  //our indexes start with 0 as in the example file
+  int i = 0;
+  //now compute the index with the compareTypes function
+  while (! Semantic::compareTypes(it->second, rhs->getType())){
+    ++it;
+    ++i;
+  }
+  return i;
 }

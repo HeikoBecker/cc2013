@@ -16,7 +16,8 @@
 
 //convenience macros
 #define BINEXPCREATE(X) llvm::Value* X(llvm::Value* lhs, llvm::Value* rhs);
-#define BINEXPCREATEL(X) llvm::Value* X(llvm::Value* lhs, llvm::Value* rhs, Parsing::SemanticDeclarationNode rhsType);
+#define BINEXPCRIND(X) llvm::Value* X(llvm::Value* lhs, llvm::Value* rhs,\
+                int index);
 #define UNEXPCREATE(X) llvm::Value* X(llvm::Value* vl);
 #define ALLOC(X) llvm::Value* X(std::string name);
 
@@ -38,12 +39,12 @@ namespace Codegeneration {
 		BINEXPCREATE(createEqual)
 		BINEXPCREATE(createLogAnd)
 		BINEXPCREATE(createLogOr)
-		BINEXPCREATEL(createPointerAccess)
-		BINEXPCREATEL(createAccess)
-		BINEXPCREATEL(createAssign)
-                BINEXPCREATEL(getAddressfromPointer)
-                BINEXPCREATEL(getMemberAddress)
-                BINEXPCREATEL(getArrayPosition)
+		BINEXPCREATE(createAssign)
+		BINEXPCRIND(createPointerAccess)
+		BINEXPCRIND(createAccess)
+                BINEXPCRIND(getAddressfromPointer)
+                BINEXPCRIND(getMemberAddress)
+                BINEXPCRIND(getArrayPosition)
                 UNEXPCREATE(createLogNeg)
                 UNEXPCREATE(createNeg)
                 UNEXPCREATE(createDeref)
@@ -84,6 +85,8 @@ namespace Codegeneration {
                 void finishFunction();
                 // declarations
                 llvm::GlobalVariable *makeGlobVar(llvm::Type *type);
+                int computeIndex (Parsing::SubExpression lhs,
+                               Parsing::SubExpression rhs);
 
 	private:
 		llvm::Module M;
