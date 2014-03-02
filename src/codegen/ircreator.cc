@@ -186,6 +186,9 @@ void Codegeneration::IRCreator::makeConditonalBranch(
 
 void Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
 {
+  if (!from) {
+    from = Builder.GetInsertBlock();
+  }
   llvm::BranchInst::Create(to, from);
 }
 

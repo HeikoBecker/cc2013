@@ -150,12 +150,14 @@ EMIT_IR(Parsing::SelectionStatement)
   this->expression->emit_condition(creator, consequenceBlock, alternativeBlock);
   creator->setCurrentBasicBlock(consequenceBlock);
   this->ifStatement->emitIR(creator);
+  creator->connect(nullptr, endBlock);
   if (this->elseStatement) {
     creator->setCurrentBasicBlock(alternativeBlock);
     this->elseStatement->emitIR(creator);
+    creator->connect(nullptr, endBlock);
+  } else {
+    creator->connect(alternativeBlock, endBlock);
   }
-  creator->connect(consequenceBlock, endBlock);
-  creator->connect(alternativeBlock, endBlock);
   creator->setCurrentBasicBlock(endBlock);
 }
 
