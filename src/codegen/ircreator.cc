@@ -227,31 +227,37 @@ BINCREATEL(createAccess) {
 }
 
 llvm::Value* Codegeneration::IRCreator::createAssign(llvm::Value* lhs, 
-                llvm::Value* rhs, llvm::Type* type) { //FIXME: We need to cast the value back to its type...
+                llvm::Value* rhs, llvm::Type* type) {
   rhs = Builder.CreateSExtOrTrunc(rhs, type);
   store(rhs,lhs);
   return lhs;
 }
 
-BINCREATEL(getAddressfromPointer){ //FIXME
-        UNUSED(lhs);
+BINCREATEL(getAddressfromPointer){
         UNUSED(rhs);
-        UNUSED(index);
-        return nullptr;
+        std::vector<llvm::Value *> indexes;
+        indexes.push_back(Builder.getInt32(0));
+        indexes.push_back(Builder.getInt32(index));
+        //Compute the GEP & return it
+        llvm::Value *GEP = Builder.CreateInBoundsGEP(lhs, indexes);
+        return GEP;
 }
 
-BINCREATEL(getMemberAddress){ //FIXME
-        UNUSED(lhs);
+BINCREATEL(getMemberAddress){
         UNUSED(rhs);
-        UNUSED(index);
-        return nullptr;
+        std::vector<llvm::Value *> indexes;
+        indexes.push_back(Builder.getInt32(0));
+        indexes.push_back(Builder.getInt32(index));
+        //Compute the GEP & return it
+        llvm::Value *GEP = Builder.CreateInBoundsGEP(lhs, indexes);
+        return GEP;
 }
 
-BINCREATEL(getArrayPosition) { //FIXME
-        UNUSED(lhs);
-        UNUSED(rhs);
+BINCREATEL(getArrayPosition) {
         UNUSED(index);
-        return nullptr;
+        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+	return Builder.CreateAdd(lhs,rhs);
 }
 
 UNCREATE(createLogNeg) {
@@ -262,37 +268,28 @@ UNCREATE(createNeg) {
         return Builder.CreateNeg(val);
 }
 
-UNCREATE(createDeref) { //FIXME
-        UNUSED(val);
-        return nullptr;
+UNCREATE(createDeref) { 
+        return Builder.CreateLoad(val);
 }
 
-UNCREATE(createAddress) { //FIXME
-        UNUSED(val);
-        return nullptr;
+UNCREATE(createAddress) {
+        std::vector<llvm::Value*> indexes ;
+        indexes.push_back(Builder.getInt32(0));
+        return Builder.CreateGEP(val,indexes);
 }
 
-UNCREATE(getDeref) { //FIXME
-        UNUSED(val);
-        return nullptr;
+UNCREATE(getDeref) {
+        return Builder.CreateLoad(val);
 }
 
-UNCREATE(getAddress) { //FIXME
-        UNUSED(val);
-        return nullptr;
-}
+UNCREATE(getAddress) {
+        std::vector<llvm::Value*> indexes ;
+        indexes.push_back(Builder.getInt32(0));
+        return Builder.CreateGEP(val,indexes);}
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
                 llvm::Value *val) {
   return Builder.CreateLoad(val);
-}
-
-llvm::Value* Codegeneration::IRCreator::lookupVariable(
-                Parsing::SemanticDeclarationNode type,
-                std::string name) { //FIXME
-        UNUSED(type);
-        UNUSED(name);
-        return nullptr;
 }
 
 ALLOCF(allocLiteral) {
@@ -312,6 +309,49 @@ ALLOCF(allocNullptr) {
   return Builder.getInt32(0); //FIXME
 }
 
+llvm::Value* Codegeneration::IRCreator::makeSelect(Parsing::SubExpression cond,
+                Parsing::SubExpression lhs, Parsing::SubExpression rhs) {
+        llvm::BasicBlock* left = getControlFlowBlock();
+        llvm::BasicBlock* right = getControlFlowBlock();
+        llvm::BasicBlock* term = getControlFlowBlock();
+        llvm::Value* branch = cond->emit_rvalue(this);
+        llvm::Instruction* inst = Builder.CreateCondBr(branch, left, right);
+        Builder.Insert(inst);
+        setCurrentBasicBlock(left);
+        llvm::Value* vall = lhs->emit_rvalue(this);
+        vall = Builder.CreateSExt(vall, Builder.getInt32Ty());
+        Builder.CreateBr(term);
+        setCurrentBasicBlock(right);
+        llvm::Value* valr = rhs->emit_rvalue(this);
+        valr = Builder.CreateSExt(valr, Builder.getInt32Ty());
+        Builder.CreateBr(term);
+        setCurrentBasicBlock(term);
+        llvm::Value* phi = Builder.CreatePHI(Builder.getInt32Ty(), 2);
+        return phi;
+}
+
+llvm::Value* Codegeneration::IRCreator::makeSelectLV(Parsing::SubExpression cond,
+                Parsing::SubExpression lhs, Parsing::SubExpression rhs){
+        llvm::BasicBlock* left = getControlFlowBlock();
+        llvm::BasicBlock* right = getControlFlowBlock();
+        llvm::BasicBlock* term = getControlFlowBlock();
+        llvm::Value* branch = cond->emit_rvalue(this);
+        llvm::Instruction* inst = Builder.CreateCondBr(branch, left, right);
+        Builder.Insert(inst);
+        setCurrentBasicBlock(left);
+        llvm::Value* vall = lhs->emit_lvalue(this);
+        vall = Builder.CreateSExt(vall, Builder.getInt32Ty());
+        Builder.CreateBr(term);
+        setCurrentBasicBlock(right);
+        llvm::Value* valr = rhs->emit_lvalue(this);
+        valr = Builder.CreateSExt(valr, Builder.getInt32Ty());
+        Builder.CreateBr(term);
+        setCurrentBasicBlock(term);
+        llvm::Value* phi = Builder.CreatePHI(Builder.getInt32Ty(), 2);
+        return phi;
+}
+
+
 llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
                 std::vector<llvm::Value*> params) { 
   return Builder.CreateCall(func, params);
@@ -330,15 +370,6 @@ llvm::BasicBlock* Codegeneration::IRCreator::getControlFlowBlock()
 void Codegeneration::IRCreator::setCurrentBasicBlock(llvm::BasicBlock* bb)
 {
   Builder.SetInsertPoint(bb);
-}
-
-
-llvm::Value* Codegeneration::IRCreator::makeSelect(llvm::Value* cond, 
-                llvm::Value* lhs, llvm::Value* rhs) { //FIXME
-        UNUSED(cond);
-        UNUSED(lhs);
-        UNUSED(rhs);
-        return nullptr;
 }
 
 /*

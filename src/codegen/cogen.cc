@@ -283,9 +283,12 @@ EMIT_LV(Parsing::BinaryExpression){
 
         switch (this->op){
         case PunctuatorType::ARROW:
-               return creator->getAddressfromPointer(lhs,rhs,0);//FIXME
-        case PunctuatorType::MEMBER_ACCESS:
-               return creator->getMemberAddress(lhs,rhs, 0); //FIXME
+        case PunctuatorType::MEMBER_ACCESS: {
+                int index = creator->computeIndex(this->lhs, this->rhs);
+                if(this->op == PunctuatorType::ARROW)
+                       return creator->getAddressfromPointer(lhs,rhs,index);
+               return creator->getMemberAddress(lhs,rhs, index);
+                                            }
         case PunctuatorType::ARRAY_ACCESS:
                return creator->getArrayPosition(lhs,rhs, 0);//FIXME
         default:
@@ -346,8 +349,6 @@ EMIT_RV(Parsing::VariableUsage) {
  * produced when it has been declared.
  */
 EMIT_LV(Parsing::VariableUsage) {
-  /* TODO: why don't we just put this generic case, loading from rvalue in the
-   * parent? */
   UNUSED(creator);
   auto type = this->getType();
   auto a = type->associatedValue;
@@ -412,25 +413,17 @@ EMIT_LV(Parsing::FunctionCall) {
 /*
  * A ternary operator can produce a valid rvalue. First evaluate the condition.
  * Then return the value based on the condition.
- * TODO: Use the phi trick that was shown in the slides!
  */
 EMIT_RV(Parsing::TernaryExpression) {
-  llvm::Value* cond = this->condition->emit_rvalue(creator);
-  llvm::Value* lhs = this->lhs->emit_rvalue(creator);
-  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
-  return creator->makeSelect(cond,lhs,rhs);
+  return creator->makeSelect(this->condition,this->lhs, this->rhs);
 }
 
 /*
  * Produce the ternary expressions value. Remember that both expressions need to
  * be evaluated as one could contain side effects.
- * TODO: Use the phi trick that was shown in the slides!
  */
 EMIT_LV(Parsing::TernaryExpression) {
-  llvm::Value* cond = this->condition->emit_rvalue(creator);
-  llvm::Value* lhs = this->lhs->emit_lvalue(creator);
-  llvm::Value* rhs = this->rhs->emit_lvalue(creator);
-  return creator->makeSelect(cond,lhs,rhs);
+  return creator->makeSelectLV(this->condition,this->lhs,this->rhs);
 }
 
 /*

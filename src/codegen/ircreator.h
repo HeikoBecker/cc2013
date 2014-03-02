@@ -54,8 +54,6 @@ namespace Codegeneration {
                 UNEXPCREATE(getAddress)
                 // are the functions below needed FIXME
                 llvm::Value* loadVariable(llvm::Value *val);
-                llvm::Value* lookupVariable(Parsing::SemanticDeclarationNode type,
-                                std::string name);
                 ALLOC(allocLiteral)
                 ALLOC(allocChar)
                 ALLOC(allocInt)
@@ -65,8 +63,12 @@ namespace Codegeneration {
                 // controlflow
                 llvm::BasicBlock* getControlFlowBlock();
                 void setCurrentBasicBlock(llvm::BasicBlock*);
-                llvm::Value* makeSelect(llvm::Value* cond, llvm::Value* lhs,
-                                        llvm::Value* rhs);
+                llvm::Value* makeSelect(Parsing::SubExpression cond, 
+                                Parsing::SubExpression lhs, 
+                                Parsing::SubExpression rhs);
+                llvm::Value* makeSelectLV(Parsing::SubExpression cond, 
+                                Parsing::SubExpression lhs, 
+                                Parsing::SubExpression rhs);
                 void makeReturn(llvm::Value *value);
                 // utilities
                 llvm::Type* semantic_type2llvm_type(
