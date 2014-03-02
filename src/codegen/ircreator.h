@@ -39,7 +39,8 @@ namespace Codegeneration {
 		BINEXPCREATE(createEqual)
 		BINEXPCREATE(createLogAnd)
 		BINEXPCREATE(createLogOr)
-		BINEXPCREATE(createAssign)
+		llvm::Value* createAssign(llvm::Value* lhs, llvm::Value* rhs,
+                                llvm::Type* type);
 		BINEXPCRIND(createPointerAccess)
 		BINEXPCRIND(createAccess)
                 BINEXPCRIND(getAddressfromPointer)

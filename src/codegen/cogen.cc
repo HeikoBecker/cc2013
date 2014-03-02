@@ -267,9 +267,11 @@ EMIT_RV(Parsing::BinaryExpression) {
           else
             return creator->createAccess(lhs, rhs, index);
                                     }
-	case PunctuatorType::ASSIGN:
+	case PunctuatorType::ASSIGN:{
           lhs = this->lhs->emit_lvalue(creator);
-          return creator->createAssign(lhs,rhs);
+          llvm::Type* type = creator->semantic_type2llvm_type(this->lhs->getType());
+          return creator->createAssign(lhs,rhs, type);
+                                    }
 	default:
 	  throw CompilerException("INTERNAL ERROR", this->pos());
 	}

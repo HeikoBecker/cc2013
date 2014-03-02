@@ -224,15 +224,11 @@ BINCREATEL(createAccess) {
         llvm::Value *GEP = Builder.CreateInBoundsGEP(lhs, indexes);
         llvm::LoadInst *var = Builder.CreateLoad(GEP);
         return var;
-
-	UNUSED(lhs);
-	UNUSED(rhs);
-        UNUSED(index);
-	return nullptr;
 }
 
-BINCREATE(createAssign) { //FIXME: We need to cast the value back to its type...
-  rhs = Builder.CreateSExt(rhs, lhs->getType());
+llvm::Value* Codegeneration::IRCreator::createAssign(llvm::Value* lhs, 
+                llvm::Value* rhs, llvm::Type* type) { //FIXME: We need to cast the value back to its type...
+  rhs = Builder.CreateSExtOrTrunc(rhs, type);
   store(rhs,lhs);
   return lhs;
 }
@@ -287,7 +283,7 @@ UNCREATE(getAddress) { //FIXME
 }
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
-                llvm::Value *val) { //FIXME
+                llvm::Value *val) {
   return Builder.CreateLoad(val);
 }
 
@@ -300,8 +296,7 @@ llvm::Value* Codegeneration::IRCreator::lookupVariable(
 }
 
 ALLOCF(allocLiteral) {
-        UNUSED(name);
-        return nullptr;
+        return Builder.CreateGlobalString(llvm::StringRef(name));
 }
 
 ALLOCF(allocChar) {
@@ -312,13 +307,13 @@ ALLOCF(allocInt) {
   return Builder.getInt32(std::stoi(name));
 }
 
-ALLOCF(allocNullptr) {//FIXME
+ALLOCF(allocNullptr) {
   UNUSED(name);
   return Builder.getInt32(0); //FIXME
 }
 
 llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
-                std::vector<llvm::Value*> params) { //FIXME
+                std::vector<llvm::Value*> params) { 
   return Builder.CreateCall(func, params);
 }
 
