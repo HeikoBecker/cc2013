@@ -153,6 +153,13 @@ EMIT_IR(Parsing::LabeledStatement) {
   statement->emitIR(creator);
 }
 
+
+EMIT_IR(Parsing::ContinueStatement) {
+  auto dead = creator->makeBlock("deadContinueBlock", false);
+  creator->makeContinue();
+  creator->setCurrentBasicBlock(dead);
+}
+
 EMIT_IR(Parsing::BreakStatement) {
 
    auto dead = creator->makeBlock("deadBreakBlock", false);
@@ -169,6 +176,7 @@ EMIT_IR(Parsing::IterationStatement) {
     auto endBlock = creator->makeBlock("while_end", false);
 
     creator->setCurrentBreakPoint(endBlock);
+    creator->setCurrentContinuePoint(contentBlock);
 
     expression->emit_condition(creator, contentBlock, endBlock);
 
@@ -190,6 +198,11 @@ EMIT_IR(Parsing::IterationStatement) {
 
     auto testBlock = creator->makeBlock("do_test");
     auto endBlock = creator->makeBlock("do_end", false);
+
+    creator->setCurrentBreakPoint(endBlock);
+    creator->setCurrentContinuePoint(contentBlock);
+
+
     creator->setCurrentBasicBlock(testBlock);
     expression->emit_condition(creator, contentBlock, endBlock);
     

@@ -107,6 +107,7 @@ namespace Codegeneration {
 
                 
                 void setCurrentBreakPoint(llvm::BasicBlock* block);
+                void setCurrentContinuePoint(llvm::BasicBlock* block);
 
 
                 /* Ensures that the last block of the function has a terminator
@@ -118,6 +119,7 @@ namespace Codegeneration {
                                Parsing::SubExpression rhs);
 
                 void makeBreak();
+                void makeContinue();
                 llvm::BasicBlock* getCurrentBlock(); 
 
 	private:
@@ -125,6 +127,7 @@ namespace Codegeneration {
 		llvm::IRBuilder<> Builder, AllocaBuilder;
                 llvm::Function* currentFunction;
                 llvm::BasicBlock* currentBreakPoint;
+                llvm::BasicBlock* currentContinuePoint;
 
   };
 }

@@ -441,15 +441,20 @@ void Codegeneration::IRCreator::setCurrentBasicBlock(llvm::BasicBlock* bb)
   Builder.SetInsertPoint(bb);
 }
 
-
 void Codegeneration::IRCreator::setCurrentBreakPoint(llvm::BasicBlock* block) {
-  std::cout<<"set point"<<std::endl;
   currentBreakPoint = block;
 }
 
+void Codegeneration::IRCreator::setCurrentContinuePoint(llvm::BasicBlock* block) {
+  currentContinuePoint = block;
+}
 
 void Codegeneration::IRCreator::makeBreak() {
   connect(currentBreakPoint);
+}
+
+void Codegeneration::IRCreator::makeContinue() {
+  connect(currentContinuePoint);
 }
 
 /*

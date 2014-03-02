@@ -82,6 +82,7 @@ class JUMPSTATEMENT(GotoStatement) {
 class JUMPSTATEMENT(ContinueStatement) {
   public:
     PPRINTABLE
+    IR_EMITTING
     ContinueStatement(Pos pos);
 };
 
