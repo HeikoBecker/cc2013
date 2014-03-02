@@ -41,11 +41,13 @@ EMIT_IR(Parsing::AstNode)
 
 EMIT_IR(Parsing::Declaration)
 {
-  llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
-  auto var = creator->allocateInCurrentFunction(variable);
-  declNode->associatedValue = var;
-  if (this->declarator->hasName()) {
-    var->setName(this->declarator->getIdentifier());
+  if (!declNode->associatedValue) {
+    llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
+    auto var = creator->allocateInCurrentFunction(variable);
+    declNode->associatedValue = var;
+    if (this->declarator->hasName()) {
+      var->setName(this->declarator->getIdentifier());
+    }
   }
 }
 
@@ -383,16 +385,21 @@ EMIT_LV(Parsing::BinaryExpression){
 EMIT_RV(Parsing::UnaryExpression) {
   llvm::Value* vl = this->operand->emit_rvalue(creator);
   switch(this->op){
-	case PunctuatorType::NOT:
-	        creator->createLogNeg(vl);
-	case PunctuatorType::MINUS:
-		creator->createNeg(vl);
-	case PunctuatorType::STAR:
-		creator->createDeref(vl);
-	case PunctuatorType::AMPERSAND:
-		creator->createAddress(vl);
-	default:
-		throw CompilerException("INTERNAL ERROR", this->pos());
+    case PunctuatorType::NOT:
+      return creator->createLogNeg(vl);
+    case PunctuatorType::MINUS:
+      return creator->createNeg(vl);
+    case PunctuatorType::STAR:
+      return creator->createDeref(vl);
+    case PunctuatorType::AMPERSAND:
+      return creator->createAddress(vl);
+    case PunctuatorType::SIZEOF:
+      if (auto as_array = std::dynamic_pointer_cast<Parsing::ArrayDeclaration>(this->operand)) {
+        return creator->allocInt(as_array->size);
+      }
+      return creator->createSizeof(creator->semantic_type2llvm_type(operand->getType()));
+    default:
+      throw CompilerException("INTERNAL ERROR", this->pos());
   }
   return nullptr;
 }
