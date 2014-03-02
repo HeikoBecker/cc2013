@@ -204,7 +204,9 @@ EMIT_CONDITION(Parsing::BinaryExpression)
 
 EMIT_IR(Parsing::ExpressionStatement)
 {
-  this->expression->emit_rvalue(creator);
+  if (expression) {
+    this->expression->emit_rvalue(creator);
+  }
 }
 
 /*
