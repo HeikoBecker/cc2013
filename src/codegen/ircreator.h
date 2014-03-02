@@ -52,6 +52,7 @@ namespace Codegeneration {
                 UNEXPCREATE(createAddress)
                 UNEXPCREATE(getDeref)
                 UNEXPCREATE(getAddress)
+                llvm::Value* createSizeof(llvm::Type*);
                 // are the functions below needed FIXME
                 llvm::Value* loadVariable(llvm::Value *val);
                 ALLOC(allocLiteral)
