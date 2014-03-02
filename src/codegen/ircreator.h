@@ -74,13 +74,11 @@ namespace Codegeneration {
                 // point into it
                 llvm::BasicBlock* makeIfHeader();
                 // get the correct basic block
-                llvm::BasicBlock* getIfConsequenceBlock();
-                llvm::BasicBlock* getIfAlternativeBlock();
-                llvm::BasicBlock* getIfEndBlock();
 
-
-                // labeled
-                llvm::BasicBlock* getLabeledBlock(std::string label);
+                // create a block 
+                // connected : true -> begins with follow block
+                // connected : false -> is independent block
+                llvm::BasicBlock* makeBlock(std::string labelName, bool connect = true);
 
                 // adds an unconditional jump from "from" to "to"
                 void connect(llvm::BasicBlock *from, llvm::BasicBlock *to);

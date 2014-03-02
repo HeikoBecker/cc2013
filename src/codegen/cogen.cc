@@ -137,16 +137,21 @@ EMIT_IR(Parsing::ReturnStatement)
 }
 
 EMIT_IR(Parsing::LabeledStatement) {
-  creator->getLabeledBlock(name);
+  creator->makeBlock(name);
   statement->emitIR(creator);
+}
+
+EMIT_IR(Parsing::IterationStatement) {
+  creator->makeBlock("while_header");
 }
 
 EMIT_IR(Parsing::SelectionStatement)
 {
-  creator->makeIfHeader();
-  auto consequenceBlock = creator->getIfConsequenceBlock();
-  auto alternativeBlock = creator->getIfAlternativeBlock();
-  auto endBlock = creator->getIfEndBlock();
+  creator->makeBlock("if-header");
+
+  auto consequenceBlock = creator->makeBlock("if-consequence", false);
+  auto alternativeBlock = creator->makeBlock("if-alternative", false);
+  auto endBlock = creator->makeBlock("if-end", false);
   this->expression->emit_condition(creator, consequenceBlock, alternativeBlock);
   creator->setCurrentBasicBlock(consequenceBlock);
   this->ifStatement->emitIR(creator);

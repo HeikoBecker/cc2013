@@ -146,32 +146,23 @@ llvm::BasicBlock* Codegeneration::IRCreator::makeIfHeader()
   return IfHeaderBlock;
 }
 
-llvm::BasicBlock* Codegeneration::IRCreator::getLabeledBlock(std::string label){
+llvm::BasicBlock* Codegeneration::IRCreator::makeBlock(std::string labelName, bool connect) {
   using namespace llvm;
    BasicBlock *labelBlock = BasicBlock::Create(
           Builder.getContext()                    /* LLVMContext &Context */,
-          label,  // FIXME : labelGen,
+          labelName,                                  /* label name */
           currentFunction                         /* Function *Parent=0 */,
           0                                       /* BasicBlock *InsertBefore=0 */);
 
-  /* Insert an unconditional branch from the current basic block to the header of the IfStmt */
-  Builder.CreateBr(labelBlock);
-  /* Set the header of the IfStmt as the new insert point */
-  Builder.SetInsertPoint(labelBlock);
+  if (connect) {
+     /* Insert an unconditional branch from the current basic block to the header of the IfStmt */
+     Builder.CreateBr(labelBlock);
+     /* Set the header of the IfStmt as the new insert point */
+     Builder.SetInsertPoint(labelBlock);
+   }
 
   return labelBlock;
 }
-
-llvm::BasicBlock* Codegeneration::IRCreator::getIfConsequenceBlock()
-{
-  return llvm::BasicBlock::Create(
-      Builder.getContext()                    /* LLVMContext &Context */,
-      "if-consequence"                        /* const Twine &Name="" */,
-      currentFunction                         /* Function *Parent=0 */,
-      0                                       /* BasicBlock *InsertBefore=0 */
-  );
-}
-
 
 void Codegeneration::IRCreator::makeConditonalBranch(
     llvm::Value* branchCondition,
@@ -192,25 +183,6 @@ void Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock
   llvm::BranchInst::Create(to, from);
 }
 
-llvm::BasicBlock* Codegeneration::IRCreator::getIfAlternativeBlock()
-{
-  return llvm::BasicBlock::Create(
-      Builder.getContext()                    /* LLVMContext &Context */,
-      "if-alternative"                        /* const Twine &Name="" */,
-      currentFunction                         /* Function *Parent=0 */,
-      0                                       /* BasicBlock *InsertBefore=0 */
-  );
-}
-
-llvm::BasicBlock* Codegeneration::IRCreator::getIfEndBlock()
-{
-  return llvm::BasicBlock::Create(
-      Builder.getContext()                    /* LLVMContext &Context */,
-      "if-end"                                /* const Twine &Name="" */,
-      currentFunction                         /* Function *Parent=0 */,
-      0                                       /* BasicBlock *InsertBefore=0 */
-  );
-}
 
 llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
 {

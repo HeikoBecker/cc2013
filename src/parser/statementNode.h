@@ -123,6 +123,7 @@ class STATEMENT(IterationStatement) {
         IterationEnum k,
         Pos pos);
     PPRINTABLE
+    IR_EMITTING
 
   private:
     SubExpression expression;
