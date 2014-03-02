@@ -139,7 +139,7 @@ class STATEMENT(LabeledStatement) {
   private:
     std::string name;
     SubStatement statement;
-    IR_EMITTING;
+    IR_EMITTING
 };
 
 typedef std::shared_ptr<LabeledStatement> SubLabeledStatement;
