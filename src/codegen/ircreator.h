@@ -70,6 +70,13 @@ namespace Codegeneration {
                                 Parsing::SubExpression lhs, 
                                 Parsing::SubExpression rhs);
                 void makeReturn(llvm::Value *value);
+                // creates a new basic block for the if head and set an insert
+                // point into it
+                llvm::BasicBlock* makeIfHeader();
+                // get the correct basic block
+                llvm::BasicBlock* getIfConsequenceBlock();
+                llvm::BasicBlock* getIfAlternativeBlock();
+                llvm::BasicBlock* getIfEndBlock();
                 // utilities
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
