@@ -41,11 +41,13 @@ EMIT_IR(Parsing::AstNode)
 
 EMIT_IR(Parsing::Declaration)
 {
-  llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
-  auto var = creator->allocateInCurrentFunction(variable);
-  declNode->associatedValue = var;
-  if (this->declarator->hasName()) {
-    var->setName(this->declarator->getIdentifier());
+  if (!declNode->associatedValue) {
+    llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
+    auto var = creator->allocateInCurrentFunction(variable);
+    declNode->associatedValue = var;
+    if (this->declarator->hasName()) {
+      var->setName(this->declarator->getIdentifier());
+    }
   }
 }
 
