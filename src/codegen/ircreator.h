@@ -104,6 +104,10 @@ namespace Codegeneration {
                     std::string name,
                     bool definition=true
                     );
+                llvm::Function *startAlreadyDefinedFunction(
+                    llvm::Function* function,
+                    std::string name
+                    );
 
                 
                 void setCurrentBreakPoint(llvm::BasicBlock* block);

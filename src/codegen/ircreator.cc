@@ -76,6 +76,15 @@ llvm::Function* Codegeneration::IRCreator::startFunction(
   if (!definition) {
     return function;
   }
+  return startAlreadyDefinedFunction(function, name);
+}
+
+
+llvm::Function* Codegeneration::IRCreator::startAlreadyDefinedFunction(
+    llvm::Function* function,
+    std::string(name)
+    ) 
+{
   auto function_basic_block = llvm::BasicBlock::Create(
       M.getContext(), // FIXME: M
       name+"_begin",

@@ -147,10 +147,10 @@ namespace Parsing {
 
       // required to handle self-referencing structs in cogen
       llvm::Type* llvm_type;
+      bool selfReferencing;
     private:
       std::string name;
       SubSemanticNode m_node;
-      bool selfReferencing;
   };
 
 }
