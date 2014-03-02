@@ -322,6 +322,22 @@ llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
   return Builder.CreateCall(func, params);
 }
 
+
+llvm::BasicBlock* Codegeneration::IRCreator::getControlFlowBlock()
+{
+  return llvm::BasicBlock::Create(
+      Builder.getContext(),
+      "shortCircuitingBlock",
+      currentFunction, // insert inside current function
+      nullptr
+      );
+}
+void Codegeneration::IRCreator::setCurrentBasicBlock(llvm::BasicBlock* bb)
+{
+  Builder.SetInsertPoint(bb);
+}
+
+
 llvm::Value* Codegeneration::IRCreator::makeSelect(llvm::Value* cond, 
                 llvm::Value* lhs, llvm::Value* rhs) { //FIXME
         UNUSED(cond);

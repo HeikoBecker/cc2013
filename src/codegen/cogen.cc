@@ -148,6 +148,30 @@ EMIT_CONDITION(Parsing::Expression) //FIXME: Why does an expression need EMIT_CO
   throw;
 }
 
+EMIT_CONDITION(Parsing::BinaryExpression)
+{
+  switch (op) {
+    case PunctuatorType::LAND: 
+      {
+      auto shortCircuitingBB = creator->getControlFlowBlock();
+      lhs->emit_condition(creator, shortCircuitingBB, falseSuccessor);
+      creator->setCurrentBasicBlock(shortCircuitingBB);
+      rhs->emit_condition(creator, trueSuccessor, falseSuccessor);
+      }
+      break;
+    case PunctuatorType::LOR:
+      {
+      auto shortCircuitingBB = creator->getControlFlowBlock();
+      lhs->emit_condition(creator, trueSuccessor, shortCircuitingBB);
+      creator->setCurrentBasicBlock(shortCircuitingBB);
+      rhs->emit_condition(creator, trueSuccessor, falseSuccessor);
+      }
+      break;
+    default:
+      Parsing::Expression::emit_condition(creator, trueSuccessor, falseSuccessor);
+  }
+}
+
 /*
  * An expression can be part of a statement with e; where e is a statement.
  * So we need! emit_rvalue to produce the rvalue.

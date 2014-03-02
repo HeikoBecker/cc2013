@@ -39,6 +39,11 @@ class EXPRESSION(BinaryExpression)
     PPRINTABLE
     EMIT_RVALUE
     EMIT_LVALUE
+    void emit_condition(
+        Codegeneration::IRCreator* creator,
+        llvm::BasicBlock* trueSuccessor,
+        llvm::BasicBlock* falseSuccessor
+    );
   private:
     SubExpression lhs;
     SubExpression rhs;
