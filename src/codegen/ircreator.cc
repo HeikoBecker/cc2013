@@ -174,6 +174,9 @@ void Codegeneration::IRCreator::makeConditonalBranch(
   Builder.CreateCondBr(branchCondition, consequenceBlock, alternativeBlock);
 }
 
+llvm::BasicBlock* Codegeneration::IRCreator::getCurrentBlock() {
+  return Builder.GetInsertBlock();
+}
 
 void Codegeneration::IRCreator::connect(llvm::BasicBlock* to)
 {
@@ -430,6 +433,17 @@ llvm::BasicBlock* Codegeneration::IRCreator::getControlFlowBlock()
 void Codegeneration::IRCreator::setCurrentBasicBlock(llvm::BasicBlock* bb)
 {
   Builder.SetInsertPoint(bb);
+}
+
+
+void Codegeneration::IRCreator::setCurrentBreakPoint(llvm::BasicBlock* block) {
+  std::cout<<"set point"<<std::endl;
+  currentBreakPoint = block;
+}
+
+
+void Codegeneration::IRCreator::makeBreak() {
+  connect(currentBreakPoint);
 }
 
 /*

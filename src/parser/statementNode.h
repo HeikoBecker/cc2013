@@ -88,6 +88,7 @@ class JUMPSTATEMENT(ContinueStatement) {
 class JUMPSTATEMENT(BreakStatement) {
   public:
     PPRINTABLE
+    IR_EMITTING
     BreakStatement(Pos pos);
 };
 
@@ -114,8 +115,7 @@ typedef std::shared_ptr<ExpressionStatement> SubExpressionStatement;
  
 typedef std::shared_ptr<SelectionStatement> SubSelectionStatement;
 
-
-
+// while, do while
 class STATEMENT(IterationStatement) { 
   public:
     IterationStatement(SubExpression ex,

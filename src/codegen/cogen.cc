@@ -151,6 +151,14 @@ EMIT_IR(Parsing::LabeledStatement) {
   statement->emitIR(creator);
 }
 
+EMIT_IR(Parsing::BreakStatement) {
+
+  // auto parent = creator->getCurrentBlock();
+  // creator->makeBlock("breakBlock");
+  creator->makeBreak();
+  // creator->setCurrentBasicBlock(parent);
+}
+
 EMIT_IR(Parsing::IterationStatement) {
 
   if (kind == WHILE) {
@@ -158,6 +166,9 @@ EMIT_IR(Parsing::IterationStatement) {
 
     auto contentBlock = creator->makeBlock("while_content", false);
     auto endBlock = creator->makeBlock("while_end", false);
+
+    creator->setCurrentBreakPoint(endBlock);
+
     expression->emit_condition(creator, contentBlock, endBlock);
 
     creator->setCurrentBasicBlock(contentBlock);

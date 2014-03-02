@@ -103,6 +103,11 @@ namespace Codegeneration {
                     std::string name,
                     bool definition=true
                     );
+
+                
+                void setCurrentBreakPoint(llvm::BasicBlock* block);
+
+
                 /* Ensures that the last block of the function has a terminator
                  */
                 void finishFunction();
@@ -111,11 +116,14 @@ namespace Codegeneration {
                 int computeIndex (Parsing::SubExpression lhs,
                                Parsing::SubExpression rhs);
 
+                void makeBreak();
+                llvm::BasicBlock* getCurrentBlock(); 
 
 	private:
 		llvm::Module M;
 		llvm::IRBuilder<> Builder, AllocaBuilder;
                 llvm::Function* currentFunction;
+                llvm::BasicBlock* currentBreakPoint;
 
   };
 }
