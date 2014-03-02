@@ -23,6 +23,7 @@ Codegeneration::IRCreator::IRCreator(const char* filename):
   Builder(M.getContext()), AllocaBuilder(M.getContext()),
   currentFunction(nullptr)
 {
+  mapLabel = std::map<std::string, llvm::BasicBlock* > ();
 }	
 
 Codegeneration::IRCreator::~IRCreator()
@@ -62,6 +63,10 @@ llvm::Function* Codegeneration::IRCreator::startFunction(
     bool definition
 )
 {
+
+  // clear the label map
+  mapLabel.clear();
+
   auto function = llvm::Function::Create(
       function_type,
       llvm::GlobalValue::ExternalLinkage,
@@ -162,6 +167,18 @@ llvm::BasicBlock* Codegeneration::IRCreator::makeBlock(std::string labelName, bo
    }
 
   return labelBlock;
+}
+
+bool Codegeneration::IRCreator::hasLabel(std::string label) {
+  return mapLabel.find(label) != mapLabel.end();
+}
+
+void Codegeneration::IRCreator::addLabel(llvm::BasicBlock *block, std::string label) {
+  mapLabel[label] = block;
+}
+
+llvm::BasicBlock* Codegeneration::IRCreator::getLabelBlock(std::string label) {
+  return mapLabel[label];
 }
 
 void Codegeneration::IRCreator::makeConditonalBranch(

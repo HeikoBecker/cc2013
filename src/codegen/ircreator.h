@@ -122,13 +122,17 @@ namespace Codegeneration {
                 void makeContinue();
                 llvm::BasicBlock* getCurrentBlock(); 
 
+                bool hasLabel(std::string label);
+                void addLabel(llvm::BasicBlock *block, std::string label);
+                llvm::BasicBlock* getLabelBlock(std::string label);
+
 	private:
 		llvm::Module M;
 		llvm::IRBuilder<> Builder, AllocaBuilder;
                 llvm::Function* currentFunction;
                 llvm::BasicBlock* currentBreakPoint;
                 llvm::BasicBlock* currentContinuePoint;
-
+                std::map<std::string, llvm::BasicBlock* > mapLabel;
   };
 }
 #endif

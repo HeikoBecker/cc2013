@@ -73,6 +73,7 @@ class STATEMENT(JumpStatement) {
 class JUMPSTATEMENT(GotoStatement) {
   public:
     PPRINTABLE
+    IR_EMITTING
     GotoStatement(std::string label, Pos pos);
 
   private:

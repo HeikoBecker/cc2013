@@ -149,8 +149,36 @@ EMIT_IR(Parsing::ReturnStatement)
 }
 
 EMIT_IR(Parsing::LabeledStatement) {
-  creator->makeBlock(name);
+
+  llvm::BasicBlock *labelBlock;
+
+  if (creator->hasLabel(name)) { // label was defined somewhere
+    labelBlock = creator->getLabelBlock(name);
+  } else { // label was not defined
+    labelBlock = creator->makeBlock(name, false);
+    creator->addLabel(labelBlock, name);
+  }
+
+  creator->connect(labelBlock);
+  creator->setCurrentBasicBlock(labelBlock);
   statement->emitIR(creator);
+}
+
+
+EMIT_IR(Parsing::GotoStatement) {
+
+  auto dead = creator->makeBlock("deadGotoBlock", false);
+  llvm::BasicBlock *labelBlock;
+
+  if (creator->hasLabel(label)) { // label was defined somewhere
+    labelBlock = creator->getLabelBlock(label);
+  } else { // label was not defined
+    labelBlock = creator->makeBlock(label, false);
+    creator->addLabel(labelBlock, label);
+  }
+
+  creator->connect(labelBlock);
+  creator->setCurrentBasicBlock(dead);
 }
 
 
@@ -161,7 +189,6 @@ EMIT_IR(Parsing::ContinueStatement) {
 }
 
 EMIT_IR(Parsing::BreakStatement) {
-
    auto dead = creator->makeBlock("deadBreakBlock", false);
   creator->makeBreak();
   creator->setCurrentBasicBlock(dead);
