@@ -270,13 +270,8 @@ llvm::Value* Codegeneration::IRCreator::createPMinus(llvm::Value* pointer,
         return Builder.CreateSub(pointer, size); 
 }
 
-llvm::Value* Codegeneration::IRCreator::createPPMinus(llvm::Value* pointer,
-                                                     llvm::Value* arg,
-                                                     llvm::Type* pointee){
-  UNUSED(pointer);
-  UNUSED(arg);
-  UNUSED(pointee);
-  return nullptr;
+BINCREATE(createPPMinus) {
+        return Builder.CreatePtrDiff(lhs, rhs);
 }
 
 

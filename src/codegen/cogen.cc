@@ -373,9 +373,7 @@ EMIT_RV(Parsing::BinaryExpression) {
             auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->lhs->getType());
           
             if (this->rhs->getType()->type() == Semantic::Type::POINTER){
-            auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->rhs->getType());
-            llvm::Type* pointee = creator->semantic_type2llvm_type(pointer->pointee());
-            return creator->createPPMinus(rhs,lhs, pointee);
+            return creator->createPPMinus(lhs, rhs);
             }
             llvm::Type* pointee = creator->semantic_type2llvm_type(pointer->pointee());
             return creator->createPMinus(lhs,rhs, pointee);
