@@ -113,7 +113,6 @@ class EXPRESSION(FunctionCall)
                  std::vector<SubExpression> arguments,
                  Pos pos);
     PPRINTABLE
-    EMIT_LVALUE
     EMIT_RVALUE
 
   private:

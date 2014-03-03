@@ -388,7 +388,7 @@ llvm::Value* Codegeneration::IRCreator::loadVariable(
 }
 
 ALLOCF(allocLiteral) {
-        return Builder.CreateGlobalString(llvm::StringRef(name));
+        return Builder.CreateGlobalStringPtr(llvm::StringRef(name));
 }
 
 llvm::Value* Codegeneration::IRCreator::allocChar (char val) {
@@ -446,10 +446,22 @@ llvm::Value* Codegeneration::IRCreator::makeSelectLV(Parsing::SubExpression cond
         return phi;
 }
 
-
+/*
+ * A functions arguments can have different types than it expects in llvm.
+ * We checked the semantics before, so it is safe to cast them in the correct
+ * type.
+ */
 llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
-                std::vector<llvm::Value*> params) { 
-  return Builder.CreateCall(func, params);
+                std::vector<llvm::Value*> params,
+                std::vector<llvm::Type*> paramTypes) { 
+  std::vector<llvm::Value*> vals;
+  for(unsigned long i = 0; i < params.size(); ++i){
+//    if(params[i]->getType() != paramTypes[i])
+      vals.push_back(Builder.CreateSExtOrTrunc(params[i], paramTypes[i]));
+//    else
+//      vals.push_back(params[i]);
+  }
+  return Builder.CreateCall(func, vals);
 }
 
 

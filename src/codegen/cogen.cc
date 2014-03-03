@@ -263,8 +263,7 @@ EMIT_IR(Parsing::SelectionStatement)
 //#                    Expression Code Generation                              #
 //##############################################################################
 
-EMIT_CONDITION(Parsing::Expression) //FIXME: Why does an expression need EMIT_CONDITION???
-{
+EMIT_CONDITION(Parsing::Expression) {
   auto condition = this->emit_rvalue(creator);
   creator->makeConditonalBranch(condition, trueSuccessor, falseSuccessor);
 }
@@ -522,24 +521,20 @@ EMIT_RV(Parsing::Constant) {
 EMIT_RV(Parsing::FunctionCall) {
  llvm::Value* func = this->funcName->emit_lvalue(creator);
   std::vector<llvm::Value*> values = std::vector<llvm::Value*> ();
+  std::vector<llvm::Type*> types;
   for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
         values.push_back((*it)->emit_rvalue(creator));
   }
-  return creator->createFCall(func, values);
-}
-
-/*
- * A function can return the address of some valid space so it can also produce
- * a valid rvalue. this has been validated by the semantics. We only need
- * to compute the value and then return it.
- */
-EMIT_LV(Parsing::FunctionCall) {
-  llvm::Value* func = this->funcName->emit_lvalue(creator);
-  std::vector<llvm::Value*> values = std::vector<llvm::Value*> ();
-  for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
-        values.push_back((*it)->emit_rvalue(creator));
+  SemanticDeclarationNode type = this->getType();
+  //The type must be an instance of a function type, otherwise semantics would 
+  //have failed, so it is safe to cast here
+  auto funcType = std::static_pointer_cast<Parsing::FunctionDeclaration>(type);
+  for (auto it = funcType->parameter().begin(); 
+                  it != funcType->parameter().end();
+                  ++it){
+    types.push_back(creator->semantic_type2llvm_type(*it));
   }
-  return creator->createFCall(func, values);
+  return creator->createFCall(func, values, types);
 }
 
 /*

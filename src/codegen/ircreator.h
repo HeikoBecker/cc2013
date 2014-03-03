@@ -60,7 +60,8 @@ namespace Codegeneration {
                 llvm::Value* allocInt ( int val);
                 ALLOC(allocNullptr)
                 llvm::Value* createFCall(llvm::Value* func, 
-                                std::vector<llvm::Value*> params);
+                                std::vector<llvm::Value*> params, 
+                                std::vector<llvm::Type*> paramTypes);
                 // controlflow
                 llvm::BasicBlock* getControlFlowBlock();
                 void setCurrentBasicBlock(llvm::BasicBlock*);
