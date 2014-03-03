@@ -77,9 +77,8 @@ class EXPRESSION(VariableUsage)
    PPRINTABLE
    EMIT_LVALUE
    EMIT_RVALUE
-
+    const std::string name;
   private:
-    std::string name;
     SemanticTreeNode semanticTree;
 };
 

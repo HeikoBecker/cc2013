@@ -595,14 +595,17 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
   return llvm_type;
 }
 
-int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs, Parsing::SubExpression rhs){
+int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs, 
+                Parsing::SubExpression rhs){
   Parsing::SemanticDeclarationNode type = lhs->getType();
   auto  structtype = std::static_pointer_cast<Parsing::StructDeclaration> (type);
   auto it = structtype->members().begin();
+  auto  rhsAsVar = std::static_pointer_cast<Parsing::VariableUsage> (rhs);
   //our indexes start with 0 as in the example file
   int i = 0;
   //now compute the index with the compareTypes function
-  while (! Semantic::compareTypes(it->second, rhs->getType())){
+  while (! (Semantic::compareTypes(it->second, rhs->getType())) && 
+         ! (it->first == rhsAsVar->name)){
     ++it;
     ++i;
   }

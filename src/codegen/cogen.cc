@@ -347,14 +347,15 @@ EMIT_RV(Parsing::BinaryExpression) {
   // We always need the rvalue of the right side. Precompute it and initialize
   // left side to nullptr
   llvm::Value* lhs = nullptr;
-  llvm::Value* rhs = this->rhs->emit_rvalue(creator);
-
+  llvm::Value* rhs = nullptr;
+  
   //then compute the corresponding value based on the operand
   //the creator will do the llvm magic. We just want to find the
   //correct method to call
   switch(this->op){
 	case PunctuatorType::PLUS:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           if(this->lhs->getType()->type() == Semantic::Type::POINTER){
             auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->lhs->getType());
             llvm::Type* pointee = creator->semantic_type2llvm_type(pointer->pointee());
@@ -369,6 +370,7 @@ EMIT_RV(Parsing::BinaryExpression) {
             return creator->createAdd(lhs, rhs);
 	case PunctuatorType::MINUS:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           if(this->lhs->getType()->type() == Semantic::Type::POINTER){
             auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->lhs->getType());
           
@@ -382,21 +384,27 @@ EMIT_RV(Parsing::BinaryExpression) {
            return creator->createMinus(lhs, rhs);
 	case PunctuatorType::LESS:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           return creator->createLess(lhs, rhs);
 	case PunctuatorType::STAR:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           return creator->createMult(lhs, rhs);
 	case PunctuatorType::NEQUAL:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           return creator->createUnequal(lhs, rhs);
 	case PunctuatorType::EQUAL:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           return creator->createEqual(lhs, rhs);
 	case PunctuatorType::LAND:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           return creator->createLogAnd(lhs,rhs);
         case PunctuatorType::LOR:
           lhs = this->lhs->emit_rvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           return creator->createLogOr(lhs, rhs);
         case PunctuatorType::MEMBER_ACCESS:
 	case PunctuatorType::ARROW: {
@@ -412,6 +420,7 @@ EMIT_RV(Parsing::BinaryExpression) {
                                     }
 	case PunctuatorType::ASSIGN:{
           lhs = this->lhs->emit_lvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
           llvm::Type* type = creator->semantic_type2llvm_type(this->lhs->getType());
           return creator->createAssign(lhs,rhs, type);
                                     }
@@ -422,7 +431,7 @@ EMIT_RV(Parsing::BinaryExpression) {
 
 EMIT_LV(Parsing::BinaryExpression){
         llvm::Value* lhs = this->lhs->emit_lvalue(creator);
-        llvm::Value* rhs = this->rhs->emit_lvalue(creator);
+        llvm::Value* rhs = nullptr;
 
         switch (this->op){
         case PunctuatorType::ARROW:
@@ -433,7 +442,8 @@ EMIT_LV(Parsing::BinaryExpression){
                return creator->getMemberAddress(lhs,rhs, index);
                                             }
         case PunctuatorType::ARRAY_ACCESS:
-               return creator->getArrayPosition(lhs,rhs, 0);//FIXME
+               rhs = this->rhs->emit_rvalue(creator);
+               return creator->getArrayPosition(lhs,rhs, 0);
         default:
                throw CompilerException("INTERNAL ERROR", this->pos());
         }
