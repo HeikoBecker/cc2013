@@ -443,17 +443,21 @@ EMIT_LV(Parsing::BinaryExpression){
  * computed, then the operator is applied.
  */
 EMIT_RV(Parsing::UnaryExpression) {
-  llvm::Value* vl = this->operand->emit_rvalue(creator);
+  llvm::Value* vl =  nullptr;
   switch(this->op){
     case PunctuatorType::NOT:
+      vl = this->operand->emit_rvalue(creator);
       return creator->createLogNeg(vl);
     case PunctuatorType::MINUS:
+      vl = this->operand->emit_rvalue(creator);
       return creator->createNeg(vl);
     case PunctuatorType::STAR:
+      vl = this->operand->emit_rvalue(creator);
       return creator->createDeref(vl);
     case PunctuatorType::AMPERSAND:
-      return creator->createAddress(vl);
+      return this->operand->emit_lvalue(creator);
     case PunctuatorType::SIZEOF:
+      vl = this->operand->emit_rvalue(creator);
       if (auto as_array = std::dynamic_pointer_cast<Parsing::ArrayDeclaration>(this->operand)) {
         return creator->allocInt(as_array->size);
       }
@@ -468,19 +472,16 @@ EMIT_RV(Parsing::UnaryExpression) {
  * A unary operator can be a valid lvalue, so we need to allow this for code 
  * generation. First compute the lvalue of the operand and then apply the 
  * operator. Corresponding value is returned.
+ * & cannot return a valid lvalue! (see slides about ir-construction)
  */
 EMIT_LV(Parsing::UnaryExpression) {
-  llvm::Value* vl  = this->operand->emit_lvalue(creator);
-
+//lvm::Value* vl  = this->operand->emit_lvalue(creator);
   switch(this->op){
         case PunctuatorType::STAR:
-                  return creator->getDeref(vl);
-        case PunctuatorType::AMPERSAND:
-                  return creator->getAddress(vl);
+                  return this->operand->emit_rvalue(creator);
         default:
                   throw CompilerException("INTERNAL ERROR", this->pos());
   }
-  return nullptr;
 }
 
 /* 

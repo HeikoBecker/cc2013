@@ -391,26 +391,10 @@ UNCREATE(createDeref) {
         return Builder.CreateLoad(val);
 }
 
-
-UNCREATE(createAddress) {
-        std::vector<llvm::Value*> indexes ;
-        indexes.push_back(Builder.getInt32(0));
-        return Builder.CreateGEP(val,indexes);
-}
-
 llvm::Value* Codegeneration::IRCreator::createSizeof(llvm::Type* type)
 {
   return llvm::ConstantExpr::getSizeOf(type);
 }
-
-UNCREATE(getDeref) {
-        return Builder.CreateLoad(val);
-}
-
-UNCREATE(getAddress) {
-        std::vector<llvm::Value*> indexes ;
-        indexes.push_back(Builder.getInt32(0));
-        return Builder.CreateGEP(val,indexes);}
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
                 llvm::Value *val) {
