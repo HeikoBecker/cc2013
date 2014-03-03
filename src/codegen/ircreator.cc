@@ -599,6 +599,13 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
 int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs, 
                 Parsing::SubExpression rhs){
   Parsing::SemanticDeclarationNode type = lhs->getType();
+  //It could also be a pointer based acces with ->
+  //check this
+  if(type->type() == Semantic::Type::POINTER){
+    auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (type);
+    //save the struct type in the type field
+    type = pointer->pointee();
+  } //now we can continue
   auto  structtype = std::static_pointer_cast<Parsing::StructDeclaration> (type);
   auto members = structtype->members();
   auto it = members.begin();
