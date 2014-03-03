@@ -8,6 +8,7 @@
 #include "llvm/IR/GlobalValue.h"           /* GlobaleVariable, LinkageTypes */
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
+#include <llvm/Support/Host.h>
 
 //convenience macros to save some typing time
 //create is marked for being inlined!
@@ -23,6 +24,8 @@ Codegeneration::IRCreator::IRCreator(const char* filename):
   Builder(M.getContext()), AllocaBuilder(M.getContext()),
   currentFunction(nullptr)
 {
+
+  M.setTargetTriple(llvm::sys::getDefaultTargetTriple());
   mapLabel = std::map<std::string, llvm::BasicBlock* > ();
 }	
 
