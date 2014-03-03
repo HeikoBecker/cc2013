@@ -10,6 +10,8 @@
 #include "llvm/Support/raw_ostream.h"
 #include <llvm/Support/Host.h>
 
+#include <climits> // for CHAR_BIT
+
 //convenience macros to save some typing time
 //create is marked for being inlined!
 #define BINCREATE(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs,\
@@ -399,7 +401,7 @@ llvm::Value* Codegeneration::IRCreator::createSizeof(llvm::Type* type)
   //auto size = llvm::ConstantExpr::getSizeOf(type);
   llvm::DataLayout dl { M.getDataLayout()};
   auto size = dl.getTypeAllocSizeInBits(type);
-  return Builder.getInt32(size);
+  return Builder.getInt32(size/CHAR_BIT);
 }
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
