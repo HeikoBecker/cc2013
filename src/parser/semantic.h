@@ -7,6 +7,7 @@
 #include <vector>
 #include <stack>
 #include <memory>
+#include "../utils/datastructures.h"
 #include "../utils/pos.h"
 #include "astNode.h"
 #include "typeNode.h"
@@ -78,7 +79,7 @@ class SemanticNode {
     bool active;
     bool insideStruct;
     bool forward;
-    std::map<std::string, Parsing::SemanticDeclarationNode> decl;
+    util::InsertionOrderPreservingMap<std::string, Parsing::SemanticDeclarationNode> decl;
 };
 
 class SemanticTree;

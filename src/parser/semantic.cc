@@ -2,6 +2,7 @@
 #include "ast.h"
 #include "../utils/debug.h"
 #include "../utils/exception.h"
+#include "../utils/datastructures.h"
 
 # include <algorithm>
 
