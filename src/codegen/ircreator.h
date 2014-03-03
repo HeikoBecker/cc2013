@@ -32,7 +32,12 @@ namespace Codegeneration {
                 void print(llvm::raw_fd_ostream & out);
                 // expressions
 		BINEXPCREATE(createAdd)
+                llvm::Value* createPAdd(llvm::Value*, llvm::Value*, llvm::Type*);
 		BINEXPCREATE(createMinus)
+                llvm::Value* createPMinus(llvm::Value*, llvm::Value*, 
+                                llvm::Type*);
+                llvm::Value* createPPMinus(llvm::Value*, llvm::Value*, 
+                                llvm::Type*);
 		BINEXPCREATE(createLess)
 		BINEXPCREATE(createMult)
 		BINEXPCREATE(createUnequal)

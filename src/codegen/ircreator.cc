@@ -248,6 +248,38 @@ BINCREATE(createAdd) {
 	return Builder.CreateAdd(lhs,rhs);
 }
 
+/*
+ * Produces pointer arithmetic expressions:
+ * x+y where x has type T* is translated to x + (y * sizeof(T))
+ */
+llvm::Value* Codegeneration::IRCreator::createPAdd(llvm::Value* pointer,
+                                                   llvm::Value* arg,
+                                                   llvm::Type* pointee) {
+        arg = Builder.CreateSExt(arg, Builder.getInt32Ty());
+        llvm::Value* size = this->createSizeof(pointee);
+        size = Builder.CreateMul(arg, size);
+        return Builder.CreateAdd(pointer, size); 
+}
+
+llvm::Value* Codegeneration::IRCreator::createPMinus(llvm::Value* pointer,
+                                                     llvm::Value* arg,
+                                                     llvm::Type* pointee){
+        arg = Builder.CreateSExt(arg, Builder.getInt32Ty());
+        llvm::Value* size = this->createSizeof(pointee);
+        size = Builder.CreateMul(arg, size);
+        return Builder.CreateSub(pointer, size); 
+}
+
+llvm::Value* Codegeneration::IRCreator::createPPMinus(llvm::Value* pointer,
+                                                     llvm::Value* arg,
+                                                     llvm::Type* pointee){
+  UNUSED(pointer);
+  UNUSED(arg);
+  UNUSED(pointee);
+  return nullptr;
+}
+
+
 BINCREATE(createMinus) {
         lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
         rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
