@@ -456,10 +456,10 @@ llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
                 std::vector<llvm::Type*> paramTypes) { 
   std::vector<llvm::Value*> vals;
   for(unsigned long i = 0; i < params.size(); ++i){
-//    if(params[i]->getType() != paramTypes[i])
+    if(params[i]->getType() != paramTypes[i])
       vals.push_back(Builder.CreateSExtOrTrunc(params[i], paramTypes[i]));
-//    else
-//      vals.push_back(params[i]);
+    else
+      vals.push_back(params[i]);
   }
   return Builder.CreateCall(func, vals);
 }
