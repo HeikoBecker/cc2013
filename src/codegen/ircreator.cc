@@ -393,7 +393,8 @@ UNCREATE(createDeref) {
 
 llvm::Value* Codegeneration::IRCreator::createSizeof(llvm::Type* type)
 {
-  return llvm::ConstantExpr::getSizeOf(type);
+  auto size = llvm::ConstantExpr::getSizeOf(type);
+  return Builder.CreateSExtOrTrunc(size, Builder.getInt32Ty());
 }
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
