@@ -472,7 +472,9 @@ EMIT_RV(Parsing::UnaryExpression) {
     case PunctuatorType::AMPERSAND:
       return this->operand->emit_lvalue(creator);
     case PunctuatorType::SIZEOF:
-      vl = this->operand->emit_rvalue(creator);
+      if (std::dynamic_pointer_cast<Parsing::SizeOfExpression>(operand)) {
+        return operand->emit_rvalue(creator);
+      }
       if (auto as_array = std::dynamic_pointer_cast<Parsing::ArrayDeclaration>(this->operand)) {
         return creator->allocInt(as_array->size);
       }
