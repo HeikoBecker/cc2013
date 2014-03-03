@@ -7,6 +7,7 @@
 #include "../parser/semantic.h"
 #include "../utils/exception.h"
 #include "../utils/util.h"
+#include "../utils/debug.h"
 #include "labelgen.h"
 
 #include <memory>
@@ -69,6 +70,10 @@ EMIT_IR(Parsing::ExternalDeclaration)
   // first we take the type of the node
 
   auto type = this->getSemanticNode();
+  if (!type) {
+    debug(SEMANTIC) << "ExternalDeclaration is still missing the type";
+    return;
+  }
   if (type->associatedValue) {
     // we already computed the value
     return;
