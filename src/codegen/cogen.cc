@@ -525,14 +525,12 @@ EMIT_RV(Parsing::FunctionCall) {
   for(auto it = this->arguments.begin() ; it != this->arguments.end(); ++it){
         values.push_back((*it)->emit_rvalue(creator));
   }
-  SemanticDeclarationNode type = this->getType();
+  SemanticDeclarationNode function_type = this->funcName->getType();
   //The type must be an instance of a function type, otherwise semantics would 
   //have failed, so it is safe to cast here
-  auto funcType = std::static_pointer_cast<Parsing::FunctionDeclaration>(type);
-  for (auto it = funcType->parameter().begin(); 
-                  it != funcType->parameter().end();
-                  ++it){
-    types.push_back(creator->semantic_type2llvm_type(*it));
+  auto funcType = std::static_pointer_cast<Parsing::FunctionDeclaration>(function_type);
+  for (auto  p: funcType->parameter()) {
+    types.push_back(creator->semantic_type2llvm_type(p));
   }
   return creator->createFCall(func, values, types);
 }
