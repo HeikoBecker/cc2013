@@ -600,7 +600,8 @@ int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs,
                 Parsing::SubExpression rhs){
   Parsing::SemanticDeclarationNode type = lhs->getType();
   auto  structtype = std::static_pointer_cast<Parsing::StructDeclaration> (type);
-  auto it = structtype->members().begin();
+  auto members = structtype->members();
+  auto it = members.begin();
   auto  rhsAsVar = std::static_pointer_cast<Parsing::VariableUsage> (rhs);
   //our indexes start with 0 as in the example file
   int i = 0;
