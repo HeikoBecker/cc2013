@@ -125,6 +125,8 @@ void Codegeneration::IRCreator::finishFunction()
 void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
   /* Create the return */
   if (value) {
+    auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
+    value = Builder.CreateSExtOrTrunc(value, CurFuncReturnType);
     Builder.CreateRet(value);
   } else {
     // if we passed a null pointer to makeReturn, we're in a void function
