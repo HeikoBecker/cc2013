@@ -440,8 +440,7 @@ llvm::Value* Codegeneration::IRCreator::makeSelect(Parsing::SubExpression cond,
         llvm::BasicBlock* right = getControlFlowBlock();
         llvm::BasicBlock* term = getControlFlowBlock();
         llvm::Value* branch = cond->emit_rvalue(this);
-        llvm::Instruction* inst = Builder.CreateCondBr(branch, left, right);
-        Builder.Insert(inst);
+        makeConditonalBranch(branch, left, right);
         setCurrentBasicBlock(left);
         llvm::Value* vall = lhs->emit_rvalue(this);
         vall = Builder.CreateSExt(vall, Builder.getInt32Ty());
@@ -461,8 +460,7 @@ llvm::Value* Codegeneration::IRCreator::makeSelectLV(Parsing::SubExpression cond
         llvm::BasicBlock* right = getControlFlowBlock();
         llvm::BasicBlock* term = getControlFlowBlock();
         llvm::Value* branch = cond->emit_rvalue(this);
-        llvm::Instruction* inst = Builder.CreateCondBr(branch, left, right);
-        Builder.Insert(inst);
+        makeConditonalBranch(branch, left, right);
         setCurrentBasicBlock(left);
         llvm::Value* vall = lhs->emit_lvalue(this);
         vall = Builder.CreateSExt(vall, Builder.getInt32Ty());
