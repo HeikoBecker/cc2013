@@ -48,6 +48,10 @@ EMIT_IR(Parsing::Declaration)
     return;
   }
   if (!declNode->associatedValue) {
+    if (!this->declarator) {
+      // we found the definition of a previously forward declared type
+      return;
+    }
     llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
     auto var = creator->allocateInCurrentFunction(variable);
     declNode->associatedValue = var;
@@ -83,6 +87,10 @@ EMIT_IR(Parsing::ExternalDeclaration)
   }
   if (type->associatedValue) {
     // we already computed the value
+    return;
+  }
+  if (!this->declarator) {
+    // we found the definition of a previously forward declared type
     return;
   }
   llvm::Type * external_declaration_type = creator->semantic_type2llvm_type(
