@@ -8,7 +8,6 @@
 #include "../utils/exception.h"
 #include "../utils/util.h"
 #include "../utils/debug.h"
-#include "labelgen.h"
 
 #include <memory>
 #include <algorithm>
