@@ -800,7 +800,9 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
 )
   : AstNode(pos), type(type), semanticTree(semanticTree)
 {
-  // std::cout<<"NAME: "<<declarator->getIdentifier()<<std::endl;
+  if(type->isStruct() && type->containsDeclaration()) {
+    declNode = semanticTree->createType(type, pos);
+  }
 }
 
 
