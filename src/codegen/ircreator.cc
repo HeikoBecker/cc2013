@@ -474,6 +474,20 @@ llvm::Value* Codegeneration::IRCreator::makeSelectLV(Parsing::SubExpression cond
         return phi;
 }
 
+
+llvm::Value* Codegeneration::IRCreator::makePhi(
+    llvm::BasicBlock* consequenceBlock,
+    llvm::Value* consequenceValue,
+    llvm::BasicBlock* alternativeBlock,
+    llvm::Value* alternativeValue
+    )
+{
+  auto phi_node = Builder.CreatePHI(consequenceValue->getType(), 2, "merge");
+  phi_node->addIncoming(consequenceValue, consequenceBlock);
+  phi_node->addIncoming(alternativeValue, alternativeBlock);
+  return phi_node;
+}
+
 /*
  * A functions arguments can have different types than it expects in llvm.
  * We checked the semantics before, so it is safe to cast them in the correct

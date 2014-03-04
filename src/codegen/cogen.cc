@@ -601,7 +601,19 @@ EMIT_RV(Parsing::FunctionCall) {
  * Then return the value based on the condition.
  */
 EMIT_RV(Parsing::TernaryExpression) {
-  return creator->makeSelect(this->condition,this->lhs, this->rhs);
+  auto consequenceBlock = creator->makeBlock("ternary-consequence", false);
+  auto alternativeBlock = creator->makeBlock("ternary-alternative", false);
+  auto endBlock = creator->makeBlock("ternary-end", false);
+  this->condition->emit_condition(creator, consequenceBlock, alternativeBlock);
+  creator->setCurrentBasicBlock(consequenceBlock);
+  auto val_consequence = this->lhs->emit_rvalue(creator);
+  creator->connect(nullptr, endBlock);
+  creator->setCurrentBasicBlock(alternativeBlock);
+  auto val_alternative = this->rhs->emit_rvalue(creator);
+  creator->connect(nullptr, endBlock);
+  creator->setCurrentBasicBlock(endBlock);
+  return creator->makePhi(consequenceBlock, val_consequence,
+      alternativeBlock, val_alternative);
 }
 
 /*

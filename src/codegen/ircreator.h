@@ -97,6 +97,12 @@ namespace Codegeneration {
                     llvm::BasicBlock* consequenceBlock,
                     llvm::BasicBlock* alternativeBlock
                 );
+                llvm::Value* makePhi(
+                    llvm::BasicBlock* consequenceBlock,
+                    llvm::Value* consequenceValue,
+                    llvm::BasicBlock* alternativeBlock,
+                    llvm::Value* alternativeValue
+                    );
                 // utilities
                 llvm::Type* semantic_type2llvm_type(
                     const Parsing::SemanticDeclarationNode semantic_type);
