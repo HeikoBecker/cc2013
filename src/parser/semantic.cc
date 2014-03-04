@@ -231,6 +231,11 @@ void SemanticTree::decreaseLoopDepth() {
   loopDepth--;
 }
 
+
+Parsing::SemanticDeclarationNode SemanticTree::currentFunction() {
+  return m_currentFunction;
+};
+
 void SemanticTree::setCurrentFunction(SemanticDeclarationNode s) {
   m_currentFunction = s;
   // delete label variables

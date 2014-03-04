@@ -95,7 +95,7 @@ class SemanticTree {
      */
     void setCurrentFunction(Parsing::SemanticDeclarationNode);
     void unsetCurrentFunction();
-    inline Parsing::SemanticDeclarationNode currentFunction() {return m_currentFunction;};
+    Parsing::SemanticDeclarationNode currentFunction();
     void addGotoLabel(std::string str, Pos pos);
     bool isInLoop();
     Parsing::SemanticDeclarationNode createType(TypeNode t, Pos pos);
