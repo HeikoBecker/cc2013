@@ -263,8 +263,11 @@ llvm::Value* Codegeneration::IRCreator::createPAdd(llvm::Value* pointer,
                                                    llvm::Type* pointee) {
         arg = Builder.CreateSExt(arg, Builder.getInt32Ty());
         llvm::Value* size = this->createSizeof(pointee);
+        auto oldType = pointer->getType(); 
+        pointer = Builder.CreatePtrToInt(pointer, Builder.getInt32Ty());
         size = Builder.CreateMul(arg, size);
-        return Builder.CreateAdd(pointer, size); 
+        llvm::Value* res = Builder.CreateAdd(pointer, size);
+        return Builder.CreateIntToPtr(res, oldType);
 }
 
 llvm::Value* Codegeneration::IRCreator::createPMinus(llvm::Value* pointer,
@@ -273,7 +276,11 @@ llvm::Value* Codegeneration::IRCreator::createPMinus(llvm::Value* pointer,
         arg = Builder.CreateSExt(arg, Builder.getInt32Ty());
         llvm::Value* size = this->createSizeof(pointee);
         size = Builder.CreateMul(arg, size);
-        return Builder.CreateSub(pointer, size); 
+        auto oldType = pointer->getType(); 
+        pointer = Builder.CreatePtrToInt(pointer, Builder.getInt32Ty());
+        size = Builder.CreateMul(arg, size);
+        llvm::Value* res = Builder.CreateSub(pointer, size);
+        return Builder.CreateIntToPtr(res, oldType);
 }
 
 BINCREATE(createPPMinus) {
