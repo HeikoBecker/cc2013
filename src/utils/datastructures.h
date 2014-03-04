@@ -51,7 +51,7 @@ class InsertionOrderPreservingMap
       return pos->second;
     }
 
-    auto at(const Key & key) -> decltype(operator[](key)) {
+    auto at(const Key & key) -> decltype(this->operator[](key)) {
       auto pos = find_pos(key);
       if (pos == mapping.end()) {
         throw std::out_of_range("Member not found!");
