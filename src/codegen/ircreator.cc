@@ -10,6 +10,9 @@
 #include "llvm/Support/raw_ostream.h"
 #include <llvm/Support/Host.h>
 
+#include "../parser/semadecl.h"
+#include "../parser/ast.h"
+
 //convenience macros to save some typing time
 //create is marked for being inlined!
 #define BINCREATE(X) llvm::Value* Codegeneration::IRCreator::X (llvm::Value* lhs,\

@@ -1,8 +1,6 @@
 #ifndef IRCREATOR_H
 #define IRCREATOR_H
 
-#include "../parser/parser.h"
-
 #include "llvm/IR/Module.h"                /* Module */
 #include "llvm/IR/Function.h"              /* Function */
 #include "llvm/IR/Constant.h"              /* Constant::getNullValue */
@@ -12,6 +10,14 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 
+#include <memory>
+
+namespace Parsing {
+  class Expression;
+  class SemanticDeclaration;
+  typedef std::shared_ptr<Expression> SubExpression;
+  typedef std::shared_ptr<SemanticDeclaration> SemanticDeclarationNode;
+}
 
 
 //convenience macros
