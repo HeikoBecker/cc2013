@@ -617,14 +617,6 @@ EMIT_RV(Parsing::TernaryExpression) {
 }
 
 /*
- * Produce the ternary expressions value. Remember that both expressions need to
- * be evaluated as one could contain side effects.
- */
-EMIT_LV(Parsing::TernaryExpression) {
-  return creator->makeSelectLV(this->condition,this->lhs,this->rhs);
-}
-
-/*
  * Produces the rvalue of the sizeof expression. TODO!
  */
 EMIT_RV(Parsing::SizeOfExpression) {

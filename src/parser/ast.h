@@ -127,7 +127,6 @@ class EXPRESSION(TernaryExpression)
                       SubExpression rhs,
                       Pos);
     PPRINTABLE
-    EMIT_LVALUE
     EMIT_RVALUE
     
   private:
