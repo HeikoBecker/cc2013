@@ -572,10 +572,12 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
         /* TODO: handle non primitive types*/
         std::vector<llvm::Type *> member_types;
         // TODO: use transform
-        for (auto member: structType->members()) {
-          member_types.push_back(semantic_type2llvm_type(member.second));
-        }
+        if (structType->members().size()) {
+          for (auto member: structType->members()) {
+            member_types.push_back(semantic_type2llvm_type(member.second));
+          }
         struct_type->setBody(member_types);
+        }
         llvm_type = struct_type;
       }
       break;
