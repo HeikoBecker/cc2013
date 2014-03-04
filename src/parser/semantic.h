@@ -29,50 +29,21 @@ typedef std::stack<std::pair<int, Parsing::SemanticDeclarationNode> > TypeStack;
 
 class SemanticNode {
   public:
-    SemanticNode(int parent, bool insideStruct, bool forward = false) : parent(parent), active(true), insideStruct(insideStruct), forward(forward) { };
+    SemanticNode(int parent, bool insideStruct, bool forward = false);
 
-    void disable() {
-      active = false;
-    }
-
-    int getParentIndex() {
-      return parent;
-    }
-
-    bool isActive() {
-      return active;
-    }
-
-    bool isForward() {
-      return forward;
-    }
-
-    void setNotForward() {
-      forward = false;
-    }
-
-    void addDeclaration(std::string s, Parsing::SemanticDeclarationNode node) {
-      decl[s] = node;
-    }
+    void disable();
+    int getParentIndex();
+    bool isActive();
+    bool isForward();
+    void setNotForward();
+    void addDeclaration(std::string s, Parsing::SemanticDeclarationNode node);
 
     // TODO: make this private and a friend of StructDeclaration?
-    std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> type() {
-      return std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>>(
-            decl.begin(), decl.end()
-          );
-    }
+    std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> type(); 
 
-    bool isInsideStruct() {
-      return insideStruct;
-    }
+    bool isInsideStruct();
 
-    Parsing::SemanticDeclarationNode getNode(std::string name) {
-      if (decl.find(name) == decl.end()) {
-        throw SemanticException(name + " not found");
-      } else {
-        return decl[name];
-      }
-    }
+    Parsing::SemanticDeclarationNode getNode(std::string name);
 
   private:
     int parent;

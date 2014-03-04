@@ -40,6 +40,57 @@ bool isValidType(const SemanticDeclarationNode & s) {
 }
 }
 
+/*===========Semantic Node=============*/
+
+SemanticNode::SemanticNode(int parent, bool insideStruct, bool forward) :
+  parent(parent), active(true), insideStruct(insideStruct), forward(forward) {};
+
+void SemanticNode::disable() {
+  active = false;
+}
+
+int SemanticNode::getParentIndex() {
+  return parent;
+}
+
+bool SemanticNode::isActive() {
+  return active;
+}
+
+bool SemanticNode::isForward() {
+  return forward;
+}
+
+void SemanticNode::setNotForward() {
+  forward = false;
+}
+
+void SemanticNode::addDeclaration(
+    std::string s,
+    Parsing::SemanticDeclarationNode node) {
+  decl[s] = node;
+}
+
+
+std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> SemanticNode::type() {
+  return std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>>(
+      decl.begin(), decl.end()
+      );
+}
+
+bool SemanticNode::isInsideStruct() {
+  return insideStruct;
+}
+
+Parsing::SemanticDeclarationNode SemanticNode::getNode(std::string name) {
+  if (decl.find(name) == decl.end()) {
+    throw SemanticException(name + " not found");
+  } else {
+    return decl[name];
+  }
+}
+
+/*====SemanticTree======*/
 
 bool SemanticTree::hasStructDeclaration(std::string name) {
   if (structMap.find(name) == structMap.end()) {
