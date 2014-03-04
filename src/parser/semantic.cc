@@ -43,7 +43,7 @@ bool isValidType(const SemanticDeclarationNode & s) {
 /*===========Semantic Node=============*/
 
 SemanticNode::SemanticNode(int parent, bool insideStruct, bool forward) :
-  parent(parent), active(true), insideStruct(insideStruct), forward(forward) {};
+  parent(parent), active(true), insideStruct(insideStruct), forward(forward) {}
 
 void SemanticNode::disable() {
   active = false;
@@ -234,7 +234,7 @@ void SemanticTree::decreaseLoopDepth() {
 
 Parsing::SemanticDeclarationNode SemanticTree::currentFunction() {
   return m_currentFunction;
-};
+}
 
 void SemanticTree::setCurrentFunction(SemanticDeclarationNode s) {
   m_currentFunction = s;
