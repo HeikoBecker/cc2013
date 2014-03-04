@@ -221,22 +221,13 @@ class TYPE(StructType) {
     StructType(std::string name, Pos pos);
     StructType(std::string name, StructContent content, Pos pos);
 
-    bool isStruct() {
-      return true;
-    }
+    bool isStruct() override;
 
-    bool containsDeclaration() {
-      return hasDeclaration;
-    }
+    bool containsDeclaration() override;
     
     // TODO : only calculate once
-    virtual std::string getIdentifier() {
-      return "struct_" + name;
-    }
-
-    std::string toString() {
-      return name;
-    }
+    virtual std::string getIdentifier();
+    std::string toString() override;
 
     PPRINTABLE
 

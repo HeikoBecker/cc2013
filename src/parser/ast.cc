@@ -689,6 +689,25 @@ StructType::StructType(std::string name, StructContent strcontent, Pos pos)
   }
 }
 
+std::string StructType::toString()
+{
+  return name;
+}
+
+bool StructType::isStruct() {
+  return true;
+}
+
+bool StructType::containsDeclaration() {
+  return hasDeclaration;
+}
+    
+
+// TODO : only calculate once
+std::string StructType::getIdentifier() {
+  return "struct_" + name;
+}
+
 CompoundStatement::CompoundStatement(std::vector<BlockItem> subStatements, Pos pos)
   : Statement(pos), subStatements(std::move(subStatements))
 {
