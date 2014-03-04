@@ -225,7 +225,7 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        string name = "@" + type;
         
        SubSemanticNode helpNode;
-       int id;
+       auto id = int{};
        while(!structMap[name].empty()) {
         id = structMap[name].top().first;
         int parent = nodes[id]->getParentIndex();
