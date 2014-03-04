@@ -41,6 +41,12 @@ EMIT_IR(Parsing::AstNode)
 
 EMIT_IR(Parsing::Declaration)
 {
+  if (!declNode) {
+    // if there is no type, it is a forward declaration, like
+    // struct S;
+    // we can't create code in that case
+    return;
+  }
   if (!declNode->associatedValue) {
     llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
     auto var = creator->allocateInCurrentFunction(variable);
@@ -70,7 +76,9 @@ EMIT_IR(Parsing::ExternalDeclaration)
 
   auto type = this->getSemanticNode();
   if (!type) {
-    debug(SEMANTIC) << "ExternalDeclaration is still missing the type";
+    // if there is no type, it is a forward declaration, like
+    // struct S;
+    // we can't create code in that case
     return;
   }
   if (type->associatedValue) {
