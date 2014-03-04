@@ -731,6 +731,12 @@ Declaration::Declaration(TypeNode t, Pos pos)
   : AstNode(pos), type(t){}
 
 
+SemanticDeclarationNode Declaration::getSemanticNode() 
+{
+  return declNode; 
+}
+
+
 FunctionDefinition::FunctionDefinition(TypeNode type,
                         SubDeclarator declarator,
                         SubCompoundStatement compoundStatement,
@@ -778,6 +784,23 @@ ExternalDeclaration::ExternalDeclaration(TypeNode type, Pos pos
   // std::cout<<"NAME: "<<declarator->getIdentifier()<<std::endl;
 }
 
+
+bool ExternalDeclaration::isFunction()
+{
+  return false;
+}
+
+
+SemanticDeclarationNode ExternalDeclaration::getSemanticNode()
+{
+  return declNode;
+}
+
+
+bool FunctionDefinition::isFunction()
+{
+  return true;
+}
 
 TranslationUnit::TranslationUnit(
     std::vector<ExternalDeclarationNode> externalDeclarations,

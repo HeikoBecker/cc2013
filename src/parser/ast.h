@@ -141,7 +141,7 @@ class ASTNODE(Declaration) {
     Declaration(TypeNode t, SubDeclarator declarator, 
                 Pos pos, SemanticTreeNode semanticTree);
     Declaration(TypeNode t, Pos pos);
-    SemanticDeclarationNode getSemanticNode() { return declNode; }
+    SemanticDeclarationNode getSemanticNode();
 
     IR_EMITTING
     PPRINTABLE
@@ -165,9 +165,9 @@ class ASTNODE(ExternalDeclaration) {
     ExternalDeclaration(TypeNode type, Pos pos,
                         SemanticTreeNode semanticTree);
 
-    virtual bool isFunction() { return false; }
+    virtual bool isFunction();
 
-    SemanticDeclarationNode getSemanticNode() { return declNode; }
+    SemanticDeclarationNode getSemanticNode();
 
 
     PPRINTABLE
@@ -189,7 +189,7 @@ class FunctionDefinition : public ExternalDeclaration {
         );
     PPRINTABLE
     IR_EMITTING
-    bool isFunction() { return true;}
+    bool isFunction() override; 
 
   private:
     SubCompoundStatement compoundStatement;
