@@ -59,6 +59,11 @@ class EXPRESSION(UnaryExpression)
   PPRINTABLE
   EMIT_LVALUE
   EMIT_RVALUE
+    void emit_condition(
+        Codegeneration::IRCreator* creator,
+        llvm::BasicBlock* trueSuccessor,
+        llvm::BasicBlock* falseSuccessor
+    );
 
   private:
    SubExpression operand;

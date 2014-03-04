@@ -319,6 +319,17 @@ EMIT_CONDITION(Parsing::BinaryExpression)
   }
 }
 
+
+EMIT_CONDITION(Parsing::UnaryExpression)
+{
+  if (op == PunctuatorType::NOT) {
+    operand->emit_condition(creator, falseSuccessor, trueSuccessor);
+  } else {
+    Parsing::Expression::emit_condition(creator, trueSuccessor, falseSuccessor);
+  }
+}
+
+
 /*
  * An expression can be part of a statement with e; where e is a statement.
  * So we need! emit_rvalue to produce the rvalue.
