@@ -29,13 +29,9 @@ namespace Parsing {
 
   class SemanticDeclaration {
     public: 
-      virtual std::string toString() {
-        return "SemanticDeclaration";
-      }
-      virtual Semantic::Type type() {throw;};
-      bool isVoid() {
-        return type() == Semantic::Type::VOID;
-      }
+      virtual std::string toString();
+      virtual Semantic::Type type();
+      bool isVoid();
       llvm::Value* associatedValue = nullptr;
   };
 
@@ -43,46 +39,33 @@ namespace Parsing {
 
   class IntDeclaration : public SemanticDeclaration {
     public: 
-      Semantic::Type type() override {return Semantic::Type::INT;}
-      virtual std::string toString() {
-        return "int";
-      }
+      Semantic::Type type() override;
+      std::string toString() override;
   };
 
   // only used to distinguish null pointer value from integer
   class NullDeclaration : public IntDeclaration {
-      virtual std::string toString() {
-        return "NULL";
-      }
+      std::string toString() override; 
   };
 
   class CharDeclaration : public SemanticDeclaration {
     public :
-      Semantic::Type type() override {return Semantic::Type::CHAR;}
-      virtual std::string toString() {
-        return "char";
-      }
+      Semantic::Type type() override;
+      std::string toString() override;
   };
 
-  // void is not allowed, but void**
   class VoidDeclaration : public SemanticDeclaration {
-    Semantic::Type type() override {return Semantic::Type::VOID;}
     public: 
-      virtual std::string toString() {
-        return "void";
-      }
+      std::string toString() override;
+      Semantic::Type type() override;
   };
 
   class PointerDeclaration : public SemanticDeclaration {
     public:
-      // type is int, char, or void
       PointerDeclaration(int pointerCounter, Parsing::SemanticDeclarationNode type);
-      Semantic::Type type() override {return Semantic::Type::POINTER;}
-      Parsing::SemanticDeclarationNode pointee() {return child;};
-
-      virtual std::string toString() {
-        return "*" + child->toString();
-      }
+      Semantic::Type type() override;
+      Parsing::SemanticDeclarationNode pointee();
+      std::string toString() override;
 
     private:
       Parsing::SemanticDeclarationNode child;
@@ -99,7 +82,8 @@ namespace Parsing {
     public:
       ArrayDeclaration(Parsing::SemanticDeclarationNode type, size_t size);
       // in type we are currently lying to faciliate the usage
-      Semantic::Type type() override {return Semantic::Type::POINTER;}
+      Semantic::Type type() override;
+      std::string toString() override;
       const size_t size;
   };
 
@@ -107,16 +91,15 @@ namespace Parsing {
 
     public:
       FunctionDeclaration(Parsing::SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par); 
-      Semantic::Type type() override {return Semantic::Type::FUNCTION;}
+      Semantic::Type type() override;
 
-      std::vector<Parsing::SemanticDeclarationNode> parameter() {return m_parameter;};
+      std::vector<Parsing::SemanticDeclarationNode> parameter();
       // Throws the parameter away and uses the provided vector for them
       // necessary to get the correct associatedValue
       // TODO: hacky. Why don't we use them directly?
       void rebindParameters(std::vector<Parsing::SemanticDeclarationNode>);
-      Parsing::SemanticDeclarationNode returnType() {return returnChild;};
-
-      virtual std::string toString();
+      Parsing::SemanticDeclarationNode returnType();
+      std::string toString() override;
 
     private:
       Parsing::SemanticDeclarationNode returnChild;
@@ -129,22 +112,13 @@ namespace Parsing {
     public:  
       // name e.g. @S
       StructDeclaration(std::string n, SubSemanticNode s, bool selfReferencing);
-      Semantic::Type type() override {return Semantic::Type::STRUCT;}
-
-      std::string toString() {
-        return name;
-      }
-
-      bool isSelfReferencing() {
-        return selfReferencing;
-      }
-
+      Semantic::Type type() override;
+      std::string toString() override;
+      bool isSelfReferencing();
       /* return members as a vector of name type pairs */
       std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>>
-      members();
-
-      SubSemanticNode node() {return m_node;}
-
+        members();
+      SubSemanticNode node();
       // required to handle self-referencing structs in cogen
       llvm::Type* llvm_type;
       bool selfReferencing;

@@ -5,12 +5,90 @@
 using namespace Parsing;
 
 
+std::string SemanticDeclaration::toString()
+{
+  return "SemanticDeclaration";
+}
+
+Semantic::Type SemanticDeclaration::type() {
+  throw;
+}
+
+bool SemanticDeclaration::isVoid() 
+{
+  return type() == Semantic::Type::VOID;
+}
+
+
+
+Semantic::Type IntDeclaration::type()
+{
+  return Semantic::Type::INT;
+}
+
+std::string IntDeclaration::toString()
+{
+  return "int";
+}
+
+
+std::string NullDeclaration::toString() {
+  return "NULL";
+}
+
+
+Semantic::Type CharDeclaration::type() 
+{
+  return Semantic::Type::CHAR;
+}
+
+std::string CharDeclaration::toString() 
+{
+  return "char";
+}
+
+
+
+Semantic::Type VoidDeclaration::type() 
+{
+  return Semantic::Type::VOID;
+}
+
+std::string VoidDeclaration::toString()
+{
+  return "void";
+}
+
+
 StructDeclaration::StructDeclaration(std::string n, SubSemanticNode s, bool selfReferencing) : llvm_type(nullptr), selfReferencing(selfReferencing), name(n), m_node(s) {}
 
 std::vector<std::pair<std::string, Parsing::SemanticDeclarationNode>> StructDeclaration::members()
 {
   return this->m_node->type();
 }
+
+
+Semantic::Type StructDeclaration::type()
+{
+  return Semantic::Type::STRUCT;
+}
+
+std::string StructDeclaration::toString()
+{
+  return name;
+}
+
+bool StructDeclaration::isSelfReferencing()
+{
+  return selfReferencing;
+}
+
+SubSemanticNode StructDeclaration::node()
+{
+  return m_node;
+}
+
+
 
 std::string FunctionDeclaration::toString() {
         std::string str = "function (";
@@ -28,6 +106,23 @@ std::string FunctionDeclaration::toString() {
         str += returnChild->toString();
 
         return str;
+}
+
+
+Semantic::Type FunctionDeclaration::type()
+{
+  return Semantic::Type::FUNCTION;
+}
+
+std::vector<Parsing::SemanticDeclarationNode> FunctionDeclaration::parameter() 
+{
+  return m_parameter;
+}
+
+
+Parsing::SemanticDeclarationNode FunctionDeclaration::returnType()
+{
+  return returnChild;
 }
 
 FunctionDeclaration::FunctionDeclaration(SemanticDeclarationNode ret, std::vector<SemanticDeclarationNode> par) :returnChild(ret), m_parameter(par) 
@@ -62,8 +157,35 @@ PointerDeclaration::PointerDeclaration(int pointerCounter, SemanticDeclarationNo
   }
 }
 
+
+Semantic::Type PointerDeclaration::type()
+{
+  return Semantic::Type::POINTER;
+}
+
+Parsing::SemanticDeclarationNode PointerDeclaration::pointee()
+{
+  return child;
+}
+
+std::string PointerDeclaration::toString()
+{
+  return "*" + child->toString();
+}
+
 ArrayDeclaration::ArrayDeclaration(Parsing::SemanticDeclarationNode type, size_t size)
   : PointerDeclaration(0, type), size(size) {}
+
+
+Semantic::Type ArrayDeclaration::type()
+{
+  return Semantic::Type::POINTER;
+}
+
+std::string ArrayDeclaration::toString()
+{
+  return pointee()->toString() + "[" + std::to_string(size) + "]";
+}
 
 using namespace Semantic;
 
