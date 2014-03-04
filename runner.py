@@ -61,7 +61,11 @@ def run(testdir=None):
             for test_file in glob.iglob(should_pass):
                 test_count += 1
                 counter += 1
-                o = c4(test_file, options)
+                if "--tokenize" in options:
+                    newopts = options[:]
+                else:
+                    newopts = ["--compile"]
+                o = c4(test_file, newopts)
                 if (o[0]) == 0:
                     print(".", end="")
                 else:
