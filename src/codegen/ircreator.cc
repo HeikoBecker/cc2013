@@ -341,6 +341,11 @@ BINCREATE(createLogOr){
 	return Builder.CreateOr(lhs,rhs);
 }
 
+BINCREATE(createArrayAccess){
+        llvm::Value* val = this->createPAdd(lhs,rhs);
+        return Builder.CreateLoad(val);
+}
+
 /*
  * This method has exacty the same behaviour as createAccess as all 
  * loading from adresses has to be done before this method is called.

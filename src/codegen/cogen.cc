@@ -429,6 +429,10 @@ EMIT_RV(Parsing::BinaryExpression) {
           lhs = this->lhs->emit_rvalue(creator);
           rhs = this->rhs->emit_rvalue(creator);
           return creator->createLogOr(lhs, rhs);
+        case PunctuatorType::ARRAY_ACCESS:
+          lhs = this->lhs->emit_lvalue(creator);
+          rhs = this->rhs->emit_rvalue(creator);
+          return creator->createArrayAccess(lhs, rhs);
         case PunctuatorType::MEMBER_ACCESS:
 	case PunctuatorType::ARROW:
           {
