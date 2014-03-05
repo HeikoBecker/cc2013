@@ -431,7 +431,7 @@ EMIT_RV(Parsing::BinaryExpression) {
           return creator->createLogOr(lhs, rhs);
         case PunctuatorType::MEMBER_ACCESS:
 	case PunctuatorType::ARROW: {
-          lhs = this->lhs->emit_rvalue(creator);
+          lhs = this->lhs->emit_lvalue(creator);
           //We need to find the correct index inside the struct
           //First get the struct type
           int index = creator->computeIndex(this->lhs, this->rhs);
