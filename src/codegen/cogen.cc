@@ -394,29 +394,20 @@ EMIT_RV(Parsing::BinaryExpression) {
 	case PunctuatorType::PLUS:
           lhs = this->lhs->emit_rvalue(creator);
           rhs = this->rhs->emit_rvalue(creator);
-          if(this->lhs->getType()->type() == Semantic::Type::POINTER){
-            auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->lhs->getType());
-            llvm::Type* pointee = creator->semantic_type2llvm_type(pointer->pointee());
-            return creator->createPAdd(lhs,rhs, pointee);
-          }
-          else if (this->rhs->getType()->type() == Semantic::Type::POINTER){
-            auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->rhs->getType());
-            llvm::Type* pointee = creator->semantic_type2llvm_type(pointer->pointee());
-            return creator->createPAdd(rhs,lhs, pointee);
-          }
+          if(this->lhs->getType()->type() == Semantic::Type::POINTER)
+            return creator->createPAdd(lhs,rhs);
+          else if (this->rhs->getType()->type() == Semantic::Type::POINTER)
+            return creator->createPAdd(rhs,lhs);
           else 
             return creator->createAdd(lhs, rhs);
 	case PunctuatorType::MINUS:
           lhs = this->lhs->emit_rvalue(creator);
           rhs = this->rhs->emit_rvalue(creator);
           if(this->lhs->getType()->type() == Semantic::Type::POINTER){
-            auto pointer = std::static_pointer_cast<Parsing::PointerDeclaration> (this->lhs->getType());
-          
             if (this->rhs->getType()->type() == Semantic::Type::POINTER){
             return creator->createPPMinus(lhs, rhs);
             }
-            llvm::Type* pointee = creator->semantic_type2llvm_type(pointer->pointee());
-            return creator->createPMinus(lhs,rhs, pointee);
+            return creator->createPMinus(lhs,rhs);
           }
           else 
            return creator->createMinus(lhs, rhs);

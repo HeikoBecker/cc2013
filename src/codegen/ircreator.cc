@@ -258,29 +258,16 @@ BINCREATE(createAdd) {
  * Produces pointer arithmetic expressions:
  * x+y where x has type T* is translated to x + (y * sizeof(T))
  */
-llvm::Value* Codegeneration::IRCreator::createPAdd(llvm::Value* pointer,
-                                                   llvm::Value* arg,
-                                                   llvm::Type* pointee) {
-        arg = Builder.CreateSExt(arg, Builder.getInt32Ty());
-        llvm::Value* size = this->createSizeof(pointee);
-        auto oldType = pointer->getType(); 
-        pointer = Builder.CreatePtrToInt(pointer, Builder.getInt32Ty());
-        size = Builder.CreateMul(arg, size);
-        llvm::Value* res = Builder.CreateAdd(pointer, size);
-        return Builder.CreateIntToPtr(res, oldType);
+BINCREATE(createPAdd) {
+        if(rhs->getType() !=  Builder.getInt32Ty())
+                rhs = Builder.CreateSExtOrTrunc(rhs,Builder.getInt32Ty());
+        return Builder.CreateGEP(lhs, rhs);
 }
 
-llvm::Value* Codegeneration::IRCreator::createPMinus(llvm::Value* pointer,
-                                                     llvm::Value* arg,
-                                                     llvm::Type* pointee){
-        arg = Builder.CreateSExt(arg, Builder.getInt32Ty());
-        llvm::Value* size = this->createSizeof(pointee);
-        size = Builder.CreateMul(arg, size);
-        auto oldType = pointer->getType(); 
-        pointer = Builder.CreatePtrToInt(pointer, Builder.getInt32Ty());
-        size = Builder.CreateMul(arg, size);
-        llvm::Value* res = Builder.CreateSub(pointer, size);
-        return Builder.CreateIntToPtr(res, oldType);
+BINCREATE(createPMinus){
+        if(rhs->getType() != Builder.getInt32Ty())
+                rhs = Builder.CreateSExtOrTrunc(rhs, Builder.getInt32Ty());
+        return Builder.CreateGEP(lhs, rhs);
 }
 
 BINCREATE(createPPMinus) {
