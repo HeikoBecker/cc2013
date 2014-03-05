@@ -445,6 +445,10 @@ EMIT_RV(Parsing::BinaryExpression) {
               return creator->createAccess(lhs, rhs, index);
             }
           }
+        case PunctuatorType::ARRAY_ACCESS:
+        {
+          creator->createLoad(this->emit_lvalue(creator));
+        }
 	case PunctuatorType::ASSIGN:{
           lhs = this->lhs->emit_lvalue(creator);
           rhs = this->rhs->emit_rvalue(creator);
