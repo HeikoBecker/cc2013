@@ -430,17 +430,21 @@ EMIT_RV(Parsing::BinaryExpression) {
           rhs = this->rhs->emit_rvalue(creator);
           return creator->createLogOr(lhs, rhs);
         case PunctuatorType::MEMBER_ACCESS:
-	case PunctuatorType::ARROW: {
-          lhs = this->lhs->emit_lvalue(creator);
-          //We need to find the correct index inside the struct
-          //First get the struct type
-          int index = creator->computeIndex(this->lhs, this->rhs);
-         if(this->op == PunctuatorType::ARROW)
-            //create the acces with the  correct index
-            return creator->createPointerAccess(lhs, rhs, index);
-          else
-            return creator->createAccess(lhs, rhs, index);
-                                    }
+	case PunctuatorType::ARROW:
+          {
+            //We need to find the correct index inside the struct
+            //First get the struct type
+            int index = creator->computeIndex(this->lhs, this->rhs);
+            if(this->op == PunctuatorType::ARROW) {
+              //create the acces with the  correct index
+              lhs = this->rhs->emit_rvalue(creator);
+              return creator->createPointerAccess(lhs, rhs, index);
+            }
+            else {
+              lhs = this->lhs->emit_lvalue(creator);
+              return creator->createAccess(lhs, rhs, index);
+            }
+          }
 	case PunctuatorType::ASSIGN:{
           lhs = this->lhs->emit_lvalue(creator);
           rhs = this->rhs->emit_rvalue(creator);
