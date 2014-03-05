@@ -142,7 +142,13 @@ namespace Codegeneration {
                 bool hasLabel(std::string label);
                 void addLabel(llvm::BasicBlock *block, std::string label);
                 llvm::BasicBlock* getLabelBlock(std::string label);
+                        
+                //Method to do type conversion if necessary
+                llvm::Value* convert(llvm::Value*, llvm::Type*);
 
+                //type field to quickly modify our "usual arithmetic 
+                //conversions" type
+                llvm::Type* USUALTYPE;
 	private:
 		llvm::Module M;
 		llvm::IRBuilder<> Builder, AllocaBuilder;

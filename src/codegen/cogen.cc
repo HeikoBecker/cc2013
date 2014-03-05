@@ -23,7 +23,6 @@
     llvm::BasicBlock* falseSuccessor\
     )
 
-
 void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
 
   std::string errorStr;

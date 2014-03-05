@@ -21,6 +21,7 @@
                 llvm::Value* rhs, int index)
 #define UNCREATE(X) llvm::Value* Codegeneration::IRCreator::X(llvm::Value* val)
 #define ALLOCF(X) llvm::Value* Codegeneration::IRCreator::X(std::string name)
+#define PREPARE(X) this->convert(X, this->USUALTYPE)
 
 Codegeneration::IRCreator::IRCreator(const char* filename):
   M(filename, llvm::getGlobalContext()),
@@ -30,6 +31,8 @@ Codegeneration::IRCreator::IRCreator(const char* filename):
 
   M.setTargetTriple(llvm::sys::getDefaultTargetTriple());
   mapLabel = std::map<std::string, llvm::BasicBlock* > ();
+  //IMPORTANT: CHANGE USUALTYPE HERE IF NECESSARY
+  USUALTYPE = Builder.getInt32Ty();
 }	
 
 Codegeneration::IRCreator::~IRCreator()
@@ -247,16 +250,19 @@ llvm::GlobalVariable *Codegeneration::IRCreator::makeGlobVar(llvm::Type *type)
 
 /*
  * Self explanatory binary expression functions. Special cases are annotated.
+ * Casting is done with the PREPARE makro, which makes use of the convert 
+ * function so that we do not create unnecessary casts.
  */
 BINCREATE(createAdd) {
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
 	return Builder.CreateAdd(lhs,rhs);
 }
 
 /*
  * Produces pointer arithmetic expressions:
- * x+y where x has type T* is translated to x + (y * sizeof(T))
+ * x+y must create an offset of y* sizeof (type of x). This is done by using a
+ * GEP
  */
 BINCREATE(createPAdd) {
         if(rhs->getType() !=  Builder.getInt32Ty())
@@ -264,64 +270,76 @@ BINCREATE(createPAdd) {
         return Builder.CreateGEP(lhs, rhs);
 }
 
+/*
+ * Same as for createPAdd
+ */
 BINCREATE(createPMinus){
         if(rhs->getType() != Builder.getInt32Ty())
                 rhs = Builder.CreateSExtOrTrunc(rhs, Builder.getInt32Ty());
         return Builder.CreateGEP(lhs, rhs);
 }
 
+/*
+ * We need to produce the number of elements between the two pointers.
+ * As llvm offers a method to compute PtrDiff and we already did type checking 
+ * it is safe to use it here.
+ */
 BINCREATE(createPPMinus) {
         return Builder.CreatePtrDiff(lhs, rhs);
 }
 
 
 BINCREATE(createMinus) {
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
 	return Builder.CreateSub(lhs, rhs);
 }
 
 /*
- * We use signed less than for the less than operator as usual arithmetic conver
- * sions imply an implicit threatment of all values as i32 integer which are
- * signed in our C subset
+ * We use signed less than for the less than operator as usual arithmetic 
+ * conversions imply an implicit threatment of all values as i32 integer 
+ * which are signed in our C subset
  */
 BINCREATE(createLess) {
-	lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+	lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
         return Builder.CreateICmpSLT(lhs,rhs);
 }
 
 BINCREATE(createMult) {
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
 	return Builder.CreateMul(lhs, rhs);
 }
 
 BINCREATE(createUnequal){
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
 	return Builder.CreateICmpNE(lhs,rhs);
 }
 
 BINCREATE(createEqual){
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
 	return Builder.CreateICmpEQ(lhs,rhs);
 }
 
 BINCREATE(createLogAnd){
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
         return Builder.CreateAnd(lhs, rhs);
 }
 
 BINCREATE(createLogOr){
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+        lhs = PREPARE(lhs);
+        rhs = PREPARE(rhs);
 	return Builder.CreateOr(lhs,rhs);
 }
 
+/*
+ * This method has exacty the same behaviour as createAccess as all 
+ * loading from adresses has to be done before this method is called.
+ */
 BINCREATEL(createPointerAccess) {
         UNUSED(rhs);
         //Loading was done before when computing the rvalue of lhs.
@@ -334,6 +352,13 @@ BINCREATEL(createPointerAccess) {
        return var;
 }
 
+/*
+ * Index computation has been done in the codegeneration method for Binary 
+ * Expressions as we need acces to both names of the acces operand which are 
+ * saved in the corresponding expression trees and not in their llvm 
+ * representation. Only thing we need to do then is acces the right element by
+ * using an indexvector.
+ */
 BINCREATEL(createAccess) {
         UNUSED(rhs);
         std::vector<llvm::Value *> indexes;
@@ -345,13 +370,22 @@ BINCREATEL(createAccess) {
         return var;
 }
 
+/*
+ * Assignments can be done directly with the builder. Only thing necessary is
+ * casting the value to the type of the variable, if they dont match, as
+ * semanti checking already validated it, this should not cause troubles.
+ */
 llvm::Value* Codegeneration::IRCreator::createAssign(llvm::Value* lhs, 
                 llvm::Value* rhs, llvm::Type* type) {
-  rhs = Builder.CreateSExtOrTrunc(rhs, type);
+  rhs = this->convert(rhs, type);
   store(rhs,lhs);
   return lhs;
 }
 
+/*
+ * Same as getMemberAddress, as loading of the struct address has been done by 
+ * value computation for lhs before.
+ */
 BINCREATEL(getAddressfromPointer){
         UNUSED(rhs);
         std::vector<llvm::Value *> indexes;
@@ -362,6 +396,12 @@ BINCREATEL(getAddressfromPointer){
         return GEP;
 }
 
+/*
+ * Used to create the lvalue of a struct field.
+ * It behaves like the createAcces and createPointerAccess methods as we need
+ * the same place. The only difference is that there is no load instruction as
+ * we want the address toi store the new value there.
+ */
 BINCREATEL(getMemberAddress){
         UNUSED(rhs);
         std::vector<llvm::Value *> indexes;
@@ -372,11 +412,17 @@ BINCREATEL(getMemberAddress){
         return GEP;
 }
 
+/*
+ * Array accesses are just another style of writing pointer arithmetics.
+ * A[1] is the same as A + 1 
+ */
 BINCREATEL(getArrayPosition) {
         UNUSED(index);
-        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
-        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
-	return Builder.CreateAdd(lhs,rhs);
+        return this->createPAdd(lhs,rhs);
+//        UNUSED(index);
+//        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
+//        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
+//	return Builder.CreateAdd(lhs,rhs);
 }
 
 UNCREATE(createLogNeg) {
@@ -387,6 +433,9 @@ UNCREATE(createNeg) {
         return Builder.CreateNeg(val);
 }
 
+/*
+ * Taken from the ircreation slides :D
+ */
 UNCREATE(createDeref) { 
         return Builder.CreateLoad(val);
 }
@@ -404,6 +453,9 @@ llvm::Value* Codegeneration::IRCreator::loadVariable(
   return Builder.CreateLoad(val);
 }
 
+/*
+ * Allocation functions. They produce the llvm value, given the internal value
+ */
 ALLOCF(allocLiteral) {
         return Builder.CreateGlobalStringPtr(llvm::StringRef(name));
 }
@@ -484,12 +536,12 @@ llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
                 std::vector<llvm::Value*> params,
                 std::vector<llvm::Type*> paramTypes) { 
   std::vector<llvm::Value*> vals;
-  for(unsigned long i = 0; i < params.size(); ++i){
-    if(params[i]->getType() != paramTypes[i])
-      vals.push_back(Builder.CreateSExtOrTrunc(params[i], paramTypes[i]));
-    else
-      vals.push_back(params[i]);
-  }
+  
+  //convert the arguments if necessary
+  for(unsigned long i = 0; i < params.size(); ++i)
+      vals.push_back(convert(params[i], paramTypes[i]));
+
+  //produce the function call with the parameters
   return Builder.CreateCall(func, vals);
 }
 
@@ -612,6 +664,11 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
   return llvm_type;
 }
 
+/*
+ * Given the two expression nodes, where lhs MUST be a struct or a pointer to 
+ * it and rhs MUST be a variable, the function computes the correct index for 
+ * the GEP pointer
+ */
 int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs, 
                 Parsing::SubExpression rhs){
   Parsing::SemanticDeclarationNode type = lhs->getType();
@@ -636,3 +693,15 @@ int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs,
   }
   return i;
 }
+
+/*
+ * Method for easy type conversion. Argument vals type is compared to the
+ * expected type. If they match, no type conversion is done. Otherwise val
+ * will be casted and the resulting value will be returned.
+ */
+llvm::Value* Codegeneration::IRCreator::convert(llvm::Value* val, llvm::Type* t){
+       if(val->getType() != t )
+              return Builder.CreateSExtOrTrunc(val, t);
+      else
+             return val;
+} 
