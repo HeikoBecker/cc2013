@@ -457,18 +457,22 @@ EMIT_RV(Parsing::BinaryExpression) {
 }
 
 EMIT_LV(Parsing::BinaryExpression){
-        llvm::Value* lhs = this->lhs->emit_lvalue(creator);
+        llvm::Value* lhs = nullptr;
         llvm::Value* rhs = nullptr;
 
         switch (this->op){
         case PunctuatorType::ARROW:
         case PunctuatorType::MEMBER_ACCESS: {
                 int index = creator->computeIndex(this->lhs, this->rhs);
-                if(this->op == PunctuatorType::ARROW)
-                       return creator->getAddressfromPointer(lhs,rhs,index);
+                if(this->op == PunctuatorType::ARROW) {
+                  lhs = this->lhs->emit_rvalue(creator);
+                  return creator->getAddressfromPointer(lhs,rhs,index);
+                }
+                lhs = this->lhs->emit_lvalue(creator);
                return creator->getMemberAddress(lhs,rhs, index);
                                             }
         case PunctuatorType::ARRAY_ACCESS:
+               lhs = this->lhs->emit_lvalue(creator);
                rhs = this->rhs->emit_rvalue(creator);
                return creator->getArrayPosition(lhs,rhs, 0);
         default:
