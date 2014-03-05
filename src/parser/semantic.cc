@@ -451,6 +451,8 @@ SemanticDeclarationNode SemanticTree::addDeclaration(TypeNode typeNode, SubDecla
         auto lastDecl = functionMap[name].first; 
         if (!hasSameType(lastDecl, decl)) {
           throw Parsing::ParsingException("the functions do not have the same type ", pos);
+        } else {
+          decl = lastDecl;
         }
 
         if (wasForward) {
