@@ -507,6 +507,11 @@ EMIT_RV(Parsing::UnaryExpression) {
       return creator->createNeg(vl);
     case PunctuatorType::STAR:
       vl = this->operand->emit_rvalue(creator);
+      if (operand->getType()->type() == Semantic::Type::FUNCTION) {
+        // if the operand is a function, it will be implicitly converted into a
+        // pointer to the function; therefore, nothing happens
+        return vl;
+      }
       return creator->createDeref(vl);
     case PunctuatorType::AMPERSAND:
       return this->operand->emit_lvalue(creator);
