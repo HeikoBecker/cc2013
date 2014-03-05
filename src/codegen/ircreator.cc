@@ -384,7 +384,7 @@ llvm::Value* Codegeneration::IRCreator::createAssign(llvm::Value* lhs,
                 llvm::Value* rhs, llvm::Type* type) {
   rhs = this->convert(rhs, type);
   store(rhs,lhs);
-  return lhs;
+  return Builder.CreateLoad(lhs);
 }
 
 /*
