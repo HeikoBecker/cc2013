@@ -132,8 +132,13 @@ void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
   /* Create the return */
   if (value) {
     auto CurFuncReturnType = Builder.getCurrentFunctionReturnType();
-    if(CurFuncReturnType != value->getType())
-            value = Builder.CreateSExtOrTrunc(value, CurFuncReturnType);
+    if (CurFuncReturnType->isIntegerTy() && value->getType()->isIntegerTy()){
+      if(CurFuncReturnType != value->getType())
+        value = Builder.CreateSExtOrTrunc(value, CurFuncReturnType);
+   } else if (! CurFuncReturnType->isIntegerTy() && value->getType()->isIntegerTy())
+      value = Builder.CreateIntToPtr(value, CurFuncReturnType);
+    else if (CurFuncReturnType->isIntegerTy() && !value->getType()->isIntegerTy())
+      value = Builder.CreatePtrToInt(value, CurFuncReturnType);         
     Builder.CreateRet(value);
   } else {
     // if we passed a null pointer to makeReturn, we're in a void function
