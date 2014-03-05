@@ -164,15 +164,10 @@ EMIT_IR(Parsing::CompoundStatement)
 
 EMIT_IR(Parsing::ReturnStatement)
 {
-  if (this->expression) {
-    auto value = expression->emit_rvalue(creator);
-    if (!value) {
-      throw ParsingException("rvalue is null, this is a bug", pos());
-    }
-    creator->makeReturn(value);
-  } else {
-    creator->makeReturn(nullptr);
-  }
+  llvm::Value* value = nullptr;
+  if (this->expression) 
+    value = expression->emit_rvalue(creator);
+  creator->makeReturn(value);
 }
 
 EMIT_IR(Parsing::LabeledStatement) {
@@ -594,7 +589,10 @@ EMIT_RV(Parsing::FunctionCall) {
   for (auto  p: funcType->parameter()) {
     types.push_back(creator->semantic_type2llvm_type(p));
   }
-  return creator->createFCall(func, values, types);
+  llvm::Value* val = creator->createFCall(func, values, types);
+  if(funcType->returnType()->isVoid())
+          return nullptr;
+  return val;
 }
 
 /*
