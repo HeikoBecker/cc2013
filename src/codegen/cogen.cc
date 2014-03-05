@@ -506,6 +506,12 @@ EMIT_RV(Parsing::UnaryExpression) {
       vl = this->operand->emit_rvalue(creator);
       return creator->createNeg(vl);
     case PunctuatorType::STAR:
+      if (auto as_unary = std::dynamic_pointer_cast<UnaryExpression>(operand)) {
+        if (as_unary->op == PunctuatorType::AMPERSAND) {
+          // * & cancellation
+          return as_unary->operand->emit_rvalue(creator);
+        }
+      }
       vl = this->operand->emit_rvalue(creator);
       if (operand->getType()->type() == Semantic::Type::FUNCTION) {
         // if the operand is a function, it will be implicitly converted into a
@@ -514,6 +520,12 @@ EMIT_RV(Parsing::UnaryExpression) {
       }
       return creator->createDeref(vl);
     case PunctuatorType::AMPERSAND:
+      if (auto as_unary = std::dynamic_pointer_cast<UnaryExpression>(operand)) {
+        if (as_unary->op == PunctuatorType::STAR) {
+          // & * cancellation
+          return as_unary->operand->emit_rvalue(creator);
+        }
+      }
       return this->operand->emit_lvalue(creator);
     case PunctuatorType::SIZEOF:
       if (std::dynamic_pointer_cast<Parsing::SizeOfExpression>(operand)) {
