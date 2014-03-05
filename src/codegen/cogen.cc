@@ -437,7 +437,7 @@ EMIT_RV(Parsing::BinaryExpression) {
             int index = creator->computeIndex(this->lhs, this->rhs);
             if(this->op == PunctuatorType::ARROW) {
               //create the acces with the  correct index
-              lhs = this->rhs->emit_rvalue(creator);
+              lhs = this->lhs->emit_rvalue(creator);
               return creator->createPointerAccess(lhs, rhs, index);
             }
             else {
