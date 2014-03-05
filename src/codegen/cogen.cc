@@ -613,6 +613,12 @@ EMIT_RV(Parsing::TernaryExpression) {
   auto val_alternative = this->rhs->emit_rvalue(creator);
   creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(endBlock);
+  if (this->getType()->type() == Semantic::Type::VOID) {
+    // it should be safe to return nullptr, as the semantic ensures that nobody
+    // will use the value anyway
+    // TODO: verify this!
+    return nullptr;
+  }
   return creator->makePhi(consequenceBlock, val_consequence,
       alternativeBlock, val_alternative);
 }
