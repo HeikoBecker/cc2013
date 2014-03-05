@@ -52,6 +52,15 @@ EMIT_IR(Parsing::Declaration)
       return;
     }
     llvm::Type *variable = creator->semantic_type2llvm_type(declNode);
+    if (declNode->type() == Semantic::Type::FUNCTION) {
+      // FIXME: weird logic
+      // function declaration inside function 
+      auto function_type_ = std::static_pointer_cast<FunctionDeclaration>(declNode);
+      auto function_type = static_cast<llvm::FunctionType*>(creator->semantic_type2llvm_type(function_type_));
+      auto function = creator->startFunction(function_type, this->declarator->getIdentifier(), false);
+      function_type_->associatedValue = function;
+      return;
+    }
     auto var = creator->allocateInCurrentFunction(variable);
     declNode->associatedValue = var;
     if (this->declarator->hasName()) {
