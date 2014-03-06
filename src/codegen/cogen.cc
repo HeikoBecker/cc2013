@@ -625,6 +625,12 @@ EMIT_RV(Parsing::FunctionCall) {
         values.push_back((*it)->emit_rvalue(creator));
   }
   SemanticDeclarationNode function_type = this->funcName->getType();
+  if (function_type->type() == Semantic::Type::POINTER) {
+    // function pointer can be called
+    function_type
+      = std::static_pointer_cast<PointerDeclaration>(function_type)->pointee();
+    func = creator->loadVariable(func);
+  }
   //The type must be an instance of a function type, otherwise semantics would 
   //have failed, so it is safe to cast here
   auto funcType = std::static_pointer_cast<Parsing::FunctionDeclaration>(function_type);
