@@ -290,7 +290,8 @@ BINCREATE(createPMinus){
  * it is safe to use it here.
  */
 BINCREATE(createPPMinus) {
-        return Builder.CreatePtrDiff(lhs, rhs);
+        llvm::Value* val = Builder.CreatePtrDiff(lhs, rhs);
+        return convert(val, Builder.getInt32Ty();
 }
 
 
