@@ -92,6 +92,7 @@ class EXPRESSION(Literal)
   public:
     Literal(std::string name, Pos pos);
     PPRINTABLE
+    EMIT_LVALUE
     EMIT_RVALUE
 
   private:

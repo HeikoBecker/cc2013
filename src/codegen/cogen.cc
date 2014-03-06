@@ -592,6 +592,14 @@ EMIT_RV(Parsing::Literal) {
 }
 
 /*
+ * LValue should be the same as RValue as we return the variable where it was 
+ * saved in
+ */
+EMIT_LV(Parsing::Literal){
+  return creator->allocLiteral(this->name);
+}
+
+/*
  * Produces the constants value. It has been validated befory by the semantics
  * so we can advise llvm to create a new constant if it does not exist and 
  * return the value
