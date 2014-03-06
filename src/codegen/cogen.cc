@@ -546,14 +546,19 @@ EMIT_RV(Parsing::UnaryExpression) {
  * generation. First compute the lvalue of the operand and then apply the 
  * operator. Corresponding value is returned.
  * & cannot return a valid lvalue! (see slides about ir-construction)
+ * & CAN return a valid 'lvalue', when we call a function pointer:
+ * (&foo)()
  */
 EMIT_LV(Parsing::UnaryExpression) {
-//lvm::Value* vl  = this->operand->emit_lvalue(creator);
+  //lvm::Value* vl  = this->operand->emit_lvalue(creator);
   switch(this->op){
-        case PunctuatorType::STAR:
-                  return this->operand->emit_rvalue(creator);
-        default:
-                  throw CompilerException("INTERNAL ERROR", this->pos());
+    case PunctuatorType::STAR:
+      return this->operand->emit_rvalue(creator);
+    case PunctuatorType::AMPERSAND:
+      if (operand->getType()->type() == Semantic::Type::FUNCTION)
+        return operand->emit_lvalue(creator);
+    default:
+      throw CompilerException("INTERNAL ERROR", this->pos());
   }
 }
 
@@ -637,7 +642,10 @@ EMIT_RV(Parsing::FunctionCall) {
     // function pointer can be called
     function_type
       = std::static_pointer_cast<PointerDeclaration>(function_type)->pointee();
-    func = creator->loadVariable(func);
+    if (std::dynamic_pointer_cast<Parsing::VariableUsage>(this->funcName)) {
+      // e.g. int (*fptr)(void); fptr();
+      func = creator->loadVariable(func);
+    } // else it was an expression like &exp and & took care of the loading
   }
   //The type must be an instance of a function type, otherwise semantics would 
   //have failed, so it is safe to cast here
