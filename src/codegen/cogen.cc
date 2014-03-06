@@ -688,12 +688,12 @@ EMIT_RV(Parsing::TernaryExpression) {
   auto val_consequence = this->lhs->emit_rvalue(creator);
   if (result_type->type() != Semantic::Type::VOID)
     val_consequence = creator->convert(val_consequence, result_type);
-  creator->connect(nullptr, endBlock);
+  consequenceBlock = creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(alternativeBlock);
   auto val_alternative = this->rhs->emit_rvalue(creator);
   if (result_type->type() != Semantic::Type::VOID)
     val_alternative = creator->convert(val_alternative, result_type);
-  creator->connect(nullptr, endBlock);
+  alternativeBlock = creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(endBlock);
   if (this->getType()->type() == Semantic::Type::VOID) {
     // it should be safe to return nullptr, as the semantic ensures that nobody

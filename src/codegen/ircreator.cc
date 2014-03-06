@@ -230,12 +230,13 @@ void Codegeneration::IRCreator::connect(llvm::BasicBlock* to)
   llvm::BranchInst::Create(to, from);
 }
 
-void Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
+llvm::BasicBlock* Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
 {
   if (!from) {
     from = Builder.GetInsertBlock();
   }
   llvm::BranchInst::Create(to, from);
+  return from;
 }
 
 
@@ -491,8 +492,6 @@ llvm::Value* Codegeneration::IRCreator::allocInt(int val){
 }
 
 llvm::Value* Codegeneration::IRCreator::allocNullptr(llvm::Type* type) {
-  //FIXME : we might need to set the type of the constant in the constructor of
-  //the enclosing expression 
   if (type->isPointerTy()) {
     return llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(type));
   } else {
