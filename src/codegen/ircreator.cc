@@ -291,7 +291,7 @@ BINCREATE(createPMinus){
  */
 BINCREATE(createPPMinus) {
         llvm::Value* val = Builder.CreatePtrDiff(lhs, rhs);
-        return convert(val, Builder.getInt32Ty();
+        return convert(val, Builder.getInt32Ty());
 }
 
 
@@ -343,8 +343,8 @@ BINCREATE(createLogOr){
 }
 
 BINCREATE(createArrayAccess){
-        llvm::Value *val = Builder.CreateLoad(lhs);
-        val = Builder.CreateGEP(val,rhs);
+        llvm::Value* val = Builder.CreateLoad(lhs);
+        val= Builder.CreateGEP(val, rhs);
         return Builder.CreateLoad(val);
 }
 
@@ -430,7 +430,8 @@ BINCREATEL(getMemberAddress){
  */
 BINCREATEL(getArrayPosition) {
         UNUSED(index);
-        return this->createPAdd(lhs,rhs);
+        llvm::Value* val = Builder.CreateLoad(lhs);
+        return Builder.CreateGEP(val,rhs);
 //        UNUSED(index);
 //        lhs = Builder.CreateSExt(lhs, Builder.getInt32Ty());
 //        rhs = Builder.CreateSExt(rhs, Builder.getInt32Ty());
@@ -713,8 +714,9 @@ int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs,
  */
 llvm::Value* Codegeneration::IRCreator::convert(llvm::Value* val, llvm::Type* t){
   //handling of void pointers... FIXME:HACK!
-  if(val->getType()->getPointerElementType() == Builder.getVoidTy())
-    return Builder.CreateBitCast(val, t);
+  if(val->getType()->isPointerTy())
+    if(val->getType()->getPointerElementType() == Builder.getVoidTy())
+      return Builder.CreateBitCast(val, t);
   if(val->getType() != t )
     return Builder.CreateSExtOrTrunc(val, t);
   else
