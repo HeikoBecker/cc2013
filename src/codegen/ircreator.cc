@@ -307,8 +307,10 @@ BINCREATE(createMinus) {
  * which are signed in our C subset
  */
 BINCREATE(createLess) {
-	lhs = PREPARE(lhs);
-        rhs = PREPARE(rhs);
+        if(! lhs->getType()->isPointerTy())
+	  lhs = PREPARE(lhs);
+        if(! rhs->getType()->isPointerTy())
+          rhs = PREPARE(rhs);
         return Builder.CreateICmpSLT(lhs,rhs);
 }
 
@@ -319,14 +321,18 @@ BINCREATE(createMult) {
 }
 
 BINCREATE(createUnequal){
-        lhs = PREPARE(lhs);
-        rhs = PREPARE(rhs);
+        if(! lhs->getType()->isPointerTy())
+	  lhs = PREPARE(lhs);
+        if(! rhs->getType()->isPointerTy())
+          rhs = PREPARE(rhs);
 	return Builder.CreateICmpNE(lhs,rhs);
 }
 
 BINCREATE(createEqual){
-        lhs = PREPARE(lhs);
-        rhs = PREPARE(rhs);
+        if(! lhs->getType()->isPointerTy())
+	  lhs = PREPARE(lhs);
+        if(! rhs->getType()->isPointerTy())
+          rhs = PREPARE(rhs);
 	return Builder.CreateICmpEQ(lhs,rhs);
 }
 
