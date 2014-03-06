@@ -439,9 +439,17 @@ EMIT_RV(Parsing::BinaryExpression) {
           rhs = this->rhs->emit_rvalue(creator);
           return creator->createLogOr(lhs, rhs);
         case PunctuatorType::ARRAY_ACCESS:
-          lhs = this->lhs->emit_lvalue(creator);
-          rhs = this->rhs->emit_rvalue(creator);
-          return creator->createArrayAccess(lhs, rhs);
+          if (Semantic::hasIntegerType(this->rhs)) {
+            lhs = this->lhs->emit_lvalue(creator);
+            rhs = this->rhs->emit_rvalue(creator);
+            return creator->createArrayAccess(lhs, rhs);
+          } else {
+            // swapped array access:
+            // 4[intpr];
+            lhs = this->rhs->emit_lvalue(creator);
+            rhs = this->lhs->emit_rvalue(creator);
+            return creator->createArrayAccess(lhs, rhs);
+          }
         case PunctuatorType::MEMBER_ACCESS:
 	case PunctuatorType::ARROW:
           {
@@ -546,14 +554,19 @@ EMIT_RV(Parsing::UnaryExpression) {
  * generation. First compute the lvalue of the operand and then apply the 
  * operator. Corresponding value is returned.
  * & cannot return a valid lvalue! (see slides about ir-construction)
+ * & CAN return a valid 'lvalue', when we call a function pointer:
+ * (&foo)()
  */
 EMIT_LV(Parsing::UnaryExpression) {
-//lvm::Value* vl  = this->operand->emit_lvalue(creator);
+  //lvm::Value* vl  = this->operand->emit_lvalue(creator);
   switch(this->op){
-        case PunctuatorType::STAR:
-                  return this->operand->emit_rvalue(creator);
-        default:
-                  throw CompilerException("INTERNAL ERROR", this->pos());
+    case PunctuatorType::STAR:
+      return this->operand->emit_rvalue(creator);
+    case PunctuatorType::AMPERSAND:
+      if (operand->getType()->type() == Semantic::Type::FUNCTION)
+        return operand->emit_lvalue(creator);
+    default:
+      throw CompilerException("INTERNAL ERROR", this->pos());
   }
 }
 
@@ -592,24 +605,39 @@ EMIT_RV(Parsing::Literal) {
 }
 
 /*
+ * LValue should be the same as RValue as we return the variable where it was 
+ * saved in
+ */
+EMIT_LV(Parsing::Literal){
+  return creator->allocLiteral(this->name);
+}
+
+/*
  * Produces the constants value. It has been validated befory by the semantics
  * so we can advise llvm to create a new constant if it does not exist and 
  * return the value
  */
 EMIT_RV(Parsing::Constant) {
   switch(this->ct){
-          case Lexing::ConstantType::CHAR:{
-                  char val = static_cast<char>(this->name.at(0));
-                  return creator->allocChar(val);
-                                          }
-          case Lexing::ConstantType::INT:{
-                  int val = std::stoi(this->name);
-                  return creator->allocInt(val);
-                                         }
-          case Lexing::ConstantType::NULLPOINTER:
-                  return creator->allocNullptr(this->name);
-          default:
-                  throw ParsingException("Other constants are handled in different classes!", pos());
+    case Lexing::ConstantType::CHAR:
+      {
+        char val = static_cast<char>(this->name.at(0));
+        return creator->allocChar(val);
+      }
+    case Lexing::ConstantType::INT:
+      {
+        int val = std::stoi(this->name);
+        return creator->allocInt(val);
+      }
+    case Lexing::ConstantType::NULLPOINTER:
+      {
+        //FIXME : we might need to set the type of the constant in the constructor of
+        //the enclosing expression
+        auto type = creator->semantic_type2llvm_type(this->getType());
+        return creator->allocNullptr(type);
+      }
+    default:
+      throw ParsingException("Other constants are handled in different classes!", pos());
   }
 }
 
@@ -629,7 +657,10 @@ EMIT_RV(Parsing::FunctionCall) {
     // function pointer can be called
     function_type
       = std::static_pointer_cast<PointerDeclaration>(function_type)->pointee();
-    func = creator->loadVariable(func);
+    if (std::dynamic_pointer_cast<Parsing::VariableUsage>(this->funcName)) {
+      // e.g. int (*fptr)(void); fptr();
+      func = creator->loadVariable(func);
+    } // else it was an expression like &exp and & took care of the loading
   }
   //The type must be an instance of a function type, otherwise semantics would 
   //have failed, so it is safe to cast here
@@ -648,16 +679,21 @@ EMIT_RV(Parsing::FunctionCall) {
  * Then return the value based on the condition.
  */
 EMIT_RV(Parsing::TernaryExpression) {
+  auto result_type = this->getType();
   auto consequenceBlock = creator->makeBlock("ternary-consequence", false);
   auto alternativeBlock = creator->makeBlock("ternary-alternative", false);
   auto endBlock = creator->makeBlock("ternary-end", false);
   this->condition->emit_condition(creator, consequenceBlock, alternativeBlock);
   creator->setCurrentBasicBlock(consequenceBlock);
   auto val_consequence = this->lhs->emit_rvalue(creator);
-  creator->connect(nullptr, endBlock);
+  if (result_type->type() != Semantic::Type::VOID)
+    val_consequence = creator->convert(val_consequence, result_type);
+  consequenceBlock = creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(alternativeBlock);
   auto val_alternative = this->rhs->emit_rvalue(creator);
-  creator->connect(nullptr, endBlock);
+  if (result_type->type() != Semantic::Type::VOID)
+    val_alternative = creator->convert(val_alternative, result_type);
+  alternativeBlock = creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(endBlock);
   if (this->getType()->type() == Semantic::Type::VOID) {
     // it should be safe to return nullptr, as the semantic ensures that nobody

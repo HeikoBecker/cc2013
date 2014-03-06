@@ -65,7 +65,7 @@ namespace Codegeneration {
                 ALLOC(allocLiteral)
                 llvm::Value* allocChar(char val);
                 llvm::Value* allocInt ( int val);
-                ALLOC(allocNullptr)
+                llvm::Value* allocNullptr(llvm::Type*);
                 llvm::Value* createFCall(llvm::Value* func, 
                                 std::vector<llvm::Value*> params, 
                                 std::vector<llvm::Type*> paramTypes);
@@ -90,7 +90,8 @@ namespace Codegeneration {
                 llvm::BasicBlock* makeBlock(std::string labelName, bool connect = true);
 
                 // adds an unconditional jump from "from" to "to"
-                void connect(llvm::BasicBlock *from, llvm::BasicBlock *to);
+                // and returns from
+                llvm::BasicBlock* connect(llvm::BasicBlock *from, llvm::BasicBlock *to);
                 void connect(llvm::BasicBlock *to);
                 void makeConditonalBranch(
                     llvm::Value* branchCondition,
@@ -146,6 +147,7 @@ namespace Codegeneration {
                         
                 //Method to do type conversion if necessary
                 llvm::Value* convert(llvm::Value*, llvm::Type*);
+                llvm::Value* convert(llvm::Value*, Parsing::SemanticDeclarationNode);
 
                 //type field to quickly modify our "usual arithmetic 
                 //conversions" type

@@ -230,12 +230,13 @@ void Codegeneration::IRCreator::connect(llvm::BasicBlock* to)
   llvm::BranchInst::Create(to, from);
 }
 
-void Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
+llvm::BasicBlock* Codegeneration::IRCreator::connect(llvm::BasicBlock* from, llvm::BasicBlock* to)
 {
   if (!from) {
     from = Builder.GetInsertBlock();
   }
   llvm::BranchInst::Create(to, from);
+  return from;
 }
 
 
@@ -490,9 +491,12 @@ llvm::Value* Codegeneration::IRCreator::allocInt(int val){
   return Builder.getInt32(val);
 }
 
-ALLOCF(allocNullptr) {
-  UNUSED(name);
-  return Builder.getInt32(0); //FIXME
+llvm::Value* Codegeneration::IRCreator::allocNullptr(llvm::Type* type) {
+  if (type->isPointerTy()) {
+    return llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(type));
+  } else {
+    return Builder.getInt32(0);
+  }
 }
 
 llvm::Value* Codegeneration::IRCreator::makeSelect(Parsing::SubExpression cond,
@@ -666,7 +670,14 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       parameter_types.reserve(function_type_->parameter().size());
       // iterate over parameter_types and push corresponding LLVM type into vector
       for (auto p: function_type_->parameter()) {
-        parameter_types.push_back(this->semantic_type2llvm_type(p));
+            auto argument_type = p;
+            if (p->type() == Semantic::Type::FUNCTION) {
+              argument_type = std::make_shared<Parsing::PointerDeclaration>(
+                  0,
+                  argument_type
+              );
+            }
+        parameter_types.push_back(this->semantic_type2llvm_type(argument_type));
       }
       /*************************************/
       llvm::FunctionType* function_type = llvm::FunctionType::get(
@@ -731,3 +742,11 @@ llvm::Value* Codegeneration::IRCreator::convert(llvm::Value* val, llvm::Type* t)
   else
     return val;
 } 
+
+llvm::Value* Codegeneration::IRCreator::convert(
+    llvm::Value* val,
+    Parsing::SemanticDeclarationNode s)
+{
+  auto llvm_type = semantic_type2llvm_type(s);
+  return convert(val, llvm_type);
+}
