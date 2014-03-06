@@ -384,7 +384,7 @@ BINCREATEL(createAccess) {
 /*
  * Assignments can be done directly with the builder. Only thing necessary is
  * casting the value to the type of the variable, if they dont match, as
- * semanti checking already validated it, this should not cause troubles.
+ * semantic checking already validated it, this should not cause troubles.
  */
 llvm::Value* Codegeneration::IRCreator::createAssign(llvm::Value* lhs, 
                 llvm::Value* rhs, llvm::Type* type) {
@@ -711,8 +711,11 @@ int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs,
  * will be casted and the resulting value will be returned.
  */
 llvm::Value* Codegeneration::IRCreator::convert(llvm::Value* val, llvm::Type* t){
-       if(val->getType() != t )
-              return Builder.CreateSExtOrTrunc(val, t);
-      else
-             return val;
+  //handling of void pointers... FIXME:HACK!
+  if(val->getType()->getPointerElementType() == Builder.getVoidTy())
+    return Builder.CreateBitCast(val, t);
+  if(val->getType() != t )
+    return Builder.CreateSExtOrTrunc(val, t);
+  else
+    return val;
 } 
