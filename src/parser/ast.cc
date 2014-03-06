@@ -467,6 +467,8 @@ Literal::Literal(std::string name, Pos pos)
    * this->m_can_be_lvalue = true
    * But I currently don't see any reason to do so
    */
+  // remove trailing "
+  this->name.erase(0,1).pop_back();
 }
 
 Constant::Constant(std::string name, Pos pos, Lexing::ConstantType ct)
@@ -477,6 +479,8 @@ Constant::Constant(std::string name, Pos pos, Lexing::ConstantType ct)
       // 6.4.4.4 $10
       // An integer character constant has type int. 
       this->type = make_shared<IntDeclaration>();
+      // strip leading and trailing '
+      this->name.erase(0,1).pop_back();
       break;
     case Lexing::ConstantType::NULLPOINTER:
       // One can't decide which type a nullpointer has without knowing in which
