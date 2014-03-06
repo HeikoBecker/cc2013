@@ -212,7 +212,10 @@ void Codegeneration::IRCreator::makeConditonalBranch(
     llvm::BasicBlock* consequenceBlock,
     llvm::BasicBlock* alternativeBlock)
 {
-  branchCondition = Builder.CreateSExt(branchCondition, Builder.getInt32Ty());
+  if(! branchCondition->getType()->isPointerTy())
+    branchCondition = Builder.CreateSExt(branchCondition, Builder.getInt32Ty());
+  else
+    branchCondition = Builder.CreatePtrToInt(branchCondition, Builder.getInt32Ty());
   branchCondition = Builder.CreateICmpNE(branchCondition, llvm::Constant::getNullValue(Builder.getInt32Ty()));
   Builder.CreateCondBr(branchCondition, consequenceBlock, alternativeBlock);
 }
