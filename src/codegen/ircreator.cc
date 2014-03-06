@@ -291,7 +291,7 @@ BINCREATE(createPMinus){
  */
 BINCREATE(createPPMinus) {
         llvm::Value* val = Builder.CreatePtrDiff(lhs, rhs);
-        return convert(val, Builder.getInt32Ty();
+        return convert(val, Builder.getInt32Ty());
 }
 
 
