@@ -670,7 +670,14 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       parameter_types.reserve(function_type_->parameter().size());
       // iterate over parameter_types and push corresponding LLVM type into vector
       for (auto p: function_type_->parameter()) {
-        parameter_types.push_back(this->semantic_type2llvm_type(p));
+            auto argument_type = p;
+            if (p->type() == Semantic::Type::FUNCTION) {
+              argument_type = std::make_shared<Parsing::PointerDeclaration>(
+                  0,
+                  argument_type
+              );
+            }
+        parameter_types.push_back(this->semantic_type2llvm_type(argument_type));
       }
       /*************************************/
       llvm::FunctionType* function_type = llvm::FunctionType::get(
