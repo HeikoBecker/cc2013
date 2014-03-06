@@ -146,6 +146,7 @@ namespace Codegeneration {
                         
                 //Method to do type conversion if necessary
                 llvm::Value* convert(llvm::Value*, llvm::Type*);
+                llvm::Value* convert(llvm::Value*, Parsing::SemanticDeclarationNode);
 
                 //type field to quickly modify our "usual arithmetic 
                 //conversions" type

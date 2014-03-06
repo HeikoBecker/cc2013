@@ -731,3 +731,11 @@ llvm::Value* Codegeneration::IRCreator::convert(llvm::Value* val, llvm::Type* t)
   else
     return val;
 } 
+
+llvm::Value* Codegeneration::IRCreator::convert(
+    llvm::Value* val,
+    Parsing::SemanticDeclarationNode s)
+{
+  auto llvm_type = semantic_type2llvm_type(s);
+  return convert(val, llvm_type);
+}

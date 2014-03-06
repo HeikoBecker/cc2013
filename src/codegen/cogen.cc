@@ -648,15 +648,20 @@ EMIT_RV(Parsing::FunctionCall) {
  * Then return the value based on the condition.
  */
 EMIT_RV(Parsing::TernaryExpression) {
+  auto result_type = this->getType();
   auto consequenceBlock = creator->makeBlock("ternary-consequence", false);
   auto alternativeBlock = creator->makeBlock("ternary-alternative", false);
   auto endBlock = creator->makeBlock("ternary-end", false);
   this->condition->emit_condition(creator, consequenceBlock, alternativeBlock);
   creator->setCurrentBasicBlock(consequenceBlock);
   auto val_consequence = this->lhs->emit_rvalue(creator);
+  if (result_type->type() != Semantic::Type::VOID)
+    val_consequence = creator->convert(val_consequence, result_type);
   creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(alternativeBlock);
   auto val_alternative = this->rhs->emit_rvalue(creator);
+  if (result_type->type() != Semantic::Type::VOID)
+    val_alternative = creator->convert(val_alternative, result_type);
   creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(endBlock);
   if (this->getType()->type() == Semantic::Type::VOID) {
