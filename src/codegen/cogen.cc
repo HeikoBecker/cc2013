@@ -563,6 +563,10 @@ EMIT_LV(Parsing::UnaryExpression) {
  */
 EMIT_RV(Parsing::VariableUsage) {
   auto address = this->emit_lvalue(creator);
+  if (this->getType()->type() == Semantic::Type::FUNCTION) {
+    // function gets implicitly converted into function pointer
+    return address;
+  }
   return creator->loadVariable(address);
 }
 
