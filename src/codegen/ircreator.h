@@ -65,7 +65,7 @@ namespace Codegeneration {
                 ALLOC(allocLiteral)
                 llvm::Value* allocChar(char val);
                 llvm::Value* allocInt ( int val);
-                ALLOC(allocNullptr)
+                llvm::Value* allocNullptr(llvm::Type*);
                 llvm::Value* createFCall(llvm::Value* func, 
                                 std::vector<llvm::Value*> params, 
                                 std::vector<llvm::Type*> paramTypes);

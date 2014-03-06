@@ -619,18 +619,25 @@ EMIT_LV(Parsing::Literal){
  */
 EMIT_RV(Parsing::Constant) {
   switch(this->ct){
-          case Lexing::ConstantType::CHAR:{
-                  char val = static_cast<char>(this->name.at(0));
-                  return creator->allocChar(val);
-                                          }
-          case Lexing::ConstantType::INT:{
-                  int val = std::stoi(this->name);
-                  return creator->allocInt(val);
-                                         }
-          case Lexing::ConstantType::NULLPOINTER:
-                  return creator->allocNullptr(this->name);
-          default:
-                  throw ParsingException("Other constants are handled in different classes!", pos());
+    case Lexing::ConstantType::CHAR:
+      {
+        char val = static_cast<char>(this->name.at(0));
+        return creator->allocChar(val);
+      }
+    case Lexing::ConstantType::INT:
+      {
+        int val = std::stoi(this->name);
+        return creator->allocInt(val);
+      }
+    case Lexing::ConstantType::NULLPOINTER:
+      {
+        //FIXME : we might need to set the type of the constant in the constructor of
+        //the enclosing expression
+        auto type = creator->semantic_type2llvm_type(this->getType());
+        return creator->allocNullptr(type);
+      }
+    default:
+      throw ParsingException("Other constants are handled in different classes!", pos());
   }
 }
 

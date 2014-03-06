@@ -490,9 +490,14 @@ llvm::Value* Codegeneration::IRCreator::allocInt(int val){
   return Builder.getInt32(val);
 }
 
-ALLOCF(allocNullptr) {
-  UNUSED(name);
-  return Builder.getInt32(0); //FIXME
+llvm::Value* Codegeneration::IRCreator::allocNullptr(llvm::Type* type) {
+  //FIXME : we might need to set the type of the constant in the constructor of
+  //the enclosing expression 
+  if (type->isPointerTy()) {
+    return llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(type));
+  } else {
+    return Builder.getInt32(0);
+  }
 }
 
 llvm::Value* Codegeneration::IRCreator::makeSelect(Parsing::SubExpression cond,
