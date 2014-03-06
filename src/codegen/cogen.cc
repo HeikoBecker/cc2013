@@ -439,9 +439,17 @@ EMIT_RV(Parsing::BinaryExpression) {
           rhs = this->rhs->emit_rvalue(creator);
           return creator->createLogOr(lhs, rhs);
         case PunctuatorType::ARRAY_ACCESS:
-          lhs = this->lhs->emit_lvalue(creator);
-          rhs = this->rhs->emit_rvalue(creator);
-          return creator->createArrayAccess(lhs, rhs);
+          if (Semantic::hasIntegerType(this->rhs)) {
+            lhs = this->lhs->emit_lvalue(creator);
+            rhs = this->rhs->emit_rvalue(creator);
+            return creator->createArrayAccess(lhs, rhs);
+          } else {
+            // swapped array access:
+            // 4[intpr];
+            lhs = this->rhs->emit_lvalue(creator);
+            rhs = this->lhs->emit_rvalue(creator);
+            return creator->createArrayAccess(lhs, rhs);
+          }
         case PunctuatorType::MEMBER_ACCESS:
 	case PunctuatorType::ARROW:
           {
