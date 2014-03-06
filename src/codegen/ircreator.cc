@@ -479,7 +479,7 @@ llvm::Value* Codegeneration::IRCreator::loadVariable(
  * Allocation functions. They produce the llvm value, given the internal value
  */
 ALLOCF(allocLiteral) {
-        return Builder.CreateGlobalStringPtr(llvm::StringRef(name));
+  return Builder.CreateGlobalStringPtr(llvm::StringRef(name));
 }
 
 llvm::Value* Codegeneration::IRCreator::allocChar (char val) {
