@@ -49,7 +49,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   });
   llvm::ValueSymbolTable VT = F.getValueSymbolTable();
   for (auto nameValuePair: VT) {
-    ValueMapping[nameValuePair.second] = ConstantLattice{};
+    ValueMapping[nameValuePair.second] = unknown;
   }
   return false;
 }
