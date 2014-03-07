@@ -145,18 +145,12 @@ PRETTY_PRINT(Literal)
 {
   // the trailing " were stripped from the name
   // therefore we must print them here
-  PPRINT('"');
   PPRINT(this->name);
-  PPRINT('"');
 }
 
 PRETTY_PRINT(Constant)
 {
-  auto txt = this->name;
-  if (this->ct == Lexing::ConstantType::CHAR) {
-    txt = "'" + txt + "'";
-  }
-  PPRINT(txt);
+  PPRINT(this->name);
 }
 
 PRETTY_PRINT(FunctionCall)

@@ -449,6 +449,37 @@ SemanticDeclarationNode VariableUsage::getType(SubSemanticNode s) {
 
 }
 
+namespace {
+  char unescape(const char c) {
+    switch(c) {
+      case '\'':
+        return  '\'';
+      case '\"':
+        return '\"';
+      case '\?':
+        return '\?';
+      case '\\':
+        return '\\';
+      case 'a':
+        return '\a';
+      case 'b':
+        return '\b';
+      case 'f':
+        return '\f';
+      case 'n':
+        return '\n';
+      case 'r':
+        return '\r';
+      case 't':
+        return '\t';
+      case 'v':
+        return '\v';
+      default:
+        return c;
+    }
+}
+}
+
 Literal::Literal(std::string name, Pos pos)
   : Expression(pos), name(name)
 {
@@ -459,24 +490,48 @@ Literal::Literal(std::string name, Pos pos)
    * But I currently don't see any reason to do so
    */
   // remove trailing "
-  this->name.erase(0,1).pop_back();
+  unescaped.reserve(name.size());
+  auto it = name.cbegin();
+  it++; // to remove the first "
+  while (it != name.cend()) {
+    if (*it != '\\') {
+      unescaped += *it;
+    } else {
+      unescaped += unescape(*++it);
+    }
+    ++it;
+  }
+  unescaped.pop_back(); // to remove the trailing "
   this->type = make_shared<ArrayDeclaration>(
       make_shared<CharDeclaration>(),  // type
-      name.size() + 1 // one more than the size to store '\0'
+      unescaped.size() + 1 // one more than the size to store '\0'
       );
 }
 
 Constant::Constant(std::string name, Pos pos, Lexing::ConstantType ct)
-  : Expression(pos), ct(ct), name(name) 
+  : Expression(pos), ct(ct), name(name)
 {
   switch (ct) {
     case Lexing::ConstantType::CHAR:
+      {
       // 6.4.4.4 $10
       // An integer character constant has type int. 
       this->type = make_shared<IntDeclaration>();
       // strip leading and trailing '
-      this->name.erase(0,1).pop_back();
+      unescaped.reserve(1);
+      auto it = name.cbegin();
+      it++; // to remove the first '
+      while (it != name.cend()) {
+        if (*it != '\\') {
+          unescaped += *it;
+        } else {
+          unescaped += unescape(*++it);
+        }
+        ++it;
+      }
+      unescaped.pop_back(); // to remove the trailing '
       break;
+      }
     case Lexing::ConstantType::NULLPOINTER:
       // One can't decide which type a nullpointer has without knowing in which
       // context it is used

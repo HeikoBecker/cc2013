@@ -602,7 +602,7 @@ EMIT_LV(Parsing::VariableUsage) {
  * Produces the rvalue of a literal by returning its variable.
  */
 EMIT_RV(Parsing::Literal) {
-  return creator->allocLiteral(this->name);
+  return creator->allocLiteral(this->unescaped);
 }
 
 /*
@@ -610,7 +610,7 @@ EMIT_RV(Parsing::Literal) {
  * saved in
  */
 EMIT_LV(Parsing::Literal){
-  return creator->allocLiteral(this->name);
+  return creator->allocLiteral(this->unescaped);
 }
 
 /*
@@ -622,7 +622,7 @@ EMIT_RV(Parsing::Constant) {
   switch(this->ct){
     case Lexing::ConstantType::CHAR:
       {
-        char val = static_cast<char>(this->name.at(0));
+        char val = static_cast<char>(this->unescaped.at(0));
         return creator->allocChar(val);
       }
     case Lexing::ConstantType::INT:

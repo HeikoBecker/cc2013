@@ -94,6 +94,7 @@ class EXPRESSION(Literal)
     PPRINTABLE
     EMIT_LVALUE
     EMIT_RVALUE
+    std::string unescaped;
 
   private:
     std::string name;
@@ -109,6 +110,7 @@ class EXPRESSION(Constant)
   private:
     Lexing::ConstantType ct;
     std::string name;
+    std::string unescaped;
 };
 
 class EXPRESSION(FunctionCall)
