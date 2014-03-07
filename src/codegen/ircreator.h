@@ -153,6 +153,9 @@ namespace Codegeneration {
                 //conversions" type
                 llvm::Type* USUALTYPE;
 	private:
+                bool isVoidPP(llvm::Type* type);
+                bool isVoidP(llvm::Type* type);
+
 		llvm::Module M;
 		llvm::IRBuilder<> Builder, AllocaBuilder;
                 llvm::Function* currentFunction;

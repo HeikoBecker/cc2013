@@ -311,11 +311,21 @@ BINCREATE(createMinus) {
  * which are signed in our C subset
  */
 BINCREATE(createLess) {
-        if(! lhs->getType()->isPointerTy())
-	  lhs = PREPARE(lhs);
-        if(! rhs->getType()->isPointerTy())
-          rhs = PREPARE(rhs);
-        return Builder.CreateICmpSLT(lhs,rhs);
+ if(this->isVoidP(lhs->getType())){
+    if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
+      lhs = Builder.CreateBitCast(lhs, rhs->getType());
+    }
+  }else{ //left is no void pointer 
+    if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
+      rhs = Builder.CreateBitCast(rhs, lhs->getType());
+    else { //neither is void pointer
+      if(! lhs->getType()->isPointerTy())
+        lhs = PREPARE(lhs);
+      if(! rhs->getType()->isPointerTy())
+        rhs = PREPARE(rhs);
+    }
+   }
+  return Builder.CreateICmpSLT(lhs,rhs);
 }
 
 BINCREATE(createMult) {
@@ -325,19 +335,39 @@ BINCREATE(createMult) {
 }
 
 BINCREATE(createUnequal){
-        if(! lhs->getType()->isPointerTy())
-	  lhs = PREPARE(lhs);
-        if(! rhs->getType()->isPointerTy())
-          rhs = PREPARE(rhs);
-	return Builder.CreateICmpNE(lhs,rhs);
+  if(this->isVoidP(lhs->getType())){
+    if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
+      lhs = Builder.CreateBitCast(lhs, rhs->getType());
+    }
+  }else{ //left is no void pointer 
+    if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
+      rhs = Builder.CreateBitCast(rhs, lhs->getType());
+    else { //neither is void pointer
+      if(! lhs->getType()->isPointerTy())
+        lhs = PREPARE(lhs);
+      if(! rhs->getType()->isPointerTy())
+        rhs = PREPARE(rhs);
+    }
+   }
+  return Builder.CreateICmpNE(lhs,rhs);
 }
 
 BINCREATE(createEqual){
-        if(! lhs->getType()->isPointerTy())
-	  lhs = PREPARE(lhs);
-        if(! rhs->getType()->isPointerTy())
-          rhs = PREPARE(rhs);
-	return Builder.CreateICmpEQ(lhs,rhs);
+  if(this->isVoidP(lhs->getType())){
+    if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
+      lhs = Builder.CreateBitCast(lhs, rhs->getType());
+    }
+  }else{ //left is no void pointer 
+    if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
+      rhs = Builder.CreateBitCast(rhs, lhs->getType());
+    else { //neither is void pointer
+      if(! lhs->getType()->isPointerTy())
+        lhs = PREPARE(lhs);
+      if(! rhs->getType()->isPointerTy())
+        rhs = PREPARE(rhs);
+    }
+   }
+  return Builder.CreateICmpEQ(lhs,rhs);
 }
 
 BINCREATE(createLogAnd){
@@ -398,9 +428,16 @@ BINCREATEL(createAccess) {
  */
 llvm::Value* Codegeneration::IRCreator::createAssign(llvm::Value* lhs, 
                 llvm::Value* rhs, llvm::Type* type) {
+  if(this->isVoidP(rhs->getType())){
+    rhs = Builder.CreateBitCast(rhs, type);
+  }else if(this->isVoidPP(lhs->getType())){
+    lhs = Builder.CreateBitCast(lhs, llvm::PointerType::getUnqual(rhs->getType()));    
+  }else{ //No void pointers involved
   rhs = this->convert(rhs, type);
+  }
   store(rhs,lhs);
   return Builder.CreateLoad(lhs);
+
 }
 
 /*
@@ -732,10 +769,6 @@ int Codegeneration::IRCreator::computeIndex (Parsing::SubExpression lhs,
  * will be casted and the resulting value will be returned.
  */
 llvm::Value* Codegeneration::IRCreator::convert(llvm::Value* val, llvm::Type* t){
-  //handling of void pointers... FIXME:HACK!
-  if(val->getType()->isPointerTy())
-    if(val->getType()->getPointerElementType() == Builder.getVoidTy())
-      return Builder.CreateBitCast(val, t);
   if(val->getType() != t )
     return Builder.CreateSExtOrTrunc(val, t);
   else
@@ -748,4 +781,17 @@ llvm::Value* Codegeneration::IRCreator::convert(
 {
   auto llvm_type = semantic_type2llvm_type(s);
   return convert(val, llvm_type);
+}
+
+bool Codegeneration::IRCreator::isVoidPP (llvm::Type *type){
+  if(type->isPointerTy())
+        return this->isVoidP(type->getPointerElementType());
+  else
+    return false;
+}
+
+bool Codegeneration::IRCreator::isVoidP (llvm::Type *type){
+    if(type->isPointerTy())
+            return type->getPointerElementType()->isVoidTy();
+    return false;
 }
