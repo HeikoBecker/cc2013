@@ -1,5 +1,6 @@
 #include "cogen.h"
 #include "ircreator.h"
+#include "sccp_pass.h"
 #include "../parser/ast.h"
 #include "../parser/astNode.h"
 #include "../parser/statementNode.h"
@@ -23,12 +24,15 @@
     llvm::BasicBlock* falseSuccessor\
     )
 
-void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root) {
+void Codegeneration::genLLVMIR(const char* filename, Parsing::AstRoot root, bool optimize) {
 
   std::string errorStr;
   llvm::raw_fd_ostream stream(filename, errorStr);
   Codegeneration::IRCreator Creator (filename);
   root->emitIR(&Creator);
+  if (optimize) {
+    Creator.optimize();
+  }
   Creator.print(stream); /* M is a llvm::Module */
 }
 
