@@ -353,7 +353,7 @@ BINCREATE(createLogOr){
 }
 
 BINCREATE(createArrayAccess){
-        llvm:Value* val= Builder.CreateGEP(lhs, rhs);
+        llvm::Value* val= Builder.CreateGEP(lhs, rhs);
         return Builder.CreateLoad(val);
 }
 
