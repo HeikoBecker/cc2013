@@ -57,7 +57,7 @@ int main(int argc, char** const argv)
         ++i;
         break;
       } else {
-        errorf("unknown arguments '%s', use --tokenize|parse|print-ast|compile", arg);
+        errorf("unknown arguments '%s', use --tokenize|parse|print-ast|compile|optimize", arg);
       }
     }
 
