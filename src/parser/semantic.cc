@@ -662,6 +662,10 @@ SemanticDeclarationNode promoteType(SemanticDeclarationNode s) {
   // many rules which are not relevant, because we have no unsigned and only int
   // + char
   if (compareTypes(s1, s2)) {
+    if (s1->type() == Semantic::Type::CHAR) {
+      auto int_type = make_shared<IntDeclaration>();
+      return make_pair(int_type, int_type);
+    }
     return make_pair<>(s1,s2);
   }
   // else
