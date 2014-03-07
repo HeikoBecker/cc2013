@@ -47,10 +47,10 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
     [&](llvm::Function::iterator function_basic_block) {
       BlockMapping[function_basic_block] = unreachable;
   });
-  llvm::ValueSymbolTable VT = F.getValueSymbolTable();
-  for (auto nameValuePair: VT) {
-    ValueMapping[nameValuePair.second] = unknown;
-  }
+  //llvm::ValueSymbolTable VT = F.getValueSymbolTable();
+  //for (auto nameValuePair: VT) {
+    //ValueMapping[nameValuePair.getValue()] = unknown;
+  //}
   return false;
 }
 
