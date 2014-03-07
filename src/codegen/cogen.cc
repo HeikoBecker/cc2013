@@ -107,8 +107,8 @@ EMIT_IR(Parsing::ExternalDeclaration)
       // TODO: convoluted logic
       // this is a struct definition, which doesn't declare a variable of this
       // type
-      llvm::Type* struct_type = creator->semantic_type2llvm_type(type);
-              
+      // FIXME: this is not ready yet, the type declaration is not added!
+      creator->semantic_type2llvm_type(type);
     }
     return;
   }
