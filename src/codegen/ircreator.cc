@@ -1,4 +1,5 @@
 #include "ircreator.h"
+#include "sccp_pass.h"
 
 #include "llvm/IR/Module.h"                /* Module */
 #include "llvm/IR/Function.h"              /* Function */
@@ -9,6 +10,8 @@
 #include "llvm/Analysis/Verifier.h"        /* verifyFunction, verifyModule */
 #include "llvm/Support/raw_ostream.h"
 #include <llvm/Support/Host.h>
+
+#include "llvm/PassManager.h"
 
 #include "../parser/semadecl.h"
 #include "../parser/ast.h"
@@ -38,6 +41,13 @@ Codegeneration::IRCreator::IRCreator(const char* filename):
 Codegeneration::IRCreator::~IRCreator()
 {
   verifyModule(M);
+}
+
+void Codegeneration::IRCreator::optimize()
+{
+    llvm::PassManager PM;
+    PM.add(new SCCP_Pass());
+    PM.run(M);
 }
 
 void Codegeneration::IRCreator::print(llvm::raw_fd_ostream & out)

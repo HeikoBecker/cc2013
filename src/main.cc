@@ -21,6 +21,7 @@ enum class Mode {
   PARSE,
   PRINT_AST,
   COMPILE,
+  OPTIMIZE,
 };
 
 int main(int argc, char** const argv)
@@ -48,6 +49,8 @@ int main(int argc, char** const argv)
         mode = Mode::PRINT_AST;
       } else if (strEq(arg, "--compile")) {
         mode = Mode::COMPILE;
+      } else if (strEq(arg, "--optimize")) {
+        mode = Mode::OPTIMIZE;
       } else if (strEq(arg, "-")) {
         break;
       } else if (strEq(arg, "--")) {
@@ -102,6 +105,7 @@ int main(int argc, char** const argv)
             pprint(ast, 0);
             break;
           }
+          case Mode::OPTIMIZE:
           case Mode::COMPILE:
             std::string namecpy(name);
             auto last_slash = namecpy.rfind('/');
@@ -111,7 +115,7 @@ int main(int argc, char** const argv)
             basename += "ll"; // append ll instead
             auto parser = Parsing::Parser{f, name};
             auto ast = parser.parse();
-            Codegeneration::genLLVMIR(basename.c_str(), ast);
+            Codegeneration::genLLVMIR(basename.c_str(), ast, (mode == Mode::OPTIMIZE));
             break;
         }
 

@@ -149,6 +149,8 @@ namespace Codegeneration {
                 llvm::Value* convert(llvm::Value*, llvm::Type*);
                 llvm::Value* convert(llvm::Value*, Parsing::SemanticDeclarationNode);
 
+                void optimize();
+
                 //type field to quickly modify our "usual arithmetic 
                 //conversions" type
                 llvm::Type* USUALTYPE;
