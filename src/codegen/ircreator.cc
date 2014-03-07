@@ -12,6 +12,7 @@
 #include <llvm/Support/Host.h>
 
 #include "llvm/PassManager.h"
+#include "llvm/Transforms/Scalar.h"
 
 #include "../parser/semadecl.h"
 #include "../parser/ast.h"
@@ -46,6 +47,7 @@ Codegeneration::IRCreator::~IRCreator()
 void Codegeneration::IRCreator::optimize()
 {
     llvm::PassManager PM;
+    PM.add(llvm::createPromoteMemoryToRegisterPass());
     PM.add(new SCCP_Pass());
     PM.run(M);
 }
