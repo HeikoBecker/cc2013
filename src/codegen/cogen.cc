@@ -540,10 +540,7 @@ EMIT_RV(Parsing::UnaryExpression) {
       }
       return this->operand->emit_lvalue(creator);
     case PunctuatorType::SIZEOF:
-      if (std::dynamic_pointer_cast<Parsing::SizeOfExpression>(operand)) {
-        return operand->emit_rvalue(creator);
-      }
-      if (auto as_array = std::dynamic_pointer_cast<Parsing::ArrayDeclaration>(this->operand)) {
+      if (auto as_array = std::dynamic_pointer_cast<Parsing::ArrayDeclaration>(this->operand->getType())) {
         return creator->allocInt(as_array->size);
       }
       return creator->createSizeof(creator->semantic_type2llvm_type(operand->getType()));

@@ -452,15 +452,6 @@ SemanticDeclarationNode VariableUsage::getType(SubSemanticNode s) {
 Literal::Literal(std::string name, Pos pos)
   : Expression(pos), name(name)
 {
-  /*WARNING: technically, the type is wrong
-   * A stringliteral has actually the type char[]
-   * however, we don't support arrays 
-   * and when used it should decay to char* anyway
-   */
-  this->type = make_shared<ArrayDeclaration>(
-      make_shared<CharDeclaration>(),  // type
-      name.size() + 1 // one more than the size to store '\0'
-      );
   /* TODO: For reasons descibed in 
    * http://stackoverflow.com/questions/10004511/why-are-string-literals-l-value-while-all-other-literals-are-r-value
    * string literals are lvalues (see 6.5.1 $4). So in theory we need to set
@@ -469,6 +460,10 @@ Literal::Literal(std::string name, Pos pos)
    */
   // remove trailing "
   this->name.erase(0,1).pop_back();
+  this->type = make_shared<ArrayDeclaration>(
+      make_shared<CharDeclaration>(),  // type
+      name.size() + 1 // one more than the size to store '\0'
+      );
 }
 
 Constant::Constant(std::string name, Pos pos, Lexing::ConstantType ct)
