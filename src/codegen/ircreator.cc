@@ -319,10 +319,18 @@ BINCREATE(createLess) {
     if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
       rhs = Builder.CreateBitCast(rhs, lhs->getType());
     else { //neither is void pointer
-      if(! lhs->getType()->isPointerTy())
-        lhs = PREPARE(lhs);
-      if(! rhs->getType()->isPointerTy())
-        rhs = PREPARE(rhs);
+
+      if(! lhs->getType()->isPointerTy()){ //the left one is no pointer
+        if (rhs->getType()->isPointerTy()){ // the right one is a pointer
+          lhs = this->convert(lhs, rhs->getType()); //--> lhs is a nullptr
+        }else{ //none is a pointer --> usual arithmetic conversions
+          lhs = PREPARE(lhs);
+          rhs = PREPARE(rhs);
+        }
+      }else{ //left is a pointer
+        if(! rhs->getType()->isPointerTy()) //right is no pointer
+          rhs = this->convert(rhs, lhs->getType()); //rhs is a nullptr
+      }
     }
    }
   return Builder.CreateICmpSLT(lhs,rhs);
@@ -335,7 +343,7 @@ BINCREATE(createMult) {
 }
 
 BINCREATE(createUnequal){
-  if(this->isVoidP(lhs->getType())){
+ if(this->isVoidP(lhs->getType())){
     if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
       lhs = Builder.CreateBitCast(lhs, rhs->getType());
     }
@@ -343,17 +351,25 @@ BINCREATE(createUnequal){
     if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
       rhs = Builder.CreateBitCast(rhs, lhs->getType());
     else { //neither is void pointer
-      if(! lhs->getType()->isPointerTy())
-        lhs = PREPARE(lhs);
-      if(! rhs->getType()->isPointerTy())
-        rhs = PREPARE(rhs);
+
+      if(! lhs->getType()->isPointerTy()){ //the left one is no pointer
+        if (rhs->getType()->isPointerTy()){ // the right one is a pointer
+          lhs = this->convert(lhs, rhs->getType()); //--> lhs is a nullptr
+        }else{ //none is a pointer --> usual arithmetic conversions
+          lhs = PREPARE(lhs);
+          rhs = PREPARE(rhs);
+        }
+      }else{ //left is a pointer
+        if(! rhs->getType()->isPointerTy()) //right is no pointer
+          rhs = this->convert(rhs, lhs->getType()); //rhs is a nullptr
+      }
     }
    }
   return Builder.CreateICmpNE(lhs,rhs);
 }
 
 BINCREATE(createEqual){
-  if(this->isVoidP(lhs->getType())){
+ if(this->isVoidP(lhs->getType())){
     if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
       lhs = Builder.CreateBitCast(lhs, rhs->getType());
     }
@@ -361,10 +377,18 @@ BINCREATE(createEqual){
     if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
       rhs = Builder.CreateBitCast(rhs, lhs->getType());
     else { //neither is void pointer
-      if(! lhs->getType()->isPointerTy())
-        lhs = PREPARE(lhs);
-      if(! rhs->getType()->isPointerTy())
-        rhs = PREPARE(rhs);
+
+      if(! lhs->getType()->isPointerTy()){ //the left one is no pointer
+        if (rhs->getType()->isPointerTy()){ // the right one is a pointer
+          lhs = this->convert(lhs, rhs->getType()); //--> lhs is a nullptr
+        }else{ //none is a pointer --> usual arithmetic conversions
+          lhs = PREPARE(lhs);
+          rhs = PREPARE(rhs);
+        }
+      }else{ //left is a pointer
+        if(! rhs->getType()->isPointerTy()) //right is no pointer
+          rhs = this->convert(rhs, lhs->getType()); //rhs is a nullptr
+      }
     }
    }
   return Builder.CreateICmpEQ(lhs,rhs);
