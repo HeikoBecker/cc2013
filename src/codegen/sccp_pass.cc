@@ -5,6 +5,8 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/ValueSymbolTable.h"
 #include "llvm/Support/raw_ostream.h"
+// contains ReplaceInstWithValue and ReplaceInstWithInst
+#include "llvm/Transforms/Utils/BasicBlockUtils.h"
 #include <queue>
 #include <map>
 #include <algorithm>
@@ -20,13 +22,14 @@ namespace {
   struct ConstantLattice
   {
     int value;
-    LatticeState state = bottom;
+    LatticeState state;
   };
   struct Reachability {
     LatticeState state;
   };
   constexpr Reachability unreachable { top };
   constexpr Reachability reachable { bottom };
+  constexpr ConstantLattice unknown { 0, bottom };
 }
 
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
@@ -44,6 +47,10 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
     [&](llvm::Function::iterator function_basic_block) {
       BlockMapping[function_basic_block] = unreachable;
   });
+  llvm::ValueSymbolTable VT = F.getValueSymbolTable();
+  for (auto nameValuePair: VT) {
+    ValueMapping[nameValuePair.second] = ConstantLattice{};
+  }
   return false;
 }
 
