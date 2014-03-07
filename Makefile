@@ -26,7 +26,7 @@ OBJ    := $(SRC:$(SRCDIR)/%.cc=$(BINDIR)/%.o)
 DEP    := $(OBJ:%.o=%.d)
 
 LLVM_CFLAGS  := $(shell $(LLVM_CONFIG) --cppflags)
-LLVM_LDFLAGS := $(shell $(LLVM_CONFIG) --ldflags --libs core)
+LLVM_LDFLAGS := $(shell $(LLVM_CONFIG) --libs core transformutils) $(shell $(LLVM_CONFIG) --ldflags)
 
 CFLAGS   += $(LLVM_CFLAGS) -Wall -W -Werror -O2
 
