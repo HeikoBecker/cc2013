@@ -440,7 +440,7 @@ EMIT_RV(Parsing::BinaryExpression) {
           return creator->createLogOr(lhs, rhs);
         case PunctuatorType::ARRAY_ACCESS:
           if (Semantic::hasIntegerType(this->rhs)) {
-            lhs = this->lhs->emit_lvalue(creator);
+            lhs = this->lhs->emit_rvalue(creator);
             rhs = this->rhs->emit_rvalue(creator);
             return creator->createArrayAccess(lhs, rhs);
           } else {
