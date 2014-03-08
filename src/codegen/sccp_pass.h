@@ -61,6 +61,8 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   //ReturnInst
   void visitReturnInst(llvm::ReturnInst& ret);
   
+  void enqueueCFGSuccessors(llvm::Instruction& inst);
+
 private:
   std::queue<llvm::BasicBlock*> workQueue;
   llvm::BasicBlock* currBlock; //to save the current block for equality checking

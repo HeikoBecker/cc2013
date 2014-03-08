@@ -8,6 +8,9 @@
 #include "llvm/Support/raw_ostream.h"
 // contains ReplaceInstWithValue and ReplaceInstWithInst
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
+//to get the macros for easy predecessor and successor iteration
+#include "llvm/Support/CFG.h"
+
 #include <queue>
 #include <map>
 #include <algorithm>
@@ -127,7 +130,8 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
     //check for value modification
     if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){ 
       this->constantTable.insert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
-      //FIXME: we modified an element--> push all dependent ones
+      this->enqueueCFGSuccessors(binOp); //add succesors to queue as we need to 
+                                         //update them
     }
       return;
     }
@@ -158,10 +162,11 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
     break; 
   }
   //check if the value was computed before
-  if(newInfo.value != oldInfo.value)
+  if(newInfo.value != oldInfo.value){
     this->constantTable.insert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
-    //FIXME: Modified value-> add cfg successors  
-
+    //enqueue the successors for updating them
+    this->enqueueCFGSuccessors(binOp);
+  }
   return;
 }
 
@@ -192,4 +197,14 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
 TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
   UNUSED(ret);
   return;
+}
+
+void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
+  llvm::BasicBlock* parent = inst.getParent();
+  for(auto block=succ_begin(parent); block != succ_end(parent); ++block){
+    //once again end should not be possible FIXME: Add internal error diag
+    Reachability reach = (*this->blockTable.find(*block)).second;
+    if(reach.state == LatticeState::top) //Top means Reachable
+      workQueue.push(*block);
+  }
 }
