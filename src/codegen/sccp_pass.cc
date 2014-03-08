@@ -13,6 +13,7 @@
 #include <algorithm>
 
 #define TRANSITION(X, Y) void Transition::X(Y)
+#define BINOP llvm::Instruction::BinaryOps
 
 using namespace llvm;
 
@@ -70,17 +71,104 @@ Transition::Transition( llvm::BasicBlock *entryBlock,
  */
 llvm::BasicBlock* Transition::getNextBlock() {
   //save the first block to return it
-  llvm::BasicBlock *res = workQueue.front();
+  currBlock = workQueue.front();
   workQueue.pop(); //remove it from the queue
-  currBlock = res;
-  return res;
+  return currBlock;
 }
 
+/*
+ * TODO: Manipulate the lattice based on the operands
+ */
 TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
-  UNUSED(binOp);
+  //take the first two operands more should not be present
+  llvm::Value *lhs= binOp.getOperand(0);
+  llvm::Value *rhs= binOp.getOperand(1);
+
+  //and the parent BasicBlock
+  llvm::BasicBlock* parent = binOp.getParent();
+
+  UNUSED(parent);
+
+  //the old info computed before
+  //FIXME: is this valid?
+  ConstantLattice oldInfo = (* this->constantTable.find(&binOp)).second;
+  ConstantLattice newInfo;
+
+
+  //take the corresponding lattice values
+  //we do not need to check wether find returns table.end() as this would mean 
+  //there was some failure previously so wen want to crash here 
+  //FIXME: Maybe add error message
+  ConstantLattice lhsInfo = (*this->constantTable.find(lhs)).second;
+  ConstantLattice rhsInfo = (*this->constantTable.find(rhs)).second;
+
+  //check wether one value already is top so we cannot compute something
+  if(lhsInfo.state == LatticeState::top || rhsInfo.state == LatticeState::top){
+    //check if we have an And or an Or Instruction which we could evaluate 
+    //short circuit:
+    if(binOp.getOpcode() == BINOP::Or){
+      //check if one of the values is != 0 so the whole exp is true
+      if((lhsInfo.state != LatticeState::top && lhsInfo.value != 0) ||
+         (rhsInfo.state != LatticeState::top && rhsInfo.value != 0)){
+        newInfo.state = LatticeState::value;
+        newInfo.value = 1;
+    }else if(binOp.getOpcode() == BINOP::And) {
+      //check if one value is 0 the case that both are != 0 can't occur here
+      //as we know that at least one is top
+      if((lhsInfo.state != LatticeState::top && lhsInfo.value == 0) ||
+         (rhsInfo.state != LatticeState::top && rhsInfo.value == 0)){
+        newInfo.state = LatticeState::value;
+        newInfo.value = 0;
+      }
+    }else{
+      // we really can set the value to top
+      newInfo.state = LatticeState::top; 
+    }
+    //check for value modification
+    if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){ 
+      this->constantTable.insert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
+      //FIXME: we modified an element--> push all dependent ones
+    }
+      return;
+    }
+  }
+  
+  //none of our operands is a top element --> we know that both have a fixed 
+  //value. If one would be bottom, there would be a path from start to this
+  //instruction where the operand is not defined --> SSA violated
+  newInfo.state = LatticeState::value;
+
+  switch(binOp.getOpcode()){
+  case BINOP::Add:
+    newInfo.value = lhsInfo.value + rhsInfo.value;
+    break;
+  case BINOP::Sub:
+    newInfo.value = lhsInfo.value - rhsInfo.value;
+    break;
+  case BINOP::Mul:
+    newInfo.value = lhsInfo.value * rhsInfo.value;
+    break;
+  case BINOP::Or:
+    newInfo.value = lhsInfo.value || rhsInfo.value;
+    break;
+  case BINOP::And:
+    newInfo.value = lhsInfo.value && rhsInfo.value;
+    break;
+  default:
+    break; 
+  }
+  //check if the value was computed before
+  if(newInfo.value != oldInfo.value)
+    this->constantTable.insert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
+    //FIXME: Modified value-> add cfg successors  
+
   return;
 }
 
+/*
+ * TODO: Make this one an on-the-fly optimize function as it does not affect the
+ * lattice but casts to already achieved type can be removed
+ */
 TRANSITION(visitCastInst, llvm::CastInst &cast) {
   UNUSED(cast);
   return;
