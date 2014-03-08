@@ -1089,12 +1089,66 @@ DeclaratorDirectDeclarator::DeclaratorDirectDeclarator(SubDeclarator d,
   : DirectDeclarator(pos), declarator(d) {}
 
 
+
+
+bool DeclaratorDirectDeclarator::canBeFunctionDefinition() {
+        if (!declarator) {
+          return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
+        } else {
+          return help.size() <= 1 && declarator->canBeFunctionDefinition() && (help.size()==0 ? true : help[0]->containsOnlyOneVoidIfSpecified());
+        }
+      }
+
+      std::vector<ParameterNode> DeclaratorDirectDeclarator::getParameter() { 
+        if (help.size() == 0) {
+          return std::vector<ParameterNode>(); 
+        } else if (help.size() == 1) {
+          return help[0]->getParameter();
+        } else {
+     throw ParsingException("there can be only one paramete list", pos());
+        }
+      }
+
+      std::vector<ParameterNode> DeclaratorDirectDeclarator::getNextParameter() { 
+        if (help.size() == 0) {
+          // this should never happen
+          return declarator->getNextParameter();
+        } else if (help.size() == 1) {
+          return help[0]->getParameter();
+        } else {
+     throw ParsingException("there can be only one paramete list", pos());
+        }
+      }
+
+
 IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,
     std::vector<SubDirectDeclaratorHelp> h,
     Pos pos) : DirectDeclarator(pos), identifier(str), help(h) {}
 
 IdentifierDirectDeclarator::IdentifierDirectDeclarator(std::string str,
     Pos pos) : DirectDeclarator(pos), identifier(str) {}
+
+
+std::vector<ParameterNode> IdentifierDirectDeclarator::getParameter() { 
+  if (help.size() == 0) {
+    return std::vector<ParameterNode>(); 
+  } else if (help.size() == 1) {
+    return help[0]->getParameter();
+  } else {
+     throw ParsingException("there can be only one paramete list", pos());
+  }
+}
+
+std::vector<ParameterNode> IdentifierDirectDeclarator::getNextParameter() { 
+  if (help.size() == 0) {
+    // this should never happen
+    return std::vector<ParameterNode>(); 
+  } else if(help.size() == 1) {
+    return help[0]->getParameter();
+  } else {
+     throw ParsingException("there can be only one paramete list", pos());
+  }
+}
 
 IdentifierList::IdentifierList(std::vector<std::string > list, Pos pos)
   : AstNode(pos), nameList(list) {}
