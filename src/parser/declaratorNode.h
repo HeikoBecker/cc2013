@@ -204,24 +204,10 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return std::make_pair(0, help.size() != 0);
       }
 
+      virtual std::vector<ParameterNode> getNextParameter();
 
-      virtual std::vector<ParameterNode> getNextParameter() { 
-        if (help.size() == 0) {
-          // this should never happen
-          return std::vector<ParameterNode>(); 
-        } else {
-          return help[0]->getParameter();
-        }
-      }
-
-      virtual std::vector<ParameterNode> getParameter() { 
-        if (help.size() == 0) {
-          return std::vector<ParameterNode>(); 
-        } else {
-          return help[0]->getParameter();
-        }
-      }
-
+      virtual std::vector<ParameterNode> getParameter();
+        
       bool hasName() {
         return true;
       }
@@ -282,29 +268,11 @@ typedef std::shared_ptr<Parameter> ParameterNode;
         return std::make_pair(0, true);
       }
 
-      virtual bool canBeFunctionDefinition() {
-        if (!declarator) {
-          return help.size() == 1 && help[0]->canBeFunction() && help[0]->containsOnlyOneVoidIfSpecified();
-        } else {
-          return help.size() <= 1 && declarator->canBeFunctionDefinition() && (help.size()==0 ? true : help[0]->containsOnlyOneVoidIfSpecified());
-        }
-      }
+      virtual bool canBeFunctionDefinition(); 
 
-      virtual std::vector<ParameterNode> getNextParameter() { 
-        if (help.size() == 0) {
-          // this should never happen
-          return declarator->getNextParameter();
-        } else {
-          return help[0]->getParameter();
-        }
-      }
-      virtual std::vector<ParameterNode> getParameter() { 
-        if (help.size() == 0) {
-          return std::vector<ParameterNode>(); 
-        } else {
-          return help[0]->getParameter();
-        }
-      }
+      virtual std::vector<ParameterNode> getNextParameter();
+      virtual std::vector<ParameterNode> getParameter();
+
       bool hasName() {
         // TODO Check whether this is working
         if (declarator) {
