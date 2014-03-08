@@ -13,25 +13,6 @@
 
 using namespace llvm;
 
-namespace {
-  enum LatticeState {
-    top = 1,
-    value,
-    bottom = 0
-  };
-  struct ConstantLattice
-  {
-    int value;
-    LatticeState state;
-  };
-  struct Reachability {
-    LatticeState state;
-  };
-  constexpr Reachability unreachable { top };
-  constexpr Reachability reachable { bottom };
-  constexpr ConstantLattice unknown { 0, bottom };
-}
-
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
 
 bool SCCP_Pass::runOnFunction(llvm::Function &F) {
@@ -51,6 +32,16 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   //for (auto nameValuePair: VT) {
     //ValueMapping[nameValuePair.getValue()] = unknown;
   //}
+ 
+  //Initialize the Transition object
+  Transition transMngr = Transition(F.getEntryBlock(), ValueMapping, BlockMapping);
+  
+  llvm::BasicBlock& curr = F.getEntryBlock();
+
+  do{
+  //FIXME: Iterate over instructions of block here!
+  }while ((curr = transMngr.getNextBlock()));
+
   return false;
 }
 
