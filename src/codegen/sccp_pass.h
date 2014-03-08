@@ -6,24 +6,22 @@
 
 #include <queue>
 
-namespace {
-  enum LatticeState {
-    top = 1,
-    value,
-    bottom = 0
-  };
-  struct ConstantLattice
-  {
-    int value;
-    LatticeState state;
-  };
-  struct Reachability {
-    LatticeState state;
-  };
-  constexpr Reachability unreachable { top };
-  constexpr Reachability reachable { bottom };
-  constexpr ConstantLattice unknown { 0, bottom };
-}
+enum LatticeState {
+  top = 1,
+  value,
+  bottom = 0
+};
+struct ConstantLattice
+{
+  int value;
+  LatticeState state;
+};
+struct Reachability {
+  LatticeState state;
+};
+constexpr Reachability unreachable { top };
+constexpr Reachability reachable { bottom };
+constexpr ConstantLattice unknown { 0, bottom };
 
 
 
