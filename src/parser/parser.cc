@@ -424,7 +424,7 @@ SubExpression Parser::computeAtom() {
              || m_lookahead->value() == "int"
              || m_lookahead->value() == "void"
              || m_lookahead->value() == "struct")) {
-      operand = sizeOfType(); 
+      return sizeOfType(); 
     } else {
       operand = expression(precNext);
     }

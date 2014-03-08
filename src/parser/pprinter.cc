@@ -129,7 +129,7 @@ PRETTY_PRINT(UnaryExpression)
 {
   PPRINT('(');
   PPRINT(this->op);
-  if (this->op == PunctuatorType::SIZEOF && !(std::dynamic_pointer_cast<SizeOfExpression>(operand))) {
+  if (this->op == PunctuatorType::SIZEOF) {
     PPRINT(' ');
   }
   PPRINT(this->operand);
@@ -538,10 +538,12 @@ PRETTY_PRINT(DirectDeclaratorHelp)
 PRETTY_PRINT(SizeOfExpression)
 {
   PPRINT('(');
+  PPRINT("sizeof(");
   PPRINT(operand.first);
   if (operand.second) {
     PPRINT(operand.second);
   }
+  PPRINT(')');
   PPRINT(')');
 }
 
