@@ -23,8 +23,8 @@ struct ConstantLattice
 struct Reachability {
   LatticeState state;
 };
-constexpr Reachability unreachable { top };
-constexpr Reachability reachable { bottom };
+constexpr Reachability unreachable { bottom };
+constexpr Reachability reachable { top };
 constexpr ConstantLattice unknown { 0, bottom };
 
 

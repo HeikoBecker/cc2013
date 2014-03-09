@@ -118,11 +118,6 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   llvm::Value *lhs= binOp.getOperand(0);
   llvm::Value *rhs= binOp.getOperand(1);
 
-  //and the parent BasicBlock
-  llvm::BasicBlock* parent = binOp.getParent();
-
-  UNUSED(parent);
-
   //the old info computed before
   //FIXME: is this valid?
   ConstantLattice oldInfo = (* this->constantTable.find(&binOp)).second;
@@ -130,11 +125,8 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
 
 
   //take the corresponding lattice values
-  //we do not need to check wether find returns table.end() as this would mean 
-  //there was some failure previously so wen want to crash here 
-  //FIXME: Maybe add error message
-  ConstantLattice lhsInfo = (*this->constantTable.find(lhs)).second;
-  ConstantLattice rhsInfo = (*this->constantTable.find(rhs)).second;
+  ConstantLattice lhsInfo = this->getConstantLatticeElem(lhs);
+  ConstantLattice rhsInfo = this->getConstantLatticeElem(rhs);
 
   //check wether one value already is top so we cannot compute something
   if(lhsInfo.state == LatticeState::top || rhsInfo.state == LatticeState::top){
@@ -147,8 +139,9 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
         newInfo.state = LatticeState::value;
         newInfo.value = 1;
     }else if(binOp.getOpcode() == BINOP::And) {
-      //check if one value is 0 the case that both are != 0 can't occur here
-      //as we know that at least one is top
+      //check if one value is 0 
+      //the case that both are != 0 can't occur here as we know that 
+      //at least one is top
       if((lhsInfo.state != LatticeState::top && lhsInfo.value == 0) ||
          (rhsInfo.state != LatticeState::top && rhsInfo.value == 0)){
         newInfo.state = LatticeState::value;
@@ -166,13 +159,22 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
     }
       return;
     }
-  }
-  
+  } 
   //none of our operands is a top element --> we know that both have a fixed 
-  //value. If one would be bottom, there would be a path from start to this
-  //instruction where the operand is not defined --> SSA violated
+  //value or one of them is bottom.
+  
   newInfo.state = LatticeState::value;
+ 
+  //handle bottom case first
+  if(lhsInfo.state == LatticeState::bottom || rhsInfo.state == LatticeState::bottom){
+    newInfo.state = LatticeState::top;
+    if(newInfo.state == oldInfo.state)
+      return;
+    this->constantTable.insert(VALPAIR(&binOp, newInfo));
+    this->enqueueCFGSuccessors(binOp);
+  }
 
+  //we definitively have values --> do computation
   switch(binOp.getOpcode()){
   case BINOP::Add:
     newInfo.value = lhsInfo.value + rhsInfo.value;
@@ -194,64 +196,165 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   }
   //check if the value was computed before
   if(newInfo.value != oldInfo.value){
-    this->constantTable.insert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
+    this->constantTable.insert(VALPAIR(&binOp,newInfo));
     //enqueue the successors for updating them
     this->enqueueCFGSuccessors(binOp);
   }
   return;
 }
 
+/*
+ * A call instruction references another function. SCCP is an intraprocedural
+ * analysis, so we don't know anything about the result --> map the value to top
+ */
 TRANSITION(visitCallInst, llvm::CallInst& call){
-  UNUSED(call);
+  auto val = this->getConstantLatticeElem(& call);
+  if(val.state == LatticeState::top)
+          return;
+  val.state = LatticeState::top;
+  this->constantTable.insert(VALPAIR(&call, val));
+  this->enqueueCFGSuccessors(call);
+  return;
 }
 
 /*
  * TODO: Make this one an on-the-fly optimize function as it does not affect the
  * lattice but casts to already achieved type can be removed
+ * For the moment just map it to the value of its operand
  */
 TRANSITION(visitCastInst, llvm::CastInst &cast) {
-  UNUSED(cast);
+  auto op = cast.getOperand(0);
+  auto info = this->getConstantLatticeElem(op);
+  this->constantTable.insert(VALPAIR(&cast, info));
   return;
 }
 
+/*
+ * As all memory operations we cannot decide what a GEP actually computes so
+ * we set its value to top
+ */
 TRANSITION(visitGetElementPtrInst, llvm::GetElementPtrInst& gep){
-  UNUSED(gep);
+  auto info = this->getConstantLatticeElem(&gep);
+  //if it is already top continue and do not enqueue the successors as the value
+  //does not change
+  if (info.state == LatticeState::top)
+          return;
+  info.state = LatticeState::top;
+  this->enqueueCFGSuccessors(gep);
 }
 
+/*
+ * Compare instructions influence reachability of BBs.
+ */
 TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
   UNUSED(cmp);
   return;
 }
 
+/*
+ * Same as visitGetElementPtrInst
+ */
 TRANSITION(visitLoadInst, llvm::LoadInst& load){
-  UNUSED(load);
+  auto info = this->getConstantLatticeElem(&load);
+  //if it is already top continue and do not enqueue the successors as the value
+  //does not change
+  if (info.state == LatticeState::top)
+          return;
+  info.state = LatticeState::top;
+  this->enqueueCFGSuccessors(load);
 }
 
+/*
+ * Same as visitGetElementPtrInst
+ */
 TRANSITION(visitStoreInst, llvm::StoreInst& store){
-  UNUSED(store);
+   auto info = this->getConstantLatticeElem(&store);
+  //if it is already top continue and do not enqueue the successors as the value
+  //does not change
+  if (info.state == LatticeState::top)
+          return;
+  info.state = LatticeState::top;
+  this->enqueueCFGSuccessors(store);
 }
 
+/*
+ * Checks if some predecessor values are dead. If there is only a single input
+ * edge or value left, we can be sure that we have this value
+ */
 TRANSITION(visitPHINode, llvm::PHINode &phi){
   UNUSED(phi);
   return;
 }
 
+/*
+ * Marks the target block reachable. It should not have a corresponding value!
+ */
 TRANSITION(visitBranchInst, llvm::BranchInst &branch){
-  UNUSED(branch);
-  return;
+  if(branch.isUnconditional()){ //unconditional branch --> successor reachable
+    auto succ = branch.getSuccessor(0);
+    auto info = this->getReachabilityElem(succ);
+    if(info.state == reachable.state)
+            return;
+    this->blockTable.insert(BLOCKPAIR(succ, reachable));
+  }else{ //conditional branch -->get value and decide based on it
+    auto trueSucc = branch.getSuccessor(0);
+    auto falseSucc = branch.getSuccessor(1);
+    auto condVal = this->getConstantLatticeElem(branch.getCondition());
+    if(condVal.state == LatticeState::value){ //we can decide which one is reachable
+      if (condVal.value == 0){
+        //false succ is reachable don't modify trueSucc as it could be reachable
+        //from another block
+        auto falseInfo = this->getReachabilityElem(falseSucc);
+        if (falseInfo.state == reachable.state)//only modify if already reachable
+          return;
+        this->blockTable.insert(BLOCKPAIR(falseSucc, reachable));
+      }else{
+        //true succ is reachable don't modify falseSucc as it could be reachable
+        //from another block
+        auto trueInfo = this->getReachabilityElem(trueSucc);
+        if (trueInfo.state == reachable.state)
+          return;
+        this->blockTable.insert(BLOCKPAIR(trueSucc, reachable));
+      }
+    }else{ //both can be reachable modify both if not already reachable
+      auto trueInfo = this->getReachabilityElem(trueSucc);
+      auto falseInfo = this->getReachabilityElem(falseSucc);
+      if (trueInfo.state != reachable.state){
+        this->blockTable.insert(BLOCKPAIR(trueSucc, reachable));
+      }
+      if(falseInfo.state != reachable.state){
+        this->blockTable.insert(BLOCKPAIR(falseSucc, reachable));
+      }
+    }
+  }
 }
 
+/*
+ * Check if operand value could be computed. If yes, map this instruction to 
+ * this value
+ */
 TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
-  UNUSED(ret);
-  return;
+  auto operand = ret.getOperand(0);
+  auto info = this->getConstantLatticeElem(operand);
+  constantTable.insert(VALPAIR(&ret, info));
+  //WARNING: do not enqueue CFG successors of return! this would mean stepping
+  //into another function
 }
 
+/*
+ * Enqueues all CFG successors of a given instruction by taking its 
+ * use chain and adding the uses parents
+ */
 void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
-  llvm::BasicBlock* parent = inst.getParent();
-  for(auto block=succ_begin(parent); block != succ_end(parent); ++block){
-    Reachability reach = this->getReachabilityElem(*block);
-    if(reach.state == LatticeState::top) //Top means Reachable
-      workQueue.push_back(*block);
+  for(auto use_it=inst.use_begin(); use_it != inst.use_end(); ++use_it){
+    auto useObj = (*use_it);
+    if(llvm::isa<llvm::Instruction>(useObj)){
+    llvm::Instruction* use = llvm::cast<Instruction>(useObj);
+    auto block = use->getParent();
+    Reachability reach = this->getReachabilityElem(block);
+    if(reach.state == LatticeState::bottom) //Top means Reachable
+      workQueue.push_back(block);
+    }
   }
 }
 
