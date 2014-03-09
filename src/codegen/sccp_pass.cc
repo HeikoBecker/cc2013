@@ -24,6 +24,12 @@
 
 using namespace llvm;
 
+auto ConstantTable::insert(std::pair<llvm::Value*, ConstantLattice> pair) ->
+decltype(std::map<llvm::Value*, ConstantLattice>::insert(pair))
+{
+  return std::map<llvm::Value*, ConstantLattice>::insert(pair);
+}
+
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
 
 bool SCCP_Pass::runOnFunction(llvm::Function &F) {

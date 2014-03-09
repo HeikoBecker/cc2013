@@ -27,7 +27,12 @@ constexpr Reachability unreachable { bottom };
 constexpr Reachability reachable { top };
 constexpr ConstantLattice unknown { 0, bottom };
 
-
+class ConstantTable : public std::map<llvm::Value*, ConstantLattice>
+{
+  public:
+    auto insert(std::pair<llvm::Value*, ConstantLattice> elem) ->
+      decltype(std::map<llvm::Value*, ConstantLattice>::insert(elem));
+};
 
 struct SCCP_Pass : public llvm::FunctionPass {
   static char ID;
@@ -38,7 +43,7 @@ struct SCCP_Pass : public llvm::FunctionPass {
 
 struct Transition: public llvm::InstVisitor<Transition, void> {
   
-  std::map<llvm::Value*, ConstantLattice> constantTable;
+  ConstantTable constantTable;
   std::map<llvm::BasicBlock*, Reachability> blockTable;
 
   Transition(llvm::Function& F,
