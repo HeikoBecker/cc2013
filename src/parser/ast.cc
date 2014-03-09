@@ -141,13 +141,13 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
     case PunctuatorType::STAR:
       // 6.5.5
       if (!hasArithmeticType(lhs)) { // TODO: should this be put into a function?
-        throw new ParsingException(std::string(
+        throw ParsingException(std::string(
               "Multiplication requires that the left operand has arithmetic type"),
             lhs->pos()
             );
       }
       if (!hasArithmeticType(rhs)) {
-        throw new ParsingException(std::string(
+        throw ParsingException(std::string(
               "Multiplication requires that the right operand has arithmetic type"),
             rhs->pos()
             );
