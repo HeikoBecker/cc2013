@@ -297,6 +297,8 @@ BINCREATE(createPAdd) {
 BINCREATE(createPMinus){
         if(rhs->getType() != Builder.getInt32Ty())
                 rhs = Builder.CreateSExtOrTrunc(rhs, Builder.getInt32Ty());
+        // we have to negate subtract, as rhs is positive in lhs - rhs
+        rhs = Builder.CreateNeg(rhs);
         return Builder.CreateGEP(lhs, rhs);
 }
 
