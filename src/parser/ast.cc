@@ -11,6 +11,53 @@ using namespace std;
 using namespace Parsing;
 using namespace Semantic;
 
+namespace {
+
+bool validAssignment(SemanticDeclarationNode lhs,SubExpression rhs) {
+  auto valid = false;
+  if (compareTypes(lhs, rhs->getType())) {
+    return true;
+  } else if ((isArithmeticType(lhs) && hasArithmeticType(rhs))) {
+    auto types_after_conversion = applyUsualConversions(lhs, rhs->getType());
+    if (compareTypes(types_after_conversion.first, types_after_conversion.second)) {
+      return true;
+    }
+  }
+  if (lhs->type() == Semantic::Type::POINTER) {
+    if (isNullPtrConstant(rhs)) {
+      return true;
+    } else if (auto rhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(rhs->getType())) {
+      if (rhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
+        return true;
+      }
+    } else if (rhs->getType()->type() == Semantic::Type::FUNCTION) {
+      auto rhs_type2fptr = make_shared<PointerDeclaration>(0,
+          std::static_pointer_cast<FunctionDeclaration>(rhs->getType()));
+      valid = compareTypes(lhs, rhs_type2fptr);
+    }
+  }
+  if (isNullPtrConstant(rhs)) {
+    switch (lhs->type()) {
+      case Semantic::Type::INT:
+      case Semantic::Type::CHAR:
+        return true;
+        break;
+      default:
+        break;
+    }
+  }
+  if (auto lhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(lhs)) {
+    if (lhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
+      if (rhs->getType()->type() == Semantic::Type::POINTER) {
+        return true;
+      }
+    }
+  }
+  return valid;
+}
+
+}
+
 BinaryExpression::BinaryExpression(SubExpression lhs,
                                    SubExpression rhs,
                                    PunctuatorType op,
@@ -273,47 +320,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
        *  lhs is int, rhs is pointer => not allowed
        *  more?
        */
-      auto valid = false;
-      if (compareTypes(lhs->getType(), rhs->getType())) {
-        valid = true;
-      } else if ((hasArithmeticType(lhs) && hasArithmeticType(rhs))) {
-        auto types_after_conversion = applyUsualConversions(lhs->getType(), rhs->getType());
-        if (compareTypes(types_after_conversion.first, types_after_conversion.second)) {
-          valid = true;
-        }
-      }
-      if (lhs->getType()->type() == Semantic::Type::POINTER) {
-        if (isNullPtrConstant(rhs)) {
-          valid = true;
-        } else if (auto rhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(rhs->getType())) {
-          if (rhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
-            valid = true;
-          }
-        } else if (rhs->getType()->type() == Semantic::Type::FUNCTION) {
-          auto rhs_type2fptr = make_shared<PointerDeclaration>(0,
-              std::static_pointer_cast<FunctionDeclaration>(rhs->getType()));
-          valid = compareTypes(lhs->getType(), rhs_type2fptr);
-        }
-      }
-      if (isNullPtrConstant(rhs)) {
-        auto lhs_type = lhs->getType();
-        switch (lhs_type->type()) {
-          case Semantic::Type::INT:
-          case Semantic::Type::CHAR:
-            valid = true;
-            break;
-          default:
-            break;
-        }
-      }
-      if (auto lhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(lhs->getType())) {
-        if (lhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
-          if (rhs->getType()->type() == Semantic::Type::POINTER) {
-            valid = true;
-          }
-        }
-      }
-      this->type = lhs->getType();
+      auto valid = validAssignment(lhs->getType(), rhs);
       if (!valid) {
         std::stringstream errmsg;
         errmsg << "Assignment invalid, <descriptive error messages here>!\n"
@@ -321,6 +328,7 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
                << "rhs has type " << rhs->getType()->toString() << '\n';
         throw ParsingException(errmsg.str(), pos);
       }
+      this->type = lhs->getType();
       break;
       }
     default:
@@ -938,7 +946,12 @@ ReturnStatement::ReturnStatement(Pos pos) : JumpStatement(pos)
 {
   // single return without expression -> return type must be void
   auto actual_type = make_shared<VoidDeclaration>();
-  verifyReturnType(actual_type);
+  auto function_type = SemanticForest::filename2SemanticTree(this->pos().name)->currentFunction();
+  // extract the return type from it
+  auto expected_type = std::dynamic_pointer_cast<FunctionDeclaration>(function_type)->returnType();
+  if (!compareTypes(actual_type, expected_type)) {
+    throw ParsingException("void function should not return a value", pos);
+  }
 }
 
 ReturnStatement::ReturnStatement(SubExpression ex, Pos pos) 
@@ -946,27 +959,17 @@ ReturnStatement::ReturnStatement(SubExpression ex, Pos pos)
 {
   // Get the type of the expression which we are returning
   auto actual_type = ex->getType();
-  verifyReturnType(actual_type);
+  verifyReturnType(ex);
 }
 
-void ReturnStatement::verifyReturnType(SemanticDeclarationNode actual_type) {
-  // TODO: share code with assignment (operator =)
-  // Get the type of the function which in which we are
+void ReturnStatement::verifyReturnType(SubExpression returnExp) {
+  // Get the type of the function which in which we ar
   auto function_type = SemanticForest::filename2SemanticTree(this->pos().name)->currentFunction();
   // extract the return type from it
   auto expected_type = std::dynamic_pointer_cast<FunctionDeclaration>(function_type)->returnType();
-  // check if expected is pointer and actual is null pointer constant
-  // TODO: this should probably move into its own function
-  if (  expected_type->type() == Semantic::Type::POINTER 
-      && dynamic_pointer_cast<NullDeclaration>(actual_type)) {
-    return; // types are compatible
-  }
-
-  auto types_after_conversion = applyUsualConversions(actual_type, expected_type);
-  if (!Semantic::compareTypes(types_after_conversion.first,
-                             types_after_conversion.second)) {
+  if (!validAssignment(expected_type, returnExp)) {
     throw ParsingException(std::string("A ")
-        + actual_type->toString()
+        + returnExp->getType()->toString()
         + " is returned, but a "
         + expected_type->toString()
         + " is expected!", pos());
