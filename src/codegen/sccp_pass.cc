@@ -13,7 +13,7 @@
 //to get the macros for easy predecessor and successor iteration
 #include "llvm/Support/CFG.h"
 
-#include <queue>
+#include <deque>
 #include <map>
 #include <algorithm>
 
@@ -69,7 +69,7 @@ Transition::Transition( llvm::Function& F,
     F.begin(),
     F.end(),
     [&](llvm::Function::iterator function_basic_block) {
-      workQueue.push(function_basic_block);
+      workQueue.push_back(function_basic_block);
   });
 }
 
@@ -83,8 +83,8 @@ llvm::BasicBlock* Transition::getNextBlock() {
     return nullptr;
   }
   //save the first block to return it
-        llvm::BasicBlock* currBlock = workQueue.front();
-  workQueue.pop(); //remove it from the queue
+  llvm::BasicBlock* currBlock = std::move(workQueue.front());
+  workQueue.pop_front(); //remove it from the queue
   return currBlock;
 }
 
@@ -251,7 +251,7 @@ void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
   for(auto block=succ_begin(parent); block != succ_end(parent); ++block){
     Reachability reach = this->getReachabilityElem(*block);
     if(reach.state == LatticeState::top) //Top means Reachable
-      workQueue.push(*block);
+      workQueue.push_back(*block);
   }
 }
 

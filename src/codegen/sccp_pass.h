@@ -1,10 +1,14 @@
+#ifndef CODEGEN_SCCP_PASS_H
+#define CODEGEN_SCCP_PASS_H
+#pragma once
+
 #include "llvm/Pass.h"
 #include "llvm/PassAnalysisSupport.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/InstVisitor.h"
 
-#include <queue>
+#include <deque>
 
 enum LatticeState {
   top = 1,
@@ -62,5 +66,6 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   Reachability getReachabilityElem(llvm::BasicBlock* block);
   
 private:
-  std::queue<llvm::BasicBlock*> workQueue;
+  std::deque<llvm::BasicBlock*> workQueue;
 };
+#endif
