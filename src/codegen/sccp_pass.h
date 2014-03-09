@@ -37,7 +37,7 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   std::map<llvm::Value*, ConstantLattice> constantTable;
   std::map<llvm::BasicBlock*, Reachability> blockTable;
 
-  Transition(llvm::BasicBlock* entryBlock,
+  Transition(llvm::Function& F,
   std::map<llvm::Value*, ConstantLattice>&  constantTable,
   std::map<llvm::BasicBlock*, Reachability>& blockTable);
 
@@ -45,24 +45,25 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   //of method
   llvm::BasicBlock* getNextBlock();
   
-  //override each instruction here 
-  //BinaryOperator
+  //override each instruction here
+  void visitAllocaInst(llvm::AllocaInst& alloc);
   void visitBinaryOperator (llvm::BinaryOperator& binOp);
-  //CastInst
+  void visitCallInst(llvm::CallInst& call);
   void visitCastInst(llvm::CastInst& cast);
-  //ICmpInst
+  void visitGetElementPtrInst(llvm::GetElementPtrInst& gep);
   void visitICmpInst(llvm::ICmpInst& icmp);
-  //PHINode
+  void visitLoadInst(llvm::LoadInst& load);
+  void visitStoreInst(llvm::StoreInst& store);
   void visitPHINode(llvm::PHINode& phi);
-  //BranchInst
   void visitBranchInst(llvm::BranchInst& branch);
-  //ReturnInst
   void visitReturnInst(llvm::ReturnInst& ret);
   
   void enqueueCFGSuccessors(llvm::Instruction& inst);
-
+  
+  //helper functions
+  ConstantLattice getConstantLatticeElem(llvm::Value* val);
+  Reachability getReachabilityElem(llvm::BasicBlock* block);
+  
 private:
   std::queue<llvm::BasicBlock*> workQueue;
-  llvm::BasicBlock* currBlock; //to save the current block for equality checking
-                               //to do queue management
 };

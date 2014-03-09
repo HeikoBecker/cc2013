@@ -1,6 +1,8 @@
 #include "sccp_pass.h"
 
 #include "../utils/util.h"
+#include "../utils/exception.h"
+#include "../utils/pos.h"
 
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
@@ -41,13 +43,13 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   //}
  
   //Initialize the Transition object
-  Transition transMngr = Transition(&F.getEntryBlock(), ValueMapping, BlockMapping);
+  Transition transMngr = Transition(F, ValueMapping, BlockMapping);
   
-  llvm::BasicBlock* curr = &F.getEntryBlock();
+  llvm::BasicBlock* curr = curr= transMngr.getNextBlock();
 
-  do{
+  while((curr = transMngr.getNextBlock())){
   //FIXME: Iterate over instructions of block here!
-  }while ((curr = transMngr.getNextBlock()));
+  }
 
   return false;
 }
@@ -59,12 +61,17 @@ static RegisterPass<SCCP_Pass> X("sccp", "SCCP Pass", false, false);
 //##                              Transition Class                            ##
 //##############################################################################
 
-Transition::Transition( llvm::BasicBlock *entryBlock,
+Transition::Transition( llvm::Function& F,
                         std::map<llvm::Value*, ConstantLattice>& constantTable,
                         std::map<llvm::BasicBlock*, Reachability>& blockTable):
                         constantTable(constantTable), blockTable(blockTable) {
- //FIXME: Do we need to put all blocks in the queue to visit them once?
- currBlock = entryBlock;
+  //Put all BasicBlocks of the function into our working queue
+ std::for_each(
+    F.begin(),
+    F.end(),
+    [&](llvm::Function::iterator function_basic_block) {
+      workQueue.push(function_basic_block);
+  });
 }
 
 /*
@@ -74,13 +81,35 @@ Transition::Transition( llvm::BasicBlock *entryBlock,
  */
 llvm::BasicBlock* Transition::getNextBlock() {
   //save the first block to return it
-  currBlock = workQueue.front();
+        llvm::BasicBlock* currBlock = workQueue.front();
   workQueue.pop(); //remove it from the queue
   return currBlock;
 }
 
 /*
- * TODO: Manipulate the lattice based on the operands
+ * Visit one AllocaInst.  As we don't know what value we are allocating, we must
+ * map the value to top if it is reachable.
+ */
+TRANSITION(visitAllocaInst,llvm::AllocaInst& alloc){
+  auto block = alloc.getParent();
+  auto reachability = this->getReachabilityElem(block);
+  auto oldElem = this->getConstantLatticeElem(&alloc);
+
+  if (reachability.state == LatticeState::bottom){ //the block is reachable
+    ConstantLattice newElem; //make new element
+    newElem.state = LatticeState::top; //set it to top
+    //insert the element
+    this->constantTable.insert(std::pair<llvm::Value*, ConstantLattice>(&alloc, newElem));
+    if(newElem.state != oldElem.state) //enqueue successors if value changed
+      this->enqueueCFGSuccessors(alloc);
+  }else{
+    //unreachable block -> leave info set to bottom and don't change it
+    return;
+  }
+}
+
+/*
+ * TODO: Handle bottom! We don't need to analyse with the control flow!
  */
 TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   //take the first two operands more should not be present
@@ -170,6 +199,10 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   return;
 }
 
+TRANSITION(visitCallInst, llvm::CallInst& call){
+  UNUSED(call);
+}
+
 /*
  * TODO: Make this one an on-the-fly optimize function as it does not affect the
  * lattice but casts to already achieved type can be removed
@@ -179,9 +212,21 @@ TRANSITION(visitCastInst, llvm::CastInst &cast) {
   return;
 }
 
+TRANSITION(visitGetElementPtrInst, llvm::GetElementPtrInst& gep){
+  UNUSED(gep);
+}
+
 TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
   UNUSED(cmp);
   return;
+}
+
+TRANSITION(visitLoadInst, llvm::LoadInst& load){
+  UNUSED(load);
+}
+
+TRANSITION(visitStoreInst, llvm::StoreInst& store){
+  UNUSED(store);
 }
 
 TRANSITION(visitPHINode, llvm::PHINode &phi){
@@ -207,4 +252,20 @@ void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
     if(reach.state == LatticeState::top) //Top means Reachable
       workQueue.push(*block);
   }
+}
+
+ConstantLattice Transition::getConstantLatticeElem(llvm::Value* val){
+  auto it = this->constantTable.find(val);
+  if(it != this->constantTable.end())
+    return (*it).second;
+  Pos pos ("FOO",1,1);
+  throw new CompilerException ("Oh, internal error in constantTable. Missing obj",pos);
+}
+
+Reachability Transition::getReachabilityElem(llvm::BasicBlock* block){
+  auto it = this->blockTable.find(block);
+  if (it != this->blockTable.end())
+    return (*it).second;
+  Pos pos("FOO",1,1);
+  throw new CompilerException("Oh, internal error in blockTable. Missing obj.", pos);
 }
