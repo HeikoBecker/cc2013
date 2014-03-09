@@ -345,7 +345,8 @@ BINCREATE(createLess) {
       }
     }
    }
-  return Builder.CreateICmpSLT(lhs,rhs);
+  auto as_i1 = Builder.CreateICmpSLT(lhs,rhs);
+  return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
 
 BINCREATE(createMult) {
@@ -377,7 +378,9 @@ BINCREATE(createUnequal){
       }
     }
    }
-  return Builder.CreateICmpNE(lhs,rhs);
+  auto as_i1 = Builder.CreateICmpNE(lhs,rhs);
+  // the comparision returns an i1, but what we need is a int32
+  return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
 
 BINCREATE(createEqual){
@@ -403,7 +406,9 @@ BINCREATE(createEqual){
       }
     }
    }
-  return Builder.CreateICmpEQ(lhs,rhs);
+  auto as_i1 =  Builder.CreateICmpEQ(lhs,rhs);
+  // the comparision returns an i1, but what we need is a int32
+  return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
 
 BINCREATE(createLogAnd){
