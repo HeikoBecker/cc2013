@@ -79,6 +79,9 @@ Transition::Transition( llvm::Function& F,
  * is removed.
  */
 llvm::BasicBlock* Transition::getNextBlock() {
+  if (workQueue.empty()) {
+    return nullptr;
+  }
   //save the first block to return it
         llvm::BasicBlock* currBlock = workQueue.front();
   workQueue.pop(); //remove it from the queue
