@@ -9,12 +9,14 @@
 #include "llvm/InstVisitor.h"
 
 #include <deque>
+#include <limits>
 
-enum LatticeState {
-  top = 1,
-  value,
+enum LatticeState : unsigned char {
+  top = std::numeric_limits<unsigned char>::max(),
+  value = std::numeric_limits<unsigned char>::max() / 2,
   bottom = 0
 };
+static_assert(bottom < value && value < top, "Lattice must have a total order!");
 struct ConstantLattice
 {
   int value;
@@ -30,8 +32,7 @@ constexpr ConstantLattice unknown { 0, bottom };
 class ConstantTable : public std::map<llvm::Value*, ConstantLattice>
 {
   public:
-    auto insert(std::pair<llvm::Value*, ConstantLattice> elem) ->
-      decltype(std::map<llvm::Value*, ConstantLattice>::insert(elem));
+    void checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair);
 };
 
 struct SCCP_Pass : public llvm::FunctionPass {

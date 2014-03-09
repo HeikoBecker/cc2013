@@ -36,5 +36,11 @@ namespace Lexing {
   };
 }
 
+inline void assert_that(bool that, std::string message)
+{
+  if(!that)
+    throw std::runtime_error(message);
+};
+
 
 #endif

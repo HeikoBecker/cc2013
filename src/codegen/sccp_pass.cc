@@ -8,6 +8,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/ValueSymbolTable.h"
 #include "llvm/Support/raw_ostream.h"
+#include "../utils/exception.h"
 // contains ReplaceInstWithValue and ReplaceInstWithInst
 #include "llvm/Transforms/Utils/BasicBlockUtils.h"
 //to get the macros for easy predecessor and successor iteration
@@ -24,10 +25,20 @@
 
 using namespace llvm;
 
-auto ConstantTable::insert(std::pair<llvm::Value*, ConstantLattice> pair) ->
-decltype(std::map<llvm::Value*, ConstantLattice>::insert(pair))
+void ConstantTable::checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair)
 {
-  return std::map<llvm::Value*, ConstantLattice>::insert(pair);
+  auto it =  this->find(pair.first);
+  if (it == this->end()) {
+    std::map<llvm::Value*, ConstantLattice>::insert(pair);
+    return;
+  } else {
+    assert_that(it->second.state <= pair.second.state, "Error: Descended in lattice");
+    if (   it->second.state == pair.second.state
+        && pair.second.state == value) {
+      assert_that(pair.second.value == it->second.value, "Value changed?");
+    }
+    this->operator[](pair.first) = pair.second;
+  }
 }
 
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
@@ -107,7 +118,7 @@ TRANSITION(visitAllocaInst,llvm::AllocaInst& alloc){
     ConstantLattice newElem; //make new element
     newElem.state = LatticeState::top; //set it to top
     //insert the element
-    this->constantTable.insert(std::pair<llvm::Value*, ConstantLattice>(&alloc, newElem));
+    this->constantTable.checkedInsert(std::pair<llvm::Value*, ConstantLattice>(&alloc, newElem));
     if(newElem.state != oldElem.state) //enqueue successors if value changed
       this->enqueueCFGSuccessors(alloc);
   }else{
@@ -159,7 +170,7 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
     }
     //check for value modification
     if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){ 
-      this->constantTable.insert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
+      this->constantTable.checkedInsert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
       this->enqueueCFGSuccessors(binOp); //add succesors to queue as we need to 
                                          //update them
     }
@@ -176,7 +187,7 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
     newInfo.state = LatticeState::bottom;
     if(newInfo.state == oldInfo.state)
       return;
-    this->constantTable.insert(VALPAIR(&binOp, newInfo));
+    this->constantTable.checkedInsert(VALPAIR(&binOp, newInfo));
     this->enqueueCFGSuccessors(binOp);
   }
 
@@ -202,7 +213,7 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   }
   //check if the value was computed before
   if(newInfo.value != oldInfo.value){
-    this->constantTable.insert(VALPAIR(&binOp,newInfo));
+    this->constantTable.checkedInsert(VALPAIR(&binOp,newInfo));
     //enqueue the successors for updating them
     this->enqueueCFGSuccessors(binOp);
   }
@@ -218,7 +229,7 @@ TRANSITION(visitCallInst, llvm::CallInst& call){
   if(val.state == LatticeState::top)
           return;
   val.state = LatticeState::top;
-  this->constantTable.insert(VALPAIR(&call, val));
+  this->constantTable.checkedInsert(VALPAIR(&call, val));
   this->enqueueCFGSuccessors(call);
   return;
 }
@@ -231,7 +242,7 @@ TRANSITION(visitCallInst, llvm::CallInst& call){
 TRANSITION(visitCastInst, llvm::CastInst &cast) {
   auto op = cast.getOperand(0);
   auto info = this->getConstantLatticeElem(op);
-  this->constantTable.insert(VALPAIR(&cast, info));
+  this->constantTable.checkedInsert(VALPAIR(&cast, info));
   return;
 }
 
@@ -268,7 +279,7 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
             return;
     else{
       newInfo.state = LatticeState::top;
-      constantTable.insert(VALPAIR(&cmp, newInfo));
+      constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
       this->enqueueCFGSuccessors(cmp);
     }
   }
@@ -279,7 +290,7 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
             return;
     else{
       newInfo.state = LatticeState::bottom;
-      constantTable.insert(VALPAIR(&cmp, newInfo));
+      constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
       this->enqueueCFGSuccessors(cmp);
     }
   }
@@ -369,7 +380,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
         newInfo.state = LatticeState::value;
         newInfo.value = res;
         if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){
-        this->constantTable.insert(VALPAIR(&phi,newInfo));
+        this->constantTable.checkedInsert(VALPAIR(&phi,newInfo));
         this->enqueueCFGSuccessors(phi);
         }
       }
@@ -378,7 +389,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
   //create the top value and add it if the value would change
   newInfo.state = LatticeState::top;
   if(newInfo.state != oldInfo.state){
-    this->constantTable.insert(VALPAIR(&phi, newInfo));
+    this->constantTable.checkedInsert(VALPAIR(&phi, newInfo));
     this->enqueueCFGSuccessors(phi); 
   }
 }
@@ -433,7 +444,7 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
 TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
   auto operand = ret.getOperand(0);
   auto info = this->getConstantLatticeElem(operand);
-  constantTable.insert(VALPAIR(&ret, info));
+  constantTable.checkedInsert(VALPAIR(&ret, info));
   //WARNING: do not enqueue CFG successors of return! this would mean stepping
   //into another function
 }
@@ -464,7 +475,7 @@ ConstantLattice Transition::getConstantLatticeElem(llvm::Value* val){
     ConstantLattice constant;
     constant.state = LatticeState::bottom;
     constant.value = 0;
-    this->constantTable.insert(VALPAIR(val,constant));
+    this->constantTable.checkedInsert(VALPAIR(val,constant));
     return constant;
   }
 }
