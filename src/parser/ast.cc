@@ -573,11 +573,9 @@ FunctionCall::FunctionCall(SubExpression funcName,
           auto promoted_expected = promoteType(expected_parameter.at(i));
           auto promoted_actually = promoteType(arguments.at(i)->getType());
           if (promoted_expected->type() == Semantic::Type::FUNCTION) {
-            std::cout << "ho!";
             promoted_expected = make_shared<PointerDeclaration>(0, promoted_expected);
           }
           if (promoted_actually->type() == Semantic::Type::FUNCTION) {
-            std::cout << "hey!";
             promoted_actually = make_shared<PointerDeclaration>(0, promoted_actually);
           }
           if (Semantic::compareTypes(promoted_actually, promoted_expected)) {
