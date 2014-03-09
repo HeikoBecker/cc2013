@@ -48,7 +48,12 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   llvm::BasicBlock* curr = transMngr.getNextBlock();
 
   while((curr = transMngr.getNextBlock())){
-  //FIXME: Iterate over instructions of block here!
+    std::for_each(
+      curr->begin(),
+      curr->end(),
+      [&](llvm::BasicBlock::iterator basic_block_inst){
+        transMngr.visit(basic_block_inst);
+    });
   }
 
   return false;
