@@ -38,11 +38,8 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   std::map<llvm::BasicBlock*, Reachability> blockTable;
 
   Transition(llvm::Function& F,
-  std::map<llvm::Value*, ConstantLattice>&  constantTable,
   std::map<llvm::BasicBlock*, Reachability>& blockTable);
 
-  //FIXME: Maybe pass the queue to the sccp_pass instead of forcing invocation
-  //of method
   llvm::BasicBlock* getNextBlock();
   
   //override each instruction here

@@ -19,15 +19,14 @@
 
 #define TRANSITION(X, Y) void Transition::X(Y)
 #define BINOP llvm::Instruction::BinaryOps
+#define VALPAIR(X,Y) std::pair<llvm::Value*, ConstantLattice>(X,Y)
+#define BLOCKPAIR(X,Y) std::pair<llvm::BasicBlock*, Reachability>(X,Y)
 
 using namespace llvm;
 
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
 
 bool SCCP_Pass::runOnFunction(llvm::Function &F) {
-  // maps "registers" to values
-  std::map<llvm::Value*, ConstantLattice> ValueMapping;
-
   // maps BasicBlocks to either reachable or unreachable
   std::map<llvm::BasicBlock*, Reachability> BlockMapping;
 
@@ -37,13 +36,9 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
     [&](llvm::Function::iterator function_basic_block) {
       BlockMapping[function_basic_block] = unreachable;
   });
-  //llvm::ValueSymbolTable VT = F.getValueSymbolTable();
-  //for (auto nameValuePair: VT) {
-    //ValueMapping[nameValuePair.getValue()] = unknown;
-  //}
  
   //Initialize the Transition object
-  Transition transMngr = Transition(F, ValueMapping, BlockMapping);
+  Transition transMngr = Transition(F, BlockMapping);
   
   llvm::BasicBlock* curr = transMngr.getNextBlock();
 
@@ -67,9 +62,8 @@ static RegisterPass<SCCP_Pass> X("sccp", "SCCP Pass", false, false);
 //##############################################################################
 
 Transition::Transition( llvm::Function& F,
-                        std::map<llvm::Value*, ConstantLattice>& constantTable,
                         std::map<llvm::BasicBlock*, Reachability>& blockTable):
-                        constantTable(constantTable), blockTable(blockTable) {
+                        blockTable(blockTable) {
   //Put all BasicBlocks of the function into our working queue
  std::for_each(
     F.begin(),
@@ -252,8 +246,7 @@ TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
 void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
   llvm::BasicBlock* parent = inst.getParent();
   for(auto block=succ_begin(parent); block != succ_end(parent); ++block){
-    //once again end should not be possible FIXME: Add internal error diag
-    Reachability reach = (*this->blockTable.find(*block)).second;
+    Reachability reach = this->getReachabilityElem(*block);
     if(reach.state == LatticeState::top) //Top means Reachable
       workQueue.push(*block);
   }
@@ -263,14 +256,21 @@ ConstantLattice Transition::getConstantLatticeElem(llvm::Value* val){
   auto it = this->constantTable.find(val);
   if(it != this->constantTable.end())
     return (*it).second;
-  Pos pos ("FOO",1,1);
-  throw new CompilerException ("Oh, internal error in constantTable. Missing obj",pos);
+  else{ //the values was not initialized--> this value was not used before
+        //return the bottom element and map the value to it
+    ConstantLattice constant;
+    constant.state = LatticeState::bottom;
+    constant.value = 0;
+    this->constantTable.insert(VALPAIR(val,constant));
+    return constant;
+  }
 }
 
 Reachability Transition::getReachabilityElem(llvm::BasicBlock* block){
   auto it = this->blockTable.find(block);
   if (it != this->blockTable.end())
     return (*it).second;
-  Pos pos("FOO",1,1);
+  //dead code should begin here
+  Pos pos("Optimization Error",1337,1337);
   throw new CompilerException("Oh, internal error in blockTable. Missing obj.", pos);
 }
