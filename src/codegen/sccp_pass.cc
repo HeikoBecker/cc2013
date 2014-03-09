@@ -45,7 +45,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   //Initialize the Transition object
   Transition transMngr = Transition(F, ValueMapping, BlockMapping);
   
-  llvm::BasicBlock* curr = curr= transMngr.getNextBlock();
+  llvm::BasicBlock* curr = transMngr.getNextBlock();
 
   while((curr = transMngr.getNextBlock())){
   //FIXME: Iterate over instructions of block here!
