@@ -167,7 +167,7 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
  
   //handle bottom case first
   if(lhsInfo.state == LatticeState::bottom || rhsInfo.state == LatticeState::bottom){
-    newInfo.state = LatticeState::top;
+    newInfo.state = LatticeState::bottom;
     if(newInfo.state == oldInfo.state)
       return;
     this->constantTable.insert(VALPAIR(&binOp, newInfo));
@@ -247,8 +247,51 @@ TRANSITION(visitGetElementPtrInst, llvm::GetElementPtrInst& gep){
  * Compare instructions influence reachability of BBs.
  */
 TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
-  UNUSED(cmp);
-  return;
+  auto lhs = cmp.getOperand(0);
+  auto rhs = cmp.getOperand(1);
+
+  //take the values
+  auto lhsInfo = this->getConstantLatticeElem(lhs);
+  auto rhsInfo = this->getConstantLatticeElem(rhs);
+
+  auto oldInfo = this->getConstantLatticeElem(&cmp);
+  ConstantLattice newInfo;
+  //if one is top --> we cannot decide it
+  if(lhsInfo.state == LatticeState::top || rhsInfo.state == LatticeState::top){
+    if(oldInfo.state == LatticeState::top)
+            return;
+    else{
+      newInfo.state = LatticeState::top;
+      constantTable.insert(VALPAIR(&cmp, newInfo));
+      this->enqueueCFGSuccessors(cmp);
+    }
+  }
+
+  //if one is bottom leave it at bottom
+  if(lhsInfo.state == LatticeState::bottom || rhsInfo.state == LatticeState::bottom){
+    if(oldInfo.state == LatticeState::bottom)
+            return;
+    else{
+      newInfo.state = LatticeState::bottom;
+      constantTable.insert(VALPAIR(&cmp, newInfo));
+      this->enqueueCFGSuccessors(cmp);
+    }
+  }
+
+
+  //none is top or botttom --> compute the value
+  newInfo.state = LatticeState::value;
+  switch(cmp.getSignedPredicate()){
+  case llvm::CmpInst::Predicate::ICMP_EQ:
+    newInfo.value = (lhsInfo.value == rhsInfo.value);
+  case llvm::CmpInst::Predicate::ICMP_NE:
+    newInfo.value = (lhsInfo.value != rhsInfo.value);
+  case llvm::CmpInst::Predicate::ICMP_SLT:
+    newInfo.value = (lhsInfo.value < rhsInfo.value);
+  default://FIXME: Maybe map unsupported ops to top
+    return;
+  }
+
 }
 
 /*
@@ -282,8 +325,56 @@ TRANSITION(visitStoreInst, llvm::StoreInst& store){
  * edge or value left, we can be sure that we have this value
  */
 TRANSITION(visitPHINode, llvm::PHINode &phi){
-  UNUSED(phi);
-  return;
+  //get the old and new infos
+  ConstantLattice oldInfo = this->getConstantLatticeElem(&phi);
+  ConstantLattice newInfo;
+
+  //get the values of the incoming edges
+  int numOfIncomingVals = phi.getNumIncomingValues();
+  std::vector<ConstantLattice> incomingValues;
+  for(int i = 0; i < numOfIncomingVals; ++i){
+    incomingValues.push_back(this->getConstantLatticeElem(phi.getIncomingValue(i)));
+  }
+
+  //check if we can simplify to a single value
+  bool canBeValue = true;
+  std::vector<int> values;
+  for(ConstantLattice elem : incomingValues){
+    if(! canBeValue) //finish if we can be sure that it cannot be a single value
+            break;
+    canBeValue = canBeValue && ((elem.state == LatticeState::bottom)
+                             || (elem.state == LatticeState::value));
+    if(elem.state == LatticeState::value)
+      values.push_back(elem.value);
+  }
+  //if we can make the phi a single value, compute it by iteration
+  if(canBeValue){
+    int res = values[0];
+    bool allSame = true;
+    for(int val : values){
+      if(val == res)
+        continue;
+      else{
+        allSame = false;
+        break;
+      }
+      //if not all values are the same, we need to create a top value
+      if(allSame){
+        newInfo.state = LatticeState::value;
+        newInfo.value = res;
+        if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){
+        this->constantTable.insert(VALPAIR(&phi,newInfo));
+        this->enqueueCFGSuccessors(phi);
+        }
+      }
+    }
+  }
+  //create the top value and add it if the value would change
+  newInfo.state = LatticeState::top;
+  if(newInfo.state != oldInfo.state){
+    this->constantTable.insert(VALPAIR(&phi, newInfo));
+    this->enqueueCFGSuccessors(phi); 
+  }
 }
 
 /*
