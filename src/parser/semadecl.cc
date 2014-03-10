@@ -135,8 +135,13 @@ FunctionDeclaration::FunctionDeclaration(SemanticDeclarationNode ret, std::vecto
        */
       m_parameter.clear();
     }
-  } 
-}
+    for (auto it = m_parameter.begin(); it != m_parameter.end(); ++it) {
+      if ((*it)->type() == Semantic::Type::FUNCTION) {
+        *it = std::make_shared<PointerDeclaration>(0, *it);
+      }
+    }
+  }
+} 
 
 void FunctionDeclaration::rebindParameters(std::vector<Parsing::SemanticDeclarationNode> parameters)
 {
@@ -144,6 +149,11 @@ void FunctionDeclaration::rebindParameters(std::vector<Parsing::SemanticDeclarat
     m_parameter.clear();
     for (auto p: parameters) {
       m_parameter.push_back(p);
+    }
+    for (auto it = m_parameter.begin(); it != m_parameter.end(); ++it) {
+      if ((*it)->type() == Semantic::Type::FUNCTION) {
+        *it = std::make_shared<PointerDeclaration>(0, *it);
+      }
     }
   }
 }
