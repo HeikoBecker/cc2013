@@ -390,6 +390,9 @@ BINCREATE(createUnequal){
       }
     }
    }  auto as_i1 = Builder.CreateICmpNE(lhs,rhs);
+ if (lhs->getType() != rhs->getType()) {
+   lhs = Builder.CreateBitCast(lhs, rhs->getType());
+ }
   // the comparision returns an i1, but what we need is a int32
   return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
@@ -425,6 +428,9 @@ BINCREATE(createEqual){
       }
     }
    }
+ if (lhs->getType() != rhs->getType()) {
+   lhs = Builder.CreateBitCast(lhs, rhs->getType());
+ }
   auto as_i1 =  Builder.CreateICmpEQ(lhs,rhs);
   // the comparision returns an i1, but what we need is a int32
   return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());

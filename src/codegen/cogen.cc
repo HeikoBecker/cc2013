@@ -640,7 +640,6 @@ EMIT_RV(Parsing::Constant) {
       {
         //FIXME : we might need to set the type of the constant in the constructor of
         //the enclosing expression
-        llvm::errs() << this->getType()->toString() << "\n";
         auto type = creator->semantic_type2llvm_type(this->getType());
         type->dump();
         return creator->allocNullptr(type);
