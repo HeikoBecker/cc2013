@@ -714,7 +714,7 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       break;
                               
     case Semantic::Type::VOID:
-      llvm_type = Builder.getVoidTy();
+      llvm_type = Builder.getInt8Ty();
       break;
                               
     case Semantic::Type::ARRAY:
