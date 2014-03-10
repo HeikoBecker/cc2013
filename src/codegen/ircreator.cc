@@ -725,6 +725,10 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
         auto pointer_type =
           std::static_pointer_cast<Parsing::PointerDeclaration>(semantic_type);	
         auto pointee = pointer_type->pointee();
+        if (pointee->type() == Semantic::Type::VOID) {
+          llvm_type = llvm::PointerType::getUnqual(Builder.getInt8Ty());
+          break;
+        }
         llvm_type = llvm::PointerType::getUnqual(
             semantic_type2llvm_type(pointee)
             );
