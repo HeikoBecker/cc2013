@@ -685,6 +685,9 @@ llvm::Value* Codegeneration::IRCreator::createFCall(llvm::Value* func,
       vals.push_back(convert(params[i], paramTypes[i]));
 
   //produce the function call with the parameters
+  if (func->isDereferenceablePointer()) {
+    func = this->createLoad(func);
+  }
   return Builder.CreateCall(func, vals);
 }
 
