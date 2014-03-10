@@ -151,6 +151,8 @@ void Codegeneration::IRCreator::makeReturn(llvm::Value *value) {
       value = Builder.CreateIntToPtr(value, CurFuncReturnType);
     else if (CurFuncReturnType->isIntegerTy() && !value->getType()->isIntegerTy())
       value = Builder.CreatePtrToInt(value, CurFuncReturnType);         
+    else if (CurFuncReturnType != value->getType())
+      value = Builder.CreateBitCast(value, CurFuncReturnType);
     Builder.CreateRet(value);
   } else {
     // if we passed a null pointer to makeReturn, we're in a void function
