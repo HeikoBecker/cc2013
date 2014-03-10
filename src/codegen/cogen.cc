@@ -158,6 +158,12 @@ EMIT_IR(Parsing::FunctionDefinition)
       creator->store(argument, ptr);
       // 3. associate type with value
       param->associatedValue = ptr;
+      if (param->type() == Semantic::Type::POINTER) {
+        auto pointee = std::static_pointer_cast<PointerDeclaration>(param)->pointee();
+        if (pointee->type() == Semantic::Type::FUNCTION) {
+          pointee->associatedValue = ptr;
+        }
+      }
       ++parameter_index;
       });
   function_type_->associatedValue = function;
