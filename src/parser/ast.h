@@ -106,6 +106,7 @@ class EXPRESSION(Constant)
     Constant(std::string name, Pos pos, Lexing::ConstantType ct);
     PPRINTABLE
     EMIT_RVALUE
+    void setType(SemanticDeclarationNode s);
 
   private:
     Lexing::ConstantType ct;

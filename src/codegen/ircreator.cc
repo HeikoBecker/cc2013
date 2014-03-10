@@ -592,8 +592,10 @@ llvm::Value* Codegeneration::IRCreator::allocInt(int val){
 llvm::Value* Codegeneration::IRCreator::allocNullptr(llvm::Type* type) {
   if (type->isPointerTy()) {
     return llvm::ConstantPointerNull::get(llvm::cast<llvm::PointerType>(type));
-  } else {
+  } else if (type->isIntegerTy()) {
     return Builder.getInt32(0);
+  } else {
+    return llvm::ConstantPointerNull::get(llvm::PointerType::getUnqual(Builder.getInt32Ty()));
   }
 }
 

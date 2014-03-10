@@ -25,6 +25,7 @@ bool validAssignment(SemanticDeclarationNode lhs,SubExpression rhs) {
   }
   if (lhs->type() == Semantic::Type::POINTER) {
     if (isNullPtrConstant(rhs)) {
+      rhs->setType(lhs);
       return true;
     } else if (auto rhs_as_ptr = std::dynamic_pointer_cast<PointerDeclaration>(rhs->getType())) {
       if (rhs_as_ptr->pointee()->type() == Semantic::Type::VOID) {
@@ -40,6 +41,7 @@ bool validAssignment(SemanticDeclarationNode lhs,SubExpression rhs) {
     switch (lhs->type()) {
       case Semantic::Type::INT:
       case Semantic::Type::CHAR:
+        rhs->setType(promoteType(lhs));
         return true;
         break;
       default:
@@ -284,6 +286,11 @@ BinaryExpression::BinaryExpression(SubExpression lhs,
         } else
         if (   (lhs_as_ptr && isNullPtrConstant(rhs))
             || (rhs_as_ptr && isNullPtrConstant(lhs))) {
+          if (isNullPtrConstant(rhs)) {
+            rhs->setType(lhs_as_ptr);
+          } else {
+            lhs->setType(rhs_as_ptr);
+          }
           this->type = make_shared<IntDeclaration>();
         } else {
           throw ParsingException(std::string("Comparision requires both operands to be either pointer to object or to be of arithmetic type."), this->pos());
@@ -552,6 +559,10 @@ Constant::Constant(std::string name, Pos pos, Lexing::ConstantType ct)
   }
 }
 
+void Expression::setType(SemanticDeclarationNode s) {
+  this->type = s;
+}
+
 
 FunctionCall::FunctionCall(SubExpression funcName,
                            std::vector<SubExpression> arguments, Pos pos)
@@ -666,9 +677,11 @@ TernaryExpression::TernaryExpression(SubExpression condition,
   if (!valid) {
     if (lhs_is_a_pointer && isNullPtrConstant(rhs)) {
       valid = true;
+      rhs->setType(lhs_type);
       this->type = lhs_type;
     } else if (rhs_is_a_pointer && isNullPtrConstant(lhs)) {
       valid = true;
+      lhs->setType(rhs_type);
       this->type = rhs_type;
     }
   }
