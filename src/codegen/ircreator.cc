@@ -360,11 +360,19 @@ BINCREATE(createMult) {
 BINCREATE(createUnequal){
  if(this->isVoidP(lhs->getType())){
     if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
-      lhs = Builder.CreateBitCast(lhs, rhs->getType());
+      //right could be a NullPointerConst
+      if(rhs->getType() == Builder.getInt32Ty())
+        lhs = Builder.CreatePtrToInt(lhs, Builder.getInt32Ty());
+      else
+        lhs = Builder.CreateBitCast(lhs, rhs->getType());
     }
   }else{ //left is no void pointer 
     if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
-      rhs = Builder.CreateBitCast(rhs, lhs->getType());
+      //left could be a nullptr const
+      if(lhs->getType() == Builder.getInt32Ty())
+        rhs = Builder.CreatePtrToInt(rhs, Builder.getInt32Ty());
+      else
+        rhs = Builder.CreateBitCast(rhs, lhs->getType());
     else { //neither is void pointer
 
       if(! lhs->getType()->isPointerTy()){ //the left one is no pointer
@@ -379,8 +387,7 @@ BINCREATE(createUnequal){
           rhs = this->convert(rhs, lhs->getType()); //rhs is a nullptr
       }
     }
-   }
-  auto as_i1 = Builder.CreateICmpNE(lhs,rhs);
+   }  auto as_i1 = Builder.CreateICmpNE(lhs,rhs);
   // the comparision returns an i1, but what we need is a int32
   return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
@@ -388,11 +395,19 @@ BINCREATE(createUnequal){
 BINCREATE(createEqual){
  if(this->isVoidP(lhs->getType())){
     if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
-      lhs = Builder.CreateBitCast(lhs, rhs->getType());
+      //right could be a NullPointerConst
+      if(rhs->getType() == Builder.getInt32Ty())
+        lhs = Builder.CreatePtrToInt(lhs, Builder.getInt32Ty());
+      else
+        lhs = Builder.CreateBitCast(lhs, rhs->getType());
     }
   }else{ //left is no void pointer 
     if( this->isVoidP(rhs->getType())) //right is void pointer --> cast to lhs
-      rhs = Builder.CreateBitCast(rhs, lhs->getType());
+      //left could be a nullptr const
+      if(lhs->getType() == Builder.getInt32Ty())
+        rhs = Builder.CreatePtrToInt(rhs, Builder.getInt32Ty());
+      else
+        rhs = Builder.CreateBitCast(rhs, lhs->getType());
     else { //neither is void pointer
 
       if(! lhs->getType()->isPointerTy()){ //the left one is no pointer
