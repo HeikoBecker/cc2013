@@ -327,7 +327,7 @@ BINCREATE(createMinus) {
  * which are signed in our C subset
  */
 BINCREATE(createLess) {
- if(this->isVoidP(lhs->getType())){
+  if(this->isVoidP(lhs->getType())){
     if(! this->isVoidP(rhs->getType())){ //right is no void pointer --> cast
       //right could be a NullPointerConst
       if(rhs->getType() == Builder.getInt32Ty())
@@ -356,10 +356,11 @@ BINCREATE(createLess) {
           rhs = this->convert(rhs, lhs->getType()); //rhs is a nullptr
       }
     }
-   }  auto as_i1 = Builder.CreateICmpSLT(lhs,rhs);
- if (lhs->getType() != rhs->getType()) {
-   lhs = Builder.CreateBitCast(lhs, rhs->getType());
- }
+  }
+  if (lhs->getType() != rhs->getType()) {
+    lhs = Builder.CreateBitCast(lhs, rhs->getType());
+  }
+  auto as_i1 = Builder.CreateICmpSLT(lhs,rhs);
   // the comparision returns an i1, but what we need is a int32
   return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
@@ -400,10 +401,11 @@ BINCREATE(createUnequal){
           rhs = this->convert(rhs, lhs->getType()); //rhs is a nullptr
       }
     }
-   }  auto as_i1 = Builder.CreateICmpNE(lhs,rhs);
+   }
  if (lhs->getType() != rhs->getType()) {
    lhs = Builder.CreateBitCast(lhs, rhs->getType());
  }
+ auto as_i1 = Builder.CreateICmpNE(lhs,rhs);
   // the comparision returns an i1, but what we need is a int32
   return Builder.CreateZExtOrTrunc(as_i1, Builder.getInt32Ty());
 }
