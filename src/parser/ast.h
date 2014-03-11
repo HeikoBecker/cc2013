@@ -137,6 +137,7 @@ class EXPRESSION(TernaryExpression)
                       Pos);
     PPRINTABLE
     EMIT_RVALUE
+    EMIT_LVALUE
     
   private:
     SubExpression condition;

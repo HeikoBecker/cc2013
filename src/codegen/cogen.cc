@@ -711,6 +711,33 @@ EMIT_RV(Parsing::TernaryExpression) {
       alternativeBlock, val_alternative);
 }
 
+EMIT_LV(Parsing::TernaryExpression){
+  auto result_type = this->getType();
+  auto consequenceBlock = creator->makeBlock("ternary-consequence", false);
+  auto alternativeBlock = creator->makeBlock("ternary-alternative", false);
+  auto endBlock = creator->makeBlock("ternary-end", false);
+  this->condition->emit_condition(creator, consequenceBlock, alternativeBlock);
+  creator->setCurrentBasicBlock(consequenceBlock);
+  auto val_consequence = this->lhs->emit_rvalue(creator);
+  if (result_type->type() != Semantic::Type::VOID)
+    val_consequence = creator->convert(val_consequence, result_type);
+  consequenceBlock = creator->connect(nullptr, endBlock);
+  creator->setCurrentBasicBlock(alternativeBlock);
+  auto val_alternative = this->rhs->emit_rvalue(creator);
+  if (result_type->type() != Semantic::Type::VOID)
+    val_alternative = creator->convert(val_alternative, result_type);
+  alternativeBlock = creator->connect(nullptr, endBlock);
+  creator->setCurrentBasicBlock(endBlock);
+  if (this->getType()->type() == Semantic::Type::VOID) {
+    // it should be safe to return nullptr, as the semantic ensures that nobody
+    // will use the value anyway
+    // TODO: verify this!
+    return nullptr;
+  }
+  return creator->makePhi(consequenceBlock, val_consequence,
+      alternativeBlock, val_alternative);
+}
+
 /*
  * Produces the rvalue of the sizeof expression. TODO!
  */

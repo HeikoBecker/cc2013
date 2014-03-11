@@ -491,7 +491,7 @@ BINCREATEL(createPointerAccess) {
  */
 BINCREATEL(createAccess) {
         UNUSED(rhs);
-        std::vector<llvm::Value *> indexes;
+        std::vector<llvm::Value*>indexes;
         indexes.push_back(Builder.getInt32(0));
         indexes.push_back(Builder.getInt32(index));
         //Compute the GEP
