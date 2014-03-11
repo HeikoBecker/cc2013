@@ -67,7 +67,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
         transMngr.visit(basic_block_inst);
     });
   }
-
+ 
   return false;
 }
 
@@ -88,6 +88,11 @@ Transition::Transition( llvm::Function& F,
     [&](llvm::Function::iterator function_basic_block) {
       workQueue.push_back(function_basic_block);
   });
+}
+
+Transition::~Transition(){
+  this->tearDownInsts(); 
+  this->deleteDeadBlocks();
 }
 
 /*
@@ -488,3 +493,13 @@ Reachability Transition::getReachabilityElem(llvm::BasicBlock* block){
   Pos pos("Optimization Error",1337,1337);
   throw new CompilerException("Oh, internal error in blockTable. Missing obj.", pos);
 }
+
+void Transition::tearDownInsts(){
+        
+}
+
+void Transition::deleteDeadBlocks(){
+
+}
+
+

@@ -74,7 +74,6 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   //helper functions
   ConstantLattice getConstantLatticeElem(llvm::Value* val);
   Reachability getReachabilityElem(llvm::BasicBlock* block);
-  void tearDown(); 
 private:
   std::deque<llvm::BasicBlock*> workQueue;
 };
