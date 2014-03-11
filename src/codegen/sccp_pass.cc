@@ -17,6 +17,7 @@
 #include <deque>
 #include <map>
 #include <algorithm>
+#include <iterator>
 
 #define TRANSITION(X, Y) void Transition::X(Y)
 #define BINOP llvm::Instruction::BinaryOps
@@ -495,7 +496,45 @@ Reachability Transition::getReachabilityElem(llvm::BasicBlock* block){
 }
 
 void Transition::tearDownInsts(){
-        
+  std::for_each(
+    this->constantTable.begin(),
+    this->constantTable.end(),
+    [&](decltype(*this->constantTable.begin()) inst_const_pair){
+      auto info = inst_const_pair.second;
+      auto val = inst_const_pair.first;
+      if(info.state != LatticeState::top){
+        if(info.state == LatticeState::bottom){
+        #ifdef DEBUG
+        //TODO: check all succesors for "bottom"
+        #endif
+        //reverse the DU chain, to start with deletion of last use
+        std::vector<llvm::Value*> duReverted;
+        std::for_each(
+          val->use_begin(),
+          val->use_end(),
+          [&](llvm::Value* use){
+            duReverted.insert(duReverted.begin(), use);
+            auto place = this->constantTable.find(use);
+            if(place != this->constantTable.end()){
+              this->constantTable.erase(place);
+            }
+          });
+         std::for_each(
+           duReverted.begin(),
+           duReverted.end(),
+           [&](llvm::Value* use){
+            auto asInst = llvm::cast<llvm::Instruction>(use);
+            asInst->removeFromParent();
+          });
+          //finally remove the instruction itself
+          auto asInst = llvm::cast<llvm::Instruction>(val);
+          asInst->removeFromParent();
+        }
+        auto type = llvm::Type::getInt32Ty(llvm::getGlobalContext());
+        auto constVal = llvm::ConstantInt::get(type, info.value, true);
+        val->replaceAllUsesWith(constVal);
+      }
+    });
 }
 
 void Transition::deleteDeadBlocks(){
