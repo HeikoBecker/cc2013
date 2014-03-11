@@ -50,6 +50,8 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   Transition(llvm::Function& F,
   std::map<llvm::BasicBlock*, Reachability>& blockTable);
 
+  ~Transition();
+
   llvm::BasicBlock* getNextBlock();
   
   //override each instruction here
@@ -67,10 +69,12 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   
   void enqueueCFGSuccessors(llvm::Instruction& inst);
   
+  void deleteDeadBlocks();
+  void tearDownInsts();
   //helper functions
   ConstantLattice getConstantLatticeElem(llvm::Value* val);
   Reachability getReachabilityElem(llvm::BasicBlock* block);
-  
+  void tearDown(); 
 private:
   std::deque<llvm::BasicBlock*> workQueue;
 };
