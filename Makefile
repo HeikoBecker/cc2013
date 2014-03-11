@@ -28,9 +28,9 @@ DEP    := $(OBJ:%.o=%.d)
 LLVM_CFLAGS  := $(shell $(LLVM_CONFIG) --cppflags)
 LLVM_LDFLAGS := $(shell $(LLVM_CONFIG) --libs core transformutils) $(shell $(LLVM_CONFIG) --ldflags)
 
-CFLAGS   += $(LLVM_CFLAGS) -Wall -W -Werror -O2
+CFLAGS   += $(LLVM_CFLAGS) -Wall -W -Werror -O2 -Wno-error=unused-parameter
 
-CXXFLAGS += $(CFLAGS) -std=c++11
+CXXFLAGS += $(CFLAGS) -std=c++11 -Wno-error=unused-parameter
 LDFLAGS  += $(LLVM_LDFLAGS)
 
 DUMMY := $(shell mkdir -p $(sort $(dir $(OBJ))))
