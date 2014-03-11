@@ -30,7 +30,7 @@
 Codegeneration::IRCreator::IRCreator(const char* filename):
   M(filename, llvm::getGlobalContext()),
   Builder(M.getContext()), AllocaBuilder(M.getContext()),
-  currentFunction(nullptr)
+  currentFunction(nullptr), currentBreakPoint(nullptr), currentContinuePoint(nullptr)
 {
 
   M.setTargetTriple(llvm::sys::getDefaultTargetTriple());
