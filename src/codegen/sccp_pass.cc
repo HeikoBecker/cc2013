@@ -430,6 +430,7 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
           return;
         this->blockTable.insert(BLOCKPAIR(trueSucc, reachable));
       }
+      this->constantTable.checkedInsert(VALPAIR(&branch, condVal));
     }else{ //both can be reachable modify both if not already reachable
       auto trueInfo = this->getReachabilityElem(trueSucc);
       auto falseInfo = this->getReachabilityElem(falseSucc);
@@ -530,9 +531,19 @@ void Transition::tearDownInsts(){
           auto asInst = llvm::cast<llvm::Instruction>(val);
           asInst->removeFromParent();
         }
+        if(llvm::isa<llvm::BranchInst>(val)){
+          auto asBranch = llvm::cast<llvm::BranchInst>(val);
+          llvm::BasicBlock* succ = nullptr;
+          if(info.value == 0)
+            succ = asBranch->getSuccessor(1);
+          else
+            succ= asBranch->getSuccessor(0);
+          val->replaceAllUsesWith(llvm::BranchInst::Create(succ)); 
+        }else{
         auto type = llvm::Type::getInt32Ty(llvm::getGlobalContext());
         auto constVal = llvm::ConstantInt::get(type, info.value, true);
         val->replaceAllUsesWith(constVal);
+        }
       }
     });
 }
