@@ -70,6 +70,12 @@ EMIT_IR(Parsing::Declaration)
     if (this->declarator->hasName()) {
       var->setName(this->declarator->getIdentifier());
     }
+  } else if (declNode->type() == Semantic::Type::STRUCT) {
+    auto as_struct = std::static_pointer_cast<StructDeclaration>(declNode);
+    if (this->declarator->hasName()) {
+      auto var = creator->allocateInCurrentFunction(as_struct->llvm_type);
+      var->setName(this->declarator->getIdentifier());
+    }
   }
 }
 
