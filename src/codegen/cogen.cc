@@ -718,12 +718,12 @@ EMIT_LV(Parsing::TernaryExpression){
   auto endBlock = creator->makeBlock("ternary-end", false);
   this->condition->emit_condition(creator, consequenceBlock, alternativeBlock);
   creator->setCurrentBasicBlock(consequenceBlock);
-  auto val_consequence = this->lhs->emit_rvalue(creator);
+  auto val_consequence = this->lhs->emit_lvalue(creator);
   if (result_type->type() != Semantic::Type::VOID)
     val_consequence = creator->convert(val_consequence, result_type);
   consequenceBlock = creator->connect(nullptr, endBlock);
   creator->setCurrentBasicBlock(alternativeBlock);
-  auto val_alternative = this->rhs->emit_rvalue(creator);
+  auto val_alternative = this->rhs->emit_lvalue(creator);
   if (result_type->type() != Semantic::Type::VOID)
     val_alternative = creator->convert(val_alternative, result_type);
   alternativeBlock = creator->connect(nullptr, endBlock);
