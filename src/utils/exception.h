@@ -8,8 +8,8 @@
 class CompilerException: public std::runtime_error {
     public:
       CompilerException(std::string message, Pos where) : std::runtime_error(message), m_where(where) {
-        if (m_where.column <= 0) {m_where.column = 1;}
-        if (m_where.line <= 0) {m_where.line = 1;}
+        if (m_where.column == 0) {m_where.column = 1;}
+        if (m_where.line == 0) {m_where.line = 1;}
       }
       Pos where() const {return m_where;}
     private:
