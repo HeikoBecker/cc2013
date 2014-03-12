@@ -395,11 +395,17 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
             || operand_as_unary->op == PunctuatorType::STAR) {
           valid = true;
         }
+      }else if(operand->getType()->type() == Semantic::Type::POINTER){
+        auto asPointer = std::static_pointer_cast<Parsing::PointerDeclaration>(operand->getType());
+        if(asPointer->pointee()->type() == Semantic::Type::CHAR){
+          valid = true;
+        }
+        
       }
       if (valid) {
         this->type = make_shared<PointerDeclaration>(0, operand->getType());
       } else {
-        throw ParsingException("Incompatible opreand for &", operand->pos());
+        throw ParsingException("Incompatible operand for &", operand->pos());
       }
       break;
       }
