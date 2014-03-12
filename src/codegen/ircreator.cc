@@ -575,11 +575,25 @@ BINCREATEL(getArrayPosition) {
 }
 
 UNCREATE(createLogNeg) {
-        return Builder.CreateNot(val);
+  if(val->getType()->isPointerTy()){
+    auto type = val->getType();
+    val = Builder.CreatePtrToInt(val, Builder.getInt32Ty());
+    val = Builder.CreateNot(val);
+    return Builder.CreateIntToPtr(val, type);
+   }else{
+    return Builder.CreateNot(val);
+   }
 }
 
 UNCREATE(createNeg) { 
-        return Builder.CreateNeg(val);
+  if(val->getType()->isPointerTy()){
+    auto ty = val->getType();
+    val = Builder.CreatePtrToInt(val, Builder.getInt32Ty());
+    val = Builder.CreateNeg(val);
+    return Builder.CreateIntToPtr(val, ty);
+  }else {
+    return Builder.CreateNeg(val);
+  }
 }
 
 /*
