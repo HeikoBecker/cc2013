@@ -445,7 +445,7 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
   if(branch.isUnconditional()){ //unconditional branch --> successor reachable
     auto succ = branch.getSuccessor(0);
     auto info = this->getReachabilityElem(succ);
-    if(info.state == reachable.state)
+    if(info.state != reachable.state)
             return;
     this->blockTable.checkedInsert(BLOCKPAIR(succ, reachable));
     
@@ -626,11 +626,10 @@ void Transition::deleteDeadBlocks(){
   // delete dead blocks
   for (auto block: deadBlockSet) {
 #ifdef DEBUG
-    llvm::errs() << "DEAD:\t";
     block->dump();
 #endif
     UNUSED(block);
-    //llvm::DeleteDeadBlock(block);
+    llvm::DeleteDeadBlock(block);
   }
 }
 
