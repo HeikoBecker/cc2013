@@ -395,8 +395,8 @@ UnaryExpression::UnaryExpression(PunctuatorType op, SubExpression operand, Pos p
             || operand_as_unary->op == PunctuatorType::STAR) {
           valid = true;
         }
-      }else if(operand->getType()->type() == Semantic::Type::POINTER){
-        auto asPointer = std::static_pointer_cast<Parsing::PointerDeclaration>(operand->getType());
+      }else if(operand->getType()->type() == Semantic::Type::ARRAY){
+        auto asPointer = std::static_pointer_cast<Parsing::ArrayDeclaration>(operand->getType());
         if(asPointer->pointee()->type() == Semantic::Type::CHAR){
           valid = true;
         }
