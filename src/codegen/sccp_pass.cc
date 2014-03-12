@@ -72,6 +72,11 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
           transMngr.visit(basic_block_inst);
           });
     }
+    
+    #ifdef DEBUG
+    F.dump();
+    #endif
+
     transMngr.tearDownInsts();
     transMngr.deleteDeadBlocks();
   }
@@ -465,8 +470,9 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
  * this value
  */
 TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
-  auto operand = ret.getOperand(0);
-  auto info = this->getConstantLatticeElem(operand);
+  ConstantLattice info;
+  info.state =LatticeState::top;
+  info.value = 0;
   constantTable.checkedInsert(VALPAIR(&ret, info));
   //WARNING: do not enqueue CFG successors of return! this would mean stepping
   //into another function
@@ -566,6 +572,7 @@ void Transition::tearDownInsts(){
             succ= asBranch->getSuccessor(0);
           val->replaceAllUsesWith(llvm::BranchInst::Create(succ)); 
         }else{
+        //we need to know if we have to handle a branch or a return inst
         auto type = llvm::Type::getInt32Ty(llvm::getGlobalContext());
         auto constVal = llvm::ConstantInt::get(type, info.value, true);
         llvm::BasicBlock::iterator ii (asInst);
