@@ -43,6 +43,19 @@ void ConstantTable::checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair)
   }
 }
 
+void BlockTable::checkedInsert(std::pair<llvm::BasicBlock*, Reachability> pair)
+{
+  auto it =  this->find(pair.first);
+  if (it == this->end()) {
+    std::map<llvm::BasicBlock*, Reachability>::insert(pair);
+    return;
+  } else {
+    assert_that(it->second.state <= pair.second.state, "Error: Descended in lattice");
+    this->operator[](pair.first) = pair.second;
+  }
+}
+
+
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
 
 bool SCCP_Pass::runOnFunction(llvm::Function &F) {
@@ -50,7 +63,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   F.dump();
   #endif
   // maps BasicBlocks to either reachable or unreachable
-  std::map<llvm::BasicBlock*, Reachability> BlockMapping;
+  BlockTable BlockMapping;
 
   std::for_each(
     F.begin(),
@@ -94,7 +107,7 @@ static RegisterPass<SCCP_Pass> X("sccp", "SCCP Pass", false, false);
 //##############################################################################
 
 Transition::Transition( llvm::Function& F,
-                        std::map<llvm::BasicBlock*, Reachability>& blockTable):
+                        BlockTable& blockTable):
                         blockTable(blockTable) {
   //Put all BasicBlocks of the function into our working queue
  std::for_each(
@@ -432,7 +445,8 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
     auto info = this->getReachabilityElem(succ);
     if(info.state == reachable.state)
             return;
-    this->blockTable.insert(BLOCKPAIR(succ, reachable));
+    this->blockTable.checkedInsert(BLOCKPAIR(succ, reachable));
+    
   }else{ //conditional branch -->get value and decide based on it
     auto trueSucc = branch.getSuccessor(0);
     auto falseSucc = branch.getSuccessor(1);
@@ -444,24 +458,24 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
         auto falseInfo = this->getReachabilityElem(falseSucc);
         if (falseInfo.state == reachable.state)//only modify if already reachable
           return;
-        this->blockTable.insert(BLOCKPAIR(falseSucc, reachable));
+        this->blockTable.checkedInsert(BLOCKPAIR(falseSucc, reachable));
       }else{
         //true succ is reachable don't modify falseSucc as it could be reachable
         //from another block
         auto trueInfo = this->getReachabilityElem(trueSucc);
         if (trueInfo.state == reachable.state)
           return;
-        this->blockTable.insert(BLOCKPAIR(trueSucc, reachable));
+        this->blockTable.checkedInsert(BLOCKPAIR(trueSucc, reachable));
       }
       this->constantTable.checkedInsert(VALPAIR(&branch, condVal));
     }else{ //both can be reachable modify both if not already reachable
       auto trueInfo = this->getReachabilityElem(trueSucc);
       auto falseInfo = this->getReachabilityElem(falseSucc);
       if (trueInfo.state != reachable.state){
-        this->blockTable.insert(BLOCKPAIR(trueSucc, reachable));
+        this->blockTable.checkedInsert(BLOCKPAIR(trueSucc, reachable));
       }
       if(falseInfo.state != reachable.state){
-        this->blockTable.insert(BLOCKPAIR(falseSucc, reachable));
+        this->blockTable.checkedInsert(BLOCKPAIR(falseSucc, reachable));
       }
     }
   }

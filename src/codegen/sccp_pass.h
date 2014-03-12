@@ -35,6 +35,12 @@ class ConstantTable : public std::map<llvm::Value*, ConstantLattice>
     void checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair);
 };
 
+class BlockTable : public std::map<llvm::BasicBlock*, Reachability>
+{
+  public:
+    void checkedInsert(std::pair<llvm::BasicBlock*, Reachability> pair);
+};
+
 struct SCCP_Pass : public llvm::FunctionPass {
   static char ID;
   SCCP_Pass();
@@ -45,10 +51,10 @@ struct SCCP_Pass : public llvm::FunctionPass {
 struct Transition: public llvm::InstVisitor<Transition, void> {
   
   ConstantTable constantTable;
-  std::map<llvm::BasicBlock*, Reachability> blockTable;
+  BlockTable blockTable;
 
   Transition(llvm::Function& F,
-  std::map<llvm::BasicBlock*, Reachability>& blockTable);
+  BlockTable& blockTable);
 
   ~Transition();
 
