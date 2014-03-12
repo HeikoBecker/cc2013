@@ -616,24 +616,23 @@ void Transition::deleteDeadBlocks(){
       });
   // shorten dead block chain into dead block
   // TODO: this might not be sufficiant yet
-  for (auto it = deadBlockSet.begin(); it != deadBlockSet.end();) {
-    if (llvm::MergeBlockIntoPredecessor(*it)) {
-      it = deadBlockSet.erase(it);
-    } else if (llvm::pred_begin(*it) == llvm::pred_end(*it)) {
-      // we can delete a dead block if it has no predecessor
-      llvm::DeleteDeadBlock(*it);
-      it = deadBlockSet.erase(it);
-    } else {
-      ++it;
+  auto dirty = true;
+  while (dirty) {
+    dirty = false;
+    for (auto it = deadBlockSet.begin(); it != deadBlockSet.end();) {
+      (*it)->dump();
+      if (llvm::MergeBlockIntoPredecessor(*it)) {
+        it = deadBlockSet.erase(it);
+        dirty = true;
+      } else if (llvm::pred_begin(*it) == llvm::pred_end(*it)) {
+        // we can delete a dead block if it has no predecessor
+        llvm::DeleteDeadBlock(*it);
+        it = deadBlockSet.erase(it);
+        dirty = true;
+      } else {
+        ++it;
+      }
     }
-  }
-  // delete dead blocks
-  for (auto block: deadBlockSet) {
-#ifdef DEBUG
-    block->dump();
-#endif
-    UNUSED(block);
-    llvm::DeleteDeadBlock(block);
   }
 }
 
