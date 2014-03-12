@@ -147,7 +147,7 @@ TRANSITION(visitAllocaInst,llvm::AllocaInst& alloc){
   auto reachability = this->getReachabilityElem(block);
   auto oldElem = this->getConstantLatticeElem(&alloc);
 
-  if (reachability.state == LatticeState::bottom){ //the block is reachable
+  if (reachability.state == LatticeState::top){ //the block is reachable
     ConstantLattice newElem; //make new element
     newElem.state = LatticeState::top; //set it to top
     //insert the element
