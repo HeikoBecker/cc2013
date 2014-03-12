@@ -461,6 +461,7 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
         if (falseInfo.state == reachable.state)//only modify if already reachable
           return;
         this->blockTable.checkedInsert(BLOCKPAIR(falseSucc, reachable));
+        this->workQueue.push_back(branch.getSuccessor(1));
       }else{
         //true succ is reachable don't modify falseSucc as it could be reachable
         //from another block
@@ -468,6 +469,7 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
         if (trueInfo.state == reachable.state)
           return;
         this->blockTable.checkedInsert(BLOCKPAIR(trueSucc, reachable));
+        this->workQueue.push_back(branch.getSuccessor(0));
       }
       this->constantTable.checkedInsert(VALPAIR(&branch, condVal));
     }else{ //both can be reachable modify both if not already reachable
@@ -479,6 +481,8 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
       if(falseInfo.state != reachable.state){
         this->blockTable.checkedInsert(BLOCKPAIR(falseSucc, reachable));
       }
+      this->workQueue.push_back(branch.getSuccessor(0));
+      this->workQueue.push_back(branch.getSuccessor(1));
     }
   }
 }
@@ -507,7 +511,7 @@ void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
     llvm::Instruction* use = llvm::cast<Instruction>(useObj);
     auto block = use->getParent();
     Reachability reach = this->getReachabilityElem(block);
-    if(reach.state == LatticeState::bottom) //Top means Reachable
+    if(reach.state == LatticeState::top) //Top means Reachable
       workQueue.push_back(block);
     }
   }
