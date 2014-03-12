@@ -771,15 +771,15 @@ llvm::Type* Codegeneration::IRCreator::semantic_type2llvm_type(
       {
         auto structType =
           std::static_pointer_cast<Parsing::StructDeclaration>(semantic_type);
-        if (structType->llvm_type) {
-          llvm_type = structType->llvm_type;
+        if (*structType->llvm_type) {
+          llvm_type = *structType->llvm_type;
           break;
         }
         auto struct_type = llvm::StructType::create(
             this->Builder.getContext(),
             structType->toString()
             );
-        structType->llvm_type = struct_type;
+        *structType->llvm_type = struct_type;
         /* TODO: handle non primitive types*/
         std::vector<llvm::Type *> member_types;
         // TODO: use transform

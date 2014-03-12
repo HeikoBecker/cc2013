@@ -120,7 +120,7 @@ namespace Parsing {
         members();
       SubSemanticNode node();
       // required to handle self-referencing structs in cogen
-      llvm::Type* llvm_type;
+      std::shared_ptr<llvm::Type*> llvm_type;
       bool selfReferencing;
     private:
       std::string name;

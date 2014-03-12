@@ -73,7 +73,7 @@ EMIT_IR(Parsing::Declaration)
   } else if (declNode->type() == Semantic::Type::STRUCT) {
     auto as_struct = std::static_pointer_cast<StructDeclaration>(declNode);
     if (this->declarator->hasName()) {
-      auto var = creator->allocateInCurrentFunction(as_struct->llvm_type);
+      auto var = creator->allocateInCurrentFunction(*as_struct->llvm_type);
       var->setName(this->declarator->getIdentifier());
     }
   }
@@ -109,7 +109,7 @@ EMIT_IR(Parsing::ExternalDeclaration)
       auto as_struct = std::static_pointer_cast<StructDeclaration>(declNode);
       if (this->declarator->hasName()) {
         auto name = this->declarator->getIdentifier();
-        GlobalVariable *GlobVar = creator->makeGlobVar(as_struct->llvm_type);
+        GlobalVariable *GlobVar = creator->makeGlobVar(*as_struct->llvm_type);
         //TODO: what should we do with the global variable now?
         GlobVar->setName(name); // FIXME: we probably want a get name method
         this->getSemanticNode()->associatedValue = GlobVar;

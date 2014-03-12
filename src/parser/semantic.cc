@@ -264,7 +264,7 @@ bool hasSameType(SemanticDeclarationNode a, SemanticDeclarationNode b) {
 }
 
 SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
-  static std::map<std::string,SemanticDeclarationNode> structname2struct {};
+  static std::map<std::string, std::shared_ptr<llvm::Type*>> structname2structtype {};
    SemanticDeclarationNode myDeclaration;
 
     string type = typeNode->toString();
@@ -296,14 +296,18 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
        if (helpNode) {
          auto ptr = (size_t) helpNode.operator->(); // TODO FIXME WARNING HACK !!!!!
          auto name = "@" + type + std::to_string(ptr);
-         if (structname2struct.find(name) == structname2struct.end()) {
+         if (structname2structtype.find(name) == structname2structtype.end()) {
            debug(SEMANTIC) << "New";
-           myDeclaration = make_shared<StructDeclaration>(name, helpNode, nodes[id]->isActive());
-           structname2struct[name] = myDeclaration;
+           auto as_struct = make_shared<StructDeclaration>(name, helpNode, nodes[id]->isActive());
+           structname2structtype[name] = std::make_shared<llvm::Type*>(nullptr);
+           as_struct->llvm_type = structname2structtype[name];
+           myDeclaration = as_struct;
          } else {
            debug(SEMANTIC) << "Old";
-           myDeclaration = structname2struct[name];
-           std::static_pointer_cast<StructDeclaration>(myDeclaration)->selfReferencing =  nodes[id]->isActive();
+           auto as_struct = make_shared<StructDeclaration>(name, helpNode, nodes[id]->isActive());
+           as_struct->llvm_type = structname2structtype[name];
+           as_struct->selfReferencing =  nodes[id]->isActive();
+           myDeclaration = as_struct;
          }
        } else {
           throw Parsing::ParsingException("the struct @" + type + "is not defined", pos);
