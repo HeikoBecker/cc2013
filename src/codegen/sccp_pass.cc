@@ -45,6 +45,9 @@ void ConstantTable::checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair)
 SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
 
 bool SCCP_Pass::runOnFunction(llvm::Function &F) {
+  #ifdef DEBUG
+  F.dump();
+  #endif
   // maps BasicBlocks to either reachable or unreachable
   std::map<llvm::BasicBlock*, Reachability> BlockMapping;
 
@@ -58,7 +61,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   //Initialize the Transition object
   Transition transMngr = Transition(F, BlockMapping);
   
-  llvm::BasicBlock* curr = transMngr.getNextBlock();
+  llvm::BasicBlock* curr;
 
   while((curr = transMngr.getNextBlock())){
     std::for_each(
@@ -322,7 +325,7 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
  */
 TRANSITION(visitLoadInst, llvm::LoadInst& load){
   auto info = this->getConstantLatticeElem(&load);
-  //if it is already top continue and do not enqueue the successors as the value
+  //if it is already top continue do not enqueue the successors as the value
   //does not change
   if (info.state == LatticeState::top)
           return;
@@ -334,13 +337,24 @@ TRANSITION(visitLoadInst, llvm::LoadInst& load){
  * Same as visitGetElementPtrInst
  */
 TRANSITION(visitStoreInst, llvm::StoreInst& store){
+   auto val = store.getValueOperand();
    auto info = this->getConstantLatticeElem(&store);
+   if(llvm::isa<llvm::ConstantInt>(val)){
+     ConstantLattice newInfo;
+     auto asInt = llvm::cast<llvm::ConstantInt>(val);
+     newInfo.state = LatticeState::value;
+     newInfo.value = asInt->getLimitedValue();
+     this->constantTable.checkedInsert(VALPAIR(&store, info));
+     if(newInfo.value != info.value || newInfo.state != info.state)
+       this->enqueueCFGSuccessors(store);
+   }else{
   //if it is already top continue and do not enqueue the successors as the value
   //does not change
   if (info.state == LatticeState::top)
           return;
   info.state = LatticeState::top;
   this->enqueueCFGSuccessors(store);
+   }
 }
 
 /*
