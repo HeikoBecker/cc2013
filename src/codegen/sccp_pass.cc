@@ -72,6 +72,8 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
           transMngr.visit(basic_block_inst);
           });
     }
+    transMngr.tearDownInsts();
+    transMngr.deleteDeadBlocks();
   }
  
   return true; // we modified the module
@@ -97,8 +99,8 @@ Transition::Transition( llvm::Function& F,
 }
 
 Transition::~Transition(){
-  this->tearDownInsts(); 
-  this->deleteDeadBlocks();
+ // this->tearDownInsts(); 
+//  this->deleteDeadBlocks();
 }
 
 /*
