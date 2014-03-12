@@ -42,5 +42,7 @@ inline void assert_that(bool that, std::string message)
     throw std::runtime_error(message);
 }
 
+#define ASSERT_THAT(X) do { assert_that((X), #X ); } while (0)
+
 
 #endif

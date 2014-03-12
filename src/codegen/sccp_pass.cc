@@ -553,7 +553,8 @@ void Transition::tearDownInsts(){
       auto info = inst_const_pair.second;
       auto val = inst_const_pair.first;
       if(info.state != LatticeState::top){
-        auto asInst = llvm::cast<llvm::Instruction>(val);
+        auto asInst = llvm::dyn_cast<llvm::Instruction>(val);
+        ASSERT_THAT(asInst != 0);
         if(info.state == LatticeState::bottom){
         #ifdef DEBUG
         //TODO: check all succesors for "bottom"
