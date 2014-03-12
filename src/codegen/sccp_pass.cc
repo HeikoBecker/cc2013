@@ -137,7 +137,7 @@ TRANSITION(visitAllocaInst,llvm::AllocaInst& alloc){
 }
 
 /*
- * TODO: Handle bottom! We don't need to analyse with the control flow!
+ *
  */
 TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   //take the first two operands more should not be present
@@ -145,10 +145,8 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
   llvm::Value *rhs= binOp.getOperand(1);
 
   //the old info computed before
-  //FIXME: is this valid?
-  ConstantLattice oldInfo = (* this->constantTable.find(&binOp)).second;
+  ConstantLattice oldInfo = this->getConstantLatticeElem(&binOp);
   ConstantLattice newInfo;
-
 
   //take the corresponding lattice values
   ConstantLattice lhsInfo = this->getConstantLatticeElem(lhs);
@@ -488,16 +486,27 @@ void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
 }
 
 ConstantLattice Transition::getConstantLatticeElem(llvm::Value* val){
-  auto it = this->constantTable.find(val);
-  if(it != this->constantTable.end())
-    return (*it).second;
-  else{ //the values was not initialized--> this value was not used before
-        //return the bottom element and map the value to it
-    ConstantLattice constant;
-    constant.state = LatticeState::bottom;
-    constant.value = 0;
-    this->constantTable.checkedInsert(VALPAIR(val,constant));
-    return constant;
+  //first check if we are dealing with a constant
+  if(llvm::isa<llvm::ConstantInt>(val)){
+    auto asConst = llvm::cast<llvm::ConstantInt>(val);
+    int value = asConst->getLimitedValue();
+    ConstantLattice info;
+    info.state = LatticeState::value;
+    info.value = value;
+    this->constantTable.checkedInsert(VALPAIR(val,info));
+    return info;
+  }else{     // it is no constant--> real op --> try to get it from the table
+    auto it = this->constantTable.find(val);
+    if(it != this->constantTable.end()) // we already computed the value
+      return (*it).second;
+    else{ //the values was not initialized--> this value was not used before
+          //return the bottom element and map the value to it
+      ConstantLattice constant;
+      constant.state = LatticeState::bottom;
+      constant.value = 0;
+      this->constantTable.checkedInsert(VALPAIR(val,constant));
+      return constant;
+    }
   }
 }
 
