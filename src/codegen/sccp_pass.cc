@@ -59,20 +59,22 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   });
  
   //Initialize the Transition object
-  Transition transMngr = Transition(F, BlockMapping);
-  
-  llvm::BasicBlock* curr;
+  {
+    Transition transMngr = Transition(F, BlockMapping);
 
-  while((curr = transMngr.getNextBlock())){
-    std::for_each(
-      curr->begin(),
-      curr->end(),
-      [&](llvm::BasicBlock::iterator basic_block_inst){
-        transMngr.visit(basic_block_inst);
-    });
+    llvm::BasicBlock* curr;
+
+    while((curr = transMngr.getNextBlock())){
+      std::for_each(
+          curr->begin(),
+          curr->end(),
+          [&](llvm::BasicBlock::iterator basic_block_inst){
+          transMngr.visit(basic_block_inst);
+          });
+    }
   }
  
-  return false;
+  return true; // we modified the module
 }
 
 char SCCP_Pass::ID = 0;
@@ -373,7 +375,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
 
   //check if we can simplify to a single value
   bool canBeValue = true;
-  std::vector<int> values;
+  std::vector<int> values {};
   for(ConstantLattice elem : incomingValues){
     if(! canBeValue) //finish if we can be sure that it cannot be a single value
             break;
@@ -539,11 +541,10 @@ void Transition::tearDownInsts(){
           val->use_end(),
           [&](llvm::Value* use){
             duReverted.insert(duReverted.begin(), use);
-            auto place = this->constantTable.find(use);
-            if(place != this->constantTable.end()){
-              this->constantTable.erase(place);
+            // prevent double deletion without invalidating the iterator
+            this->constantTable[use].state = top;
             }
-          });
+          );
          std::for_each(
            duReverted.begin(),
            duReverted.end(),
