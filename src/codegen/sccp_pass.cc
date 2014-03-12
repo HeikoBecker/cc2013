@@ -288,6 +288,7 @@ TRANSITION(visitGetElementPtrInst, llvm::GetElementPtrInst& gep){
   if (info.state == LatticeState::top)
           return;
   info.state = LatticeState::top;
+  constantTable.checkedInsert(std::make_pair(&gep, info));
   this->enqueueCFGSuccessors(gep);
 }
 
@@ -352,6 +353,7 @@ TRANSITION(visitLoadInst, llvm::LoadInst& load){
   if (info.state == LatticeState::top)
           return;
   info.state = LatticeState::top;
+  constantTable.checkedInsert(std::make_pair(&load, info));
   this->enqueueCFGSuccessors(load);
 }
 
