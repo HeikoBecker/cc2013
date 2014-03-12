@@ -605,10 +605,8 @@ UNCREATE(createDeref) {
 
 llvm::Value* Codegeneration::IRCreator::createSizeof(llvm::Type* type)
 {
-  llvm::DataLayout dl { M.getDataLayout()};
-  auto size = dl.getTypeAllocSize(type);
-  auto ret = Builder.getInt32(size);
-  return ret;
+  auto val = llvm::ConstantExpr::getSizeOf(type);
+  return Builder.CreateSExtOrTrunc(val,  Builder.getInt32Ty());
 }
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
