@@ -538,11 +538,10 @@ void Transition::tearDownInsts(){
           val->use_end(),
           [&](llvm::Value* use){
             duReverted.insert(duReverted.begin(), use);
-            auto place = this->constantTable.find(use);
-            if(place != this->constantTable.end()){
-              this->constantTable.erase(place);
+            // prevent double deletion without invalidating the iterator
+            this->constantTable[use].state = top;
             }
-          });
+          );
          std::for_each(
            duReverted.begin(),
            duReverted.end(),
