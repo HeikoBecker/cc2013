@@ -583,7 +583,15 @@ void Transition::tearDownInsts(){
 }
 
 void Transition::deleteDeadBlocks(){
-
+  for (auto block_reachable_pair: blockTable) {
+    if (block_reachable_pair.second.state == bottom) {
+#ifdef DEBUG
+      auto BB = block_reachable_pair.first;
+      llvm::errs() << "DEAD!\t";
+      BB->dump();
+#endif
+    }
+  }
 }
 
 
