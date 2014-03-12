@@ -589,7 +589,8 @@ void Transition::tearDownInsts(){
             succ = asBranch->getSuccessor(1);
           else
             succ= asBranch->getSuccessor(0);
-          val->replaceAllUsesWith(llvm::BranchInst::Create(succ)); 
+          llvm::BranchInst::Create(succ, asInst->getParent());
+          asInst->eraseFromParent();
         }else{
         //we need to know if we have to handle a branch or a return inst
         auto type = llvm::Type::getInt32Ty(llvm::getGlobalContext());
