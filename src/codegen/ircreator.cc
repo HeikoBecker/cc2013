@@ -450,15 +450,26 @@ BINCREATE(createEqual){
 }
 
 BINCREATE(createLogAnd){
-        lhs = PREPARE(lhs);
-        rhs = PREPARE(rhs);
-        return Builder.CreateAnd(lhs, rhs);
+  bool rhsPointer = rhs->getType()->isPointerTy();
+  if(lhs->getType()->isPointerTy()){
+    lhs = (rhsPointer? lhs : Builder.CreatePtrToInt(lhs, USUALTYPE));
+    rhs = (rhsPointer? rhs :PREPARE(rhs));
+  }else{
+    rhs = (rhsPointer? Builder.CreatePtrToInt(rhs, USUALTYPE):PREPARE(rhs));
+    lhs = PREPARE(lhs);
+  }
+  return Builder.CreateAnd(lhs, rhs);
 }
 
 BINCREATE(createLogOr){
-        lhs = PREPARE(lhs);
-        rhs = PREPARE(rhs);
-	return Builder.CreateOr(lhs,rhs);
+  bool rhsPointer = rhs->getType()->isPointerTy();
+  if(lhs->getType()->isPointerTy()){
+    lhs = (rhsPointer? lhs : Builder.CreatePtrToInt(lhs, USUALTYPE));
+    rhs = (rhsPointer? rhs :PREPARE(rhs));
+  }else{
+    rhs = (rhsPointer? Builder.CreatePtrToInt(rhs, USUALTYPE):PREPARE(rhs));
+    lhs = PREPARE(lhs);
+  }	return Builder.CreateOr(lhs,rhs);
 }
 
 BINCREATE(createArrayAccess){
@@ -580,10 +591,7 @@ UNCREATE(createDeref) {
 
 llvm::Value* Codegeneration::IRCreator::createSizeof(llvm::Type* type)
 {
-  llvm::DataLayout dl { M.getDataLayout()};
-  auto size = dl.getTypeAllocSize(type);
-  auto ret = Builder.getInt32(size);
-  return ret;
+  return llvm::ConstantExpr::getSizeOf(type);
 }
 
 llvm::Value* Codegeneration::IRCreator::loadVariable(
