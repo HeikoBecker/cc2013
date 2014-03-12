@@ -527,6 +527,7 @@ void Transition::tearDownInsts(){
       auto info = inst_const_pair.second;
       auto val = inst_const_pair.first;
       if(info.state != LatticeState::top){
+        auto asInst = llvm::cast<llvm::Instruction>(val);
         if(info.state == LatticeState::bottom){
         #ifdef DEBUG
         //TODO: check all succesors for "bottom"
@@ -551,7 +552,6 @@ void Transition::tearDownInsts(){
             asInst->removeFromParent();
           });
           //finally remove the instruction itself
-          auto asInst = llvm::cast<llvm::Instruction>(val);
           asInst->removeFromParent();
         }
         if(llvm::isa<llvm::BranchInst>(val)){
@@ -565,7 +565,8 @@ void Transition::tearDownInsts(){
         }else{
         auto type = llvm::Type::getInt32Ty(llvm::getGlobalContext());
         auto constVal = llvm::ConstantInt::get(type, info.value, true);
-        val->replaceAllUsesWith(constVal);
+        llvm::BasicBlock::iterator ii (asInst);
+        ReplaceInstWithValue(asInst->getParent()->getInstList(),ii,constVal);
         }
       }
     });
