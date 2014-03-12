@@ -57,6 +57,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
     [&](llvm::Function::iterator function_basic_block) {
       BlockMapping[function_basic_block] = unreachable;
   });
+  BlockMapping[F.begin()] = reachable;
  
   //Initialize the Transition object
   {
