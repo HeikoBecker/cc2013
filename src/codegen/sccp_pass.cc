@@ -17,6 +17,7 @@
 #include <deque>
 #include <map>
 #include <algorithm>
+#include <vector>
 #include <iterator>
 
 #define TRANSITION(X, Y) void Transition::X(Y)
@@ -584,14 +585,34 @@ void Transition::tearDownInsts(){
 }
 
 void Transition::deleteDeadBlocks(){
-  for (auto block_reachable_pair: blockTable) {
-    if (block_reachable_pair.second.state == bottom) {
-#ifdef DEBUG
-      auto BB = block_reachable_pair.first;
-      llvm::errs() << "DEAD!\t";
-      BB->dump();
-#endif
+  auto deadBlockSet = std::vector<llvm::BasicBlock*> {};
+  std::for_each(blockTable.begin(), blockTable.end(),
+      [&](decltype(*blockTable.begin()) & pair){
+        if (pair.second.state == bottom) {
+          deadBlockSet.push_back(pair.first);
+        }
+      });
+  // shorten dead block chain into dead block
+  // TODO: this might not be sufficiant yet
+  for (auto it = deadBlockSet.begin(); it != deadBlockSet.end();) {
+    if (llvm::MergeBlockIntoPredecessor(*it)) {
+      it = deadBlockSet.erase(it);
+    } else if (llvm::pred_begin(*it) == llvm::pred_end(*it)) {
+      // we can delete a dead block if it has no predecessor
+      llvm::DeleteDeadBlock(*it);
+      it = deadBlockSet.erase(it);
+    } else {
+      ++it;
     }
+  }
+  // delete dead blocks
+  for (auto block: deadBlockSet) {
+#ifdef DEBUG
+    llvm::errs() << "DEAD:\t";
+    block->dump();
+#endif
+    UNUSED(block);
+    //llvm::DeleteDeadBlock(block);
   }
 }
 
