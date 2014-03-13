@@ -77,7 +77,9 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   void visitPHINode(llvm::PHINode& phi);
   void visitBranchInst(llvm::BranchInst& branch);
   void visitReturnInst(llvm::ReturnInst& ret);
-  
+  void visitPtrToIntInst(llvm::PtrToIntInst& ptrInt);
+  void visitIntToPtrInst(llvm::IntToPtrInst& intPtr);
+
   void enqueueCFGSuccessors(llvm::Instruction& inst);
   
   void deleteDeadBlocks();

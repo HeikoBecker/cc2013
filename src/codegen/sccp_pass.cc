@@ -257,7 +257,8 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
       newInfo.state = LatticeState::top; 
     }
     //check for value modification
-    if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){ 
+    if(newInfo.state != oldInfo.state || 
+      (newInfo.state == LatticeState::value &&newInfo.value != oldInfo.value)){ 
       this->constantTable.checkedInsert(std::pair<llvm::Value*,ConstantLattice>(&binOp,newInfo));
       this->enqueueCFGSuccessors(binOp); //add succesors to queue as we need to 
                                          //update them
@@ -631,6 +632,32 @@ TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
   constantTable.checkedInsert(VALPAIR(&ret, info));
   //WARNING: do not enqueue CFG successors of return! this would mean stepping
   //into another function
+}
+
+/*
+ * PtrToInt and IntToPtr are memory near. Don't try to guess the value.
+ */
+TRANSITION(visitPtrToIntInst, llvm::PtrToIntInst& ptrInt){
+  ConstantLattice oldInfo = this->getConstantLatticeElem(&ptrInt);
+  ConstantLattice info;
+  info.state =LatticeState::top;
+  info.value = 0;
+  if(oldInfo.state != LatticeState::top){
+    constantTable.checkedInsert(VALPAIR(&ptrInt, info));
+    this->enqueueCFGSuccessors(ptrInt);
+  }
+}
+
+TRANSITION(visitIntToPtrInst, llvm::IntToPtrInst& intPtr){
+  ConstantLattice oldInfo = this->getConstantLatticeElem(&intPtr);
+  ConstantLattice info;
+  info.state =LatticeState::top;
+  info.value = 0;
+  if(oldInfo.state != LatticeState::top){
+    constantTable.checkedInsert(VALPAIR(&intPtr, info));
+    this->enqueueCFGSuccessors(intPtr);
+  }
+
 }
 
 /*
