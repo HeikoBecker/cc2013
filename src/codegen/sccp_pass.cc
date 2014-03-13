@@ -515,7 +515,6 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
         elem.state = top;
       }
       incomingValues.push_back(elem);
-      llvm::outs()<< i << " is reachable";
     }
   }
 
