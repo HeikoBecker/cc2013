@@ -64,7 +64,7 @@ def run(testdir=None):
                 if "--tokenize" in options:
                     newopts = options[:]
                 else:
-                    newopts = ["--compile"]
+                    newopts = ["--optimize"]
                 o = c4(test_file, newopts)
                 if (o[0]) == 0:
                     print(".", end="")
