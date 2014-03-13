@@ -408,24 +408,14 @@ TRANSITION(visitLoadInst, llvm::LoadInst& load){
  * Same as visitGetElementPtrInst
  */
 TRANSITION(visitStoreInst, llvm::StoreInst& store){
-   auto val = store.getValueOperand();
-   auto info = this->getConstantLatticeElem(&store);
-   if(llvm::isa<llvm::ConstantInt>(val)){
-     ConstantLattice newInfo;
-     auto asInt = llvm::cast<llvm::ConstantInt>(val);
-     newInfo.state = LatticeState::value;
-     newInfo.value = asInt->getLimitedValue();
-     this->constantTable.checkedInsert(VALPAIR(&store, newInfo));
-     if(newInfo.value != info.value || newInfo.state != info.state)
-       this->enqueueCFGSuccessors(store);
-   }else{
+  auto info = this->getConstantLatticeElem(&store);
   //if it is already top continue and do not enqueue the successors as the value
   //does not change
   if (info.state == LatticeState::top)
-          return;
+    return;
   info.state = LatticeState::top;
   this->enqueueCFGSuccessors(store);
-   }
+  this->constantTable.checkedInsert(VALPAIR(&store, info));
 }
 
 /*
