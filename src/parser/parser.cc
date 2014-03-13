@@ -196,8 +196,6 @@ ExternalDeclarationNode Parser::externalDeclaration() {
     // it was a declaration
     scan();
 
-    // TODO : make lookuptable for struct
-    // or is this not allowed in our grammar
     return make_shared<ExternalDeclaration>(type, pos, semanticTree);
   }
 
@@ -844,6 +842,9 @@ void Parser::directDeclaratorHelp(std::vector<SubDirectDeclaratorHelp> & hs ,Thr
     }
 
   } else if (testTypeSpecifier()) { // parameter-list
+    
+    //FIXME: by HEIKO push a new scope for parameters
+    //semanticTree->addChild(pos);
 
     auto params = parameterList();
     expect(PunctuatorType::RIGHTPARENTHESIS);
