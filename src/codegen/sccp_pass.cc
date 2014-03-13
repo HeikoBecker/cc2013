@@ -494,16 +494,14 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
   int numOfIncomingVals = phi.getNumIncomingValues();
   std::vector<ConstantLattice> incomingValues;
   for(int i = 0; i < numOfIncomingVals; ++i){
+    if (getReachabilityElem(phi.getIncomingBlock(i)).state == bottom) {
+      // unreachable block
+      continue;
+    }
     auto incoming = phi.getIncomingValue(i);
     //check if the incoming value is a Instruction
     if(llvm::isa<llvm::Instruction>(incoming)){ 
-      auto incomingAsInst = llvm::cast<llvm::Instruction>(incoming);
-      auto reachability = this->getReachabilityElem(incomingAsInst->getParent());
-      //we have a instruction-_> check if its block is reachable!
-      if(reachability.state == LatticeState::top)
-        incomingValues.push_back(this->getConstantLatticeElem(incoming));
-      else
-        continue;
+      incomingValues.push_back(this->getConstantLatticeElem(incoming));
     } else if(llvm::isa<llvm::Argument>(incoming)){
     // this is a shitty case! We know that one of our selectors is always reachable
     // and we will never know its value
