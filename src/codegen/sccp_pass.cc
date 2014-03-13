@@ -706,6 +706,8 @@ void Transition::tearDownInsts(){
           val->use_begin(),
           val->use_end(),
           [&](llvm::Value* use){
+            // any value that we delete must have been in the table
+            ASSERT_THAT(constantTable.find(use) != constantTable.end());
             if (constantTable[use].state == top) {
               // already modified while iterating over another DU chain
               return;
