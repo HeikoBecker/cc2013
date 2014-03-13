@@ -466,7 +466,9 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
         if (CI->getBitWidth() <= 32) {
           elem.value = CI->getSExtValue();
         }
-      } // TODO: can there be an alternative case?
+      } else {// TODO: can there be an alternative case?
+        elem.state = top;
+      }
       incomingValues.push_back(elem);
       llvm::outs()<< i << " is reachable";
     }
@@ -570,6 +572,12 @@ TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
   info.state =LatticeState::top;
   info.value = 0;
   constantTable.checkedInsert(VALPAIR(&ret, info));
+  auto retval = ret.getOperand(0);
+  auto retInfo = getConstantLatticeElem(retval);
+  if (retInfo.state != top) {
+    retInfo.state = top;
+    constantTable.checkedInsert(VALPAIR(retval, retInfo));
+  }
   //WARNING: do not enqueue CFG successors of return! this would mean stepping
   //into another function
 }
@@ -660,6 +668,7 @@ void Transition::tearDownInsts(){
               // already modified while iterating over another DU chain
               return;
             }
+            ASSERT_THAT(constantTable[use].state == bottom);
             duReverted.insert(duReverted.begin(), use);
             // prevent double deletion without invalidating the iterator
             this->constantTable[use].state = top;
@@ -670,10 +679,10 @@ void Transition::tearDownInsts(){
            duReverted.end(),
            [&](llvm::Value* use){
             auto asInst = llvm::cast<llvm::Instruction>(use);
-            asInst->removeFromParent();
+            asInst->eraseFromParent();
           });
           //finally remove the instruction itself
-          asInst->removeFromParent();
+          asInst->eraseFromParent();
           return;
         }
         if(llvm::isa<llvm::BranchInst>(val)){
