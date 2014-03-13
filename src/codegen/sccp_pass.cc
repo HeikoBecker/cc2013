@@ -5,6 +5,7 @@
 #include "../utils/pos.h"
 
 #include "llvm/Pass.h"
+#include "llvm/IR/Constant.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/ValueSymbolTable.h"
 #include "llvm/Support/raw_ostream.h"
@@ -441,9 +442,17 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
         incomingValues.push_back(this->getConstantLatticeElem(incoming));
       else
         continue;
-    }else{ //only  a value(constant) --> always reachable
-    incomingValues.push_back(this->getConstantLatticeElem(incoming));
-    llvm::outs()<< i << " is reachable";
+    } else { //only  a value(constant) --> always reachable
+      ASSERT_THAT(isa<Constant>(incoming));
+      auto elem = ConstantLattice {};
+      elem.state = value;
+      if (ConstantInt* CI = dyn_cast<ConstantInt>(incoming)) {
+        if (CI->getBitWidth() <= 32) {
+          elem.value = CI->getSExtValue();
+        }
+      } // TODO: can there be an alternative case?
+      incomingValues.push_back(elem);
+      llvm::outs()<< i << " is reachable";
     }
   }
 
@@ -460,6 +469,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
   }
   //if we can make the phi a single value, compute it by iteration
   if(canBeValue){
+    ASSERT_THAT(!values.empty());
     auto res = values[0];
     auto allSame =  std::all_of(
         values.begin(),
@@ -705,6 +715,7 @@ void Transition::deleteDeadBlocks(){
       }
     }
   }
+  ASSERT_THAT(deadBlockSet.empty());
 }
 
 
