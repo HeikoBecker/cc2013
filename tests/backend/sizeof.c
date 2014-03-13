@@ -1,0 +1,30 @@
+struct S {int i;};
+struct S s;
+struct S *sptr;
+int main(void) {
+  int a;
+  int sum;
+  sum = 0;
+  a = sizeof(a);
+  sum = sum + a;
+  a = sizeof(sizeof(a));
+  sum = sum + a;
+  a = sizeof(&a);
+  sum = sum + a;
+  a = sizeof(s);
+  sum = sum + a;
+  a = sizeof(sptr);
+  sum = sum + a;
+  struct S {int i; char c; int j;} s;
+  a = sizeof(s);
+  sum = sum + a;
+  a = sizeof(&s);
+  sum = sum + a;
+  a = sizeof(s.c);
+  sum = sum + a;
+  a = sizeof((&s)->c);
+  sum = sum + a;
+  a = sizeof("abc");
+  sum = sum +a;
+  return sum;
+}
