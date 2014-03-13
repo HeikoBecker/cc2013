@@ -503,6 +503,18 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
         incomingValues.push_back(this->getConstantLatticeElem(incoming));
       else
         continue;
+    } else if(llvm::isa<llvm::Argument>(incoming)){
+    // this is a shitty case! We know that one of our selectors is always reachable
+    // and we will never know its value
+    // --> our value = top
+      newInfo.state = LatticeState::top;
+      newInfo.value = 0;
+      if(newInfo.state != oldInfo.state || 
+        (newInfo.state == value && newInfo.value != oldInfo.value)){
+        this->constantTable.checkedInsert(VALPAIR(&phi, newInfo));
+        this->enqueueCFGSuccessors(phi);
+      }
+      return;
     } else { //only  a value(constant) --> always reachable
       ASSERT_THAT(isa<Constant>(incoming));
       auto elem = ConstantLattice {};
