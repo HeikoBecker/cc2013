@@ -542,7 +542,8 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
     if(allSame){
      newInfo.state = LatticeState::value;
      newInfo.value = res;
-     if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){
+     if(   newInfo.state != oldInfo.state
+        || (newInfo.state == LatticeState::value && newInfo.value != oldInfo.value)){
        this->constantTable.checkedInsert(VALPAIR(&phi,newInfo));
        this->enqueueCFGSuccessors(phi);
      }
