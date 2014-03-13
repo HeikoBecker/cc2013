@@ -313,6 +313,7 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
       newInfo.state = LatticeState::top;
       constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
       this->enqueueCFGSuccessors(cmp);
+      return;
     }
   }
 
@@ -324,6 +325,7 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
       newInfo.state = LatticeState::bottom;
       constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
       this->enqueueCFGSuccessors(cmp);
+      return;
     }
   }
 
@@ -333,10 +335,16 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
   switch(cmp.getSignedPredicate()){
   case llvm::CmpInst::Predicate::ICMP_EQ:
     newInfo.value = (lhsInfo.value == rhsInfo.value);
+    constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
+    return;
   case llvm::CmpInst::Predicate::ICMP_NE:
     newInfo.value = (lhsInfo.value != rhsInfo.value);
+    constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
+    return;
   case llvm::CmpInst::Predicate::ICMP_SLT:
     newInfo.value = (lhsInfo.value < rhsInfo.value);
+    constantTable.checkedInsert(VALPAIR(&cmp, newInfo));
+    return;
   default://FIXME: Maybe map unsupported ops to top
     return;
   }
