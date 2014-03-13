@@ -432,6 +432,25 @@ TRANSITION(visitSExtInst, llvm::SExtInst& sext){
 }
 
 
+TRANSITION(visitTruncInst, llvm::TruncInst & trunc){
+  auto operand = trunc.getOperand(0);
+  auto operandInfo = this->getConstantLatticeElem(operand);
+  auto old_info = this->getConstantLatticeElem(&trunc);
+  auto info = ConstantLattice {operandInfo.value, operandInfo.state};
+  if (auto asInt =  dyn_cast<llvm::IntegerType>(trunc.getSrcTy())) {
+    const auto bitwidth = asInt->getBitWidth();
+    // hacky checks
+    if (bitwidth == asInt->getInt8Ty(asInt->getContext())->getBitWidth()) {
+      info.value = static_cast<unsigned char>(info.value);
+    } else if (bitwidth == asInt->getInt1Ty(asInt->getContext())->getBitWidth()) {
+      info.value =  static_cast<bool>(info.value);
+    }
+  }
+  if (old_info.state != info.state) {
+    constantTable.checkedInsert(std::make_pair(&trunc, info));
+    this->enqueueCFGSuccessors(trunc);
+  }
+}
 
 /*
  * Same as visitGetElementPtrInst
