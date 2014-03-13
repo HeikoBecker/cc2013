@@ -618,15 +618,6 @@ TRANSITION(visitReturnInst, llvm::ReturnInst &ret){
   info.state =LatticeState::top;
   info.value = 0;
   constantTable.checkedInsert(VALPAIR(&ret, info));
-  auto retval = ret.getOperand(0);
-  auto retInfo = getConstantLatticeElem(retval);
-  if (retInfo.state != top) {
-    retInfo.state = top;
-    constantTable.checkedInsert(VALPAIR(retval, retInfo));
-    if (auto asInst = dyn_cast<Instruction>(retval)) {
-      enqueueCFGSuccessors(*asInst);
-    }
-  }
   //WARNING: do not enqueue CFG successors of return! this would mean stepping
   //into another function
 }
