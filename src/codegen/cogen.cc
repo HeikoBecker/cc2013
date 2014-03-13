@@ -660,7 +660,12 @@ EMIT_RV(Parsing::Constant) {
       }
     case Lexing::ConstantType::INT:
       {
-        int val = std::stoi(this->name);
+        int val;
+        try {
+          val = std::stoi(this->name);
+        } catch (std::out_of_range & e)  {
+          throw CompilerException("Integer constant value outside of range of int!", pos());
+        }
         return creator->allocInt(val);
       }
     case Lexing::ConstantType::NULLPOINTER:

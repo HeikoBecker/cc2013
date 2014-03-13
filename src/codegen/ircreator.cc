@@ -41,7 +41,6 @@ Codegeneration::IRCreator::IRCreator(const char* filename):
 
 Codegeneration::IRCreator::~IRCreator()
 {
-  verifyModule(M);
 }
 
 void Codegeneration::IRCreator::optimize()
@@ -54,6 +53,7 @@ void Codegeneration::IRCreator::optimize()
 
 void Codegeneration::IRCreator::print(llvm::raw_fd_ostream & out)
 {
+  verifyModule(M);
   M.print(out, nullptr); /* M is a llvm::Module */
 }
 
