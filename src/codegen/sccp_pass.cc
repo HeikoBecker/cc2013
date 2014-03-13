@@ -468,18 +468,13 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
   }
   //if we can make the phi a single value, compute it by iteration
   if(canBeValue){
-    int res = values[0];
-    bool allSame = true;
-    for(int val : values){
-      if(val == res)
-        continue;
-      else{
-        allSame = false;
-        break;
-      }
-    }
-      //if not all values are the same, we need to create a top value
-   if(allSame){
+    auto res = values[0];
+    auto allSame =  std::all_of(
+        values.begin(),
+        values.end(),
+        [&](decltype(values[0]) const value) {return value == res;});
+    //if not all values are the same, we need to create a top value
+    if(allSame){
      newInfo.state = LatticeState::value;
      newInfo.value = res;
      if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){
