@@ -443,7 +443,7 @@ TRANSITION(visitTruncInst, llvm::TruncInst & trunc){
     if (bitwidth == asInt->getInt8Ty(asInt->getContext())->getBitWidth()) {
       info.value = static_cast<unsigned char>(info.value);
     } else if (bitwidth == asInt->getInt1Ty(asInt->getContext())->getBitWidth()) {
-      info.value =  static_cast<bool>(info.value);
+      info.value =  (info.value != 0);
     }
   }
   if (old_info.state != info.state) {
