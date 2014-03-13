@@ -571,6 +571,10 @@ void Transition::tearDownInsts(){
           val->use_begin(),
           val->use_end(),
           [&](llvm::Value* use){
+            if (constantTable[use].state == top) {
+              // already modified while iterating over another DU chain
+              return;
+            }
             duReverted.insert(duReverted.begin(), use);
             // prevent double deletion without invalidating the iterator
             this->constantTable[use].state = top;
