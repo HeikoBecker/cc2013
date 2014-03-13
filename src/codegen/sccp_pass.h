@@ -68,6 +68,7 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   void visitCallInst(llvm::CallInst& call);
   void visitCastInst(llvm::CastInst& cast);
   void visitGetElementPtrInst(llvm::GetElementPtrInst& gep);
+  void visitZExtInst(llvm::ZExtInst& zext);
   void visitICmpInst(llvm::ICmpInst& icmp);
   void visitLoadInst(llvm::LoadInst& load);
   void visitStoreInst(llvm::StoreInst& store);

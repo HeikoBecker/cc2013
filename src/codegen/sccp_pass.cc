@@ -407,6 +407,18 @@ TRANSITION(visitICmpInst, llvm::ICmpInst &cmp){
 
 }
 
+
+TRANSITION(visitZExtInst, llvm::ZExtInst& zext){
+  auto operand = zext.getOperand(0);
+  auto operandInfo = this->getConstantLatticeElem(operand);
+  auto old_info = this->getConstantLatticeElem(&zext);
+  auto info = ConstantLattice {operandInfo.value, operandInfo.state};
+  if (old_info.state != info.state) {
+    constantTable.checkedInsert(std::make_pair(&zext, info));
+    this->enqueueCFGSuccessors(zext);
+  }
+}
+
 /*
  * Same as visitGetElementPtrInst
  */
