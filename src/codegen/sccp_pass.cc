@@ -100,7 +100,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
  
   //Initialize the Transition object
   {
-    Transition transMngr = Transition(F, BlockMapping);
+    Transition transMngr = Transition(F, BlockMapping, globals);
 
     llvm::BasicBlock* curr;
 
@@ -112,13 +112,13 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
           transMngr.visit(basic_block_inst);
           });
     }
-    
-    #ifdef DEBUG
-    F.print(llvm::outs());
-    #endif
 
     transMngr.tearDownInsts();
     transMngr.deleteDeadBlocks();
+
+    #ifdef DEBUG
+    F.print(llvm::outs());
+    #endif
   }
  
   return true; // we modified the module
@@ -127,12 +127,20 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
 char SCCP_Pass::ID = 0;
 static RegisterPass<SCCP_Pass> X("sccp", "SCCP Pass", false, false);
 
+bool SCCP_Pass::doInitialization(llvm::Module& M){
+  for (auto it =  M.global_begin(); it !=  M.global_end(); ++it){
+    this->globals.push_back(it);
+    }
+  return false;
+}
+
 //##############################################################################
 //##                              Transition Class                            ##
 //##############################################################################
 
 Transition::Transition( llvm::Function& F,
-                        BlockTable& blockTable):
+                        BlockTable& blockTable,
+                        std::vector<llvm::Value*> globals):
                         blockTable(blockTable) {
   //Put all BasicBlocks of the function into our working queue
  std::for_each(
@@ -152,6 +160,14 @@ Transition::Transition( llvm::Function& F,
      info.value = 0;
      this->constantTable.checkedInsert(VALPAIR(param, info));
    });
+
+   //Initialize globals to top too. We don't know anything about them
+   for (auto it =globals.begin(); it != globals.end(); ++it){
+   ConstantLattice info;
+   info.state = LatticeState::top;
+   info.value = 0;
+   this->constantTable.checkedInsert(VALPAIR(*it,info));
+   }
 }
 
 /*

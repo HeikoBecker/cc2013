@@ -43,9 +43,12 @@ class BlockTable : public std::map<llvm::BasicBlock*, Reachability>
 
 struct SCCP_Pass : public llvm::FunctionPass {
   static char ID;
+  std::vector<llvm::Value*>globals;
+
   SCCP_Pass();
 
   bool runOnFunction(llvm::Function &F) override;
+  bool doInitialization(llvm::Module& M) override;
 };
 
 struct Transition: public llvm::InstVisitor<Transition, void> {
@@ -54,7 +57,8 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   BlockTable blockTable;
 
   Transition(llvm::Function& F,
-  BlockTable& blockTable);
+  BlockTable& blockTable,
+  std::vector<llvm::Value*> globals);
 
   llvm::BasicBlock* getNextBlock();
   
