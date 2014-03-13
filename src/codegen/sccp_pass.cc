@@ -481,6 +481,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
        this->constantTable.checkedInsert(VALPAIR(&phi,newInfo));
        this->enqueueCFGSuccessors(phi);
      }
+     return;
     }
   }
   //create the top value and add it if the value would change
