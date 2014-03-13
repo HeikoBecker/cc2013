@@ -685,6 +685,11 @@ void Transition::deleteDeadBlocks(){
         llvm::DeleteDeadBlock(*it);
         it = deadBlockSet.erase(it);
         dirty = true;
+      } else if (*it == (*it)->getUniquePredecessor()) {
+        // kill self loops
+        llvm::DeleteDeadBlock(*it);
+        it = deadBlockSet.erase(it);
+        dirty = true;
       } else {
         ++it;
       }
