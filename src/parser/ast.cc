@@ -585,22 +585,15 @@ FunctionCall::FunctionCall(SubExpression funcName,
       // check if argument types match
       // if not, try to convert to desired type
       for (unsigned long i = 0; i < arguments.size(); ++i) {
-        if (!Semantic::compareTypes(expected_parameter.at(i), arguments.at(i)->getType())) {
-          // TODO: conversion is not correct atm
-          auto promoted_expected = promoteType(expected_parameter.at(i));
-          auto promoted_actually = promoteType(arguments.at(i)->getType());
-          if (promoted_actually->type() == Semantic::Type::FUNCTION) {
-            promoted_actually = std::make_shared<PointerDeclaration>(0, promoted_actually);
-          }
-          if (Semantic::compareTypes(promoted_actually, promoted_expected)) {
-            continue;
-          }
+        if (validAssignment(expected_parameter.at(i), arguments.at(i))) {
+          continue;
+        } else {
           std::ostringstream errmsg;
           errmsg << "Expected argument of type "
-                  << expected_parameter.at(i)->toString()
-                  << " but got "
-                  << (arguments.at(i)->getType() ? arguments.at(i)->getType()->toString()
-                                                 : "INITIALIZE ME!");
+            << expected_parameter.at(i)->toString()
+            << " but got "
+            << (arguments.at(i)->getType() ? arguments.at(i)->getType()->toString()
+                : "INITIALIZE ME!");
           throw ParsingException(errmsg.str(), arguments.at(i)->pos());
         }
       }
