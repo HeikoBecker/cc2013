@@ -330,7 +330,7 @@ EMIT_CONDITION(Parsing::BinaryExpression)
   switch (op) {
     case PunctuatorType::LAND: 
       {
-      auto shortCircuitingBB = creator->getControlFlowBlock();
+      llvm::BasicBlock* shortCircuitingBB = creator->getControlFlowBlock();
       lhs->emit_condition(creator, shortCircuitingBB, falseSuccessor);
       creator->setCurrentBasicBlock(shortCircuitingBB);
       rhs->emit_condition(creator, trueSuccessor, falseSuccessor);
@@ -359,6 +359,16 @@ EMIT_CONDITION(Parsing::UnaryExpression)
   }
 }
 
+EMIT_CONDITION(Parsing::TernaryExpression)
+{
+        llvm::BasicBlock* trueBlock = creator->getControlFlowBlock();
+        llvm::BasicBlock* falseBlock = creator->getControlFlowBlock();
+        this->condition->emit_condition(creator, trueBlock, falseBlock);
+        creator->setCurrentBasicBlock(trueBlock);
+        this->lhs->emit_condition(creator, trueSuccessor, falseSuccessor);
+        creator->setCurrentBasicBlock(falseBlock);
+        this->rhs->emit_condition(creator, trueSuccessor, falseSuccessor);
+}
 
 /*
  * An expression can be part of a statement with e; where e is a statement.
