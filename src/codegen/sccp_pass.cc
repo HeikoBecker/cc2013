@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <vector>
 #include <iterator>
+#include <iostream>
 
 #define TRANSITION(X, Y) void Transition::X(Y)
 #define BINOP llvm::Instruction::BinaryOps
@@ -40,6 +41,19 @@ void ConstantTable::checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair)
       assert_that(pair.second.value == it->second.value, "Value changed?");
     }
     this->operator[](pair.first) = pair.second;
+    #ifdef DEBUG
+    llvm::outs() <<"Mapped instruction:";
+    pair.first->print(llvm::outs());
+    llvm::outs() << "to:";
+    if(pair.second.state == LatticeState::top)
+            llvm::outs() << "top\n";
+    else if (pair.second.state == LatticeState::bottom)
+            llvm::outs() << "bottom\n";
+    else
+            llvm::outs() << pair.second.value << "\n";
+    #endif
+
+
   }
 }
 
@@ -60,7 +74,7 @@ SCCP_Pass::SCCP_Pass() : FunctionPass(ID) {}
 
 bool SCCP_Pass::runOnFunction(llvm::Function &F) {
   #ifdef DEBUG
-  F.dump();
+  F.print(llvm::outs());
   #endif
   // maps BasicBlocks to either reachable or unreachable
   BlockTable BlockMapping;
@@ -89,7 +103,7 @@ bool SCCP_Pass::runOnFunction(llvm::Function &F) {
     }
     
     #ifdef DEBUG
-    F.dump();
+    F.print(llvm::outs());
     #endif
 
     transMngr.tearDownInsts();
@@ -638,7 +652,9 @@ void Transition::deleteDeadBlocks(){
   while (dirty) {
     dirty = false;
     for (auto it = deadBlockSet.begin(); it != deadBlockSet.end();) {
-      (*it)->dump();
+      #ifdef DEBUG
+      (*it)->print(llvm::outs());
+      #endif
       if (llvm::MergeBlockIntoPredecessor(*it)) {
         it = deadBlockSet.erase(it);
         dirty = true;
