@@ -675,6 +675,7 @@ void Transition::deleteDeadBlocks(){
     dirty = false;
     for (auto it = deadBlockSet.begin(); it != deadBlockSet.end();) {
       #ifdef DEBUG
+       llvm::outs() << "DEAD: ";
       (*it)->print(llvm::outs());
       #endif
       if (llvm::MergeBlockIntoPredecessor(*it)) {
