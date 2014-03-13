@@ -415,7 +415,7 @@ TRANSITION(visitStoreInst, llvm::StoreInst& store){
      auto asInt = llvm::cast<llvm::ConstantInt>(val);
      newInfo.state = LatticeState::value;
      newInfo.value = asInt->getLimitedValue();
-     this->constantTable.checkedInsert(VALPAIR(&store, info));
+     this->constantTable.checkedInsert(VALPAIR(&store, newInfo));
      if(newInfo.value != info.value || newInfo.state != info.state)
        this->enqueueCFGSuccessors(store);
    }else{
