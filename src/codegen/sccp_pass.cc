@@ -66,6 +66,15 @@ void BlockTable::checkedInsert(std::pair<llvm::BasicBlock*, Reachability> pair)
   } else {
     assert_that(it->second.state <= pair.second.state, "Error: Descended in lattice");
     this->operator[](pair.first) = pair.second;
+    #ifdef DEBUG
+    llvm::outs() <<"Mapped block:";
+    pair.first->print(llvm::outs());
+    llvm::outs() << "to: ";
+    if(pair.second.state == LatticeState::top)
+            llvm::outs() << "top\n";
+    else
+            llvm::outs() << "bottom\n";
+    #endif
   }
 }
 
@@ -124,12 +133,12 @@ Transition::Transition( llvm::Function& F,
                         BlockTable& blockTable):
                         blockTable(blockTable) {
   //Put all BasicBlocks of the function into our working queue
- std::for_each(
-    F.begin(),
-    F.end(),
-    [&](llvm::Function::iterator function_basic_block) {
-      workQueue.push_back(function_basic_block);
-  });
+// std::for_each(
+//    F.begin(),
+ //   F.end(),
+  //  [&](llvm::Function::iterator function_basic_block) {
+//      workQueue.push_back(function_basic_block);
+//  });
 
  //Initialize function parameters to top, as we can never know anything about them
  std::for_each(
@@ -422,7 +431,20 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
   int numOfIncomingVals = phi.getNumIncomingValues();
   std::vector<ConstantLattice> incomingValues;
   for(int i = 0; i < numOfIncomingVals; ++i){
-    incomingValues.push_back(this->getConstantLatticeElem(phi.getIncomingValue(i)));
+    auto incoming = phi.getIncomingValue(i);
+    //check if the incoming value is a Instruction
+    if(llvm::isa<llvm::Instruction>(incoming)){ 
+      auto incomingAsInst = llvm::cast<llvm::Instruction>(incoming);
+      auto reachability = this->getReachabilityElem(incomingAsInst->getParent());
+      //we have a instruction-_> check if its block is reachable!
+      if(reachability.state == LatticeState::top)
+        incomingValues.push_back(this->getConstantLatticeElem(incoming));
+      else
+        continue;
+    }else{ //only  a value(constant) --> always reachable
+    incomingValues.push_back(this->getConstantLatticeElem(incoming));
+    llvm::outs()<< i << " is reachable";
+    }
   }
 
   //check if we can simplify to a single value
@@ -447,15 +469,15 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
         allSame = false;
         break;
       }
+    }
       //if not all values are the same, we need to create a top value
-      if(allSame){
-        newInfo.state = LatticeState::value;
-        newInfo.value = res;
-        if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){
-        this->constantTable.checkedInsert(VALPAIR(&phi,newInfo));
-        this->enqueueCFGSuccessors(phi);
-        }
-      }
+   if(allSame){
+     newInfo.state = LatticeState::value;
+     newInfo.value = res;
+     if(newInfo.state != oldInfo.state || newInfo.value != oldInfo.value){
+       this->constantTable.checkedInsert(VALPAIR(&phi,newInfo));
+       this->enqueueCFGSuccessors(phi);
+     }
     }
   }
   //create the top value and add it if the value would change
