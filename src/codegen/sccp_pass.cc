@@ -133,12 +133,12 @@ Transition::Transition( llvm::Function& F,
                         BlockTable& blockTable):
                         blockTable(blockTable) {
   //Put all BasicBlocks of the function into our working queue
-// std::for_each(
-//    F.begin(),
- //   F.end(),
-  //  [&](llvm::Function::iterator function_basic_block) {
-//      workQueue.push_back(function_basic_block);
-//  });
+ std::for_each(
+    F.begin(),
+    F.end(),
+    [&](llvm::Function::iterator function_basic_block) {
+      workQueue.push_back(function_basic_block);
+  });
 
  //Initialize function parameters to top, as we can never know anything about them
  std::for_each(
@@ -158,12 +158,20 @@ Transition::Transition( llvm::Function& F,
  * is removed.
  */
 llvm::BasicBlock* Transition::getNextBlock() {
-  if (workQueue.empty()) {
+   //save the first block to return it
+  auto notFound = false;
+  llvm::BasicBlock* currBlock; 
+  do {
+if (workQueue.empty()) {
     return nullptr;
   }
-  //save the first block to return it
-  llvm::BasicBlock* currBlock = std::move(workQueue.front());
+
+  currBlock = std::move(workQueue.front());
   workQueue.pop_front(); //remove it from the queue
+   auto reachability = this->getReachabilityElem(currBlock);
+   if(reachability.state == LatticeState::bottom)
+      notFound = true;
+  }while(notFound);
   return currBlock;
 }
 
