@@ -591,6 +591,11 @@ ConstantLattice Transition::getConstantLatticeElem(llvm::Value* val){
     info.value = value;
 //    this->constantTable.checkedInsert(VALPAIR(val,info)); TODO: Needed or not?
     return info;
+  }else if(! llvm::isa<Instruction>(val)){
+    ConstantLattice constant;
+    constant.value = 0;
+    constant.state = LatticeState::top;
+    return constant;
   }else{     // it is no constant--> real op --> try to get it from the table
     auto it = this->constantTable.find(val);
     if(it != this->constantTable.end()) // we already computed the value
