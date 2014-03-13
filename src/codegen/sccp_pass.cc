@@ -674,6 +674,7 @@ void Transition::tearDownInsts(){
           });
           //finally remove the instruction itself
           asInst->removeFromParent();
+          return;
         }
         if(llvm::isa<llvm::BranchInst>(val)){
           auto asBranch = llvm::cast<llvm::BranchInst>(val);
