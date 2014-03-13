@@ -243,6 +243,7 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
          (rhsInfo.state != LatticeState::top && rhsInfo.value != 0)){
         newInfo.state = LatticeState::value;
         newInfo.value = 1;
+      }
     }else if(binOp.getOpcode() == BINOP::And) {
       //check if one value is 0 
       //the case that both are != 0 can't occur here as we know that 
@@ -263,7 +264,6 @@ TRANSITION(visitBinaryOperator, llvm::BinaryOperator& binOp) {
                                          //update them
     }
       return;
-    }
   } 
   //none of our operands is a top element --> we know that both have a fixed 
   //value or one of them is bottom.
