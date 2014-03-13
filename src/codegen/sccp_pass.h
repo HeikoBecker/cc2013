@@ -56,8 +56,6 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   Transition(llvm::Function& F,
   BlockTable& blockTable);
 
-  ~Transition();
-
   llvm::BasicBlock* getNextBlock();
   
   //override each instruction here

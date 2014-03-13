@@ -116,11 +116,17 @@ Transition::Transition( llvm::Function& F,
     [&](llvm::Function::iterator function_basic_block) {
       workQueue.push_back(function_basic_block);
   });
-}
 
-Transition::~Transition(){
- // this->tearDownInsts(); 
-//  this->deleteDeadBlocks();
+ //Initialize function parameters to top, as we can never know anything about them
+ std::for_each(
+   F.arg_begin(),
+   F.arg_end(),
+   [&](llvm::Function::arg_iterator param){
+     ConstantLattice info;
+     info.state = LatticeState::top;
+     info.value = 0;
+     this->constantTable.checkedInsert(VALPAIR(param, info));
+   });
 }
 
 /*
