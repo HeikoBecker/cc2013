@@ -506,6 +506,7 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
     if(info.state != reachable.state)
             return;
     this->blockTable.checkedInsert(BLOCKPAIR(succ, reachable));
+    this->enqueueCFGSuccessors(branch);
     
   }else{ //conditional branch -->get value and decide based on it
     auto trueSucc = branch.getSuccessor(0);
