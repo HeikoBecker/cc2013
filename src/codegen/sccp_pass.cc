@@ -191,6 +191,7 @@ if (workQueue.empty()) {
    if(reachability.state == LatticeState::bottom)
       notFound = true;
   }while(notFound);
+  this->currentBlock = currBlock;
   return currBlock;
 }
 
@@ -631,8 +632,10 @@ void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
     if(llvm::isa<llvm::Instruction>(useObj)){
     llvm::Instruction* use = llvm::cast<Instruction>(useObj);
     auto block = use->getParent();
+    if (block == currentBlock) //do not reenqueue yourself
+      continue;
     Reachability reach = this->getReachabilityElem(block);
-    if(reach.state == LatticeState::top) //Top means Reachable
+    if(reach.state == LatticeState::top ) //Top means Reachable
      {
      #ifdef DEBUG
        llvm::outs() << "Enqueued ";

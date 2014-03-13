@@ -59,6 +59,7 @@ struct Transition: public llvm::InstVisitor<Transition, void> {
   Transition(llvm::Function& F,
   BlockTable& blockTable,
   std::vector<llvm::Value*> globals);
+  llvm::BasicBlock* currentBlock;
 
   llvm::BasicBlock* getNextBlock();
   
