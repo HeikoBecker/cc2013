@@ -36,15 +36,16 @@ void ConstantTable::checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair)
     return;
   } else {
     assert_that(it->second.state <= pair.second.state, "Error: Descended in lattice");
-    if (   it->second.state == pair.second.state
-        && pair.second.state == value) {
-      assert_that(pair.second.value == it->second.value, "Value changed?");
-    }
+//    if (   it->second.state == pair.second.state
+ //       && pair.second.state == value) {
+ //     assert_that(pair.second.value == it->second.value, "Value changed?");
+  //  }
     this->operator[](pair.first) = pair.second;
-    #ifdef DEBUG
+  }
+ #ifdef DEBUG
     llvm::outs() <<"Mapped instruction:";
     pair.first->print(llvm::outs());
-    llvm::outs() << "to:";
+    llvm::outs() << " to: ";
     if(pair.second.state == LatticeState::top)
             llvm::outs() << "top\n";
     else if (pair.second.state == LatticeState::bottom)
@@ -54,7 +55,6 @@ void ConstantTable::checkedInsert(std::pair<llvm::Value*, ConstantLattice> pair)
     #endif
 
 
-  }
 }
 
 void BlockTable::checkedInsert(std::pair<llvm::BasicBlock*, Reachability> pair)
@@ -66,16 +66,17 @@ void BlockTable::checkedInsert(std::pair<llvm::BasicBlock*, Reachability> pair)
   } else {
     assert_that(it->second.state <= pair.second.state, "Error: Descended in lattice");
     this->operator[](pair.first) = pair.second;
-    #ifdef DEBUG
+   }
+ #ifdef DEBUG
     llvm::outs() <<"Mapped block:";
     pair.first->print(llvm::outs());
-    llvm::outs() << "to: ";
+    llvm::outs() << " to: ";
     if(pair.second.state == LatticeState::top)
             llvm::outs() << "top\n";
     else
             llvm::outs() << "bottom\n";
     #endif
-  }
+
 }
 
 
@@ -167,6 +168,7 @@ if (workQueue.empty()) {
   }
 
   currBlock = std::move(workQueue.front());
+  notFound = false;
   workQueue.pop_front(); //remove it from the queue
    auto reachability = this->getReachabilityElem(currBlock);
    if(reachability.state == LatticeState::bottom)
@@ -568,7 +570,13 @@ void Transition::enqueueCFGSuccessors(llvm::Instruction &inst){
     auto block = use->getParent();
     Reachability reach = this->getReachabilityElem(block);
     if(reach.state == LatticeState::top) //Top means Reachable
+     {
+     #ifdef DEBUG
+       llvm::outs() << "Enqueued ";
+       block->dump();
+      #endif
       workQueue.push_back(block);
+    }
     }
   }
 }
