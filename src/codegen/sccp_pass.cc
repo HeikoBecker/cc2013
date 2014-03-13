@@ -499,10 +499,11 @@ TRANSITION(visitBranchInst, llvm::BranchInst &branch){
   if(branch.isUnconditional()){ //unconditional branch --> successor reachable
     auto succ = branch.getSuccessor(0);
     auto info = this->getReachabilityElem(succ);
-    if(info.state != reachable.state)
-            return;
-    this->blockTable.checkedInsert(BLOCKPAIR(succ, reachable));
-    this->enqueueCFGSuccessors(branch);
+    if(info.state != reachable.state){
+      this->blockTable.checkedInsert(BLOCKPAIR(succ, reachable));
+      this->enqueueCFGSuccessors(branch);
+    }
+    return;
     
   }else{ //conditional branch -->get value and decide based on it
     auto trueSucc = branch.getSuccessor(0);
