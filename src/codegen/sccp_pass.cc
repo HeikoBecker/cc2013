@@ -516,7 +516,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
       return;
     } else { //only  a value(constant) --> always reachable
       ASSERT_THAT(isa<Constant>(incoming));
-      auto elem = ConstantLattice {};
+      ConstantLattice elem;
       elem.state = value;
       if (ConstantInt* CI = dyn_cast<ConstantInt>(incoming)) {
         if (CI->getBitWidth() <= 32) {
@@ -547,7 +547,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
     auto allSame =  std::all_of(
         values.begin(),
         values.end(),
-        [&](decltype(values[0]) const value) {return value == res;});
+        [&](decltype(values[0]) value) {return value == res;});
     //if not all values are the same, we need to create a top value
     if(allSame){
      newInfo.state = LatticeState::value;
