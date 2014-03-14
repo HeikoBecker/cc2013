@@ -518,6 +518,7 @@ TRANSITION(visitPHINode, llvm::PHINode &phi){
       ASSERT_THAT(isa<Constant>(incoming));
       ConstantLattice elem;
       elem.state = value;
+      elem.value = 1337;
       if (ConstantInt* CI = dyn_cast<ConstantInt>(incoming)) {
         if (CI->getBitWidth() <= 32) {
           elem.value = CI->getSExtValue();
