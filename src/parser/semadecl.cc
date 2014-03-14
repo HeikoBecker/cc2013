@@ -233,6 +233,9 @@ bool Semantic::compareTypes(SemanticDeclarationNode s1, SemanticDeclarationNode 
     case Type::STRUCT: {
       auto struct1 = std::static_pointer_cast<StructDeclaration>(s1);
       auto struct2 = std::static_pointer_cast<StructDeclaration>(s2);
+      if (struct1->uid != struct2->uid) {
+        return false;
+      }
       if (struct1->toString() != struct2->toString()) {
         return false;
       }

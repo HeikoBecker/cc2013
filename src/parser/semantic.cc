@@ -295,18 +295,20 @@ SemanticDeclarationNode SemanticTree::createType(TypeNode typeNode, Pos pos) {
 
        if (helpNode) {
          auto ptr = (size_t) helpNode.operator->(); // TODO FIXME WARNING HACK !!!!!
-         auto name = "@" + type + std::to_string(ptr);
+         auto name = "@" + type;
          if (structname2structtype.find(name) == structname2structtype.end()) {
            debug(SEMANTIC) << "New";
            auto as_struct = make_shared<StructDeclaration>(name, helpNode, nodes[id]->isActive());
            structname2structtype[name] = std::make_shared<llvm::Type*>(nullptr);
            as_struct->llvm_type = structname2structtype[name];
+           as_struct->uid = ptr;
            myDeclaration = as_struct;
          } else {
            debug(SEMANTIC) << "Old";
            auto as_struct = make_shared<StructDeclaration>(name, helpNode, nodes[id]->isActive());
            as_struct->llvm_type = structname2structtype[name];
            as_struct->selfReferencing =  nodes[id]->isActive();
+           as_struct->uid = ptr;
            myDeclaration = as_struct;
          }
        } else {
